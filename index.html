@@ -2183,6 +2183,16 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
+    const VALID_PAGES = ['home','shop','product','certs','about','contact','quiz','cart','checkout'];
+    const pathPage = window.location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
+    if (VALID_PAGES.includes(pathPage) && pathPage !== (this.state.page || 'home')) {
+      this.setState({ page: pathPage });
+    }
+    this.onPopState = () => {
+      const p = window.location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
+      if (VALID_PAGES.includes(p)) this.setState({ page: p, menuOpen: false });
+    };
+    window.addEventListener('popstate', this.onPopState);
     this.rvNodes = [];
     this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.onScroll = () => {
@@ -2262,12 +2272,17 @@ class Component extends DCLogic {
     window.removeEventListener('scroll', this.onScroll);
     clearTimeout(this.rvFallback);
     if (this.io) this.io.disconnect();
+    window.removeEventListener('popstate', this.onPopState);
   }
 
   nav(page) {
     return () => {
       this.setState({ page, menuOpen: false, added: false });
-      if (typeof window !== 'undefined') window.scrollTo({ top: 0 });
+      if (typeof window !== 'undefined') {
+        const path = page === 'home' ? '/' : '/' + page;
+        if (window.location.pathname !== path) window.history.pushState({ page }, '', path);
+        window.scrollTo({ top: 0 });
+      }
     };
   }
 
