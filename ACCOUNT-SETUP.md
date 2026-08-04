@@ -37,8 +37,8 @@ In Vercel → project **happy-beanie** → **Settings → Environment Variables*
 
 | Name | Value |
 |---|---|
-| `SHOPIFY_CUSTOMER_CLIENT_ID` | Client ID from Step 1 |
 | `COOKIE_SECRET` | Any long random string (32+ characters — a password generator is fine) |
+| `SHOPIFY_CUSTOMER_CLIENT_ID` | Optional — the public client ID is baked into the code; set this only to override it |
 | `SHOPIFY_CUSTOMER_CLIENT_SECRET` | Only if using a Confidential client — omit for Public |
 
 Optional overrides (defaults already correct): `SHOPIFY_STORE_DOMAIN`

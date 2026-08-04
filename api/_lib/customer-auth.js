@@ -21,9 +21,13 @@ const REDIRECT_URI = process.env.SHOPIFY_CUSTOMER_REDIRECT_URI || 'https://happy
 const SESSION_COOKIE = 'hb_session';
 const OAUTH_COOKIE = 'hb_oauth';
 
+// Public-client ID for the Headless channel's Customer Account API. Public
+// client IDs are not secrets — they appear in the sign-in URL by design.
+const DEFAULT_CLIENT_ID = 'e44d32e6-bd9e-4bb5-9f84-22cbaaaa6c6d';
+
 function config() {
   return {
-    clientId: process.env.SHOPIFY_CUSTOMER_CLIENT_ID || '',
+    clientId: process.env.SHOPIFY_CUSTOMER_CLIENT_ID || DEFAULT_CLIENT_ID,
     clientSecret: process.env.SHOPIFY_CUSTOMER_CLIENT_SECRET || '',
     cookieSecret: process.env.COOKIE_SECRET || '',
     redirectUri: REDIRECT_URI
