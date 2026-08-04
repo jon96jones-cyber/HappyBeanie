@@ -23,8 +23,9 @@ The portal needs a one-time credential setup (~5 minutes) that only you can do.
 1. In Shopify admin, go to **Sales channels → Headless** and open your storefront.
    (You already have this channel — it powers the site's checkout.)
 2. Open **Customer Account API settings**.
-3. Set the client type to **Confidential**.
-4. From **Credentials**, copy the **Client ID** and **Client secret**.
+3. From **Credentials**, copy the **Client ID**.
+   (A **Public** client — the default — has no client secret; that's expected and fully
+   supported. If you switch the client type to **Confidential**, also copy the secret.)
 5. Under **Application setup**, add:
    - **Callback URI:** `https://www.happybeanie.com/api/auth/callback`
    - **JavaScript origin:** `https://www.happybeanie.com`
@@ -37,8 +38,8 @@ In Vercel → project **happy-beanie** → **Settings → Environment Variables*
 | Name | Value |
 |---|---|
 | `SHOPIFY_CUSTOMER_CLIENT_ID` | Client ID from Step 1 |
-| `SHOPIFY_CUSTOMER_CLIENT_SECRET` | Client secret from Step 1 |
 | `COOKIE_SECRET` | Any long random string (32+ characters — a password generator is fine) |
+| `SHOPIFY_CUSTOMER_CLIENT_SECRET` | Only if using a Confidential client — omit for Public |
 
 Optional overrides (defaults already correct): `SHOPIFY_STORE_DOMAIN`
 (`pxv2u2-kc.myshopify.com`), `SHOPIFY_SHOP_ID` (`61033185344`),

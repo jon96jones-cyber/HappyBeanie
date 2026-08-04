@@ -30,9 +30,12 @@ function config() {
   };
 }
 
+// Client secret is optional: Shopify Headless channels default to a Public
+// client (no secret), where PKCE alone secures the exchange. When a secret is
+// present (Confidential client), it's included in token requests.
 function isConfigured() {
   const c = config();
-  return Boolean(c.clientId && c.clientSecret && c.cookieSecret);
+  return Boolean(c.clientId && c.cookieSecret);
 }
 
 // ---- endpoint discovery (cached per lambda instance) ----
@@ -173,11 +176,11 @@ async function exchangeCode(code, verifier, redirectUri) {
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
     client_id: c.clientId,
-    client_secret: c.clientSecret,
     redirect_uri: redirectUri || c.redirectUri,
     code: code,
     code_verifier: verifier
   });
+  if (c.clientSecret) body.set('client_secret', c.clientSecret);
   const res = await fetch(d.token_endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -196,9 +199,9 @@ async function refreshTokens(refreshToken) {
   const body = new URLSearchParams({
     grant_type: 'refresh_token',
     client_id: c.clientId,
-    client_secret: c.clientSecret,
     refresh_token: refreshToken
   });
+  if (c.clientSecret) body.set('client_secret', c.clientSecret);
   const res = await fetch(d.token_endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
