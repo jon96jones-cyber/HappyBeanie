@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wholesale &amp; Trade Accounts — Happy Beanie</title>
+<meta name="description" content="Apply for a Happy Beanie wholesale account. For veterinary clinics, pet retailers, groomers and distributors — trade pricing on peptide-infused daily care for dogs and cats.">
+<meta name="robots" content="index, follow">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<style>
+@font-face { font-family:'DM Mono'; font-weight:400; src:url('/assets/fonts/23b5af97.woff2') format('woff2'); }
+@font-face { font-family:'DM Mono'; font-weight:500; src:url('/assets/fonts/b847e313.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:400; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:500; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:700; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:#17140F; color:#F5F0E6; font-family:'DM Sans',-apple-system,sans-serif; font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+a { color:#F0C64B; text-decoration:none; }
+a:hover { border-bottom:1px solid #F0C64B; }
+.mono { font-family:'DM Mono',monospace; }
+.shell { max-width:1180px; margin:0 auto; padding:0 24px; }
+
+/* ---------- reveal-on-scroll ---------- */
+.rv { opacity:0; transform:translateY(22px); transition:opacity 0.7s cubic-bezier(0.2,0.7,0.2,1), transform 0.7s cubic-bezier(0.2,0.7,0.2,1); }
+.rv.in { opacity:1; transform:none; }
+.rv.d1 { transition-delay:0.08s; } .rv.d2 { transition-delay:0.16s; } .rv.d3 { transition-delay:0.24s; }
+@media (prefers-reduced-motion: reduce) { .rv { opacity:1; transform:none; transition:none; } }
+
+/* ---------- header ---------- */
+header.site { position:sticky; top:0; z-index:50; background:rgba(23,20,15,0.88); backdrop-filter:blur(10px); border-bottom:1px solid rgba(245,240,230,0.12); }
+header.site .bar { max-width:1180px; margin:0 auto; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.mark { display:flex; align-items:baseline; gap:10px; color:#F5F0E6; }
+.mark:hover { border-bottom:none; }
+.mark b { font-family:'DM Sans',sans-serif; font-weight:700; font-size:23px; letter-spacing:-0.045em; }
+.mark b i { font-style:normal; color:#F0C64B; }
+.mark span { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; }
+.hdr-actions { display:flex; align-items:center; gap:20px; }
+.back { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:#C9BEA8; }
+.hdr-cta { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; padding:11px 18px; border-radius:2px; background:#F0C64B; color:#17140F; transition:background 0.2s ease, transform 0.2s ease; }
+.hdr-cta:hover { background:#f4d268; border-bottom:none; transform:translateY(-1px); }
+@media (max-width:640px){ .hdr-cta { display:none; } }
+
+/* ---------- hero ---------- */
+.hero { position:relative; overflow:hidden; padding:96px 0 0; }
+.hero::before { content:''; position:absolute; inset:0; background:
+  radial-gradient(46% 42% at 78% 18%, rgba(240,198,75,0.13), transparent 70%),
+  radial-gradient(40% 46% at 12% 82%, oklch(0.44 0.07 152 / 0.18), transparent 72%); pointer-events:none; }
+.hero::after { content:''; position:absolute; inset:0; pointer-events:none; opacity:0.5;
+  background-image:radial-gradient(rgba(245,240,230,0.09) 1px, transparent 1px); background-size:26px 26px;
+  -webkit-mask-image:radial-gradient(70% 60% at 50% 30%, #000 0%, transparent 100%); mask-image:radial-gradient(70% 60% at 50% 30%, #000 0%, transparent 100%); }
+.hero .shell { position:relative; z-index:1; }
+.kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:#F0C64B; display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+.kicker::before { content:''; width:30px; height:1px; background:#F0C64B; }
+h1 { font-family:'DM Sans',sans-serif; font-weight:700; font-size:clamp(40px,6.2vw,78px); line-height:1.0; letter-spacing:-0.042em; max-width:13em; }
+h1 em { font-style:normal; color:#F0C64B; }
+.lede { font-size:clamp(16px,1.6vw,19px); color:#DED5C4; max-width:33em; margin:26px 0 38px; }
+.hero-ctas { display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-bottom:74px; }
+.btn-gold { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; padding:17px 32px; border-radius:2px; background:#F0C64B; color:#17140F; transition:background 0.2s ease, transform 0.2s ease; display:inline-block; }
+.btn-gold:hover { background:#f4d268; transform:translateY(-2px); border-bottom:none; }
+.btn-ghost { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; padding:16px 28px; border-radius:2px; border:1px solid rgba(245,240,230,0.3); color:#F5F0E6; transition:border-color 0.2s ease, background 0.2s ease; display:inline-block; }
+.btn-ghost:hover { border-color:#F0C64B; color:#F0C64B; background:rgba(240,198,75,0.06); border-bottom-style:solid; }
+/* stat strip */
+.stats { position:relative; z-index:1; border-top:1px solid rgba(245,240,230,0.14); background:rgba(245,240,230,0.03); }
+.stats .shell { display:grid; grid-template-columns:repeat(4,1fr); }
+.stat { padding:26px 22px 28px; border-left:1px solid rgba(245,240,230,0.12); }
+.stat:first-child { border-left:none; padding-left:0; }
+.stat .n { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(26px,3vw,38px); line-height:1; color:#F5F0E6; margin-bottom:8px; }
+.stat .n i { font-style:normal; color:#F0C64B; }
+.stat .l { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.15em; text-transform:uppercase; color:#8A7F6E; line-height:1.55; }
+@media (max-width:760px){ .stats .shell { grid-template-columns:1fr 1fr; } .stat { padding-left:18px; } .stat:nth-child(odd){ border-left:none; padding-left:0; } .stat:nth-child(n+3){ border-top:1px solid rgba(245,240,230,0.12); } }
+
+/* ---------- cream band: perks ---------- */
+.band { background:#F5F0E6; color:#17140F; padding:92px 0 96px; }
+.band .kicker { color:oklch(0.44 0.07 152); }
+.band .kicker::before { background:oklch(0.44 0.07 152); }
+.band h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(30px,3.9vw,50px); line-height:1.05; max-width:17em; }
+.band h2 em { font-style:normal; color:oklch(0.44 0.07 152); }
+.band .sub { color:#6A6055; font-size:16px; max-width:36em; margin:16px 0 44px; }
+.cards { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+@media (max-width:960px){ .cards { grid-template-columns:1fr 1fr; } }
+@media (max-width:540px){ .cards { grid-template-columns:1fr; } }
+.card { position:relative; background:#FCFAF4; border:1px solid #E4DBC9; border-radius:4px; padding:26px 24px 28px; box-shadow:0 18px 34px -26px rgba(23,20,15,0.35); transition:transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease, border-color 0.3s ease; overflow:hidden; }
+.card:hover { transform:translateY(-5px); box-shadow:0 30px 44px -26px rgba(23,20,15,0.42); border-color:#D8CCB4; }
+.card::after { content:''; position:absolute; left:0; right:0; top:0; height:3px; background:linear-gradient(90deg, #F0C64B, oklch(0.72 0.08 152)); opacity:0; transition:opacity 0.3s ease; }
+.card:hover::after { opacity:1; }
+.card .ic { width:40px; height:40px; border-radius:50%; background:rgba(240,198,75,0.2); display:flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.card .pt { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:oklch(0.44 0.07 152); margin-bottom:9px; }
+.card .pd { font-size:14px; color:#4A4438; line-height:1.6; }
+
+/* ---------- steps ---------- */
+.steps-sec { padding:96px 0 100px; position:relative; overflow:hidden; }
+.steps-sec::before { content:''; position:absolute; inset:0; background:radial-gradient(50% 40% at 90% 100%, oklch(0.44 0.07 152 / 0.12), transparent 70%); pointer-events:none; }
+.steps-sec .shell { position:relative; z-index:1; }
+.steps { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:48px; counter-reset:step; }
+@media (max-width:860px){ .steps { grid-template-columns:1fr; } }
+.step { position:relative; border:1px solid rgba(245,240,230,0.14); border-radius:4px; background:rgba(245,240,230,0.035); padding:30px 26px 32px; overflow:hidden; transition:border-color 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1); }
+.step:hover { border-color:rgba(240,198,75,0.45); background:rgba(245,240,230,0.055); transform:translateY(-4px); }
+.step .ghost { position:absolute; right:14px; top:-24px; font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:130px; line-height:1; color:rgba(245,240,230,0.05); pointer-events:none; }
+.step .tag { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#F0C64B; margin-bottom:14px; }
+.step h3 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:25px; margin-bottom:10px; }
+.step p { font-size:14px; color:#B9AF9C; line-height:1.65; }
+.step p b { color:#DED5C4; font-weight:400; }
+
+/* ---------- apply section ---------- */
+.apply { padding:0 0 110px; }
+.apply-grid { display:grid; grid-template-columns:1.55fr 1fr; gap:22px; align-items:start; }
+@media (max-width:920px){ .apply-grid { grid-template-columns:1fr; } }
+.panel { border:1px solid rgba(245,240,230,0.16); border-radius:6px; background:linear-gradient(180deg, rgba(245,240,230,0.05), rgba(245,240,230,0.02)); box-shadow:0 40px 80px -50px rgba(0,0,0,0.8); overflow:hidden; }
+.panel-head { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px 28px; border-bottom:1px solid rgba(245,240,230,0.12); background:rgba(23,20,15,0.5); }
+.panel-head .ph-t { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; color:#C9BEA8; }
+.panel-head .ph-dot { display:flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:oklch(0.72 0.08 152); }
+.panel-head .ph-dot::before { content:''; width:7px; height:7px; border-radius:50%; background:oklch(0.72 0.08 152); box-shadow:0 0 0 3px oklch(0.72 0.08 152 / 0.2); }
+.panel-body { padding:32px 28px 36px; }
+@media (max-width:540px){ .panel-body { padding:26px 18px 30px; } }
+.panel-body h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:27px; margin-bottom:6px; }
+.panel-body .sub { color:#B9AF9C; font-size:14.5px; margin-bottom:28px; }
+form { display:grid; gap:20px; }
+.row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:560px){ .row { grid-template-columns:1fr; } }
+.field { display:grid; gap:8px; }
+label { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:#C9BEA8; }
+label .req { color:#F0C64B; }
+label .opt { color:#6A6055; }
+input, select, textarea {
+  width:100%; background:rgba(23,20,15,0.55); border:1px solid rgba(245,240,230,0.22); border-radius:3px;
+  padding:13px 15px; color:#F5F0E6; font-family:'DM Sans',sans-serif; font-size:15px; line-height:1.5;
+  transition:border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+textarea { resize:vertical; min-height:96px; }
+select { appearance:none; -webkit-appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%23C9BEA8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 15px center; padding-right:40px; }
+input:focus, select:focus, textarea:focus { outline:none; border-color:#F0C64B; background:rgba(23,20,15,0.75); box-shadow:0 0 0 3px rgba(240,198,75,0.14); }
+input::placeholder, textarea::placeholder { color:#6A6055; }
+.hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+label.consent { display:flex; align-items:flex-start; gap:12px; font-family:'DM Sans',sans-serif; font-size:13px; letter-spacing:0; text-transform:none; color:#B9AF9C; line-height:1.55; }
+.consent input { width:auto; margin-top:3px; flex:0 0 auto; accent-color:#F0C64B; }
+button.submit {
+  font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+  padding:17px 34px; border:none; border-radius:3px; background:#F0C64B; color:#17140F; cursor:pointer;
+  transition:background 0.2s ease, transform 0.2s ease; justify-self:start;
+}
+button.submit:hover { background:#f4d268; transform:translateY(-1px); }
+button.submit:disabled { opacity:0.55; cursor:default; transform:none; }
+.formnote { font-size:12.5px; color:#8A7F6E; line-height:1.6; }
+.msg { border-radius:3px; padding:15px 19px; font-size:14px; line-height:1.6; display:none; margin-bottom:22px; }
+.msg.err { border:1px solid rgba(224,122,95,0.5); background:rgba(224,122,95,0.08); color:#EDBBA9; }
+/* aside */
+.aside { display:grid; gap:16px; position:sticky; top:96px; }
+@media (max-width:920px){ .aside { position:static; } }
+.abox { border:1px solid rgba(245,240,230,0.14); border-radius:6px; background:rgba(245,240,230,0.035); padding:24px 24px 26px; }
+.abox .at { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#F0C64B; margin-bottom:16px; }
+.abox ul { list-style:none; display:grid; gap:12px; }
+.abox li { display:flex; gap:12px; font-size:13.5px; color:#DED5C4; line-height:1.55; }
+.abox li .tick { flex:0 0 auto; width:17px; height:17px; margin-top:2px; border-radius:50%; background:rgba(240,198,75,0.18); display:flex; align-items:center; justify-content:center; }
+.abox.gold { border-color:rgba(240,198,75,0.4); background:rgba(240,198,75,0.06); }
+.abox p { font-size:13.5px; color:#B9AF9C; line-height:1.6; }
+.abox .big { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:21px; color:#F5F0E6; line-height:1.25; margin-bottom:6px; }
+/* success */
+.success { display:none; text-align:center; padding:56px 30px; }
+.success.show { display:block; }
+.success .dot { width:52px; height:52px; border-radius:50%; background:#F0C64B; display:inline-flex; align-items:center; justify-content:center; margin-bottom:22px; animation:pop 0.45s cubic-bezier(0.2,0.7,0.2,1) both; }
+@keyframes pop { from { transform:scale(0.4); opacity:0; } to { transform:scale(1); opacity:1; } }
+.success h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:29px; margin-bottom:12px; }
+.success p { color:#DED5C4; max-width:30em; margin:0 auto 8px; font-size:15px; }
+
+/* ---------- footer ---------- */
+footer.site { border-top:1px solid rgba(245,240,230,0.14); }
+footer.site .shell { padding-top:26px; padding-bottom:26px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:#8A7F6E; }
+footer.site a { color:#8A7F6E; }
+footer.site a:hover { color:#F0C64B; border-bottom:none; }
+</style>
+</head><body>
+
+<header class="site">
+  <div class="bar">
+    <a class="mark" href="/"><b>happy bean<i>ie</i></b><span>Peptide Care</span></a>
+    <div class="hdr-actions">
+      <a class="back" href="/">&larr; Back to site</a>
+      <a class="hdr-cta" href="#apply">Apply now</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="shell">
+    <div class="kicker rv">Wholesale &amp; Trade Program</div>
+    <h1 class="rv d1">Stock the peptide care <em>your clients ask for.</em></h1>
+    <p class="lede rv d2">Trade accounts for veterinary clinics, pet retailers, groomers and distributors. Compounded fresh in Scottsdale, Arizona, third-party assayed, and priced for the businesses pet owners already trust.</p>
+    <div class="hero-ctas rv d3">
+      <a class="btn-gold" href="#apply">Apply for an account</a>
+      <a class="btn-ghost" href="#how">How it works</a>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="shell">
+      <div class="stat rv"><div class="n"><i>30%</i> off</div><div class="l">Trade pricing, applied automatically at checkout</div></div>
+      <div class="stat rv d1"><div class="n">5 <i>box</i> min</div><div class="l">Per wholesale order — below that, retail applies</div></div>
+      <div class="stat rv d2"><div class="n">48 hr</div><div class="l">Compounded &amp; shipped from our cGMP suite</div></div>
+      <div class="stat rv d3"><div class="n">100%</div><div class="l">Of lots third-party assayed, with COAs</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PERKS (cream band) -->
+<section class="band">
+  <div class="shell">
+    <div class="kicker rv">Why carry Happy Beanie</div>
+    <h2 class="rv d1">Built for the counter, <em>not just the cart.</em></h2>
+    <p class="sub rv d2">Everything a trade account gets, beyond the margin.</p>
+    <div class="cards">
+      <div class="card rv">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9.5 7 14.5 16 3.5" stroke="oklch(0.44 0.07 152)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pt">Trade pricing</div>
+        <div class="pd">30% off both dog and cat formulas on orders of 5+ boxes — applied automatically once you're approved. No codes to type.</div>
+      </div>
+      <div class="card rv d1">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="11" rx="1.5" stroke="oklch(0.44 0.07 152)" stroke-width="1.8"/><path d="M2 8h14" stroke="oklch(0.44 0.07 152)" stroke-width="1.8"/></svg></div>
+        <div class="pt">One portal</div>
+        <div class="pd">Reorder, track shipments and manage your account from the same dashboard as every order. Sign in with an emailed code.</div>
+      </div>
+      <div class="card rv d2">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.8 15.5 5v5.2c0 3.4-2.7 5.6-6.5 6.8-3.8-1.2-6.5-3.4-6.5-6.8V5L9 1.8Z" stroke="oklch(0.44 0.07 152)" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <div class="pt">Made to order</div>
+        <div class="pd">Compounded and shipped within 48 hours from our licensed cGMP suite in Scottsdale. Every lot assayed, every COA published.</div>
+      </div>
+      <div class="card rv d3">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3.2" stroke="oklch(0.44 0.07 152)" stroke-width="1.8"/><path d="M2.8 15.5c1.1-2.9 3.4-4.3 6.2-4.3s5.1 1.4 6.2 4.3" stroke="oklch(0.44 0.07 152)" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <div class="pt">Real support</div>
+        <div class="pd">A pharmacist desk and a dedicated trade contact — an actual human who knows your account, not a ticket queue.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="steps-sec" id="how">
+  <div class="shell">
+    <div class="kicker rv">How it works</div>
+    <h2 class="rv d1" style="font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(30px,3.9vw,50px); line-height:1.05;">Three steps to <em style="font-style:normal; color:#F0C64B;">trade pricing.</em></h2>
+    <div class="steps">
+      <div class="step rv">
+        <div class="ghost">01</div>
+        <div class="tag">Step 01 — Today</div>
+        <h3>Apply</h3>
+        <p>Tell us about your business in the form below — takes about <b>two minutes</b>. No documents required up front; a resale or tax ID speeds things along.</p>
+      </div>
+      <div class="step rv d1">
+        <div class="ghost">02</div>
+        <div class="tag">Step 02 — 1&ndash;2 business days</div>
+        <h3>We review</h3>
+        <p>Our trade team looks over every application personally. You'll get an email from a <b>real person</b> with your approval and anything we still need.</p>
+      </div>
+      <div class="step rv d2">
+        <div class="ghost">03</div>
+        <div class="tag">Step 03 — Approved</div>
+        <h3>Order at 30% off</h3>
+        <p>Sign in to your portal and order like any customer — <b>trade pricing applies automatically</b> on orders of 5+ boxes. Reorder in two clicks.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APPLICATION -->
+<section class="apply" id="apply">
+  <div class="shell">
+    <div class="apply-grid">
+      <div class="panel rv">
+        <div class="panel-head">
+          <span class="ph-t">Wholesale application</span>
+          <span class="ph-dot">Accepting accounts</span>
+        </div>
+
+        <div id="successPanel" class="success">
+          <span class="dot"><svg width="22" height="17" viewBox="0 0 20 15" fill="none"><path d="M2 8 7.5 13 18 2" stroke="#17140F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <h2>Application received</h2>
+          <p>Thank you — your wholesale application is in. Our trade team reviews new accounts within 1&ndash;2 business days and will email you with next steps and your pricing.</p>
+          <p style="margin-top:16px;"><a href="/">Return to the site</a></p>
+        </div>
+
+        <div id="formWrap" class="panel-body">
+          <h2>Tell us about your business</h2>
+          <p class="sub">Fields marked <span style="color:#F0C64B;">&lowast;</span> are required. Approved accounts unlock trade pricing on your next order.</p>
+
+          <div id="errBox" class="msg err"></div>
+
+          <form id="wholesaleForm" novalidate>
+            <!-- Honeypot: real people never see or fill this -->
+            <div class="hp" aria-hidden="true"><label>Do not fill this in<input type="text" name="company_url" tabindex="-1" autocomplete="off"></label></div>
+
+            <div class="field">
+              <label for="company">Business / company name <span class="req">&lowast;</span></label>
+              <input id="company" name="company" type="text" required autocomplete="organization" placeholder="Scottsdale Animal Hospital">
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="firstName">Contact first name <span class="req">&lowast;</span></label>
+                <input id="firstName" name="firstName" type="text" required autocomplete="given-name" placeholder="Jordan">
+              </div>
+              <div class="field">
+                <label for="lastName">Contact last name <span class="req">&lowast;</span></label>
+                <input id="lastName" name="lastName" type="text" required autocomplete="family-name" placeholder="Rivera">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="email">Work email <span class="req">&lowast;</span></label>
+                <input id="email" name="email" type="email" required autocomplete="email" placeholder="jordan@yourclinic.com">
+              </div>
+              <div class="field">
+                <label for="phone">Phone <span class="req">&lowast;</span></label>
+                <input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="(480) 555-0142">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="businessType">Business type <span class="req">&lowast;</span></label>
+                <select id="businessType" name="businessType" required>
+                  <option value="" disabled selected>Select one&hellip;</option>
+                  <option>Veterinary clinic / hospital</option>
+                  <option>Pet store / retailer</option>
+                  <option>Groomer / boarding / daycare</option>
+                  <option>Distributor / broker</option>
+                  <option>Online reseller</option>
+                  <option>Breeder / kennel</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="volume">Estimated monthly volume <span class="req">&lowast;</span></label>
+                <select id="volume" name="volume" required>
+                  <option value="" disabled selected>Select one&hellip;</option>
+                  <option>5&ndash;10 boxes</option>
+                  <option>11&ndash;25 boxes</option>
+                  <option>26&ndash;50 boxes</option>
+                  <option>51&ndash;100 boxes</option>
+                  <option>100+ boxes</option>
+                  <option>Not sure yet</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="website">Website or social <span class="opt">(optional)</span></label>
+                <input id="website" name="website" type="text" autocomplete="url" placeholder="yourclinic.com">
+              </div>
+              <div class="field">
+                <label for="taxId">Resale / EIN / tax ID <span class="opt">(optional)</span></label>
+                <input id="taxId" name="taxId" type="text" placeholder="For tax-exempt / resale">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="address">Business address <span class="opt">(optional)</span></label>
+              <input id="address" name="address" type="text" autocomplete="street-address" placeholder="Street, city, state, ZIP">
+            </div>
+
+            <div class="field">
+              <label for="message">Anything else we should know? <span class="opt">(optional)</span></label>
+              <textarea id="message" name="message" placeholder="Tell us about your clientele, the species you serve, timelines, or questions for the trade team."></textarea>
+            </div>
+
+            <label class="consent">
+              <input type="checkbox" id="consent" name="consent" required>
+              <span>I confirm I'm applying on behalf of a business and agree to be contacted about this wholesale application. See our <a href="/policies/privacy">Privacy Policy</a>.</span>
+            </label>
+
+            <button type="submit" class="submit" id="submitBtn">Submit application</button>
+            <p class="formnote">Applying does not create a retail order. Already approved? <a href="https://shopify.com/61033185344/account">Sign in to your portal</a>.</p>
+          </form>
+        </div>
+      </div>
+
+      <div class="aside">
+        <div class="abox rv d1">
+          <div class="at">What happens next</div>
+          <ul>
+            <li><span class="tick"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4 3.6 6.4 9 1" stroke="#F0C64B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Your application lands with the trade team immediately.</li>
+            <li><span class="tick"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4 3.6 6.4 9 1" stroke="#F0C64B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>We review within 1&ndash;2 business days — a person, not a bot.</li>
+            <li><span class="tick"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4 3.6 6.4 9 1" stroke="#F0C64B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Approval email includes your pricing and portal sign-in.</li>
+            <li><span class="tick"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4 3.6 6.4 9 1" stroke="#F0C64B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>30% off applies automatically on every 5+ box order.</li>
+          </ul>
+        </div>
+        <div class="abox gold rv d2">
+          <div class="at">Questions first?</div>
+          <div class="big">Talk to the pharmacist desk.</div>
+          <p>Formulation questions, dosing guides for your clients, or COAs for a specific lot — we're happy to walk through it before you apply.</p>
+          <p style="margin-top:12px;"><a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
+        </div>
+        <div class="abox rv d3">
+          <div class="at">The fine print</div>
+          <p>5-box minimum per wholesale order. Pricing applies to one-time trade orders, not retail subscriptions. Accounts reviewed individually; we may ask for a resale certificate for distributor terms.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="shell">
+    <span>&copy; 2026 Happy Beanie Pet Health, LLC</span>
+    <span><a href="/">Home</a> &middot; <a href="/policies/terms">Terms</a> &middot; <a href="/policies/privacy">Privacy</a> &middot; <a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Scroll-reveal
+  var els = document.querySelectorAll('.rv');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  } else {
+    els.forEach(function (el) { el.classList.add('in'); });
+  }
+
+  var form = document.getElementById('wholesaleForm');
+  var btn = document.getElementById('submitBtn');
+  var errBox = document.getElementById('errBox');
+  var formWrap = document.getElementById('formWrap');
+  var successPanel = document.getElementById('successPanel');
+
+  function showError(msg) {
+    errBox.textContent = msg;
+    errBox.style.display = 'block';
+    errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function clearError() { errBox.style.display = 'none'; errBox.textContent = ''; }
+
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    clearError();
+
+    var data = {
+      company: form.company.value.trim(),
+      firstName: form.firstName.value.trim(),
+      lastName: form.lastName.value.trim(),
+      email: form.email.value.trim(),
+      phone: form.phone.value.trim(),
+      businessType: form.businessType.value,
+      volume: form.volume.value,
+      website: form.website.value.trim(),
+      taxId: form.taxId.value.trim(),
+      address: form.address.value.trim(),
+      message: form.message.value.trim(),
+      company_url: form.company_url.value // honeypot
+    };
+
+    if (!data.company || !data.firstName || !data.lastName || !data.email || !data.phone || !data.businessType || !data.volume) {
+      showError('Please fill in all required fields.');
+      return;
+    }
+    if (!EMAIL_RE.test(data.email)) {
+      showError('Please enter a valid work email address.');
+      return;
+    }
+    if (!form.consent.checked) {
+      showError('Please confirm the consent checkbox to continue.');
+      return;
+    }
+
+    btn.disabled = true;
+    var original = btn.textContent;
+    btn.textContent = 'Submitting…';
+
+    fetch('/api/wholesale-apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        return { ok: res.ok, status: res.status, body: body };
+      });
+    }).then(function (r) {
+      if (r.ok && r.body && r.body.ok) {
+        formWrap.style.display = 'none';
+        successPanel.classList.add('show');
+        successPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        var m = (r.body && r.body.error) ? r.body.error
+          : 'Something went wrong submitting your application. Please try again, or email hello@happybeanie.com.';
+        showError(m);
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    }).catch(function () {
+      showError('We couldn’t reach the server. Check your connection and try again, or email hello@happybeanie.com.');
+      btn.disabled = false;
+      btn.textContent = original;
+    });
+  });
+})();
+</script>
+</body></html>
