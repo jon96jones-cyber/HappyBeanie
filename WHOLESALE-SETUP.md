@@ -56,27 +56,26 @@ instead of failing silently.
 
 ---
 
-## Step 3 — Set up wholesale pricing (automatic % off for the wholesale segment)
+## Step 3 — Wholesale pricing ✅ already configured
 
-This is what gives approved wholesalers their discount, with nothing for them to type at checkout.
+This is already set up on the store, so there's nothing to do here — it's documented for reference.
 
-1. **Create a customer segment** — Shopify admin → **Customers → Segments → Create segment**.
-   Name it `Wholesale`, and use this filter:
-   ```
-   customer_tags CONTAINS 'wholesale'
-   ```
-   Save.
-2. **Create the automatic discount** — **Discounts → Create discount → Amount off products**,
-   then set **Discount type = Automatic**.
-   - **Value:** the wholesale rate, e.g. `30%` off.
-   - **Applies to:** all products (or just the Happy Beanie collection).
-   - **Eligibility:** *Specific customer segments* → choose the `Wholesale` segment.
-   - Save.
+- **Customer segment:** `Wholesale accounts` — filter `customer_tags CONTAINS 'wholesale'`.
+- **Automatic discount:** `Wholesale — 30% off (5+ boxes)`
+  - 30% off all products, applied automatically at checkout
+  - Eligibility: the `Wholesale accounts` segment only
+  - Minimum: 5+ items in the cart (below 5, the customer pays retail)
+  - One-time purchases only; does not combine with other product/order discounts
 
-Now anyone tagged `wholesale` sees trade pricing automatically; everyone else pays retail.
+Anyone tagged `wholesale` sees trade pricing automatically once they have 5+ boxes in the cart;
+everyone else pays retail.
 
-> Prefer a shareable code instead of automatic pricing? Create a **code** discount (e.g.
-> `WHOLESALE30`) limited to the `Wholesale` segment and email it to approved accounts.
+**To change the rate or minimum:** Shopify admin → **Discounts** → open
+*Wholesale — 30% off (5+ boxes)* → edit the value or the minimum-quantity requirement.
+
+> A previous `WHOLESALE40` code discount was deactivated so it can't undercut these terms.
+> Prefer a shareable code instead of automatic pricing? Create a **code** discount limited to
+> the `Wholesale accounts` segment and email it to approved accounts.
 
 ---
 
