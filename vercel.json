@@ -1,5 +1,9 @@
 {
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/((?!assets/|favicon).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!assets/|policies|favicon).*)",
+      "destination": "/index.html"
+    }
   ]
 }
