@@ -1555,7 +1555,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
               <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 12px;">{{ pb.tag }}</div>
               <h3 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1.1; margin: 0 0 12px;">{{ pb.title }}</h3>
               <p style="font-size: 14px; line-height: 1.65; color: #554C40; margin: 0 0 20px;">{{ pb.body }}</p>
-              <span style="font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #17140F; border-bottom: 1px solid #17140F; padding-bottom: 3px;">{{ pb.cta }}</span>
+              <a href="{{ pb.href }}" style="font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: #17140F; border-bottom: 1px solid #17140F; padding-bottom: 3px; cursor: pointer; text-decoration: none;" style-hover="color: oklch(0.44 0.07 152); border-color: oklch(0.44 0.07 152);">{{ pb.cta }} &rarr;</a>
             </div>
           </div>
         </sc-for>
@@ -2868,8 +2868,8 @@ class Component extends DCLogic {
         { k: 'Team', v: 'Three pharmacists, one DVM, one QA lead' }
       ],
       partnerBlocks: [
-        { tag: 'For veterinarians', title: 'Clinic pricing and full data', body: 'Formulation sheets, assay history and dose curves by species, plus practice pricing and a direct line to our pharmacist team.', cta: 'Request the vet packet', slot: 'hbv2-contact-vet', ph: 'Veterinarian with dog in clinic', delay: 0 },
-        { tag: 'Retail & wholesale', title: 'Shelf space in your shop', body: 'Small-batch allocation for independent pet retailers and groomers, with training on how to dose customers honestly.', cta: 'Open a wholesale account', slot: 'hbv2-contact-retail', ph: 'Independent pet shop interior', delay: 100 }
+        { tag: 'For veterinarians', title: 'Clinic pricing and full data', body: 'Formulation sheets, assay history and dose curves by species, plus practice pricing and a direct line to our pharmacist team.', cta: 'Request the vet packet', href: 'mailto:vet@happybeanie.com', slot: 'hbv2-contact-vet', ph: 'Veterinarian with dog in clinic', delay: 0 },
+        { tag: 'Retail & wholesale', title: 'Shelf space in your shop', body: 'Small-batch allocation for independent pet retailers and groomers, with training on how to dose customers honestly.', cta: 'Open a wholesale account', href: '/wholesale', slot: 'hbv2-contact-retail', ph: 'Independent pet shop interior', delay: 100 }
       ],
       topics: topicDefs.map((t, i) => ({
         label: t.label,
