@@ -159,14 +159,22 @@ function readOauthCookie(req) {
   return decrypt(cookies[OAUTH_COOKIE]);
 }
 
-async function exchangeCode(code, verifier) {
+// The redirect URI must match the one used in the authorize request exactly, so
+// callers derive it per-request (custom domain vs vercel.app) and pass it through.
+function redirectUriFor(req) {
+  if (process.env.SHOPIFY_CUSTOMER_REDIRECT_URI) return process.env.SHOPIFY_CUSTOMER_REDIRECT_URI;
+  const host = (req.headers && req.headers.host) || 'www.happybeanie.com';
+  return 'https://' + host + '/api/auth/callback';
+}
+
+async function exchangeCode(code, verifier, redirectUri) {
   const c = config();
   const d = await discover();
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
     client_id: c.clientId,
     client_secret: c.clientSecret,
-    redirect_uri: c.redirectUri,
+    redirect_uri: redirectUri || c.redirectUri,
     code: code,
     code_verifier: verifier
   });
@@ -247,6 +255,7 @@ module.exports = {
   isConfigured: isConfigured,
   discover: discover,
   buildAuthRequest: buildAuthRequest,
+  redirectUriFor: redirectUriFor,
   oauthCookie: oauthCookie,
   readOauthCookie: readOauthCookie,
   exchangeCode: exchangeCode,

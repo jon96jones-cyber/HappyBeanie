@@ -26,9 +26,9 @@ The portal needs a one-time credential setup (~5 minutes) that only you can do.
 3. Set the client type to **Confidential**.
 4. From **Credentials**, copy the **Client ID** and **Client secret**.
 5. Under **Application setup**, add:
-   - **Callback URI:** `https://happy-beanie.vercel.app/api/auth/callback`
-   - **JavaScript origin:** `https://happy-beanie.vercel.app`
-   - **Logout URI:** `https://happy-beanie.vercel.app/account`
+   - **Callback URI:** `https://www.happybeanie.com/api/auth/callback`
+   - **JavaScript origin:** `https://www.happybeanie.com`
+   - **Logout URI:** `https://www.happybeanie.com/account`
 
 ## Step 2 — Add the credentials to Vercel
 
@@ -71,5 +71,5 @@ friendly "portal isn't connected yet" message. Nothing breaks.
 
 - Sign-in loops back with an error → check the Vercel function logs for
   `/api/auth/callback`; the usual cause is a Callback URI mismatch (must be exactly
-  `https://happy-beanie.vercel.app/api/auth/callback`) or a wrong client secret.
+  `https://www.happybeanie.com/api/auth/callback`) or a wrong client secret.
 - `not_configured` message → one of the three environment variables is missing.

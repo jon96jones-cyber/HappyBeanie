@@ -19,7 +19,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const tokens = await auth.exchangeCode(String(q.code), stash.verifier);
+    const tokens = await auth.exchangeCode(String(q.code), stash.verifier, stash.ru);
     const session = auth.sessionFromTokens(tokens, null);
     res.setHeader('Set-Cookie', [
       auth.sessionCookie(session),

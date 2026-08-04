@@ -12,19 +12,20 @@ module.exports = async function handler(req, res) {
   const c = auth.config();
   const d = await auth.discover();
   const r = auth.buildAuthRequest();
+  const redirectUri = auth.redirectUriFor(req);
 
   const params = new URLSearchParams({
     scope: 'openid email customer-account-api:full',
     client_id: c.clientId,
     response_type: 'code',
-    redirect_uri: c.redirectUri,
+    redirect_uri: redirectUri,
     state: r.state,
     nonce: r.nonce,
     code_challenge: r.challenge,
     code_challenge_method: 'S256'
   });
 
-  res.setHeader('Set-Cookie', auth.oauthCookie({ state: r.state, verifier: r.verifier }));
+  res.setHeader('Set-Cookie', auth.oauthCookie({ state: r.state, verifier: r.verifier, ru: redirectUri }));
   res.setHeader('Location', d.authorization_endpoint + '?' + params.toString());
   return res.status(302).end();
 };
