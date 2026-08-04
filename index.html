@@ -24,7 +24,7 @@ window.HB_SHOPIFY = {
   },
   sellingPlan: 'gid://shopify/SellingPlan/974946368'
 };
-window.hbShopifyCheckout = async function (rows) {
+window.hbShopifyCheckout = async function (rows, buyer) {
   const cfg = window.HB_SHOPIFY;
   if (!cfg.token || cfg.token.indexOf('PLACEHOLDER') !== -1) {
     throw new Error('Shopify storefront token not configured yet');
@@ -41,7 +41,26 @@ window.hbShopifyCheckout = async function (rows) {
     headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': cfg.token },
     body: JSON.stringify({
       query: 'mutation cartCreate($input: CartInput!) { cartCreate(input: $input) { cart { checkoutUrl } userErrors { field message } } }',
-      variables: { input: { lines: lines } }
+      variables: { input: (function () {
+        const input = { lines: lines };
+        if (buyer && buyer.email) {
+          const parts = String(buyer.name || '').trim().split(/\s+/);
+          const firstName = parts.slice(0, -1).join(' ') || parts[0] || '';
+          const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
+          input.buyerIdentity = {
+            email: buyer.email,
+            countryCode: 'US',
+            deliveryAddressPreferences: [{
+              deliveryAddress: {
+                firstName: firstName, lastName: lastName,
+                address1: buyer.addr || '', city: buyer.city || '',
+                province: buyer.state || '', zip: buyer.zip || '', country: 'US'
+              }
+            }]
+          };
+        }
+        return input;
+      })() }
     })
   });
   const json = await res.json();
@@ -2022,7 +2041,7 @@ class Component extends DCLogic {
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all',
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
-    co: { email: '', name: '', addr: '', city: '', zip: '', card: '', exp: '', cvc: '',
+    co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true };
 
   setCo(k) {
@@ -2354,8 +2373,7 @@ class Component extends DCLogic {
     const page = this.state.page;
     const M = this.cartMath();
     const co = this.state.co;
-    const coKeys = ['email', 'name', 'addr', 'city', 'zip', 'card', 'exp', 'cvc']
-      .concat(this.state.billSame ? [] : ['bname', 'baddr', 'bcity', 'bzip']);
+    const coKeys = ['email', 'name', 'addr', 'city', 'state', 'zip'];
     const coReady = coKeys.every(k => String(co[k] || '').trim().length > 0) && M.items.length > 0;
     const joinReady = /.+@.+\..+/.test(String(this.state.joinEmail || '').trim());
     const pages = [
@@ -2673,14 +2691,7 @@ class Component extends DCLogic {
       isCart: page === 'cart',
       isCheckout: page === 'checkout',
       goCart: this.nav('cart'),
-      goCheckout: () => {
-        const MM = this.cartMath();
-        if (!MM.items.length) return;
-        const cfg = window.HB_SHOPIFY || {};
-        if (!cfg.token || cfg.token.indexOf('PLACEHOLDER') !== -1) { this.nav('checkout')(); return; }
-        window.hbShopifyCheckout(MM.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })))
-          .catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
-      },
+      goCheckout: this.nav('checkout'),
       cartEmpty: M.items.length === 0,
       cartHasItems: M.items.length > 0,
       cartHead: M.items.length === 0 ? 'Your cart is' : 'Two minutes from',
@@ -2717,20 +2728,9 @@ class Component extends DCLogic {
         { n: '02', title: 'Shipping', fields: [
           { label: 'Street address', ph: '1421 N Scottsdale Rd', value: co.addr, set: this.setCo('addr'), mode: 'text', span: 'span 2' },
           { label: 'City', ph: 'Scottsdale', value: co.city, set: this.setCo('city'), mode: 'text', span: 'span 1' },
-          { label: 'ZIP', ph: '85257', value: co.zip, set: this.setCo('zip'), mode: 'numeric', span: 'span 1' }
-        ] },
-        { n: '03', title: 'Payment', fields: [
-          { label: 'Card number', ph: '4242 4242 4242 4242', value: co.card, set: this.setCo('card'), mode: 'numeric', span: 'span 2' },
-          { label: 'Expiry', ph: 'MM / YY', value: co.exp, set: this.setCo('exp'), mode: 'numeric', span: 'span 1' },
-          { label: 'CVC', ph: '123', value: co.cvc, set: this.setCo('cvc'), mode: 'numeric', span: 'span 1' }
-        ] },
-        { n: '04', title: 'Billing address', toggle: true,
-          fields: this.state.billSame ? [] : [
-            { label: 'Name on card', ph: 'Jamie Rivera', value: co.bname, set: this.setCo('bname'), mode: 'text', span: 'span 2' },
-            { label: 'Street address', ph: '900 E Camelback Rd', value: co.baddr, set: this.setCo('baddr'), mode: 'text', span: 'span 2' },
-            { label: 'City', ph: 'Phoenix', value: co.bcity, set: this.setCo('bcity'), mode: 'text', span: 'span 1' },
-            { label: 'ZIP', ph: '85016', value: co.bzip, set: this.setCo('bzip'), mode: 'numeric', span: 'span 1' }
-          ] }
+          { label: 'State', ph: 'AZ', value: co.state, set: this.setCo('state'), mode: 'text', span: 'span 1' },
+          { label: 'ZIP', ph: '85257', value: co.zip, set: this.setCo('zip'), mode: 'numeric', span: 'span 2' }
+        ] }
       ].map(sec => {
         const done = sec.fields.length > 0 && sec.fields.every(f => String(f.value || '').trim().length > 0);
         const same = !!this.state.billSame;
@@ -2749,21 +2749,17 @@ class Component extends DCLogic {
         };
       }),
       orderDisabled: !coReady,
-      orderBtnLabel: coReady ? 'Place order · ' + '$' + M.total : 'Complete the form',
+      orderBtnLabel: coReady ? 'Continue to payment · ' + '$' + M.total : 'Complete the form',
       orderBtnBg: coReady ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.14)',
       orderBtnFg: coReady ? '#17140F' : '#8A7F6E',
       orderBtnCursor: coReady ? 'pointer' : 'not-allowed',
-      orderHint: coReady ? 'You will not be charged in this prototype.' : 'Fill in contact, shipping and payment to continue.',
+      orderHint: coReady ? 'Payment happens next on our secure checkout.' : 'Fill in contact and shipping to continue.',
       placeOrder: () => {
         if (!coReady) return;
-        this.setState({
-          ordered: true, orderId: 'HB-' + String(Math.floor(1000 + Math.random() * 8999)),
-          orderTotal: '$' + M.total, orderItems: M.items.map(i => i.name + ' × ' + i.qty).join(' · '),
-          cartDog: 0, cartCat: 0, added: false,
-          co: { email: '', name: '', addr: '', city: '', zip: '', card: '', exp: '', cvc: '', bname: '', baddr: '', bcity: '', bzip: '' },
-          billSame: true
-        });
-        window.scrollTo({ top: 0 });
+        window.hbShopifyCheckout(
+          M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })),
+          { ...this.state.co }
+        ).catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
       },
       wallHasPhoto: !!this.state.wallPhoto,
       wallNoPhoto: !this.state.wallPhoto,
