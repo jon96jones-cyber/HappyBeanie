@@ -396,7 +396,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <a sc-camel-on-click="{{ nl.go }}" style="color: {{ nl.color }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ nl.rule }};" style-hover="color: oklch(0.5 0.07 152);">{{ nl.label }}</a>
       </sc-for>
       <a href="/wholesale" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">Wholesale</a>
-      <a href="https://shopify.com/61033185344/account" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">Account</a>
+      <a href="/account" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">Account</a>
       <a sc-camel-on-click="{{ goQuiz }}" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">Eligibility</a>
       <sc-if value="{{ cartAdded }}" hint-placeholder-val="{{ false }}">
         <div sc-camel-on-click="{{ goCart }}" title="In your cart" style="position: relative; display: flex; align-items: center; gap: 7px; padding: 8px 12px 8px 10px; border: 1px solid #17140F; border-radius: 2px; background: #FCFAF4; cursor: pointer; flex: 0 0 auto; transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F0EAD9; transform: translateY(-1px);">
@@ -476,7 +476,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
           <a sc-camel-on-click="{{ ml.go }}" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">{{ ml.label }}</a>
         </sc-for>
         <a href="/wholesale" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">Wholesale</a>
-        <a href="https://shopify.com/61033185344/account" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">Account</a>
+        <a href="/account" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">Account</a>
         <sc-if value="{{ cartAdded }}" hint-placeholder-val="{{ false }}">
           <a sc-camel-on-click="{{ goCart }}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F;">Your cart<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152);">{{ cartCount }}</span></a>
         </sc-if>
@@ -2034,7 +2034,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     </div>
     <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 16px; max-width: 1180px; margin: 0 auto; padding-top: 26px; border-top: 1px solid rgba(245,240,230,0.14); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A7F6E;">
       <span>© 2026 Happy Beanie Pet Health, LLC</span>
-      <span><a href="https://shopify.com/61033185344/account" style="color: inherit; text-decoration: none;">Account</a> · <a href="/wholesale" style="color: inherit; text-decoration: none;">Wholesale</a> · <a href="/policies/terms" style="color: inherit; text-decoration: none;">Terms</a> · <a href="/policies/privacy" style="color: inherit; text-decoration: none;">Privacy</a> · <a href="/policies/shipping" style="color: inherit; text-decoration: none;">Shipping</a> · <a href="/policies/refunds" style="color: inherit; text-decoration: none;">Refunds</a> · <a href="/policies/subscriptions" style="color: inherit; text-decoration: none;">Subscriptions</a> · <a href="/policies/disclaimer" style="color: inherit; text-decoration: none;">Disclaimer</a></span>
+      <span><a href="/account" style="color: inherit; text-decoration: none;">Account</a> · <a href="/wholesale" style="color: inherit; text-decoration: none;">Wholesale</a> · <a href="/policies/terms" style="color: inherit; text-decoration: none;">Terms</a> · <a href="/policies/privacy" style="color: inherit; text-decoration: none;">Privacy</a> · <a href="/policies/shipping" style="color: inherit; text-decoration: none;">Shipping</a> · <a href="/policies/refunds" style="color: inherit; text-decoration: none;">Refunds</a> · <a href="/policies/subscriptions" style="color: inherit; text-decoration: none;">Subscriptions</a> · <a href="/policies/disclaimer" style="color: inherit; text-decoration: none;">Disclaimer</a></span>
     </div>
   </footer>
 </div>
