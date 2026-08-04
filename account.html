@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Your Account — Happy Beanie</title>
-<meta name="description" content="Sign in to your Happy Beanie account to view orders, track shipments, and manage your subscription.">
+<meta name="description" content="Sign in to your Happy Beanie account to view orders, track deliveries, and manage your subscription.">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
@@ -15,95 +15,108 @@
 @font-face { font-family:'DM Sans'; font-weight:500; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
 @font-face { font-family:'DM Sans'; font-weight:700; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#17140F; color:#F5F0E6; font-family:'DM Sans',-apple-system,sans-serif; font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased; min-height:100vh; display:flex; flex-direction:column; }
-a { color:#F0C64B; text-decoration:none; }
-a:hover { border-bottom:1px solid #F0C64B; }
+body { background:#F5F0E6; color:#17140F; font-family:'DM Sans',-apple-system,sans-serif; font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased; min-height:100vh; display:flex; flex-direction:column; }
+a { color:#17140F; text-decoration:none; border-bottom:1px solid rgba(23,20,15,0.35); padding-bottom:1px; transition:color 0.2s ease, border-color 0.2s ease; }
+a:hover { color:oklch(0.44 0.07 152); border-color:oklch(0.44 0.07 152); }
 .mono { font-family:'DM Mono',monospace; }
 .shell { max-width:1080px; margin:0 auto; padding:0 24px; width:100%; }
 
-header.site { position:sticky; top:0; z-index:50; background:rgba(23,20,15,0.88); backdrop-filter:blur(10px); border-bottom:1px solid rgba(245,240,230,0.12); }
+header.site { position:sticky; top:0; z-index:50; background:rgba(245,240,230,0.93); backdrop-filter:blur(10px); border-bottom:1px solid #DDD3C0; }
 header.site .bar { max-width:1080px; margin:0 auto; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-.mark { display:flex; align-items:baseline; gap:10px; color:#F5F0E6; }
+.mark { display:flex; align-items:baseline; gap:9px; color:#17140F; border-bottom:none; }
 .mark:hover { border-bottom:none; }
-.mark b { font-family:'DM Sans',sans-serif; font-weight:700; font-size:23px; letter-spacing:-0.045em; }
-.mark b i { font-style:normal; color:#F0C64B; }
-.mark span { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; }
-.back { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:#C9BEA8; }
+.mark b { font-family:'DM Sans',sans-serif; font-weight:700; font-size:23px; letter-spacing:-0.045em; white-space:nowrap; }
+.mark b .bean { position:relative; }
+.mark b .bean::before { content:''; position:absolute; left:50%; top:0.19em; width:0.42em; height:0.26em; margin-left:-0.21em; border-radius:46% 54% 50% 50% / 58% 42% 58% 42%; background:oklch(0.88 0.15 96); transform:rotate(-7deg); }
+.mark b .bean span { position:relative; z-index:1; }
+.mark small { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.back { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:#554C40; border-bottom:none; }
+.back:hover { color:oklch(0.44 0.07 152); border-bottom:none; }
 
-main { flex:1 1 auto; padding:64px 0 90px; }
-.kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:#F0C64B; display:flex; align-items:center; gap:14px; margin-bottom:18px; }
-.kicker::before { content:''; width:30px; height:1px; background:#F0C64B; }
-h1 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(34px,4.6vw,54px); line-height:1.02; }
-h1 em { font-style:normal; color:#F0C64B; }
+main { flex:1 1 auto; padding:72px 0 100px; }
+.kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:oklch(0.44 0.07 152); display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+.kicker::before { content:''; width:26px; height:1px; background:oklch(0.44 0.07 152); }
+h1 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(34px,4.6vw,54px); line-height:1.04; }
+h1 em { font-style:normal; color:oklch(0.44 0.07 152); }
 
 .state { display:none; }
 .state.on { display:block; }
 
+/* cards — soft paper, like the home page */
+.card { background:#FCFAF4; border:1px solid #E4DBC9; border-radius:8px; box-shadow:0 24px 44px -30px rgba(23,20,15,0.28), 0 4px 10px -8px rgba(23,20,15,0.1); }
+.card-pad { padding:30px 30px 32px; }
+@media (max-width:560px){ .card-pad { padding:24px 20px 26px; } }
+
 /* signed out */
-.signin-wrap { display:grid; grid-template-columns:1.2fr 1fr; gap:26px; align-items:start; margin-top:38px; }
+.signin-wrap { display:grid; grid-template-columns:1.15fr 1fr; gap:26px; align-items:start; margin-top:40px; }
 @media (max-width:860px){ .signin-wrap { grid-template-columns:1fr; } }
-.panel { border:1px solid rgba(245,240,230,0.16); border-radius:6px; background:linear-gradient(180deg, rgba(245,240,230,0.05), rgba(245,240,230,0.02)); box-shadow:0 40px 80px -50px rgba(0,0,0,0.8); overflow:hidden; }
-.panel-head { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:16px 26px; border-bottom:1px solid rgba(245,240,230,0.12); background:rgba(23,20,15,0.5); }
-.panel-head .ph-t { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; color:#C9BEA8; }
-.panel-body { padding:30px 26px 34px; }
-.btn-gold { display:inline-block; font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; padding:17px 32px; border-radius:3px; background:#F0C64B; color:#17140F; cursor:pointer; border:none; transition:background 0.2s ease, transform 0.2s ease; }
-.btn-gold:hover { background:#f4d268; transform:translateY(-1px); border-bottom:none; }
-.hint { font-size:13.5px; color:#8A7F6E; line-height:1.6; }
-.sfeat { list-style:none; display:grid; gap:12px; }
-.sfeat li { display:flex; gap:12px; font-size:14px; color:#DED5C4; }
-.sfeat .tick { flex:0 0 auto; width:17px; height:17px; margin-top:3px; border-radius:50%; background:rgba(240,198,75,0.18); display:flex; align-items:center; justify-content:center; }
-.errbar { display:none; margin-top:26px; border:1px solid rgba(224,122,95,0.5); background:rgba(224,122,95,0.08); color:#EDBBA9; border-radius:3px; padding:14px 18px; font-size:14px; }
+.lede { font-size:17px; color:#554C40; max-width:30em; margin-top:18px; }
+.btn-dark { display:inline-block; font-family:'DM Mono',monospace; font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; padding:17px 30px; border-radius:2px; background:#17140F; color:#F5F0E6; cursor:pointer; border:none; transition:background 0.25s ease, transform 0.2s ease; }
+.btn-dark:hover { background:oklch(0.5 0.07 152); color:#F5F0E6; transform:translateY(-1px); border-bottom:none; }
+.hint { font-size:13px; color:#8A7F6E; line-height:1.6; }
+.paw-note { display:flex; align-items:flex-start; gap:14px; padding:18px 20px; background:#F5F0E6; border:1px solid #E4DBC9; border-radius:6px; font-size:14px; color:#554C40; }
+.sfeat { list-style:none; display:grid; gap:0; }
+.sfeat li { display:flex; gap:14px; font-size:14.5px; color:#3D372D; padding:14px 0; border-bottom:1px solid #EDE5D4; align-items:baseline; }
+.sfeat li:last-child { border-bottom:none; }
+.bdot { flex:0 0 auto; width:11px; height:7px; border-radius:46% 54% 50% 50% / 58% 42% 58% 42%; background:oklch(0.88 0.15 96); transform:rotate(-7deg) translateY(-1px); }
+.errbar { display:none; margin-top:26px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:6px; padding:14px 18px; font-size:14px; }
 .errbar.on { display:block; }
 
 /* loading */
-.loading { display:flex; align-items:center; gap:16px; margin-top:48px; color:#B9AF9C; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; }
-.spin { width:22px; height:22px; border-radius:50%; border:2px solid rgba(245,240,230,0.2); border-top-color:#F0C64B; animation:spin 0.9s linear infinite; }
+.loading { display:flex; align-items:center; gap:16px; margin-top:48px; color:#8A7F6E; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; }
+.spin { width:22px; height:22px; border-radius:50%; border:2px solid #E0D6C2; border-top-color:oklch(0.44 0.07 152); animation:spin 0.9s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 
 /* dashboard */
-.dash-head { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:12px; }
-.who { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-top:10px; }
-.signout { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:#C9BEA8; border:1px solid rgba(245,240,230,0.25); border-radius:3px; padding:11px 18px; transition:border-color 0.2s ease, color 0.2s ease; }
-.signout:hover { border-color:#F0C64B; color:#F0C64B; border-bottom-style:solid; }
-.badge { display:inline-flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; border-radius:999px; padding:6px 13px; }
-.badge.gold { background:rgba(240,198,75,0.14); color:#F0C64B; border:1px solid rgba(240,198,75,0.4); }
-.badge.pend { background:rgba(245,240,230,0.06); color:#C9BEA8; border:1px solid rgba(245,240,230,0.25); }
-.grid { display:grid; grid-template-columns:1.55fr 1fr; gap:22px; align-items:start; margin-top:34px; }
-@media (max-width:920px){ .grid { grid-template-columns:1fr; } }
-.order { border-bottom:1px solid rgba(245,240,230,0.1); padding:20px 0; }
-.order:last-child { border-bottom:none; padding-bottom:4px; }
-.o-top { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 16px; }
-.o-name { font-weight:700; letter-spacing:-0.02em; font-size:17px; }
-.o-date { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; }
-.o-items { font-size:13.5px; color:#B9AF9C; margin-top:6px; }
-.o-meta { display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin-top:12px; font-size:13px; }
-.o-total { font-family:'DM Mono',monospace; font-size:12px; color:#DED5C4; }
-.pill { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.13em; text-transform:uppercase; border-radius:999px; padding:4px 11px; }
-.pill.ok { background:oklch(0.44 0.07 152 / 0.25); color:oklch(0.8 0.09 152); }
-.pill.wait { background:rgba(240,198,75,0.12); color:#F0C64B; }
-.pill.dim { background:rgba(245,240,230,0.07); color:#B9AF9C; }
-.track { display:inline-flex; align-items:center; gap:7px; font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; }
-.abox { border:1px solid rgba(245,240,230,0.14); border-radius:6px; background:rgba(245,240,230,0.035); padding:22px 24px 24px; }
-.aside { display:grid; gap:16px; }
-.at { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#F0C64B; margin-bottom:14px; }
-.sub-line { display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid rgba(245,240,230,0.08); font-size:14px; }
-.sub-line:last-child { border-bottom:none; }
-.sub-line .k { color:#8A7F6E; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; }
-.addr { font-size:13.5px; color:#DED5C4; line-height:1.6; padding:12px 0; border-bottom:1px solid rgba(245,240,230,0.08); }
-.addr:last-child { border-bottom:none; }
-.muted { color:#8A7F6E; font-size:13.5px; }
-.empty { color:#8A7F6E; font-size:14px; padding:18px 0 6px; }
+.dash-head { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:18px; }
+.who { font-size:14px; color:#8A7F6E; margin-top:12px; }
+.trade-line { display:inline-flex; align-items:center; gap:10px; margin-top:16px; font-size:14px; color:#3D372D; background:rgba(240,198,75,0.16); border:1px solid rgba(200,160,50,0.35); border-radius:999px; padding:8px 18px 8px 14px; }
+.trade-line .bdot { background:oklch(0.78 0.13 92); }
+.signout { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:#554C40; border:1px solid #C9BEA8; border-radius:2px; padding:12px 20px; transition:all 0.2s ease; }
+.signout:hover { border-color:#17140F; color:#17140F; }
 
-footer.site { border-top:1px solid rgba(245,240,230,0.14); }
-footer.site .shell { padding-top:24px; padding-bottom:24px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:#8A7F6E; }
-footer.site a { color:#8A7F6E; }
+.grid { display:grid; grid-template-columns:1.6fr 1fr; gap:24px; align-items:start; margin-top:40px; }
+@media (max-width:920px){ .grid { grid-template-columns:1fr; } }
+.sec-title { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px; }
+.sec-title h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:22px; }
+.sec-title .count { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; }
+
+.orders { display:grid; gap:16px; }
+.order { position:relative; }
+.o-head { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; }
+.o-title { font-weight:700; letter-spacing:-0.03em; font-size:18px; }
+.o-date { font-size:13.5px; color:#8A7F6E; }
+.o-items { font-size:14.5px; color:#554C40; margin-top:8px; max-width:34em; }
+.o-status { display:flex; flex-wrap:wrap; align-items:center; gap:8px 20px; margin-top:16px; padding-top:16px; border-top:1px solid #EDE5D4; font-size:14px; color:#3D372D; }
+.dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; vertical-align:baseline; }
+.dot.green { background:oklch(0.6 0.09 152); }
+.dot.gold { background:oklch(0.78 0.13 92); }
+.dot.grey { background:#C9BEA8; }
+.o-total { font-family:'DM Mono',monospace; font-size:12px; color:#554C40; margin-left:auto; }
+.tracklink { font-size:13.5px; }
+
+.aside { display:grid; gap:24px; }
+.plan-line { font-size:15px; color:#3D372D; line-height:1.7; }
+.plan-line b { font-weight:700; letter-spacing:-0.02em; }
+.plan-next { margin-top:14px; padding-top:14px; border-top:1px solid #EDE5D4; font-size:14px; color:#554C40; }
+.addr { font-size:14px; color:#3D372D; line-height:1.7; padding:14px 0; border-bottom:1px solid #EDE5D4; }
+.addr:first-child { padding-top:0; }
+.addr:last-child { border-bottom:none; padding-bottom:0; }
+.addr .tag { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:oklch(0.44 0.07 152); margin-left:8px; }
+.muted { color:#8A7F6E; font-size:14px; }
+.help { font-size:14px; color:#554C40; line-height:1.7; }
+.empty { color:#8A7F6E; font-size:14.5px; }
+
+footer.site { background:#17140F; color:#8A7F6E; }
+footer.site .shell { padding-top:26px; padding-bottom:26px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; }
+footer.site a { color:#8A7F6E; border-bottom:none; }
 footer.site a:hover { color:#F0C64B; border-bottom:none; }
 </style>
 </head><body>
 
 <header class="site">
   <div class="bar">
-    <a class="mark" href="/"><b>happy bean<i>ie</i></b><span>Peptide Care</span></a>
+    <a class="mark" href="/"><b>happy bean<span class="bean"><span>i</span></span>e</b><small>peptide care</small></a>
     <a class="back" href="/">&larr; Back to site</a>
   </div>
 </header>
@@ -114,25 +127,27 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     <!-- SIGNED OUT -->
     <section id="stateOut" class="state">
       <div class="kicker">Your account</div>
-      <h1>Every order, chew,<br>and delivery — <em>in one place.</em></h1>
+      <h1>Good to see you <em>again.</em></h1>
+      <p class="lede">Sign in to check on a delivery, peek at your order history, or see when the next tin leaves Scottsdale.</p>
       <div id="errBar" class="errbar"></div>
       <div class="signin-wrap">
-        <div class="panel">
-          <div class="panel-head"><span class="ph-t">Sign in / create account</span></div>
-          <div class="panel-body">
-            <p style="color:#DED5C4; margin-bottom:22px;">No passwords here. Enter your email on the next screen and we'll send you a six-digit code — first sign-in creates your account automatically.</p>
-            <a class="btn-gold" href="/api/auth/login" id="signinBtn">Sign in with email</a>
-            <p class="hint" style="margin-top:18px;">Secured by Shopify's authentication. Your session stays private to this browser.</p>
-          </div>
+        <div class="card card-pad">
+          <h2 style="font-weight:700; letter-spacing:-0.042em; font-size:23px; margin-bottom:10px;">Sign in — or join us</h2>
+          <p style="color:#554C40; font-size:15px; margin-bottom:24px; max-width:30em;">No passwords to remember. Tell us your email and we'll send a six-digit code; if you're new here, that same code opens your account.</p>
+          <a class="btn-dark" href="/api/auth/login" id="signinBtn">Continue with email</a>
+          <p class="hint" style="margin-top:20px;">Your details stay between you, us, and the beans. Secured by Shopify.</p>
         </div>
-        <div class="abox">
-          <div class="at">What's inside</div>
+        <div>
           <ul class="sfeat">
-            <li><span class="tick"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4 3.6 6.4 9 1" stroke="#F0C64B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Order history with live payment &amp; delivery status</li>
-            <li><span class="tick"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4 3.6 6.4 9 1" stroke="#F0C64B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Tracking numbers the moment your tin ships</li>
-            <li><span class="tick"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4 3.6 6.4 9 1" stroke="#F0C64B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Subscription status and next billing date</li>
-            <li><span class="tick"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4 3.6 6.4 9 1" stroke="#F0C64B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Wholesale account status for trade partners</li>
+            <li><span class="bdot"></span>Every order, with plain-words delivery updates</li>
+            <li><span class="bdot"></span>Tracking links the moment a tin ships</li>
+            <li><span class="bdot"></span>Your care plan — what's coming, and when</li>
+            <li><span class="bdot"></span>Trade pricing status for wholesale partners</li>
           </ul>
+          <div class="paw-note" style="margin-top:22px;">
+            <span class="bdot" style="margin-top:7px;"></span>
+            <span>Prefer a human? The pharmacist desk reads every note — <a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></span>
+          </div>
         </div>
       </div>
     </section>
@@ -140,7 +155,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     <!-- LOADING -->
     <section id="stateLoading" class="state on">
       <div class="kicker">Your account</div>
-      <div class="loading"><span class="spin"></span>Checking your session&hellip;</div>
+      <div class="loading"><span class="spin"></span>Fetching your beans&hellip;</div>
     </section>
 
     <!-- DASHBOARD -->
@@ -150,27 +165,29 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
           <div class="kicker">Your account</div>
           <h1 id="helloLine">Welcome back.</h1>
           <div class="who" id="whoLine"></div>
-          <div id="badgeRow" style="margin-top:14px;"></div>
+          <div id="badgeRow"></div>
         </div>
         <a class="signout" href="/api/auth/logout">Sign out</a>
       </div>
       <div class="grid">
-        <div class="panel">
-          <div class="panel-head"><span class="ph-t">Orders</span><span class="ph-t" id="orderCount"></span></div>
-          <div class="panel-body" id="ordersList"></div>
+        <div>
+          <div class="sec-title"><h2>Your deliveries</h2><span class="count" id="orderCount"></span></div>
+          <div class="orders" id="ordersList"></div>
         </div>
         <div class="aside">
-          <div class="abox">
-            <div class="at">Subscription</div>
-            <div id="subsBox"></div>
+          <div>
+            <div class="sec-title"><h2>Care plan</h2></div>
+            <div class="card card-pad" id="subsBox" style="padding:24px 26px 26px;"></div>
           </div>
-          <div class="abox">
-            <div class="at">Addresses</div>
-            <div id="addrBox"></div>
+          <div>
+            <div class="sec-title"><h2>Where we ship</h2></div>
+            <div class="card" id="addrBox" style="padding:20px 26px;"></div>
           </div>
-          <div class="abox">
-            <div class="at">Need a hand?</div>
-            <p class="muted">The pharmacist desk answers within a business day.<br><a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
+          <div>
+            <div class="sec-title"><h2>From the desk</h2></div>
+            <div class="card card-pad" style="padding:24px 26px 26px;">
+              <p class="help">Questions about a delivery, a dose, or a lot number? The pharmacist desk answers within a business day.<br><br><a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
+            </div>
           </div>
         </div>
       </div>
@@ -205,96 +222,102 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
   function money(m) {
     if (!m) return '';
     var n = parseFloat(m.amount);
-    return '$' + (isNaN(n) ? esc(m.amount) : n.toFixed(2)) + ' ' + esc(m.currencyCode || '');
+    return '$' + (isNaN(n) ? esc(m.amount) : n.toFixed(2));
   }
 
   function fmtDate(iso) {
     if (!iso) return '';
     try {
-      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     } catch (e) { return esc(iso); }
   }
 
-  function financialPill(status) {
-    var s = String(status || '').replace(/_/g, ' ').toLowerCase();
-    var cls = status === 'PAID' ? 'ok' : (status === 'PENDING' || status === 'AUTHORIZED') ? 'wait' : 'dim';
-    return '<span class="pill ' + cls + '">' + esc(s || 'processing') + '</span>';
+  // Plain-words status lines instead of uppercase pills.
+  function payLine(status) {
+    if (status === 'PAID') return '<span><span class="dot green"></span>Paid</span>';
+    if (status === 'PENDING' || status === 'AUTHORIZED') return '<span><span class="dot gold"></span>Payment on its way</span>';
+    if (status === 'REFUNDED' || status === 'PARTIALLY_REFUNDED') return '<span><span class="dot grey"></span>Refunded</span>';
+    if (!status) return '';
+    return '<span><span class="dot grey"></span>' + esc(String(status).replace(/_/g, ' ').toLowerCase()) + '</span>';
   }
 
-  function shipmentPill(f) {
-    var s = f && (f.latestShipmentStatus || f.status);
-    if (!s) return '';
-    var t = String(s).replace(/_/g, ' ').toLowerCase();
-    var cls = /delivered/i.test(s) ? 'ok' : /transit|out for|confirmed/i.test(t) ? 'wait' : 'dim';
-    return '<span class="pill ' + cls + '">' + esc(t) + '</span>';
+  function shipLine(f) {
+    var s = String((f && (f.latestShipmentStatus || f.status)) || '');
+    if (/delivered/i.test(s)) return '<span><span class="dot green"></span>Delivered</span>';
+    if (/transit|out_for|confirmed|ready/i.test(s)) return '<span><span class="dot gold"></span>On its way</span>';
+    if (s) return '<span><span class="dot grey"></span>Being prepared</span>';
+    return '';
   }
 
   function renderDash(c) {
     var first = c.firstName || '';
     $('helloLine').innerHTML = first ? 'Welcome back, <em>' + esc(first) + '.</em>' : 'Welcome back.';
     var email = c.emailAddress && c.emailAddress.emailAddress;
-    $('whoLine').textContent = [email, c.creationDate ? 'Member since ' + fmtDate(c.creationDate) : ''].filter(Boolean).join(' · ');
+    var since = c.creationDate ? 'with us since ' + fmtDate(c.creationDate) : '';
+    $('whoLine').textContent = [email, since].filter(Boolean).join(' · ');
 
     var tags = (c.tags || []).map(function (t) { return String(t).toLowerCase(); });
     var badges = '';
     if (tags.indexOf('wholesale') !== -1) {
-      badges += '<span class="badge gold">&#9679;&nbsp; Wholesale account — 30% off on 5+ boxes</span>';
+      badges = '<div class="trade-line"><span class="bdot"></span>Trade partner — 30% off when you order 5+ boxes</div>';
     } else if (tags.indexOf('wholesale-pending') !== -1) {
-      badges += '<span class="badge pend">Wholesale application under review</span>';
+      badges = '<div class="trade-line" style="background:#F5F0E6; border-color:#DDD3C0;"><span class="bdot" style="background:#C9BEA8;"></span>Wholesale application in review — we’ll email you shortly</div>';
     }
     $('badgeRow').innerHTML = badges;
 
     var orders = (c.orders && c.orders.nodes) || [];
-    $('orderCount').textContent = orders.length ? orders.length + (orders.length === 1 ? ' order' : ' orders') : '';
+    $('orderCount').textContent = orders.length ? (orders.length === 1 ? 'One so far' : orders.length + ' and counting') : '';
     if (!orders.length) {
-      $('ordersList').innerHTML = '<div class="empty">No orders yet — your first tin is waiting. <a href="/shop">Shop the formulas</a>.</div>';
+      $('ordersList').innerHTML = '<div class="card card-pad"><p class="empty">Nothing here yet — your first tin is waiting. <a href="/shop">Meet the formulas</a>.</p></div>';
     } else {
       $('ordersList').innerHTML = orders.map(function (o) {
         var items = ((o.lineItems && o.lineItems.nodes) || []).map(function (li) {
-          return esc(li.title) + (li.quantity > 1 ? ' ×' + li.quantity : '');
-        }).join(' · ');
+          return esc(li.title) + (li.quantity > 1 ? ' &times; ' + li.quantity : '');
+        }).join(', ');
+        var ship = '';
         var tracks = '';
         (((o.fulfillments && o.fulfillments.nodes) || [])).forEach(function (f) {
-          var ti = f.trackingInformation || [];
-          ti.forEach(function (t) {
-            var label = (t.company ? esc(t.company) + ' ' : '') + esc(t.number || 'tracking');
-            tracks += t.url
-              ? ' <a class="track" href="' + esc(t.url) + '" target="_blank" rel="noopener">&#8599; ' + label + '</a>'
-              : ' <span class="track" style="color:#B9AF9C;">' + label + '</span>';
+          if (!ship) ship = shipLine(f);
+          (f.trackingInformation || []).forEach(function (t) {
+            var label = t.company ? 'Track with ' + esc(t.company) : 'Track this delivery';
+            if (t.url) tracks += '<a class="tracklink" href="' + esc(t.url) + '" target="_blank" rel="noopener">' + label + ' &rarr;</a>';
+            else if (t.number) tracks += '<span class="tracklink" style="color:#8A7F6E;">' + esc(t.number) + '</span>';
           });
-          var sp = shipmentPill(f);
-          if (sp) tracks += ' ' + sp;
         });
-        var statusLink = o.statusPageUrl ? ' <a class="track" href="' + esc(o.statusPageUrl) + '" target="_blank" rel="noopener">order status</a>' : '';
-        return '<div class="order">' +
-          '<div class="o-top"><span class="o-name">' + esc(o.name) + '</span><span class="o-date">' + fmtDate(o.processedAt) + '</span></div>' +
+        return '<div class="card card-pad order">' +
+          '<div class="o-head"><span class="o-title">Order ' + esc(o.name) + '</span><span class="o-date">' + fmtDate(o.processedAt) + '</span></div>' +
           (items ? '<div class="o-items">' + items + '</div>' : '') +
-          '<div class="o-meta"><span class="o-total">' + money(o.totalPrice) + '</span>' + financialPill(o.financialStatus) + tracks + statusLink + '</div>' +
+          '<div class="o-status">' + payLine(o.financialStatus) + ship + tracks + '<span class="o-total">' + money(o.totalPrice) + '</span></div>' +
           '</div>';
       }).join('');
     }
 
     var subs = (c.subscriptionContracts && c.subscriptionContracts.nodes) || [];
     if (!subs.length) {
-      $('subsBox').innerHTML = '<p class="muted">No active subscription. Subscribe from any <a href="/product">product page</a> and save on every tin.</p>';
+      $('subsBox').innerHTML = '<p class="muted">No care plan running right now. Start one from any <a href="/product">product page</a> and a fresh tin arrives like clockwork.</p>';
     } else {
       $('subsBox').innerHTML = subs.map(function (s) {
         var dp = s.deliveryPolicy || {};
-        var every = dp.interval ? 'Every ' + ((dp.intervalCount && dp.intervalCount.count) || 1) + ' ' + String(dp.interval).toLowerCase() + ((dp.intervalCount && dp.intervalCount.count) > 1 ? 's' : '') : '';
-        return '<div class="sub-line"><span class="k">Status</span><span>' + esc(String(s.status || '').toLowerCase()) + '</span></div>' +
-          (every ? '<div class="sub-line"><span class="k">Delivers</span><span>' + esc(every) + '</span></div>' : '') +
-          (s.nextBillingDate ? '<div class="sub-line"><span class="k">Next billing</span><span>' + fmtDate(s.nextBillingDate) + '</span></div>' : '');
-      }).join('<div style="height:14px"></div>');
+        var count = (dp.intervalCount && dp.intervalCount.count) || 1;
+        var unit = String(dp.interval || '').toLowerCase();
+        var cadence = unit ? (count === 1 ? 'every ' + unit : 'every ' + count + ' ' + unit + 's') : '';
+        var active = String(s.status || '').toUpperCase() === 'ACTIVE';
+        var line = active
+          ? '<p class="plan-line"><span class="dot green"></span><b>Running smoothly.</b>' + (cadence ? ' A fresh tin ' + esc(cadence) + '.' : '') + '</p>'
+          : '<p class="plan-line"><span class="dot grey"></span><b>' + esc(String(s.status || '').toLowerCase()) + '.</b></p>';
+        var next = s.nextBillingDate ? '<div class="plan-next">Next tin is billed ' + fmtDate(s.nextBillingDate) + '.</div>' : '';
+        return line + next;
+      }).join('<div style="height:16px"></div>');
     }
 
     var addrs = (c.addresses && c.addresses.nodes) || [];
     if (!addrs.length) {
-      $('addrBox').innerHTML = '<p class="muted">No saved addresses yet — one is saved automatically at checkout.</p>';
+      $('addrBox').innerHTML = '<div class="addr"><span class="muted">We’ll remember your address after your first checkout.</span></div>';
     } else {
       var defId = c.defaultAddress && c.defaultAddress.id;
       $('addrBox').innerHTML = addrs.map(function (a) {
         var lines = (a.formatted || []).map(esc).join('<br>');
-        var tag = a.id === defId ? ' <span class="pill dim" style="margin-left:6px;">default</span>' : '';
+        var tag = a.id === defId ? '<span class="tag">usual spot</span>' : '';
         return '<div class="addr">' + lines + tag + '</div>';
       }).join('');
     }
@@ -303,10 +326,10 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
   }
 
   var ERRORS = {
-    not_configured: 'The portal isn’t connected yet — hang tight, we’re finishing setup. You can still email hello@happybeanie.com for anything order-related.',
-    state_mismatch: 'That sign-in link expired. Please try again.',
-    exchange_failed: 'Sign-in hit a snag on our side. Please try again in a minute.',
-    auth: 'Sign-in was cancelled or failed. Please try again.'
+    not_configured: 'The member area isn’t quite ready — we’re finishing the wiring. For anything order-related, the pharmacist desk has you: hello@happybeanie.com.',
+    state_mismatch: 'That sign-in link had gone stale. One more try should do it.',
+    exchange_failed: 'Sign-in hit a snag on our side. Give it another go in a minute.',
+    auth: 'Sign-in was cancelled or didn’t finish. Happy to try again whenever you are.'
   };
   var err = params.get('error');
   if (err) {
@@ -324,11 +347,11 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
       addresses: { nodes: [{ id: 'a1', formatted: ['Scottsdale Animal Hospital', '1421 N Scottsdale Rd', 'Scottsdale AZ 85257', 'United States'] }] },
       orders: { nodes: [
         { id: 'o3', name: '#1043', processedAt: '2026-07-28T00:00:00Z', financialStatus: 'PAID',
-          totalPrice: { amount: '278.60', currencyCode: 'USD' }, statusPageUrl: '#',
+          totalPrice: { amount: '278.60', currencyCode: 'USD' },
           lineItems: { nodes: [{ title: 'Happy Beans · for dogs', quantity: 5 }, { title: 'Happy Beans for Cats', quantity: 2 }] },
           fulfillments: { nodes: [{ status: 'SUCCESS', latestShipmentStatus: 'IN_TRANSIT', trackingInformation: [{ number: '9405 5361 0393', url: '#', company: 'USPS' }] }] } },
         { id: 'o2', name: '#1027', processedAt: '2026-06-30T00:00:00Z', financialStatus: 'PAID',
-          totalPrice: { amount: '199.00', currencyCode: 'USD' }, statusPageUrl: '#',
+          totalPrice: { amount: '199.00', currencyCode: 'USD' },
           lineItems: { nodes: [{ title: 'Happy Beans · for dogs', quantity: 5 }] },
           fulfillments: { nodes: [{ status: 'SUCCESS', latestShipmentStatus: 'DELIVERED', trackingInformation: [{ number: '9405 5361 0271', url: '#', company: 'USPS' }] }] } },
         { id: 'o1', name: '#1009', processedAt: '2026-05-26T00:00:00Z', financialStatus: 'PAID',
@@ -354,7 +377,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     if (body && body.ok && body.customer) renderDash(body.customer);
     else if (body) {
       show('out');
-      $('errBar').textContent = 'We couldn’t load your account right now. Please refresh, or try again shortly.';
+      $('errBar').textContent = 'We couldn’t load your account just now. A refresh usually sorts it.';
       $('errBar').classList.add('on');
     }
   }).catch(function () {
