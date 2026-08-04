@@ -13,6 +13,44 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://happy-beanie.vercel.app/">
 <meta name="twitter:card" content="summary">
+<script>
+window.HB_SHOPIFY = {
+  domain: 'pxv2u2-kc.myshopify.com',
+  token: 'HB_STOREFRONT_TOKEN_PLACEHOLDER',
+  apiVersion: '2025-07',
+  variants: {
+    dog: { onetime: 'gid://shopify/ProductVariant/41325473005632', bundle: 'gid://shopify/ProductVariant/41325473071168' },
+    cat: { onetime: 'gid://shopify/ProductVariant/41325473103936', bundle: 'gid://shopify/ProductVariant/41325473169472' }
+  },
+  sellingPlan: 'gid://shopify/SellingPlan/974946368'
+};
+window.hbShopifyCheckout = async function (rows) {
+  const cfg = window.HB_SHOPIFY;
+  if (!cfg.token || cfg.token.indexOf('PLACEHOLDER') !== -1) {
+    throw new Error('Shopify storefront token not configured yet');
+  }
+  const lines = rows.map(function (r) {
+    const v = cfg.variants[r.key];
+    if (r.plan === 2) return { merchandiseId: v.bundle, quantity: r.qty };
+    const line = { merchandiseId: v.onetime, quantity: r.qty };
+    if (r.plan === 1) line.sellingPlanId = cfg.sellingPlan;
+    return line;
+  });
+  const res = await fetch('https://' + cfg.domain + '/api/' + cfg.apiVersion + '/graphql.json', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': cfg.token },
+    body: JSON.stringify({
+      query: 'mutation cartCreate($input: CartInput!) { cartCreate(input: $input) { cart { checkoutUrl } userErrors { field message } } }',
+      variables: { input: { lines: lines } }
+    })
+  });
+  const json = await res.json();
+  const errs = (json.errors || []).concat((json.data && json.data.cartCreate && json.data.cartCreate.userErrors) || []);
+  const url = json.data && json.data.cartCreate && json.data.cartCreate.cart && json.data.cartCreate.cart.checkoutUrl;
+  if (!url) throw new Error('Checkout failed: ' + (errs.map(function(e){return e.message}).join('; ') || 'no checkout URL returned'));
+  window.location.href = url;
+};
+</script>
 <script>window.__resources = {"https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js": "assets/vendor/react-dom.production.min.js", "https://unpkg.com/react@18.3.1/umd/react.production.min.js": "assets/vendor/react.production.min.js"};</script>
 
 <script src="assets/js/e936a6cc.js"></script>
@@ -2635,7 +2673,14 @@ class Component extends DCLogic {
       isCart: page === 'cart',
       isCheckout: page === 'checkout',
       goCart: this.nav('cart'),
-      goCheckout: this.nav('checkout'),
+      goCheckout: () => {
+        const MM = this.cartMath();
+        if (!MM.items.length) return;
+        const cfg = window.HB_SHOPIFY || {};
+        if (!cfg.token || cfg.token.indexOf('PLACEHOLDER') !== -1) { this.nav('checkout')(); return; }
+        window.hbShopifyCheckout(MM.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })))
+          .catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
+      },
       cartEmpty: M.items.length === 0,
       cartHasItems: M.items.length > 0,
       cartHead: M.items.length === 0 ? 'Your cart is' : 'Two minutes from',
