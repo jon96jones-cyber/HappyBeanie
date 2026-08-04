@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/((?!assets/|policies|favicon).*)",
+      "source": "/((?!assets/|policies|api/|wholesale|favicon).*)",
       "destination": "/index.html"
     }
   ]
