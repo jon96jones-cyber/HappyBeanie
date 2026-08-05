@@ -587,7 +587,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <div style="padding: 46px 44px;">
           <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 20px;">Third-party verification</div>
           <p style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 26px; line-height: 1.35; margin: 0 0 20px; color: #F5F0E6;">Every lot is assayed by an independent lab for peptide identity, concentration, heavy metals and microbial load.</p>
-          <p style="font-size: 15px; line-height: 1.65; color: #B9AF9C; margin: 0 0 22px;">Certificates of analysis are published by lot number and stay online for the life of the product. Scan the code on the tin to pull yours.</p>
+          <p style="font-size: 15px; line-height: 1.65; color: #B9AF9C; margin: 0 0 22px;">Certificates of analysis are published by lot number and stay online for the life of the product. Scan the code on the box to pull yours.</p>
           <span sc-camel-on-click="{{ goCerts }}" style="display: inline-block; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.86 0.14 92); border-bottom: 1px solid oklch(0.86 0.14 92); padding-bottom: 3px; cursor: pointer;">Browse COAs by lot</span>
         </div>
         <div data-m="auto" style="height: 100%; min-height: 320px; border-left: 1px solid rgba(245,240,230,0.16);">
@@ -672,7 +672,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
           <button sc-camel-on-click="{{ toggleFacts }}" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; background: transparent; border: none; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #17140F; cursor: pointer;">Supplement facts<span>{{ factsSign }}</span></button>
           <sc-if value="{{ factsOpen }}" hint-placeholder-val="{{ true }}">
             <div style="padding: 0 22px 22px;">
-              <div style="border-top: 1px solid #17140F; padding-top: 12px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: #6A6055; margin-bottom: 10px;">Serving size: 1 chew · 28 servings per tin</div>
+              <div style="border-top: 1px solid #17140F; padding-top: 12px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: #6A6055; margin-bottom: 10px;">Serving size: 1 chew · 28 servings per box</div>
               <sc-for list="{{ facts }}" as="f" hint-placeholder-count="4">
                 <div style="display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-top: 1px solid #E8DFCC; font-size: 14px;">
                   <span>{{ f.k }}</span><span style="font-family: 'DM Mono', monospace; color: #554C40;">{{ f.v }}</span>
@@ -705,7 +705,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
             </div>
           </div>
         </div>
-        <p style="font-size: 16px; line-height: 1.7; color: #554C40; max-width: 34em; margin: 0 0 30px;">Sent in by owners, unedited. Add your own and take 15% off your next tin.</p>
+        <p style="font-size: 16px; line-height: 1.7; color: #554C40; max-width: 34em; margin: 0 0 30px;">Sent in by owners, unedited. Add your own and take 15% off your next box.</p>
       </div>
 
       <div data-m="wall" style="max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 196px; gap: 10px;">
@@ -1139,7 +1139,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
             </div>
           </div>
         </div>
-        <p style="font-size: 16px; line-height: 1.7; color: #554C40; max-width: 34em; margin: 0 0 30px;">Sent in by owners, unedited. Add your own and take 15% off your next tin.</p>
+        <p style="font-size: 16px; line-height: 1.7; color: #554C40; max-width: 34em; margin: 0 0 30px;">Sent in by owners, unedited. Add your own and take 15% off your next box.</p>
       </div>
 
       <div data-m="wall" style="max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 196px; gap: 10px;">
@@ -1264,14 +1264,14 @@ window.hbShopifyCheckout = async function (rows, buyer) {
           <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">Why this exists</div>
           <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.04; margin: 0 0 22px; max-width: 20em; text-wrap: balance;">He stopped meeting me at the door.</h2>
           <p style="font-size: 16.5px; line-height: 1.72; color: #554C40; margin: 0 0 18px; max-width: 34em; text-wrap: pretty;">Beanie was fourteen. Nothing was wrong on paper — bloodwork fine, no diagnosis, nothing to treat. He had just quietly stopped doing the things that made him him. The stairs became a decision. The greeting at the door became a look up from the rug.</p>
-          <p style="font-size: 16.5px; line-height: 1.72; color: #554C40; margin: 0 0 26px; max-width: 34em; text-wrap: pretty;">His owner is a compounding pharmacist. He spent a year reading canine trials instead of marketing copy, then blended the first batch on a borrowed bench for one dog. Eleven weeks later Beanie beat him to the door. Every tin since is that formula, published lot by lot.</p>
+          <p style="font-size: 16.5px; line-height: 1.72; color: #554C40; margin: 0 0 26px; max-width: 34em; text-wrap: pretty;">His owner is a compounding pharmacist. He spent a year reading canine trials instead of marketing copy, then blended the first batch on a borrowed bench for one dog. Eleven weeks later Beanie beat him to the door. Every batch since is that formula, published lot by lot.</p>
           <div style="display: flex; align-items: center; gap: 14px; padding-top: 22px; border-top: 1px solid #E0D6C2; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;"><span style="width: 26px; height: 1px; background: oklch(0.44 0.07 152);"></span>Scottsdale, Arizona · since 2022</div>
         </div>
       </div>
 
       <div style="max-width: 1180px; margin: 72px auto 0;">
         <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">Before you decide</div>
-        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 44px); line-height: 1.05; margin: 0 0 32px; max-width: 22em;">The questions owners ask us <span style="color: oklch(0.44 0.07 152);">before the first tin.</span></h2>
+        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 44px); line-height: 1.05; margin: 0 0 32px; max-width: 22em;">The questions owners ask us <span style="color: oklch(0.44 0.07 152);">before the first box.</span></h2>
         <div style="display: grid; gap: 0; border-top: 1px solid #E0D6C2;">
           <sc-for list="{{ faqs }}" as="q" hint-placeholder-count="4">
             <div style="border-bottom: 1px solid #E0D6C2;">
@@ -1289,7 +1289,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; align-items: center;">
           <div>
             <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 22px;">Nothing to lose</div>
-            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.03; color: #F5F0E6; margin: 0 0 20px; max-width: 20em;">Try it for ninety days. <span style="color: oklch(0.86 0.14 92);">Keep the tin either way.</span></h2>
+            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.03; color: #F5F0E6; margin: 0 0 20px; max-width: 20em;">Try it for ninety days. <span style="color: oklch(0.86 0.14 92);">Keep the box either way.</span></h2>
             <p style="font-size: 16px; line-height: 1.7; color: #B9AF9C; margin: 0 0 32px; max-width: 32em;">If you do not see the change you were hoping for, tell us and we refund the order in full — opened, half-empty, no return shipment. We would rather earn the second month than argue about the first.</p>
             <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
               <button sc-camel-on-click="{{ cartCta }}" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 20px 36px; border: none; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 38px -22px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">{{ cartLabel }}</button>
@@ -1308,7 +1308,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div aria-hidden="true" style="position: absolute; left: 0; top: 0; height: 2px; width: {{ barPct }}; background: oklch(0.86 0.14 92); transition: width 0.12s linear;"></div>
       <div data-m="gap" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 1180px; margin: 0 auto;">
         <div data-m="hide" style="display: flex; align-items: center; gap: 14px;">
-          <div style="width: 46px; height: 46px; border-radius: 3px; overflow: hidden; flex: 0 0 auto;"><image-slot id="{{ pdpSlotMain }}" placeholder="Tin" style="width: 100%; height: 100%;"></image-slot></div>
+          <div style="width: 46px; height: 46px; border-radius: 3px; overflow: hidden; flex: 0 0 auto;"><image-slot id="{{ pdpSlotMain }}" placeholder="Product shot" style="width: 100%; height: 100%;"></image-slot></div>
           <div>
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 20px; color: #F5F0E6; line-height: 1.1;">{{ pdpName }}</div>
             <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;">Ships within 24 hours</div>
@@ -1411,7 +1411,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <div>
           <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 22px;">The facility</div>
           <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.4vw, 48px); line-height: 1.05; margin: 0 0 20px;">One suite in Scottsdale, <span style="color: oklch(0.44 0.07 152);">nothing outsourced.</span></h2>
-          <p style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 26px; max-width: 32em;">Nine hundred square feet, cGMP licensed, with a cold-blend room and an analytical bench. Every tin you receive was weighed, blended and sealed here — then held until its assay comes back clean.</p>
+          <p style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 26px; max-width: 32em;">Nine hundred square feet, cGMP licensed, with a cold-blend room and an analytical bench. Every box you receive was weighed, blended and sealed here — then held until its assay comes back clean.</p>
           <div style="display: grid; gap: 0; margin-bottom: 30px;">
             <sc-for list="{{ facilityFacts }}" as="ff" hint-placeholder-count="4">
               <div style="display: grid; grid-template-columns: auto 1fr; gap: 18px; padding: 15px 0; border-top: 1px solid #D5CAB5; align-items: baseline;">
@@ -1627,7 +1627,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
           </sc-for>
         </div>
         </div>
-        <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 28px 0 0;">Lot numbers are printed under each tin beside the best-by date. Reports are held unpublished only while an assay is in progress.</p>
+        <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 28px 0 0;">Lot numbers are printed on each box beside the best-by date. Reports are held unpublished only while an assay is in progress.</p>
       </div>
     </section>
 
@@ -2059,8 +2059,8 @@ class Component extends DCLogic {
     const price = [115, 99, 297];
     const term = ['One-time · 30-day supply', 'Subscribe & save · 30-day supply', 'Buy 3 get 1 free · 4 months'];
     const rows = [];
-    if (this.state.cartDog > 0) rows.push({ key: 'dog', badge: 'For dogs', name: 'Happy Beans for Dogs', slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans tin', qty: this.state.cartDog, plan: this.state.cartPlanDog });
-    if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats tin', qty: this.state.cartCat, plan: this.state.cartPlanCat });
+    if (this.state.cartDog > 0) rows.push({ key: 'dog', badge: 'For dogs', name: 'Happy Beans for Dogs', slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans box', qty: this.state.cartDog, plan: this.state.cartPlanDog });
+    if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box', qty: this.state.cartCat, plan: this.state.cartPlanCat });
     const items = rows.map(r => ({ ...r, unitPrice: price[r.plan], planLabel: term[r.plan], line: price[r.plan] * r.qty }));
     const sub = items.reduce((n, i) => n + i.line, 0);
     const disc = this.state.wallPhoto ? Math.round(sub * 0.15) : 0;
@@ -2351,7 +2351,7 @@ class Component extends DCLogic {
     return [
         { year: '2022', title: 'One dog', body: 'A compounding pharmacist blends a peptide chew for his own fourteen-year-old lab.',
           evLabel: 'Literature review', evFinding: 'Formulation began as a reading exercise: which repair-signalling ingredients had controlled canine trials behind them, and which had only marketing.', evCite: 'Internal formulation memo · 2022', hasLink: false },
-        { year: '2023', title: 'Twelve dogs', body: 'Vet friends ask for tins. First stability and assay work runs on a borrowed bench.',
+        { year: '2023', title: 'Twelve dogs', body: 'Vet friends ask for boxes. First stability and assay work runs on a borrowed bench.',
           evLabel: 'Peer-reviewed trial', evFinding: 'A double-blind, placebo-controlled trial of elk velvet antler powder in 38 dogs with osteoarthrosis found gait, daily-life performance and owner-rated vitality all improved on the active powder but not on placebo, with no abnormalities on blood analysis.', evCite: 'Moreau M, Dupuis J, Bonneau NH, Lécuyer M. Can Vet J. 2004;45(2):133–9. PMID 15025149', hasLink: true, evHref: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC548602/' },
         { year: '2024', title: 'Two species', body: 'The feline dose curve is finished and the Scottsdale suite goes cGMP licensed.',
           evLabel: 'Dose modelling', evFinding: 'Feline clearance and copper tolerance data drove a separate formulation rather than a smaller scoop of the dog product.', evCite: 'Internal dose-curve study · reviewed by P. Raman, DVM', hasLink: false },
@@ -2388,7 +2388,7 @@ class Component extends DCLogic {
       { key: 'contact', label: 'Contact' }
     ];
     const shopDefs = [
-      { key: 'dog', badge: 'For dogs', format: 'Happy Beans™ · daily soft chew', name: 'Happy Beans for Dogs', price: 'As low as $74', term: 'Per month · buy 3 get 1 free', slot: 'hbv2-shop-dog', ph: 'Happy Beans tin with dog, editorial',
+      { key: 'dog', badge: 'For dogs', format: 'Happy Beans™ · daily soft chew', name: 'Happy Beans for Dogs', price: 'As low as $74', term: 'Per month · buy 3 get 1 free', slot: 'hbv2-shop-dog', ph: 'Happy Beans box with dog, editorial',
         body: 'The world\u2019s most powerful anti aging pet supplement. Made fresh daily at our in-house lab in Scottsdale, Arizona. Tested on humans, trusted by pets.',
         points: [
           { k: 'A1 Peptides', v: 'Proprietary peptide blend · 420mg' },
@@ -2397,7 +2397,7 @@ class Component extends DCLogic {
           { k: 'Weight range', v: '6\u2013120 lb' },
           { k: 'Ritual', v: 'One chew each morning' }
         ] },
-      { key: 'cat', badge: 'For cats', format: 'Happy Beans for Cats™ · daily supplement chew', name: 'Happy Beans for Cats', price: 'As low as $74', term: 'Per month · buy 3 get 1 free', slot: 'hbv2-shop-cat', ph: 'Happy Beans for Cats tin with cat, editorial',
+      { key: 'cat', badge: 'For cats', format: 'Happy Beans for Cats™ · daily supplement chew', name: 'Happy Beans for Cats', price: 'As low as $74', term: 'Per month · buy 3 get 1 free', slot: 'hbv2-shop-cat', ph: 'Happy Beans for Cats box with cat, editorial',
         body: 'The world\u2019s most powerful anti aging pet supplement. Made fresh daily at our in-house lab in Scottsdale, Arizona. Tested on humans, trusted by pets.',
         points: [
           { k: 'A1 Peptides', v: 'Proprietary peptide blend · 420mg' },
@@ -2415,7 +2415,7 @@ class Component extends DCLogic {
       { k: 'Copper', dog: 'Included as cofactor', cat: 'None — removed entirely' },
       { k: 'Dosing', dog: 'One chew daily', cat: 'One chew daily' },
       { k: 'Weight range', dog: '6–120 lb', cat: '4–22 lb' },
-      { k: 'Supply', dog: '30-day tin', cat: '30-day tin' },
+      { k: 'Supply', dog: '30-day box', cat: '30-day box' },
       { k: 'Flavour base', dog: 'Natural chicken', cat: 'Natural tuna, salmon oil' }
     ];
     const dogDosing = [
@@ -2443,13 +2443,13 @@ class Component extends DCLogic {
     const deskOpen = hr >= 8 && hr < 17;
     const topicDefs = [
       { label: 'Dosing help', hint: 'Include species, age and weight — it is the first thing we will ask for.' },
-      { label: 'Look up a lot', hint: 'The lot number is printed under the tin, next to the best-by date.' },
+      { label: 'Look up a lot', hint: 'The lot number is printed on the box, next to the best-by date.' },
       { label: 'Order issue', hint: 'Paste your order number and we will fix it before we explain it.' },
       { label: 'Vet or clinic', hint: 'Tell us your practice name and we will send the full formulation packet.' },
       { label: 'Wholesale', hint: 'Shop name, city and rough monthly volume gets you a straight answer fastest.' }
     ];
     const certDefs = [
-      { key: 'dog', product: 'Happy Beans', lot: 'HB-2607-A', made: '02 Jul 2026', tested: '09 Jul 2026', lab: 'Sonoran Analytical, Tempe AZ', status: 'Released', size: '4,120 tins',
+      { key: 'dog', product: 'Happy Beans', lot: 'HB-2607-A', made: '02 Jul 2026', tested: '09 Jul 2026', lab: 'Sonoran Analytical, Tempe AZ', status: 'Released', size: '4,120 boxes',
         panels: [
           { k: 'Peptide complex, identity', spec: 'Conforms', result: 'Conforms', pass: true },
           { k: 'Peptide complex, assay', spec: '420mg ± 10%', result: '431mg', pass: true },
@@ -2460,7 +2460,7 @@ class Component extends DCLogic {
           { k: 'Salmonella / E. coli', spec: 'Absent', result: 'Absent', pass: true },
           { k: 'Water activity', spec: '< 0.65 aw', result: '0.58 aw', pass: true }
         ] },
-      { key: 'dog', product: 'Happy Beans', lot: 'HB-2605-C', made: '14 May 2026', tested: '21 May 2026', lab: 'Sonoran Analytical, Tempe AZ', status: 'Released', size: '3,880 tins',
+      { key: 'dog', product: 'Happy Beans', lot: 'HB-2605-C', made: '14 May 2026', tested: '21 May 2026', lab: 'Sonoran Analytical, Tempe AZ', status: 'Released', size: '3,880 boxes',
         panels: [
           { k: 'Peptide complex, identity', spec: 'Conforms', result: 'Conforms', pass: true },
           { k: 'Peptide complex, assay', spec: '420mg ± 10%', result: '408mg', pass: true },
@@ -2469,7 +2469,7 @@ class Component extends DCLogic {
           { k: 'Total aerobic count', spec: '< 10,000 cfu/g', result: '460 cfu/g', pass: true },
           { k: 'Salmonella / E. coli', spec: 'Absent', result: 'Absent', pass: true }
         ] },
-      { key: 'cat', product: 'Happy Beans for Cats', lot: 'LB-2607-A', made: '06 Jul 2026', tested: '13 Jul 2026', lab: 'Sonoran Analytical, Tempe AZ', status: 'Released', size: '1,640 tins',
+      { key: 'cat', product: 'Happy Beans for Cats', lot: 'LB-2607-A', made: '06 Jul 2026', tested: '13 Jul 2026', lab: 'Sonoran Analytical, Tempe AZ', status: 'Released', size: '1,640 boxes',
         panels: [
           { k: 'Feline peptide complex, identity', spec: 'Conforms', result: 'Conforms', pass: true },
           { k: 'Feline peptide complex, assay', spec: '180mg ± 10%', result: '186mg', pass: true },
@@ -2479,7 +2479,7 @@ class Component extends DCLogic {
           { k: 'Total aerobic count', spec: '< 1,000 cfu/g', result: '< 10 cfu/g', pass: true },
           { k: 'Yeast & mould', spec: '< 100 cfu/g', result: '< 10 cfu/g', pass: true }
         ] },
-      { key: 'cat', product: 'Happy Beans for Cats', lot: 'LB-2604-B', made: '11 Apr 2026', tested: '18 Apr 2026', lab: 'Desert Peak Labs, Phoenix AZ', status: 'Destroyed', size: '1,200 tins',
+      { key: 'cat', product: 'Happy Beans for Cats', lot: 'LB-2604-B', made: '11 Apr 2026', tested: '18 Apr 2026', lab: 'Desert Peak Labs, Phoenix AZ', status: 'Destroyed', size: '1,200 boxes',
         panels: [
           { k: 'Feline peptide complex, identity', spec: 'Conforms', result: 'Conforms', pass: true },
           { k: 'Feline peptide complex, assay', spec: '180mg ± 10%', result: '149mg', pass: false },
@@ -2494,8 +2494,8 @@ class Component extends DCLogic {
     const faqDefs = [
       { q: 'How fast will I see something?', a: 'Owners most often report a change between weeks two and six — usually energy and willingness to move before anything visible in coat or weight. Peptide effects compound with consistency, so daily matters more than dose size.' },
       { q: 'Is it safe alongside prescriptions?', a: 'In most cases yes, but send us the list. Our pharmacist reviews interactions directly and will tell you plainly if we would rather you waited or spaced the doses.' },
-      { q: 'What if my animal refuses it?', a: 'Switch formats. Refusers usually take Thirsty Bean in the water bowl instead, and we will swap an opened tin inside the first 90 days, no return shipment needed.' },
-      { q: 'Where are the certificates of analysis?', a: 'Published by lot number and linked from the code on every tin. They stay online for the life of the product, including heavy metals and microbial panels.' }
+      { q: 'What if my animal refuses it?', a: 'Switch formats. Refusers usually take Thirsty Bean in the water bowl instead, and we will swap an opened box inside the first 90 days, no return shipment needed.' },
+      { q: 'Where are the certificates of analysis?', a: 'Published by lot number and linked from the code on every box. They stay online for the life of the product, including heavy metals and microbial panels.' }
     ];
     const isDog = this.state.sp === 'dog';
     const base = (this.props.basePrice ?? 68) - (isDog ? 0 : 6);
@@ -2513,14 +2513,14 @@ class Component extends DCLogic {
       head: 'For Dogs',
       italic: '',
       body: 'Made fresh daily at our in-house lab in Scottsdale, Arizona. Tested on humans, trusted by pets.',
-      main: { slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans tin, hero angle' },
+      main: { slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans box, hero angle' },
       thumbs: [
         { slot: 'hbv2-pdp-dog-2', ph: 'Chew macro' },
-        { slot: 'hbv2-pdp-dog-3', ph: 'Tin in hand' },
+        { slot: 'hbv2-pdp-dog-3', ph: 'Box in hand' },
         { slot: 'hbv2-pdp-dog-4', ph: 'Dog taking chew' }
       ],
       specs: [
-        { k: 'Format', v: 'Soft chew · 30-day tin' },
+        { k: 'Format', v: 'Soft chew · 30-day box' },
         { k: 'Quality', v: 'Human-grade · made in USA' },
         { k: 'The ritual', v: 'One chew, every morning' }
       ],
@@ -2536,14 +2536,14 @@ class Component extends DCLogic {
       head: 'For Cats',
       italic: '',
       body: 'Made fresh daily at our in-house lab in Scottsdale, Arizona. Tested on humans, trusted by pets.',
-      main: { slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats tin, hero angle' },
+      main: { slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box, hero angle' },
       thumbs: [
         { slot: 'hbv2-pdp-cat-2', ph: 'Chew in close-up' },
-        { slot: 'hbv2-pdp-cat-3', ph: 'Tin in hand' },
+        { slot: 'hbv2-pdp-cat-3', ph: 'Box in hand' },
         { slot: 'hbv2-pdp-cat-4', ph: 'Cat taking the chew' }
       ],
       specs: [
-        { k: 'Format', v: 'Soft chew · 30-day tin' },
+        { k: 'Format', v: 'Soft chew · 30-day box' },
         { k: 'Quality', v: 'Copper-free · made in USA' },
         { k: 'The ritual', v: 'One chew, every morning' }
       ],
@@ -2699,7 +2699,7 @@ class Component extends DCLogic {
       cartEmpty: M.items.length === 0,
       cartHasItems: M.items.length > 0,
       cartHead: M.items.length === 0 ? 'Your cart is' : 'Two minutes from',
-      cartHeadAccent: M.items.length === 0 ? 'empty.' : 'the first tin.',
+      cartHeadAccent: M.items.length === 0 ? 'empty.' : 'the first box.',
       cartItems: M.items.map(i => ({
         slot: i.slot, ph: i.ph, badge: i.badge, name: i.name, planLabel: i.planLabel, qty: String(i.qty),
         unit: '$' + i.unitPrice + ' each',
@@ -2723,7 +2723,7 @@ class Component extends DCLogic {
       orderPending: !this.state.ordered,
       orderId: this.state.orderId,
       orderEta: '2–4 business days',
-      orderNote: 'We compound to order, so your tin is blended fresh and leaves Scottsdale in the morning. A confirmation and the lot number for your batch are on the way by email.',
+      orderNote: 'We compound to order, so your chews are blended fresh and leave Scottsdale in the morning. A confirmation and the lot number for your batch are on the way by email.',
       checkoutSections: [
         { n: '01', title: 'Contact', fields: [
           { label: 'Email', ph: 'you@email.com', value: co.email, set: this.setCo('email'), mode: 'email', span: 'span 2' },
@@ -2802,7 +2802,7 @@ class Component extends DCLogic {
       barOpacity: this.state.barOn ? 1 : 0,
       barPct: this.state.pct + '%',
       assurances: [
-        { k: '90 days', v: 'Full refund if you do not see a change — opened tins included, no return shipment.' },
+        { k: '90 days', v: 'Full refund if you do not see a change — opened boxes included, no return shipment.' },
         { k: 'Made to order', v: 'Blended and shipped within 48 hours of your order, never warehoused.' },
         { k: 'Ask first', v: 'A licensed pharmacist reviews interactions with your animal\u2019s prescriptions, free.' }
       ],
@@ -2815,7 +2815,7 @@ class Component extends DCLogic {
       inside: (isDog ? [
         { n: '01 Signalling', title: 'Peptide complex', amount: '420mg per chew', body: 'Copper tripeptide, collagen fragments and signal amino acids — short enough to reach tissue, specific enough to instruct it.' },
         { n: '02 Nutrition', title: 'Whole-food carriers', amount: '500mg elk liver + zinc 4mg', body: 'The cofactors repair actually spends: heme iron, B12, vitamin A and zinc from organ sources rather than isolates.' },
-        { n: '03 Delivery', title: 'Cold-blended chew', amount: 'Stability tested to 24 months', body: 'Blended below 40°C, pH buffered, packed in an opaque tin with an oxygen scavenger so the label dose survives the shelf.' }
+        { n: '03 Delivery', title: 'Cold-blended chew', amount: 'Stability tested to 24 months', body: 'Blended below 40°C, pH buffered, sealed away from light and air so the label dose survives the shelf.' }
       ] : [
         { n: '01 Signalling', title: 'Feline peptide complex', amount: '180mg per serving', body: 'Copper-free by design, dosed to a faster clearance rate — collagen fragments and signal amino acids only.' },
         { n: '02 Nutrition', title: 'Taurine-forward carriers', amount: '250mg taurine + vitamin E 6 IU', body: 'Built around the amino acid cats cannot make enough of, with salmon oil for absorption and no added iron.' },
@@ -2863,7 +2863,7 @@ class Component extends DCLogic {
       ].map((s, i) => ({ ...s, delay: i * 100 })),
       facilityFacts: [
         { k: 'Licensing', v: 'cGMP registered · Arizona Board of Pharmacy' },
-        { k: 'Capacity', v: 'Roughly 4,000 tins a month, made to order' },
+        { k: 'Capacity', v: 'Roughly 4,000 boxes a month, made to order' },
         { k: 'Testing', v: 'Independent assay per lot, held until cleared' },
         { k: 'Team', v: 'Three pharmacists, one DVM, one QA lead' }
       ],
@@ -2939,7 +2939,7 @@ class Component extends DCLogic {
         { quote: '\u201CI lost my soul dog too soon. This time I\u2019m doing everything I can.\u201D', who: 'Carly M. · Ghost, 8 yrs', slot: 'hbv2-rev4' }
       ].map((r, i) => ({ ...r, delay: i * 90 })),
       steps: [
-        { n: '01 Morning', title: 'One chew, first thing', body: 'Before the walk, before breakfast. Peptide uptake is best on a near-empty stomach.', slot: 'hbv2-step1', ph: 'Tin on kitchen counter, morning light' },
+        { n: '01 Morning', title: 'One chew, first thing', body: 'Before the walk, before breakfast. Peptide uptake is best on a near-empty stomach.', slot: 'hbv2-step1', ph: 'Chews on kitchen counter, morning light' },
         { n: '02 Direct', title: 'Hand it over', body: 'No mixing, no measuring, no pill pocket. Most beans take it as a treat on the first try.', slot: 'hbv2-step2', ph: 'Hand offering chew to dog' },
         { n: '03 Consistent', title: 'Never miss a morning', body: 'Repair compounds. Owners who stay daily report the clearest change between weeks two and six.', slot: 'hbv2-step3', ph: 'Dog mid-run in field' }
       ],
@@ -2971,7 +2971,7 @@ class Component extends DCLogic {
       layers: [
         { n: '01', title: 'The signalling layer', accent: '| Bioactive peptides', tag: 'Short-chain · route-matched', slot: 'hbv2-layer1', ph: 'Peptide vials on light table', body: 'Peptides are the body\u2019s instruction set — chains short enough to reach tissue and specific enough to tell it what to do. Beanie doses them to the animal and the route they take into the body.', chips: ['Collagen fragments', 'Signal amino acids'] },
         { n: '02', title: 'The nutritional layer', accent: '| Whole-food carriers', tag: 'Organic-certified inputs', slot: 'hbv2-layer2', ph: 'Raw whole-food inputs, overhead', body: 'Good signals need good fuel. Every chew carries the nutrients a body draws on to repair itself — B12, iron, zinc, taurine and vitamin A — and they come from real whole-food sources, never synthetic shortcuts.', chips: ['Vitamin A', 'B12', 'Heme iron', 'Taurine'] },
-        { n: '03', title: 'The delivery layer', accent: '| How it stays intact', tag: 'Stability tested to 24 months', slot: 'hbv2-layer3', ph: 'Sealed tin, cold-blend line', body: 'Peptides are delicate, so we treat them that way. Every batch is blended cold, never overheated, and sealed in a light-proof tin that keeps air out — so the dose on the label is the dose in the bowl.', chips: ['Cold blend', 'pH buffered', 'Opaque pack', 'Lot-coded'] }
+        { n: '03', title: 'The delivery layer', accent: '| How it stays intact', tag: 'Stability tested to 24 months', slot: 'hbv2-layer3', ph: 'Sealed pack, cold-blend line', body: 'Peptides are delicate, so we treat them that way. Every batch is blended cold, never overheated, and sealed in light-proof packaging that keeps air out — so the dose on the label is the dose in the bowl.', chips: ['Cold blend', 'pH buffered', 'Opaque pack', 'Lot-coded'] }
       ].map((l, i) => {
         const on = this.state.layer === i;
         return { ...l,
@@ -3205,7 +3205,7 @@ Object.assign(Component.prototype, {
       qzCanBuy: verdict !== 'block',
       qzBuyRule: 'rgba(245,240,230,0.22)',
       qzBuyLabel: 'Get ' + (a.species === 'cat' ? 'Happy Beans for Cats' : 'Happy Beans for Dogs') + ' →',
-      qzBuyNote: verdict === 'ok' ? 'One chew daily · 30-day tin' : 'Start at ½ dose for week one',
+      qzBuyNote: verdict === 'ok' ? 'One chew daily · 30-day box' : 'Start at ½ dose for week one',
       qzGoBuy: () => {
         this.setState({ page: 'product', sp: a.species === 'cat' ? 'cat' : 'dog', plan: 1, added: false, ordered: false, menuOpen: false });
         window.scrollTo({ top: 0 });
