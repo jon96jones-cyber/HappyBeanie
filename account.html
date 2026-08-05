@@ -128,7 +128,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     <section id="stateOut" class="state">
       <div class="kicker">Your account</div>
       <h1>Good to see you <em>again.</em></h1>
-      <p class="lede">Sign in to check on a delivery, peek at your order history, or see when the next tin leaves Scottsdale.</p>
+      <p class="lede">Sign in to check on a delivery, peek at your order history, or see when the next box leaves Scottsdale.</p>
       <div id="errBar" class="errbar"></div>
       <div class="signin-wrap">
         <div class="card card-pad">
@@ -140,7 +140,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
         <div>
           <ul class="sfeat">
             <li><span class="bdot"></span>Every order, with plain-words delivery updates</li>
-            <li><span class="bdot"></span>Tracking links the moment a tin ships</li>
+            <li><span class="bdot"></span>Tracking links the moment a box ships</li>
             <li><span class="bdot"></span>Your care plan — what's coming, and when</li>
             <li><span class="bdot"></span>Trade pricing status for wholesale partners</li>
           </ul>
@@ -268,7 +268,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     var orders = (c.orders && c.orders.nodes) || [];
     $('orderCount').textContent = orders.length ? (orders.length === 1 ? 'One so far' : orders.length + ' and counting') : '';
     if (!orders.length) {
-      $('ordersList').innerHTML = '<div class="card card-pad"><p class="empty">Nothing here yet — your first tin is waiting. <a href="/shop">Meet the formulas</a>.</p></div>';
+      $('ordersList').innerHTML = '<div class="card card-pad"><p class="empty">Nothing here yet — your first box is waiting. <a href="/shop">Meet the formulas</a>.</p></div>';
     } else {
       $('ordersList').innerHTML = orders.map(function (o) {
         var items = ((o.lineItems && o.lineItems.nodes) || []).map(function (li) {
@@ -294,7 +294,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 
     var subs = (c.subscriptionContracts && c.subscriptionContracts.nodes) || [];
     if (!subs.length) {
-      $('subsBox').innerHTML = '<p class="muted">No care plan running right now. Start one from any <a href="/product">product page</a> and a fresh tin arrives like clockwork.</p>';
+      $('subsBox').innerHTML = '<p class="muted">No care plan running right now. Start one from any <a href="/product">product page</a> and a fresh box arrives like clockwork.</p>';
     } else {
       $('subsBox').innerHTML = subs.map(function (s) {
         var dp = s.deliveryPolicy || {};
@@ -303,9 +303,9 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
         var cadence = unit ? (count === 1 ? 'every ' + unit : 'every ' + count + ' ' + unit + 's') : '';
         var active = String(s.status || '').toUpperCase() === 'ACTIVE';
         var line = active
-          ? '<p class="plan-line"><span class="dot green"></span><b>Running smoothly.</b>' + (cadence ? ' A fresh tin ' + esc(cadence) + '.' : '') + '</p>'
+          ? '<p class="plan-line"><span class="dot green"></span><b>Running smoothly.</b>' + (cadence ? ' A fresh box ' + esc(cadence) + '.' : '') + '</p>'
           : '<p class="plan-line"><span class="dot grey"></span><b>' + esc(String(s.status || '').toLowerCase()) + '.</b></p>';
-        var next = s.nextBillingDate ? '<div class="plan-next">Next tin is billed ' + fmtDate(s.nextBillingDate) + '.</div>' : '';
+        var next = s.nextBillingDate ? '<div class="plan-next">Next box is billed ' + fmtDate(s.nextBillingDate) + '.</div>' : '';
         return line + next;
       }).join('<div style="height:16px"></div>');
     }
