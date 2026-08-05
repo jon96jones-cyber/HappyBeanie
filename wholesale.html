@@ -33,8 +33,11 @@ header.site { position:sticky; top:0; z-index:50; background:rgba(23,20,15,0.88)
 header.site .bar { max-width:1180px; margin:0 auto; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .mark { display:flex; align-items:baseline; gap:10px; color:#F5F0E6; }
 .mark:hover { border-bottom:none; }
-.mark b { font-family:'DM Sans',sans-serif; font-weight:700; font-size:23px; letter-spacing:-0.045em; }
-.mark b i { font-style:normal; color:#F0C64B; }
+.mark b { font-family:'DM Sans',sans-serif; font-weight:700; font-size:23px; letter-spacing:-0.045em; white-space:nowrap; }
+.mark b span { font-family:inherit; font-size:inherit; letter-spacing:inherit; text-transform:none; color:inherit; }
+.mark b .bean { position:relative; }
+.mark b .bean::before { content:''; position:absolute; left:50%; top:0.19em; width:0.42em; height:0.26em; margin-left:-0.21em; border-radius:46% 54% 50% 50% / 58% 42% 58% 42%; background:oklch(0.88 0.15 96); transform:rotate(-7deg); }
+.mark b .bean span { position:relative; z-index:1; }
 .mark span { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; }
 .hdr-actions { display:flex; align-items:center; gap:20px; }
 .back { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:#C9BEA8; }
@@ -176,7 +179,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 
 <header class="site">
   <div class="bar">
-    <a class="mark" href="/"><b>happy bean<i>ie</i></b><span>Peptide Care</span></a>
+    <a class="mark" href="/"><b>happy bean<span class="bean"><span>i</span></span>e</b><span>Peptide Care</span></a>
     <div class="hdr-actions">
       <a class="back" href="/">&larr; Back to site</a>
       <a class="hdr-cta" href="#apply">Apply now</a>
