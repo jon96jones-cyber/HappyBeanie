@@ -1386,6 +1386,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
               <div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 9px;">{{ abSel.evLabel }}</div>
               <p style="font-size: 14px; line-height: 1.6; color: #B9AF9C; margin: 0 0 8px; max-width: 44em;">{{ abSel.evFinding }}</p>
               <div style="font-family: 'DM Mono', monospace; font-size: 10px; color: #8A7F6E;">{{ abSel.evCite }}</div>
+              <a href="{{ abSel.evHref }}" target="_blank" rel="noopener" style="display: {{ abSel.evLinkDisplay }}; align-items: center; gap: 6px; margin-top: 12px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.86 0.14 92); text-decoration: none;" style-hover="color: #F5F0E6;">Read the study &rarr;</a>
             </div>
           </div>
         </div>
@@ -2375,7 +2376,7 @@ class Component extends DCLogic {
         { year: '2023', title: 'Twelve dogs', body: 'Vet friends ask for boxes. First stability and assay work runs on a borrowed bench.',
           evLabel: 'Peer-reviewed trial', evFinding: 'A double-blind, placebo-controlled trial of elk velvet antler powder in 38 dogs with osteoarthrosis found gait, daily-life performance and owner-rated vitality all improved on the active powder but not on placebo, with no abnormalities on blood analysis.', evCite: 'Moreau M, Dupuis J, Bonneau NH, Lécuyer M. Can Vet J. 2004;45(2):133–9. PMID 15025149', hasLink: true, evHref: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC548602/' },
         { year: '2024', title: 'Two species', body: 'The feline dose curve is finished and the Scottsdale suite goes cGMP licensed.',
-          evLabel: 'Dose modelling', evFinding: 'Feline clearance and copper tolerance data drove a separate formulation rather than a smaller scoop of the dog product.', evCite: 'Internal dose-curve study · reviewed by P. Raman, DVM', hasLink: false },
+          evLabel: 'Peer-reviewed review', evFinding: 'Cross-species dosing leaned on the marine omega-3 literature: a review of controlled green-lipped (greenshell) mussel trials found it eased degenerative joint disease in cats and chronic orthopaedic pain in dogs — evidence the same repair target responds in both species, but at doses each one needs rather than a smaller scoop of the other.', evCite: 'Eason CT, Adams SL, Puddick J, et al. Vet Sci. 2018;5(2):36. PMCID PMC6024869', hasLink: true, evHref: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6024869/' },
         { year: '2026', title: 'Two formulations', body: 'Happy Beans for Dogs and for Cats, every lot published with a third-party certificate of analysis.',
           evLabel: 'Ongoing', evFinding: 'A 90-day owner-reported outcome survey runs continuously; results and sample size are published with each release.', evCite: 'Owner survey, n=412 · updated quarterly', hasLink: false }
       ].map((t, i) => {
@@ -2677,7 +2678,7 @@ class Component extends DCLogic {
       abSel: (() => {
         const i = this.state.abRec || 0;
         const scale = ['One dog', 'Twelve dogs', 'Two species', 'Two formulations'][i];
-        return { ...this.evRecs()[i], chapNo: '0' + (i + 1), scale };
+        return { ...this.evRecs()[i], chapNo: '0' + (i + 1), scale, evLinkDisplay: this.evRecs()[i].hasLink ? 'inline-flex' : 'none' };
       })(),
       evRecords: this.evRecs().map((r, i) => {
         const on = (this.state.evRec || 0) === i;
