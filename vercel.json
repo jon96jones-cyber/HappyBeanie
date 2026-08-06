@@ -22,7 +22,7 @@
   ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/|policies|api/|admin|wholesale|account|favicon).*)",
       "destination": "/"
     }
   ]
