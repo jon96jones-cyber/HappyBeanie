@@ -174,6 +174,18 @@ footer.site { border-top:1px solid rgba(245,240,230,0.14); }
 footer.site .shell { padding-top:26px; padding-bottom:26px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:#8A7F6E; }
 footer.site a { color:#8A7F6E; }
 footer.site a:hover { color:#F0C64B; border-bottom:none; }
+
+@media (max-width:620px){
+  header.site .bar { padding:13px 16px; gap:12px; }
+  .mark b { font-size:19px; }
+  .mark span { display:none; }
+  .back { font-size:9.5px; letter-spacing:0.14em; white-space:nowrap; }
+  .hdr-actions { gap:12px; }
+  .shell { padding:0 16px; }
+  .hero { padding-top:44px; }
+  h1 { font-size:clamp(30px,8.4vw,42px); }
+  .lede { font-size:15.5px; margin:18px 0 28px; }
+}
 </style>
 </head><body>
 
@@ -191,21 +203,23 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 <section class="hero">
   <div class="shell">
     <div class="kicker rv">Wholesale &amp; Trade Program</div>
-    <h1 class="rv d1">Stock the peptide care <em>your clients ask for.</em></h1>
-    <p class="lede rv d2">Trade accounts for veterinary clinics, pet retailers, groomers and distributors. Compounded fresh in Scottsdale, Arizona, third-party assayed, and priced for the businesses pet owners already trust.</p>
+    <h1 class="rv d1">Dozens of vendors trust Happy Beanie <em>for their practice.</em></h1>
+    <p class="lede rv d2">Veterinary clinics, pet retailers, groomers and distributors already keep Happy Beanie on their shelves and in their exam rooms — compounded fresh in Scottsdale, Arizona, third-party assayed, and priced for the businesses pet owners trust most.</p>
     <div class="hero-ctas rv d3">
       <a class="btn-gold" href="#apply">Apply for an account</a>
       <a class="btn-ghost" href="#how">How it works</a>
     </div>
   </div>
+  <!-- STATS — hidden for now
   <div class="stats">
     <div class="shell">
-      <div class="stat rv"><div class="n"><i>30%</i> off</div><div class="l">Trade pricing, applied automatically at checkout</div></div>
-      <div class="stat rv d1"><div class="n">5 <i>box</i> min</div><div class="l">Per wholesale order — below that, retail applies</div></div>
+      <div class="stat rv"><div class="n">Up to <i>30%</i> off</div><div class="l">Trade pricing, applied automatically at checkout</div></div>
+      <div class="stat rv d1"><div class="n">90 <i>day</i></div><div class="l">Money-back guarantee extended to every trade order</div></div>
       <div class="stat rv d2"><div class="n">48 hr</div><div class="l">Compounded &amp; shipped from our cGMP suite</div></div>
       <div class="stat rv d3"><div class="n">100%</div><div class="l">Of lots third-party assayed, with COAs</div></div>
     </div>
   </div>
+  -->
 </section>
 
 <!-- PERKS (cream band) -->
@@ -228,7 +242,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
       <div class="card rv d2">
         <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.8 15.5 5v5.2c0 3.4-2.7 5.6-6.5 6.8-3.8-1.2-6.5-3.4-6.5-6.8V5L9 1.8Z" stroke="oklch(0.44 0.07 152)" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
         <div class="pt">Made to order</div>
-        <div class="pd">Compounded and shipped within 48 hours from our licensed cGMP suite in Scottsdale. Every lot assayed, every COA published.</div>
+        <div class="pd">Compounded and shipped within 48 hours from our lab in Scottsdale, Arizona. Every lot assayed, every COA published.</div>
       </div>
       <div class="card rv d3">
         <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3.2" stroke="oklch(0.44 0.07 152)" stroke-width="1.8"/><path d="M2.8 15.5c1.1-2.9 3.4-4.3 6.2-4.3s5.1 1.4 6.2 4.3" stroke="oklch(0.44 0.07 152)" stroke-width="1.8" stroke-linecap="round"/></svg></div>
@@ -408,7 +422,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 
 <footer class="site">
   <div class="shell">
-    <span>&copy; 2026 Happy Beanie Pet Health, LLC</span>
+    <span>&copy; 2026 Happy Beanie</span>
     <span><a href="/">Home</a> &middot; <a href="/policies/terms">Terms</a> &middot; <a href="/policies/privacy">Privacy</a> &middot; <a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></span>
   </div>
 </footer>

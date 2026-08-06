@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bandana review — Happy Beanie</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="../favicon.png">
+<style>
+@font-face { font-family:'DM Mono'; font-weight:400; src:url('../assets/fonts/23b5af97.woff2') format('woff2'); }
+@font-face { font-family:'DM Mono'; font-weight:500; src:url('../assets/fonts/b847e313.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:400; src:url('../assets/fonts/d7200164.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:700; src:url('../assets/fonts/d7200164.woff2') format('woff2'); }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#F5F0E6; color:#17140F; font-family:'DM Sans',-apple-system,sans-serif; font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased; min-height:100vh; }
+a { color:oklch(0.44 0.07 152); text-decoration:none; border-bottom:1px solid oklch(0.44 0.07 152 / 0.4); }
+a:hover { color:#17140F; border-color:#17140F; }
+.shell { max-width:1000px; margin:0 auto; padding:0 24px; }
+
+.console { position:relative; overflow:hidden; background:#17140F; color:#F5F0E6; }
+.veil { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(245,240,230,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.045) 1px, transparent 1px); background-size:34px 34px; -webkit-mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); }
+.con-top { position:relative; display:flex; align-items:center; gap:22px; padding:16px 0; border-bottom:1px solid rgba(245,240,230,0.14); font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.live { display:flex; align-items:center; gap:9px; color:oklch(0.78 0.1 152); }
+.pulse { position:relative; width:7px; height:7px; border-radius:50%; background:oklch(0.72 0.16 152); }
+.pulse::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1px solid oklch(0.72 0.16 152); opacity:0; animation:ping 2.4s ease-out infinite; }
+@keyframes ping { 0% { transform:scale(0.7); opacity:0.9; } 70% { transform:scale(1.9); opacity:0; } 100% { opacity:0; } }
+.con-body { position:relative; padding:34px 0 32px; }
+h1 { font-weight:700; letter-spacing:-0.042em; font-size:clamp(28px,3.4vw,40px); line-height:1.05; }
+.sub { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-top:12px; }
+
+main { padding:28px 0 90px; }
+.lab { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.gate { max-width:420px; }
+.gate input { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:0.08em; color:#17140F; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:2px; padding:13px 14px; width:100%; margin-top:9px; }
+.gate input:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.btn { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; padding:12px 18px; border:none; border-radius:2px; background:#17140F; color:#F5F0E6; cursor:pointer; }
+.btn:hover { background:oklch(0.44 0.07 152); }
+.btn.ghost { background:transparent; color:#3D372D; border:1px solid #DDD3C0; }
+.btn.ghost:hover { background:transparent; border-color:#17140F; }
+.btn.danger { background:transparent; color:#8C4630; border:1px solid rgba(196,88,60,0.4); }
+.btn.danger:hover { background:transparent; border-color:#8C4630; }
+.tabs { display:flex; gap:10px; margin-bottom:20px; }
+.tab { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; padding:10px 15px; border:1px solid #DDD3C0; border-radius:2px; background:transparent; color:#8A7F6E; cursor:pointer; }
+.tab.on { border-color:#17140F; color:#17140F; }
+
+.claims { display:grid; gap:1px; background:#E4DBC9; border:1px solid #E0D6C2; border-radius:3px; }
+.claim { display:grid; grid-template-columns:150px 1fr auto; gap:22px; align-items:start; background:#FCFAF4; padding:20px 22px; }
+@media (max-width:720px){ .claim { grid-template-columns:1fr; } }
+.shot { width:150px; height:150px; object-fit:cover; border:1px solid #E0D6C2; border-radius:3px; background:#F5F0E6; display:block; }
+.who { font-weight:700; letter-spacing:-0.02em; font-size:17px; }
+.meta { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; margin-top:5px; line-height:1.8; }
+.note { font-size:14.5px; color:#3D372D; margin-top:12px; max-width:40em; }
+.acts { display:grid; gap:9px; justify-items:stretch; min-width:150px; }
+.state { display:flex; align-items:center; gap:9px; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#554C40; }
+.dot { width:7px; height:7px; border-radius:50%; }
+.dot.gold { background:oklch(0.78 0.13 92); }
+.dot.green { background:oklch(0.6 0.09 152); }
+.dot.grey { background:#C9BEA8; }
+.code { font-family:'DM Mono',monospace; font-size:13px; letter-spacing:0.12em; color:#17140F; border:1px solid oklch(0.86 0.14 92 / 0.5); background:oklch(0.86 0.14 92 / 0.1); border-radius:2px; padding:9px 11px; text-align:center; }
+.empty { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; padding:34px 22px; background:#FCFAF4; }
+.err { margin-top:18px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:13px 16px; font-size:14px; }
+.fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
+</style>
+</head><body>
+
+<div class="console">
+  <span class="veil"></span>
+  <div class="shell">
+    <div class="con-top">
+      <span class="live"><span class="pulse"></span>Review desk</span>
+      <span>Bandana reward</span>
+    </div>
+    <div class="con-body">
+      <h1>Photo review</h1>
+      <div class="sub">Approve a photo and the customer's 15% code is created and shown in their portal</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="shell">
+    <div id="gate" class="gate">
+      <label class="lab" for="key">Review key</label>
+      <input id="key" type="password" autocomplete="off" placeholder="BANDANA_REVIEW_KEY">
+      <div style="margin-top:14px;"><button class="btn" id="unlock">Open the queue</button></div>
+      <div class="fine">The key is the BANDANA_REVIEW_KEY environment variable. It is held in this tab only.</div>
+      <div id="gateErr"></div>
+    </div>
+
+    <div id="queue" style="display:none;">
+      <div class="tabs">
+        <button class="tab on" data-status="pending">Pending</button>
+        <button class="tab" data-status="approved">Approved</button>
+        <button class="tab" data-status="rejected">Rejected</button>
+      </div>
+      <div class="claims" id="claims"></div>
+      <div class="fine">Photos live in Shopify Files · claims live on the customer record as bandana.* metafields · approving creates a single-use 15% code limited to that customer, valid 30 days</div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var key = '';
+  var status = 'pending';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function fmt(iso) {
+    if (!iso) return '';
+    try { return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
+    catch (e) { return esc(iso); }
+  }
+
+  function api(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ 'x-review-key': key }, opts.headers || {});
+    return fetch('/api/admin/bandana-queue' + path, opts).then(function (r) {
+      return r.json().catch(function () { return { ok: false, error: 'bad_response' }; });
+    }).catch(function () {
+      return { ok: false, error: 'unreachable' };
+    });
+  }
+
+  $('unlock').onclick = function () {
+    key = $('key').value.trim();
+    if (!key) return;
+    $('gateErr').innerHTML = '';
+    api('?status=pending').then(function (b) {
+      if (!b.ok) {
+        $('gateErr').innerHTML = '<div class="err">' +
+          (b.error === 'bad_key' ? 'That key was not accepted.' :
+           b.error === 'not_configured' ? 'Set SHOPIFY_ADMIN_TOKEN and BANDANA_REVIEW_KEY on the deployment first.' :
+           b.error === 'unreachable' ? 'No backend here — this page only works on the deployed site.' :
+           'Could not reach the queue.') + '</div>';
+        return;
+      }
+      $('gate').style.display = 'none';
+      $('queue').style.display = 'block';
+      draw(b.claims);
+    });
+  };
+
+  $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('unlock').click(); });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (t) {
+    t.onclick = function () {
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === t); });
+      status = t.getAttribute('data-status');
+      load();
+    };
+  });
+
+  function load() {
+    $('claims').innerHTML = '<div class="empty">Loading…</div>';
+    api('?status=' + status).then(function (b) { draw(b.ok ? b.claims : []); });
+  }
+
+  function draw(claims) {
+    if (!claims || !claims.length) {
+      $('claims').innerHTML = '<div class="empty">Nothing ' + status + '</div>';
+      return;
+    }
+    $('claims').innerHTML = claims.map(function (c) {
+      var dot = c.status === 'approved' ? 'green' : c.status === 'rejected' ? 'grey' : 'gold';
+      var acts = c.status === 'pending'
+        ? '<button class="btn" data-approve="' + esc(c.id) + '">Approve · 15%</button>' +
+          '<button class="btn danger" data-reject="' + esc(c.id) + '">Reject</button>'
+        : (c.code ? '<div class="code">' + esc(c.code) + '</div>' : '');
+      return '<div class="claim">' +
+        (c.photo
+          ? '<a href="' + esc(c.photo) + '" target="_blank" rel="noopener" style="border:none;"><img class="shot" src="' + esc(c.photo) + '" alt="Submission"></a>'
+          : '<div class="shot"></div>') +
+        '<div>' +
+          '<div class="who">' + (esc(c.name) || 'Customer') + '</div>' +
+          '<div class="meta">' + esc(c.email) + (c.submittedAt ? '<br>Sent ' + fmt(c.submittedAt) : '') + '</div>' +
+          (c.note ? '<p class="note">' + esc(c.note) + '</p>' : '') +
+          '<div class="state" style="margin-top:12px;"><span class="dot ' + dot + '"></span>' + esc(c.status) + '</div>' +
+        '</div>' +
+        '<div class="acts">' + acts + '</div>' +
+      '</div>';
+    }).join('');
+
+    Array.prototype.forEach.call($('claims').querySelectorAll('[data-approve]'), function (b) {
+      b.onclick = function () { act(b.getAttribute('data-approve'), 'approve', b); };
+    });
+    Array.prototype.forEach.call($('claims').querySelectorAll('[data-reject]'), function (b) {
+      b.onclick = function () { act(b.getAttribute('data-reject'), 'reject', b); };
+    });
+  }
+
+  function act(id, action, btn) {
+    btn.disabled = true;
+    btn.textContent = action === 'approve' ? 'Creating code…' : 'Rejecting…';
+    api('', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id, action: action })
+    }).then(function (b) {
+      if (!b.ok) {
+        btn.disabled = false;
+        btn.textContent = action === 'approve' ? 'Approve · 15%' : 'Reject';
+        alert(b.message || 'That did not go through.');
+        return;
+      }
+      load();
+    });
+  }
+})();
+</script>
+</body></html>

@@ -16,16 +16,16 @@
 @font-face { font-family:'DM Sans'; font-weight:700; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#F5F0E6; color:#17140F; font-family:'DM Sans',-apple-system,sans-serif; font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased; min-height:100vh; display:flex; flex-direction:column; }
-a { color:#17140F; text-decoration:none; border-bottom:1px solid rgba(23,20,15,0.35); padding-bottom:1px; transition:color 0.2s ease, border-color 0.2s ease; }
+a { color:#17140F; text-decoration:none; border-bottom:1px solid rgba(23,20,15,0.35); padding-bottom:1px; transition:color .2s ease, border-color .2s ease; }
 a:hover { color:oklch(0.44 0.07 152); border-color:oklch(0.44 0.07 152); }
-.mono { font-family:'DM Mono',monospace; }
-.shell { max-width:1080px; margin:0 auto; padding:0 24px; width:100%; }
+.shell { max-width:1140px; margin:0 auto; padding:0 24px; width:100%; }
+.lab { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
 
 header.site { position:sticky; top:0; z-index:50; background:rgba(245,240,230,0.93); backdrop-filter:blur(10px); border-bottom:1px solid #DDD3C0; }
-header.site .bar { max-width:1080px; margin:0 auto; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+header.site .bar { max-width:1140px; margin:0 auto; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .mark { display:flex; align-items:baseline; gap:9px; color:#17140F; border-bottom:none; }
 .mark:hover { border-bottom:none; }
-.mark b { font-family:'DM Sans',sans-serif; font-weight:700; font-size:23px; letter-spacing:-0.045em; white-space:nowrap; }
+.mark b { font-weight:700; font-size:23px; letter-spacing:-0.045em; white-space:nowrap; }
 .mark b .bean { position:relative; }
 .mark b .bean::before { content:''; position:absolute; left:50%; top:0.19em; width:0.42em; height:0.26em; margin-left:-0.21em; border-radius:46% 54% 50% 50% / 58% 42% 58% 42%; background:oklch(0.88 0.15 96); transform:rotate(-7deg); }
 .mark b .bean span { position:relative; z-index:1; }
@@ -33,84 +33,211 @@ header.site .bar { max-width:1080px; margin:0 auto; padding:20px 24px; display:f
 .back { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:#554C40; border-bottom:none; }
 .back:hover { color:oklch(0.44 0.07 152); border-bottom:none; }
 
-main { flex:1 1 auto; padding:72px 0 100px; }
-.kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:oklch(0.44 0.07 152); display:flex; align-items:center; gap:14px; margin-bottom:16px; }
-.kicker::before { content:''; width:26px; height:1px; background:oklch(0.44 0.07 152); }
-h1 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(34px,4.6vw,54px); line-height:1.04; }
-h1 em { font-style:normal; color:oklch(0.44 0.07 152); }
-
+main { flex:1 1 auto; padding:56px 0 100px; }
+h1 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(32px,4.2vw,50px); line-height:1.03; }
+h1 em { font-style:normal; color:oklch(0.86 0.14 92); }
 .state { display:none; }
 .state.on { display:block; }
 
-/* cards — soft paper, like the home page */
-.card { background:#FCFAF4; border:1px solid #E4DBC9; border-radius:8px; box-shadow:0 24px 44px -30px rgba(23,20,15,0.28), 0 4px 10px -8px rgba(23,20,15,0.1); }
+.kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:oklch(0.44 0.07 152); display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+.kicker::before { content:''; width:26px; height:1px; background:oklch(0.44 0.07 152); }
+
+/* ---------- signed out ---------- */
+.card { background:#FCFAF4; border:1px solid #E0D6C2; border-radius:3px; }
 .card-pad { padding:30px 30px 32px; }
 @media (max-width:560px){ .card-pad { padding:24px 20px 26px; } }
-
-/* signed out */
 .signin-wrap { display:grid; grid-template-columns:1.15fr 1fr; gap:26px; align-items:start; margin-top:40px; }
 @media (max-width:860px){ .signin-wrap { grid-template-columns:1fr; } }
 .lede { font-size:17px; color:#554C40; max-width:30em; margin-top:18px; }
-.btn-dark { display:inline-block; font-family:'DM Mono',monospace; font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; padding:17px 30px; border-radius:2px; background:#17140F; color:#F5F0E6; cursor:pointer; border:none; transition:background 0.25s ease, transform 0.2s ease; }
+.btn-dark { display:inline-block; font-family:'DM Mono',monospace; font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; padding:17px 30px; border-radius:2px; background:#17140F; color:#F5F0E6; cursor:pointer; border:none; transition:background .25s ease, transform .2s ease; }
 .btn-dark:hover { background:oklch(0.5 0.07 152); color:#F5F0E6; transform:translateY(-1px); border-bottom:none; }
 .hint { font-size:13px; color:#8A7F6E; line-height:1.6; }
-.paw-note { display:flex; align-items:flex-start; gap:14px; padding:18px 20px; background:#F5F0E6; border:1px solid #E4DBC9; border-radius:6px; font-size:14px; color:#554C40; }
+.paw-note { display:flex; align-items:flex-start; gap:14px; padding:18px 20px; background:#F5F0E6; border:1px solid #E4DBC9; border-radius:3px; font-size:14px; color:#554C40; }
 .sfeat { list-style:none; display:grid; gap:0; }
 .sfeat li { display:flex; gap:14px; font-size:14.5px; color:#3D372D; padding:14px 0; border-bottom:1px solid #EDE5D4; align-items:baseline; }
 .sfeat li:last-child { border-bottom:none; }
 .bdot { flex:0 0 auto; width:11px; height:7px; border-radius:46% 54% 50% 50% / 58% 42% 58% 42%; background:oklch(0.88 0.15 96); transform:rotate(-7deg) translateY(-1px); }
-.errbar { display:none; margin-top:26px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:6px; padding:14px 18px; font-size:14px; }
+.errbar { display:none; margin-top:26px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:14px 18px; font-size:14px; }
 .errbar.on { display:block; }
-
-/* loading */
 .loading { display:flex; align-items:center; gap:16px; margin-top:48px; color:#8A7F6E; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; }
-.spin { width:22px; height:22px; border-radius:50%; border:2px solid #E0D6C2; border-top-color:oklch(0.44 0.07 152); animation:spin 0.9s linear infinite; }
+.spin { width:22px; height:22px; border-radius:50%; border:2px solid #E0D6C2; border-top-color:oklch(0.44 0.07 152); animation:spin .9s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 
-/* dashboard */
-.dash-head { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:18px; }
-.who { font-size:14px; color:#8A7F6E; margin-top:12px; }
-.trade-line { display:inline-flex; align-items:center; gap:10px; margin-top:16px; font-size:14px; color:#3D372D; background:rgba(240,198,75,0.16); border:1px solid rgba(200,160,50,0.35); border-radius:999px; padding:8px 18px 8px 14px; }
-.trade-line .bdot { background:oklch(0.78 0.13 92); }
-.signout { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:#554C40; border:1px solid #C9BEA8; border-radius:2px; padding:12px 20px; transition:all 0.2s ease; }
-.signout:hover { border-color:#17140F; color:#17140F; }
+/* ---------- console ---------- */
+.console { position:relative; overflow:hidden; background:#17140F; color:#F5F0E6; border-radius:4px; padding:0; }
+.console .veil { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(245,240,230,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.045) 1px, transparent 1px); background-size:34px 34px; -webkit-mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); }
+.console .glow { position:absolute; right:-140px; top:-190px; width:520px; height:520px; border-radius:50%; background:radial-gradient(circle, oklch(0.86 0.14 92 / 0.13), transparent 70%); pointer-events:none; }
+.brk { position:absolute; width:9px; height:9px; pointer-events:none; }
+.brk.tl { top:13px; left:13px; border-top:1px solid rgba(245,240,230,0.45); border-left:1px solid rgba(245,240,230,0.45); }
+.brk.tr { top:13px; right:13px; border-top:1px solid rgba(245,240,230,0.45); border-right:1px solid rgba(245,240,230,0.45); }
+.brk.bl { bottom:13px; left:13px; border-bottom:1px solid rgba(245,240,230,0.45); border-left:1px solid rgba(245,240,230,0.45); }
+.brk.brr { bottom:13px; right:13px; border-bottom:1px solid rgba(245,240,230,0.45); border-right:1px solid rgba(245,240,230,0.45); }
 
-.grid { display:grid; grid-template-columns:1.6fr 1fr; gap:24px; align-items:start; margin-top:40px; }
-@media (max-width:920px){ .grid { grid-template-columns:1fr; } }
-.sec-title { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px; }
-.sec-title h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:22px; }
-.sec-title .count { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; }
+.con-top { position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:12px 22px; padding:16px 30px; border-bottom:1px solid rgba(245,240,230,0.14); font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.live { display:flex; align-items:center; gap:9px; color:oklch(0.78 0.1 152); }
+.pulse { position:relative; width:7px; height:7px; border-radius:50%; background:oklch(0.72 0.16 152); }
+.pulse::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1px solid oklch(0.72 0.16 152); opacity:0; animation:ping 2.4s ease-out infinite; }
+@keyframes ping { 0% { transform:scale(0.7); opacity:0.9; } 70% { transform:scale(1.9); opacity:0; } 100% { opacity:0; } }
+.con-sign { margin-left:auto; }
+.signout { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#B9AF9C; border:1px solid rgba(245,240,230,0.28); border-radius:2px; padding:8px 15px; transition:all .2s ease; }
+.signout:hover { border-color:oklch(0.86 0.14 92); color:oklch(0.86 0.14 92); }
 
-.orders { display:grid; gap:16px; }
-.order { position:relative; }
-.o-head { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; }
-.o-title { font-weight:700; letter-spacing:-0.03em; font-size:18px; }
-.o-date { font-size:13.5px; color:#8A7F6E; }
-.o-items { font-size:14.5px; color:#554C40; margin-top:8px; max-width:34em; }
-.o-status { display:flex; flex-wrap:wrap; align-items:center; gap:8px 20px; margin-top:16px; padding-top:16px; border-top:1px solid #EDE5D4; font-size:14px; color:#3D372D; }
-.dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; vertical-align:baseline; }
+.con-body { position:relative; padding:36px 30px 34px; }
+.who { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; color:#8A7F6E; margin-top:14px; }
+.trade-line { display:inline-flex; align-items:center; gap:10px; margin-top:18px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:oklch(0.9 0.1 92); border:1px solid oklch(0.86 0.14 92 / 0.4); background:oklch(0.86 0.14 92 / 0.1); border-radius:2px; padding:9px 16px; }
+
+.readouts { position:relative; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:rgba(245,240,230,0.16); border-top:1px solid rgba(245,240,230,0.16); }
+@media (max-width:820px){ .readouts { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.ro { background:#17140F; padding:22px 24px 24px; }
+.ro-lab { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; }
+.ro-val { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.04em; font-size:34px; line-height:1.05; margin-top:12px; color:#F5F0E6; }
+.ro-val small { font-family:'DM Mono',monospace; font-weight:400; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#8A7F6E; margin-left:7px; }
+.ro-sub { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; color:#B9AF9C; margin-top:9px; }
+.ro-sub.gold { color:oklch(0.86 0.14 92); }
+.ro-sub.green { color:oklch(0.78 0.1 152); }
+
+/* ---------- layout ---------- */
+.grid { display:grid; grid-template-columns:1.55fr 1fr; gap:22px; align-items:start; margin-top:22px; }
+@media (max-width:980px){ .grid { grid-template-columns:1fr; } }
+.aside { display:grid; gap:22px; }
+.panel { position:relative; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:3px; }
+.panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 22px; border-bottom:1px solid #EDE5D4; background:#F5F0E6; }
+.panel-head h2 { font-family:'DM Mono',monospace; font-weight:400; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#554C40; display:flex; align-items:center; gap:10px; }
+.panel-head .count { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; }
+.gdot { width:6px; height:6px; border-radius:50%; background:oklch(0.72 0.16 152); }
+.panel-body { padding:24px 22px 26px; }
+
+/* ---------- delivery log ---------- */
+.orders { display:grid; gap:1px; background:#E4DBC9; }
+.order { position:relative; background:#FCFAF4; padding:24px 22px 26px; }
+.o-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 16px; }
+.o-id { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.1em; color:#17140F; }
+.o-date { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; }
+.o-total { font-family:'DM Mono',monospace; font-size:12px; color:#554C40; margin-left:auto; }
+.o-items { font-size:15px; color:#3D372D; margin-top:10px; max-width:36em; }
+
+.rail { position:relative; display:grid; grid-template-columns:repeat(3,1fr); margin-top:22px; }
+.rail::before { content:''; position:absolute; left:16.66%; right:16.66%; top:5px; height:1px; background:#E0D6C2; }
+.rail-fill { position:absolute; left:16.66%; top:5px; height:1px; background:#C9BEA8; transition:width .5s ease; }
+.rail.done-all .rail-fill { background:oklch(0.6 0.09 152 / 0.45); }
+.rn { position:relative; text-align:center; }
+.rn-dot { position:relative; display:block; width:11px; height:11px; margin:0 auto; border-radius:50%; background:#F5F0E6; border:1px solid #D5C9B2; }
+.rn.done .rn-dot { background:#C9BEA8; border-color:#C9BEA8; }
+.rn.now .rn-dot { background:oklch(0.86 0.14 92); border-color:oklch(0.86 0.14 92); }
+.rn.now .rn-dot::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1px solid oklch(0.78 0.13 92); opacity:0; animation:ping 2.4s ease-out infinite; }
+.rn.now.final .rn-dot { background:oklch(0.6 0.09 152); border-color:oklch(0.6 0.09 152); }
+.rn.now.final .rn-dot::after { border-color:oklch(0.6 0.09 152); }
+.rn-lab { display:block; font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.12em; text-transform:uppercase; color:#C2B7A3; margin-top:11px; line-height:1.4; }
+.rn.done .rn-lab { color:#A79C8A; }
+.rn.now .rn-lab { color:#17140F; }
+
+.o-foot { display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin-top:22px; padding-top:16px; border-top:1px solid #EDE5D4; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; }
+.dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:8px; }
 .dot.green { background:oklch(0.6 0.09 152); }
 .dot.gold { background:oklch(0.78 0.13 92); }
 .dot.grey { background:#C9BEA8; }
-.o-total { font-family:'DM Mono',monospace; font-size:12px; color:#554C40; margin-left:auto; }
-.tracklink { font-size:13.5px; }
+.tracklink { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:oklch(0.44 0.07 152); border-bottom-color:oklch(0.44 0.07 152 / 0.4); }
+.trackno { color:#A79C8A; }
+.empty { color:#8A7F6E; font-size:14.5px; }
 
-.aside { display:grid; gap:24px; }
+.o-pet:empty { display:none; }
+.o-pet { display:flex; align-items:center; gap:9px; margin-top:14px; }
+.o-petlabel { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.o-petsel { font-family:'DM Mono',monospace; font-size:11px; color:#3D372D; background:#F5F0E6; border:1px solid #DDD3C0; border-radius:2px; padding:6px 8px; }
+.o-petsel:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+
+/* ---------- care plan ---------- */
 .plan-line { font-size:15px; color:#3D372D; line-height:1.7; }
 .plan-line b { font-weight:700; letter-spacing:-0.02em; }
-.plan-next { margin-top:14px; padding-top:14px; border-top:1px solid #EDE5D4; font-size:14px; color:#554C40; }
-.addr { font-size:14px; color:#3D372D; line-height:1.7; padding:14px 0; border-bottom:1px solid #EDE5D4; }
-.addr:first-child { padding-top:0; }
-.addr:last-child { border-bottom:none; padding-bottom:0; }
-.addr .tag { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:oklch(0.44 0.07 152); margin-left:8px; }
+.plan-next { margin-top:14px; padding-top:14px; border-top:1px solid #EDE5D4; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#554C40; }
+.cadence { display:flex; align-items:center; gap:7px; margin-top:16px; }
+.cad { width:9px; height:9px; border-radius:50%; background:#E0D6C2; }
+.cad.past { background:oklch(0.6 0.09 152 / 0.45); }
+.cad.next { background:oklch(0.86 0.14 92); box-shadow:0 0 0 3px oklch(0.86 0.14 92 / 0.2); }
+.cad-lab { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.14em; text-transform:uppercase; color:#A79C8A; margin-left:6px; }
+.plan-acts { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid #EDE5D4; }
+.plan-btn { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; padding:11px 15px; border-radius:2px; border:1px solid #DDD3C0; background:transparent; color:#3D372D; cursor:pointer; transition:border-color .2s ease, color .2s ease; }
+.plan-btn:hover { border-color:#17140F; }
+.plan-btn.danger { color:#8C4630; border-color:rgba(196,88,60,0.4); }
+.plan-btn.danger:hover { border-color:#8C4630; }
+.cancel-confirm { margin-top:16px; padding:16px 18px; border:1px solid rgba(196,88,60,0.35); background:rgba(224,122,95,0.07); border-radius:3px; }
+.cancel-confirm p { font-size:14px; line-height:1.65; color:#3D372D; margin:0 0 14px; }
+.cancel-confirm .row { display:flex; flex-wrap:wrap; gap:10px; }
+.plan-note { margin-top:14px; font-size:13px; line-height:1.6; color:#8A7F6E; }
 .muted { color:#8A7F6E; font-size:14px; }
 .help { font-size:14px; color:#554C40; line-height:1.7; }
-.empty { color:#8A7F6E; font-size:14.5px; }
+
+/* ---------- pets ---------- */
+.pet-list { display:grid; gap:1px; background:#EDE5D4; margin:-24px -22px 0; }
+.pet-card { display:flex; align-items:center; gap:14px; background:#FCFAF4; padding:18px 22px; }
+.pet-avatar { position:relative; flex:0 0 auto; width:52px; height:52px; border-radius:2px; border:1px solid #E0D6C2; background:#F5F0E6; display:flex; align-items:center; justify-content:center; }
+.pet-name { font-weight:700; letter-spacing:-0.02em; font-size:17px; color:#17140F; }
+.pet-breed { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; margin-top:3px; }
+.pet-rowacts { margin-left:auto; display:flex; gap:12px; }
+.pet-edit { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#A79C8A; background:none; border:none; cursor:pointer; }
+.pet-edit:hover { color:#17140F; }
+.pet-add { margin-top:20px; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; padding:11px 15px; border:1px solid #DDD3C0; border-radius:2px; background:transparent; color:#3D372D; cursor:pointer; }
+.pet-add:hover { border-color:#17140F; }
+.pet-divider { height:1px; background:#EDE5D4; margin:20px 0; }
+.pet-form { display:grid; gap:14px; }
+.pet-field { display:grid; gap:7px; }
+.pet-field label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.pet-field input, .pet-field select { font-family:inherit; font-size:15px; color:#17140F; background:#F5F0E6; border:1px solid #DDD3C0; border-radius:2px; padding:11px 12px; width:100%; }
+.pet-field input:focus, .pet-field select:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.pet-save { justify-self:start; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; padding:12px 18px; border:none; border-radius:2px; background:#17140F; color:#F5F0E6; cursor:pointer; }
+.pet-save:hover { background:oklch(0.44 0.07 152); }
+.pet-formacts { display:flex; align-items:center; gap:14px; }
+.dash-pet { display:inline-flex; align-items:center; vertical-align:-4px; margin-left:8px; }
+.dash-pets { gap:4px; }
+
+.bz-lede { font-size:15px; color:#3D372D; line-height:1.7; max-width:40em; }
+.bz-lede b { font-weight:700; letter-spacing:-0.02em; }
+.bz-drop { display:flex; align-items:center; gap:16px; margin-top:18px; padding:18px 20px; border:1px dashed #D5C9B2; border-radius:3px; background:#F5F0E6; cursor:pointer; transition:border-color .2s ease; }
+.bz-drop:hover, .bz-drop.over { border-color:oklch(0.44 0.07 152); }
+.bz-drop-ic { flex:0 0 auto; width:38px; height:38px; border-radius:2px; border:1px solid #DDD3C0; background:#FCFAF4; display:flex; align-items:center; justify-content:center; }
+.bz-drop-txt { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#554C40; line-height:1.7; }
+.bz-drop-txt span { display:block; color:#A79C8A; letter-spacing:0.1em; }
+.bz-prev { display:flex; align-items:flex-start; gap:16px; margin-top:18px; }
+.bz-thumb { flex:0 0 auto; width:96px; height:96px; border-radius:3px; border:1px solid #E0D6C2; object-fit:cover; background:#F5F0E6; }
+.bz-meta { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; line-height:1.8; }
+.bz-acts { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:18px; }
+.bz-note { font-family:inherit; font-size:14px; color:#17140F; background:#F5F0E6; border:1px solid #DDD3C0; border-radius:2px; padding:10px 12px; width:100%; margin-top:14px; resize:vertical; min-height:64px; }
+.bz-note:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.bz-status { display:flex; align-items:center; gap:10px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#554C40; }
+.bz-code { display:inline-block; margin-top:16px; padding:16px 22px; border:1px solid oklch(0.86 0.14 92 / 0.5); background:oklch(0.86 0.14 92 / 0.1); border-radius:3px; font-family:'DM Mono',monospace; font-size:19px; letter-spacing:0.18em; color:#17140F; }
+.bz-fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:16px; line-height:1.8; }
+.addr { font-family:'DM Mono',monospace; font-size:11.5px; line-height:1.75; color:#3D372D; padding:14px 0; border-bottom:1px solid #EDE5D4; }
+.addr:first-child { padding-top:0; }
+.addr:last-child { border-bottom:none; padding-bottom:0; }
+.addr .tag { font-size:8.5px; letter-spacing:0.14em; text-transform:uppercase; color:oklch(0.44 0.07 152); margin-left:8px; }
 
 footer.site { background:#17140F; color:#8A7F6E; }
 footer.site .shell { padding-top:26px; padding-bottom:26px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; }
 footer.site a { color:#8A7F6E; border-bottom:none; }
-footer.site a:hover { color:#F0C64B; border-bottom:none; }
+footer.site a:hover { color:oklch(0.86 0.14 92); border-bottom:none; }
+@media (max-width:620px){
+  .shell { padding:0 16px; }
+  header.site .bar { padding:12px 16px; gap:12px; }
+  .mark b { font-size:19px; }
+  .mark small { display:none; }
+  .back { font-size:9.5px; letter-spacing:0.14em; white-space:nowrap; }
+  main { padding:26px 0 64px; }
+  .con-top { padding:13px 18px; gap:10px 16px; }
+  .con-body { padding:26px 18px 24px; }
+  .readouts { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .ro { padding:16px 16px 18px; }
+  .ro-val { font-size:26px; }
+  .ro-val small { font-size:10px; margin-left:5px; }
+  .who { line-height:1.7; }
+  .panel-head { padding:13px 16px; }
+  .panel-body { padding:20px 16px 22px; }
+  .order { padding:20px 16px 22px; }
+  .pet-list { margin:-20px -16px 0; }
+  .pet-card { padding:16px; }
+  .rn-lab { font-size:8px; letter-spacing:0.08em; }
+  footer.site .shell { flex-direction:column; gap:8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation:none !important; } }
 </style>
 </head><body>
 
@@ -127,7 +254,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     <!-- SIGNED OUT -->
     <section id="stateOut" class="state">
       <div class="kicker">Your account</div>
-      <h1>Good to see you <em>again.</em></h1>
+      <h1 style="color:#17140F;">Good to see you <em style="color:oklch(0.44 0.07 152);">again.</em></h1>
       <p class="lede">Sign in to check on a delivery, peek at your order history, or see when the next box leaves Scottsdale.</p>
       <div id="errBar" class="errbar"></div>
       <div class="signin-wrap">
@@ -139,7 +266,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
         </div>
         <div>
           <ul class="sfeat">
-            <li><span class="bdot"></span>Every order, with plain-words delivery updates</li>
+            <li><span class="bdot"></span>Every box tracked from the compounding bench to your door</li>
             <li><span class="bdot"></span>Tracking links the moment a box ships</li>
             <li><span class="bdot"></span>Your care plan — what's coming, and when</li>
             <li><span class="bdot"></span>Trade pricing status for wholesale partners</li>
@@ -155,38 +282,57 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     <!-- LOADING -->
     <section id="stateLoading" class="state on">
       <div class="kicker">Your account</div>
-      <div class="loading"><span class="spin"></span>Fetching your beans&hellip;</div>
+      <div class="loading"><span class="spin"></span>Opening a line to Scottsdale&hellip;</div>
     </section>
 
     <!-- DASHBOARD -->
     <section id="stateDash" class="state">
-      <div class="dash-head">
-        <div>
-          <div class="kicker">Your account</div>
+      <div class="console">
+        <span class="veil"></span><span class="glow"></span>
+        <span class="brk tl"></span><span class="brk tr"></span><span class="brk bl"></span><span class="brk brr"></span>
+        <div class="con-top">
+          <span class="live"><span class="pulse"></span>Account live</span>
+          <span class="con-sign"><a class="signout" href="/api/auth/logout">Sign out</a></span>
+        </div>
+        <div class="con-body">
           <h1 id="helloLine">Welcome back.</h1>
           <div class="who" id="whoLine"></div>
           <div id="badgeRow"></div>
         </div>
-        <a class="signout" href="/api/auth/logout">Sign out</a>
+        <div class="readouts" id="readouts"></div>
       </div>
+
       <div class="grid">
-        <div>
-          <div class="sec-title"><h2>Your deliveries</h2><span class="count" id="orderCount"></span></div>
-          <div class="orders" id="ordersList"></div>
+        <div class="aside">
+          <div class="panel">
+            <div class="panel-head">
+              <h2><span class="gdot"></span>Delivery log<span id="deliveriesFor"></span></h2>
+              <span class="count" id="orderCount"></span>
+            </div>
+            <div class="orders" id="ordersList"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>Bandana reward</h2><span class="count" id="bandanaState"></span></div>
+            <div class="panel-body" id="bandanaBox"></div>
+          </div>
         </div>
         <div class="aside">
-          <div>
-            <div class="sec-title"><h2>Care plan</h2></div>
-            <div class="card card-pad" id="subsBox" style="padding:24px 26px 26px;"></div>
+          <div class="panel">
+            <div class="panel-head"><h2>Registered pets</h2><span class="count" id="petCount"></span></div>
+            <div class="panel-body" id="petBox"></div>
           </div>
-          <div>
-            <div class="sec-title"><h2>Where we ship</h2></div>
-            <div class="card" id="addrBox" style="padding:20px 26px;"></div>
+          <div class="panel">
+            <div class="panel-head"><h2>Ship to</h2></div>
+            <div class="panel-body" id="addrBox"></div>
           </div>
-          <div>
-            <div class="sec-title"><h2>From the desk</h2></div>
-            <div class="card card-pad" style="padding:24px 26px 26px;">
-              <p class="help">Questions about a delivery, a dose, or a lot number? The pharmacist desk answers within a business day.<br><br><a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
+          <div class="panel">
+            <div class="panel-head"><h2>Care plan</h2></div>
+            <div class="panel-body" id="subsBox"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>Pharmacist desk</h2></div>
+            <div class="panel-body">
+              <p class="help">Questions about a delivery, a dose, or a lot number? The desk answers within a business day.<br><br><a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
             </div>
           </div>
         </div>
@@ -198,11 +344,10 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 
 <footer class="site">
   <div class="shell">
-    <span>&copy; 2026 Happy Beanie Pet Health, LLC</span>
+    <span>&copy; 2026 Happy Beanie</span>
     <span><a href="/">Home</a> &middot; <a href="/wholesale">Wholesale</a> &middot; <a href="/policies/privacy">Privacy</a> &middot; <a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></span>
   </div>
 </footer>
-
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -227,12 +372,20 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 
   function fmtDate(iso) {
     if (!iso) return '';
-    try {
-      return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    } catch (e) { return esc(iso); }
+    try { return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); }
+    catch (e) { return esc(iso); }
+  }
+  function fmtShort(iso) {
+    if (!iso) return '';
+    try { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+    catch (e) { return esc(iso); }
+  }
+  function daysUntil(iso) {
+    if (!iso) return null;
+    var d = new Date(iso).getTime() - Date.now();
+    return Math.max(0, Math.ceil(d / 86400000));
   }
 
-  // Plain-words status lines instead of uppercase pills.
   function payLine(status) {
     if (status === 'PAID') return '<span><span class="dot green"></span>Paid</span>';
     if (status === 'PENDING' || status === 'AUTHORIZED') return '<span><span class="dot gold"></span>Payment on its way</span>';
@@ -241,90 +394,665 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     return '<span><span class="dot grey"></span>' + esc(String(status).replace(/_/g, ' ').toLowerCase()) + '</span>';
   }
 
-  function shipLine(f) {
-    var s = String((f && (f.latestShipmentStatus || f.status)) || '');
-    if (/delivered/i.test(s)) return '<span><span class="dot green"></span>Delivered</span>';
-    if (/transit|out_for|confirmed|ready/i.test(s)) return '<span><span class="dot gold"></span>On its way</span>';
-    if (s) return '<span><span class="dot grey"></span>Being prepared</span>';
-    return '';
+  // ---- delivery stages: compounded -> sealed -> in transit -> delivered ----
+  var STAGES = ['Compounded', 'In transit', 'Delivered'];
+
+  function stageOf(order) {
+    var fs = (order.fulfillments && order.fulfillments.nodes) || [];
+    var stage = 0;
+    fs.forEach(function (f) {
+      var s = String((f.latestShipmentStatus || f.status) || '');
+      if (/delivered/i.test(s)) stage = Math.max(stage, 2);
+      else if (/transit|out_for/i.test(s)) stage = Math.max(stage, 1);
+    });
+    return stage;
+  }
+
+  function stageLabel(stage) {
+    return stage === 2 ? 'Delivered' : stage === 1 ? 'In transit' : 'Compounded';
+  }
+
+  function railHtml(stage) {
+    var last = STAGES.length - 1;
+    var nodes = STAGES.map(function (label, i) {
+      var cls = i < stage ? 'done' : i === stage ? (i === last ? 'now final' : 'now') : '';
+      return '<span class="rn ' + cls + '"><span class="rn-dot"></span><span class="rn-lab">' + label + '</span></span>';
+    }).join('');
+    var fill = stage / last * 66.66;
+    return '<div class="rail' + (stage === last ? ' done-all' : '') + '">' +
+      '<span class="rail-fill" style="width:' + fill + '%"></span>' + nodes + '</div>';
+  }
+
+  function renderReadouts(orders, subs) {
+    var sub = subs[0];
+    var active = sub && String(sub.status || '').toUpperCase() === 'ACTIVE';
+    var days = sub && daysUntil(sub.nextBillingDate);
+    var dp = (sub && sub.deliveryPolicy) || {};
+    var count = (dp.intervalCount && dp.intervalCount.count) || 1;
+    var unit = String(dp.interval || '').toLowerCase();
+    var cadence = unit ? (count === 1 ? 'Every ' + unit : 'Every ' + count + ' ' + unit + 's') : 'No cadence set';
+
+    var latest = orders[0];
+    var lStage = latest ? stageOf(latest) : null;
+
+    var cells = [
+      { lab: 'Next box', val: (days == null ? '—' : days + '<small>days</small>'),
+        sub: sub && sub.nextBillingDate ? 'Billed ' + fmtShort(sub.nextBillingDate) : 'No plan running',
+        cls: days != null && days <= 7 ? 'gold' : '' },
+      { lab: 'Care plan', val: active ? 'Active' : (sub ? esc(String(sub.status || '').toLowerCase()) : 'None'),
+        sub: cadence, cls: active ? 'green' : '' },
+      { lab: 'Latest box', val: latest ? stageLabel(lStage) : '—',
+        sub: latest ? 'Order ' + esc(latest.name) + ' · ' + fmtShort(latest.processedAt) : 'Nothing shipped yet',
+        cls: lStage === 2 ? 'green' : lStage === 1 ? 'gold' : 'gold' },
+      { lab: 'Boxes on record', val: String(orders.length),
+        sub: orders.length ? 'Every lot assayed' : 'Your first is waiting', cls: '' }
+    ];
+
+    $('readouts').innerHTML = cells.map(function (c) {
+      return '<div class="ro"><div class="ro-lab">' + c.lab + '</div>' +
+        '<div class="ro-val">' + c.val + '</div>' +
+        '<div class="ro-sub ' + c.cls + '">' + c.sub + '</div></div>';
+    }).join('');
+  }
+
+  function renderOrders(orders) {
+    $('orderCount').textContent = orders.length ? orders.length + ' on record' : '';
+    if (!orders.length) {
+      $('ordersList').innerHTML = '<div class="order"><p class="empty">Nothing here yet — your first box is waiting. <a href="/">Meet the formulas</a>.</p></div>';
+      return;
+    }
+    $('ordersList').innerHTML = orders.map(function (o) {
+      var items = ((o.lineItems && o.lineItems.nodes) || []).map(function (li) {
+        return esc(li.title) + (li.quantity > 1 ? ' &times; ' + li.quantity : '');
+      }).join(', ');
+      var tracks = '';
+      (((o.fulfillments && o.fulfillments.nodes) || [])).forEach(function (f) {
+        (f.trackingInformation || []).forEach(function (t) {
+          var label = t.company ? 'Track with ' + esc(t.company) : 'Track this delivery';
+          if (t.url) tracks += '<a class="tracklink" href="' + esc(t.url) + '" target="_blank" rel="noopener">' + label + ' &rarr;</a>';
+          else if (t.number) tracks += '<span class="trackno">' + esc(t.number) + '</span>';
+        });
+      });
+      return '<div class="order">' +
+        '<div class="o-head"><span class="o-id">' + esc(o.name) + '</span>' +
+          '<span class="o-date">' + fmtShort(o.processedAt) + '</span>' +
+          '<span class="o-total">' + money(o.totalPrice) + '</span></div>' +
+        (items ? '<div class="o-items">' + items + '</div>' : '') +
+        railHtml(stageOf(o)) +
+        '<div class="o-foot">' + payLine(o.financialStatus) + tracks + '</div>' +
+        '<div class="o-pet" data-order="' + esc(o.id) + '"></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function renderPlan(subs) {
+    if (!subs.length) {
+      $('subsBox').innerHTML = '<p class="muted">No care plan running right now. Start one from any <a href="/">product page</a> and a fresh box arrives like clockwork.</p>';
+      return;
+    }
+    $('subsBox').innerHTML = subs.map(function (s) {
+      var dp = s.deliveryPolicy || {};
+      var count = (dp.intervalCount && dp.intervalCount.count) || 1;
+      var unit = String(dp.interval || '').toLowerCase();
+      var cadence = unit ? (count === 1 ? 'every ' + unit : 'every ' + count + ' ' + unit + 's') : '';
+      var active = String(s.status || '').toUpperCase() === 'ACTIVE';
+      var line = active
+        ? '<p class="plan-line"><span class="dot green"></span><b>Running smoothly.</b>' + (cadence ? ' A fresh box ' + esc(cadence) + '.' : '') + '</p>'
+        : '<p class="plan-line"><span class="dot grey"></span><b>' + esc(String(s.status || '').toLowerCase()) + '.</b></p>';
+      var cad = '';
+      var next = s.nextBillingDate ? '<div class="plan-next">Next box billed ' + fmtDate(s.nextBillingDate) + '</div>' : '';
+      var acts = active
+        ? '<div class="plan-acts">' +
+            '<button type="button" class="plan-btn" data-act="skip" data-id="' + esc(s.id) + '">Skip next box</button>' +
+            '<button type="button" class="plan-btn danger" data-act="cancel" data-id="' + esc(s.id) + '">Cancel plan</button>' +
+          '</div>' +
+          '<div class="plan-note">Cancel any time before the next billing date — no fees, no phone call. Skipping pushes your next box out one cycle.</div>' +
+          '<div class="cancel-slot" data-slot="' + esc(s.id) + '"></div>'
+        : '';
+      return line + cad + next + acts;
+    }).join('<div class="pet-divider"></div>');
+  }
+
+  function renderAddresses(c) {
+    var addrs = (c.addresses && c.addresses.nodes) || [];
+    if (!addrs.length) {
+      $('addrBox').innerHTML = '<span class="muted">We\u2019ll remember your address after your first checkout.</span>';
+      return;
+    }
+    var defId = c.defaultAddress && c.defaultAddress.id;
+    $('addrBox').innerHTML = addrs.map(function (a) {
+      var lines = (a.formatted || []).map(esc).join('<br>');
+      var tag = a.id === defId ? '<span class="tag">usual spot</span>' : '';
+      return '<div class="addr">' + lines + tag + '</div>';
+    }).join('');
+  }
+
+  // ---- bandana photo reward (manual review queue) ----
+  var BZ_MAX = 8 * 1024 * 1024;
+  var bzFile = null;
+
+  function bzIcon() {
+    return '<svg width="19" height="19" viewBox="0 0 19 19" fill="none" aria-hidden="true">' +
+      '<rect x="1.6" y="3.6" width="15.8" height="12.4" rx="1.6" stroke="oklch(0.44 0.07 152)" stroke-width="1.4"/>' +
+      '<circle cx="6.6" cy="7.9" r="1.5" fill="oklch(0.44 0.07 152)"/>' +
+      '<path d="M2.4 14.2l4.4-4 3.1 2.8 2.7-2.4 4 3.6" stroke="oklch(0.44 0.07 152)" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+  }
+
+  function renderBandana(orders) {
+    var box = $('bandanaBox');
+    if (!box) return;
+    var delivered = orders.some(function (o) { return stageOf(o) === 2; });
+
+    if (!delivered) {
+      $('bandanaState').textContent = 'locked';
+      box.innerHTML = '<p class="bz-lede"><b>15% off for a photo.</b> Once your first box lands, send us a picture of your pet in their Happy Beanie bandana and we will send back a code for 15% off your next order.</p>' +
+        '<div class="bz-fine">Unlocks when your first delivery is marked delivered</div>';
+      return;
+    }
+
+    bzShowForm();
+    if (!DEMO) {
+      fetch('/api/account/bandana', { credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (b) {
+          if (!b || !b.ok) return;
+          if (b.status === 'pending') bzShowPending();
+          else if (b.status === 'approved') bzShowApproved(b.code);
+        })
+        .catch(function () {});
+    }
+  }
+
+  function bzShowForm() {
+    $('bandanaState').textContent = '15% off';
+    $('bandanaBox').innerHTML =
+      '<p class="bz-lede"><b>Send a photo, get 15% off.</b> A picture of your pet wearing their Happy Beanie bandana earns a single-use code for 15% off your next order. The desk reviews every photo by hand — usually within a business day.</p>' +
+      '<div class="bz-drop" id="bzDrop">' +
+        '<span class="bz-drop-ic">' + bzIcon() + '</span>' +
+        '<span class="bz-drop-txt">Choose a photo<span>JPG, PNG or WEBP · up to 8 MB</span></span>' +
+      '</div>' +
+      '<input type="file" id="bzFileInput" accept="image/jpeg,image/png,image/webp" style="display:none">' +
+      '<div id="bzPreview"></div>' +
+      '<div class="bz-fine">One code per customer. Photos may appear on our site or socials — tell us in the note if you would rather they did not.</div>';
+    bzWire();
+  }
+
+  function bzWire() {
+    var drop = $('bzDrop');
+    var input = $('bzFileInput');
+    if (!drop || !input) return;
+    drop.onclick = function () { input.click(); };
+    drop.ondragover = function (e) { e.preventDefault(); drop.classList.add('over'); };
+    drop.ondragleave = function () { drop.classList.remove('over'); };
+    drop.ondrop = function (e) {
+      e.preventDefault();
+      drop.classList.remove('over');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) bzTake(e.dataTransfer.files[0]);
+    };
+    input.onchange = function () { if (this.files && this.files[0]) bzTake(this.files[0]); };
+  }
+
+  function bzTake(file) {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+      bzMessage('That file is not a JPG, PNG or WEBP.');
+      return;
+    }
+    if (file.size > BZ_MAX) {
+      bzMessage('That photo is over 8 MB — try a smaller one.');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () {
+      bzFile = { name: file.name, size: file.size, data: reader.result };
+      bzShowPreview();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function bzShowPreview() {
+    var kb = Math.round(bzFile.size / 1024);
+    $('bzPreview').innerHTML =
+      '<div class="bz-prev">' +
+        '<img class="bz-thumb" src="' + bzFile.data + '" alt="Your photo">' +
+        '<span class="bz-meta">' + esc(bzFile.name) + '<br>' + (kb > 1024 ? (kb / 1024).toFixed(1) + ' MB' : kb + ' KB') + '</span>' +
+      '</div>' +
+      '<textarea class="bz-note" id="bzNote" maxlength="300" placeholder="Anything we should know? (optional)"></textarea>' +
+      '<div class="bz-acts">' +
+        '<button type="button" class="pet-save" id="bzSend">Send for review</button>' +
+        '<button type="button" class="pet-edit" id="bzClear">Choose a different photo</button>' +
+      '</div>';
+    $('bzClear').onclick = function () { bzFile = null; $('bzPreview').innerHTML = ''; };
+    $('bzSend').onclick = bzSubmit;
+  }
+
+  function bzMessage(text) {
+    $('bzPreview').innerHTML = '<div class="plan-note">' + esc(text) + '</div>';
+  }
+
+  function bzSubmit() {
+    if (!bzFile) return;
+    var note = ($('bzNote') && $('bzNote').value) || '';
+    $('bzPreview').innerHTML = '<div class="plan-note">Sending your photo to the desk…</div>';
+    if (DEMO) { setTimeout(bzShowPending, 600); return; }
+    fetch('/api/account/bandana', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: bzFile.data, note: note })
+    }).then(function (r) { return r.json().catch(function () { return null; }); })
+      .then(function (b) {
+        if (b && b.ok) { bzShowPending(); return; }
+        if (b && b.error === 'already_claimed') { b.code ? bzShowApproved(b.code) : bzShowPending(); return; }
+        bzMessage('We could not reach the desk just now. Email hello@happybeanie.com with your photo and we will sort the code out.');
+      })
+      .catch(function () {
+        bzMessage('We could not reach the desk just now. Email hello@happybeanie.com with your photo and we will sort the code out.');
+      });
+  }
+
+  function bzShowPending() {
+    $('bandanaState').textContent = 'in review';
+    $('bandanaBox').innerHTML =
+      '<div class="bz-status"><span class="dot gold"></span>Photo received — in review</div>' +
+      '<p class="bz-lede" style="margin-top:14px;">The desk looks at every photo by hand. Once it is approved we email your 15% code, usually within a business day.</p>';
+  }
+
+  function bzShowApproved(code) {
+    $('bandanaState').textContent = 'approved';
+    $('bandanaBox').innerHTML =
+      '<div class="bz-status"><span class="dot green"></span>Approved — thank you</div>' +
+      (code ? '<div class="bz-code">' + esc(code) + '</div>' : '') +
+      '<div class="bz-fine">Single use · 15% off your next order · also sent to your email</div>';
+  }
+
+  function stampSync() {
+    var el = $('syncLine');
+    if (!el) return;
+    var t = new Date();
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    el.textContent = 'Synced ' + pad(t.getHours()) + ':' + pad(t.getMinutes()) + ':' + pad(t.getSeconds());
   }
 
   function renderDash(c) {
     var first = c.firstName || '';
     $('helloLine').innerHTML = first ? 'Welcome back, <em>' + esc(first) + '.</em>' : 'Welcome back.';
     var email = c.emailAddress && c.emailAddress.emailAddress;
-    var since = c.creationDate ? 'with us since ' + fmtDate(c.creationDate) : '';
-    $('whoLine').textContent = [email, since].filter(Boolean).join(' · ');
+    var since = c.creationDate ? 'member since ' + fmtDate(c.creationDate) : '';
+    $('whoLine').textContent = [email, since].filter(Boolean).join('  ·  ');
 
     var tags = (c.tags || []).map(function (t) { return String(t).toLowerCase(); });
     var badges = '';
     if (tags.indexOf('wholesale') !== -1) {
-      badges = '<div class="trade-line"><span class="bdot"></span>Trade partner — 30% off when you order 5+ boxes</div>';
+      badges = '<div class="trade-line"><span class="bdot"></span>Trade partner — up to 30% off</div>';
     } else if (tags.indexOf('wholesale-pending') !== -1) {
-      badges = '<div class="trade-line" style="background:#F5F0E6; border-color:#DDD3C0;"><span class="bdot" style="background:#C9BEA8;"></span>Wholesale application in review — we’ll email you shortly</div>';
+      badges = '<div class="trade-line" style="color:#B9AF9C; border-color:rgba(245,240,230,0.24); background:rgba(245,240,230,0.05);"><span class="bdot" style="background:#8A7F6E;"></span>Wholesale application in review</div>';
     }
     $('badgeRow').innerHTML = badges;
 
     var orders = (c.orders && c.orders.nodes) || [];
-    $('orderCount').textContent = orders.length ? (orders.length === 1 ? 'One so far' : orders.length + ' and counting') : '';
-    if (!orders.length) {
-      $('ordersList').innerHTML = '<div class="card card-pad"><p class="empty">Nothing here yet — your first box is waiting. <a href="/shop">Meet the formulas</a>.</p></div>';
-    } else {
-      $('ordersList').innerHTML = orders.map(function (o) {
-        var items = ((o.lineItems && o.lineItems.nodes) || []).map(function (li) {
-          return esc(li.title) + (li.quantity > 1 ? ' &times; ' + li.quantity : '');
-        }).join(', ');
-        var ship = '';
-        var tracks = '';
-        (((o.fulfillments && o.fulfillments.nodes) || [])).forEach(function (f) {
-          if (!ship) ship = shipLine(f);
-          (f.trackingInformation || []).forEach(function (t) {
-            var label = t.company ? 'Track with ' + esc(t.company) : 'Track this delivery';
-            if (t.url) tracks += '<a class="tracklink" href="' + esc(t.url) + '" target="_blank" rel="noopener">' + label + ' &rarr;</a>';
-            else if (t.number) tracks += '<span class="tracklink" style="color:#8A7F6E;">' + esc(t.number) + '</span>';
-          });
-        });
-        return '<div class="card card-pad order">' +
-          '<div class="o-head"><span class="o-title">Order ' + esc(o.name) + '</span><span class="o-date">' + fmtDate(o.processedAt) + '</span></div>' +
-          (items ? '<div class="o-items">' + items + '</div>' : '') +
-          '<div class="o-status">' + payLine(o.financialStatus) + ship + tracks + '<span class="o-total">' + money(o.totalPrice) + '</span></div>' +
-          '</div>';
-      }).join('');
-    }
-
     var subs = (c.subscriptionContracts && c.subscriptionContracts.nodes) || [];
-    if (!subs.length) {
-      $('subsBox').innerHTML = '<p class="muted">No care plan running right now. Start one from any <a href="/product">product page</a> and a fresh box arrives like clockwork.</p>';
-    } else {
-      $('subsBox').innerHTML = subs.map(function (s) {
-        var dp = s.deliveryPolicy || {};
-        var count = (dp.intervalCount && dp.intervalCount.count) || 1;
-        var unit = String(dp.interval || '').toLowerCase();
-        var cadence = unit ? (count === 1 ? 'every ' + unit : 'every ' + count + ' ' + unit + 's') : '';
-        var active = String(s.status || '').toUpperCase() === 'ACTIVE';
-        var line = active
-          ? '<p class="plan-line"><span class="dot green"></span><b>Running smoothly.</b>' + (cadence ? ' A fresh box ' + esc(cadence) + '.' : '') + '</p>'
-          : '<p class="plan-line"><span class="dot grey"></span><b>' + esc(String(s.status || '').toLowerCase()) + '.</b></p>';
-        var next = s.nextBillingDate ? '<div class="plan-next">Next box is billed ' + fmtDate(s.nextBillingDate) + '.</div>' : '';
-        return line + next;
-      }).join('<div style="height:16px"></div>');
-    }
 
-    var addrs = (c.addresses && c.addresses.nodes) || [];
-    if (!addrs.length) {
-      $('addrBox').innerHTML = '<div class="addr"><span class="muted">We’ll remember your address after your first checkout.</span></div>';
-    } else {
-      var defId = c.defaultAddress && c.defaultAddress.id;
-      $('addrBox').innerHTML = addrs.map(function (a) {
-        var lines = (a.formatted || []).map(esc).join('<br>');
-        var tag = a.id === defId ? '<span class="tag">usual spot</span>' : '';
-        return '<div class="addr">' + lines + tag + '</div>';
-      }).join('');
-    }
-
+    renderReadouts(orders, subs);
+    renderOrders(orders);
+    renderPlan(subs);
+    renderAddresses(c);
+    renderBandana(orders);
+    stampSync();
+    wirePlanActions();
+    renderPets();
     show('dash');
   }
 
+  // ---- breed icons ----
+  // One head mark parameterised by ear shape, muzzle, coat and markings, so each
+  // breed in the list reads as itself. Same filled style as the product page.
+  var VB = '6.2 -1.5 20.6 17.2';
+
+  function _e(cx, cy, rx, ry, fill, rot) {
+    return '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="' + fill + '"' +
+      (rot ? ' transform="rotate(' + rot + ' ' + cx + ' ' + cy + ')"' : '') + '></ellipse>';
+  }
+  function _p(d, fill) { return '<path d="' + d + '" fill="' + fill + '"></path>'; }
+
+  function _ears(kind, c) {
+    switch (kind) {
+      case 'longdrop': return _e(9.4, 10.0, 2.7, 5.4, c, -10) + _e(23.6, 10.0, 2.7, 5.4, c, 10);
+      case 'feather':  return _e(9.5, 9.6, 3.0, 4.8, c, -16) + _e(23.5, 9.6, 3.0, 4.8, c, 16);
+      case 'prick':    return _p('M11.6 5.6 10.5 -0.6 15.4 3.0Z', c) + _p('M21.4 5.6 22.5 -0.6 17.6 3.0Z', c);
+      case 'bigprick': return _p('M11.4 6.0 9.6 -1.2 15.6 2.8Z', c) + _p('M21.6 6.0 23.4 -1.2 17.4 2.8Z', c);
+      case 'bat':      return _e(10.9, 3.9, 2.6, 3.7, c, -16) + _e(22.1, 3.9, 2.6, 3.7, c, 16);
+      case 'semi':     return _p('M10.8 6.0 9.8 0.2 15.2 3.0Z', c) + _p('M22.2 6.0 23.2 0.2 17.8 3.0Z', c) +
+                              _e(10.2, 1.2, 1.6, 1.0, c, 28) + _e(22.8, 1.2, 1.6, 1.0, c, -28);
+      case 'fold':     return _e(10.8, 4.6, 2.5, 2.0, c, -28) + _e(22.2, 4.6, 2.5, 2.0, c, 28);
+      case 'small':    return _e(11.2, 4.6, 2.1, 1.8, c, -24) + _e(21.8, 4.6, 2.1, 1.8, c, 24);
+      case 'tuft':     return _p('M11.4 5.8 10.2 -1.0 15.5 2.9Z', c) + _p('M21.6 5.8 22.8 -1.0 17.5 2.9Z', c) +
+                              _p('M12.1 3.2 10.4 1.1 12.9 1.9Z', '#F1E9D8') + _p('M20.9 3.2 22.6 1.1 20.1 1.9Z', '#F1E9D8');
+      default:         return _e(9.8, 9.4, 2.6, 4.4, c, -14) + _e(23.2, 9.4, 2.6, 4.4, c, 14);
+    }
+  }
+
+  function _muzzle(kind, snout, nose) {
+    switch (kind) {
+      case 'flat':  return _e(16.5, 10.5, 3.1, 1.6, snout) + _e(16.5, 9.9, 1.0, 0.7, nose);
+      case 'long':  return _e(16.5, 11.3, 2.0, 2.4, snout) + _e(16.5, 12.6, 0.8, 0.6, nose);
+      case 'short': return _e(16.5, 10.7, 2.4, 1.5, snout) + _e(16.5, 10.2, 0.95, 0.65, nose);
+      case 'cat':   return _p('M15.6 11.2h1.8l-0.9 1.2Z', nose);
+      default:      return _e(16.5, 10.9, 1.9, 1.4, snout) + _e(16.5, 10.3, 0.85, 0.6, nose);
+    }
+  }
+
+  function _eyes(kind, color) {
+    if (kind === 'slit') {
+      return _e(14.1, 7.7, 1.3, 1.75, color) + _e(18.9, 7.7, 1.3, 1.75, color) +
+             _e(14.1, 7.7, 0.42, 1.55, '#0B0906') + _e(18.9, 7.7, 0.42, 1.55, '#0B0906');
+    }
+    return _e(14.1, 7.4, 1.05, 1.05, color) + _e(18.9, 7.4, 1.05, 1.05, color);
+  }
+
+  var BLAZE = _e(16.5, 6.0, 1.15, 3.7, '#F1E9D8');
+  function MASK(c) { return _e(16.5, 10.4, 3.5, 2.7, c); }
+  function POINTS(c) { return _e(16.5, 9.8, 4.0, 3.2, c); }
+  function STRIPES(c) {
+    return _p('M13.5 3.4l0.8 2.1-1.5 0.3Z', c) + _p('M19.5 3.4l-0.8 2.1 1.5 0.3Z', c) + _e(16.5, 4.1, 0.5, 1.6, c);
+  }
+  function SPOTS(c) {
+    return _e(12.9, 9.4, 0.75, 0.6, c) + _e(20.1, 9.4, 0.75, 0.6, c) + _e(16.5, 4.6, 0.7, 0.55, c) +
+           _e(12.5, 6.4, 0.65, 0.5, c) + _e(20.5, 6.4, 0.65, 0.5, c);
+  }
+  function PATCH(c) { return _e(12.7, 6.6, 2.3, 2.6, c, -14) + _e(20.6, 10.0, 1.6, 1.5, c); }
+
+  var SPECS = {
+    'Labrador Retriever':  { ear:'drop',     coat:'#D6B074', muzzle:'med',   snout:'#B98A4E', earColor:'#BE9455' },
+    'Golden Retriever':    { ear:'feather',  coat:'#D79E56', muzzle:'med',   snout:'#C88E45', earColor:'#C68E45' },
+    'German Shepherd':     { ear:'bigprick', coat:'#AE7639', muzzle:'long',  snout:'#3A2A1C', nose:'#0B0906', earColor:'#8A5A29', marks:[MASK('#3A2A1C')] },
+    'French Bulldog':      { ear:'bat',      coat:'#C6A176', muzzle:'flat',  snout:'#8E6C48', earColor:'#B08E64' },
+    'Poodle':              { ear:'longdrop', coat:'#E0D0B2', muzzle:'med',   snout:'#BFA97F', earColor:'#C9B590', fluff:true },
+    'Beagle':              { ear:'longdrop', coat:'#A9713F', muzzle:'med',   snout:'#EFE7D6', earColor:'#8A5A2E', marks:[BLAZE] },
+    'Dachshund':           { ear:'longdrop', coat:'#9C4E22', muzzle:'long',  snout:'#7A3C1A', earColor:'#6E3415' },
+    'Border Collie':       { ear:'semi',     coat:'#2A2420', muzzle:'med',   snout:'#F1E9D8', nose:'#0B0906', earColor:'#15110E', marks:[BLAZE] },
+    'Boxer':               { ear:'fold',     coat:'#C08A4E', muzzle:'short', snout:'#3A2A1C', nose:'#0B0906', earColor:'#9E6C36', marks:[MASK('#3A2A1C')] },
+    'Australian Shepherd': { ear:'semi',     coat:'#9A9086', muzzle:'med',   snout:'#EFE7D6', eye:'#4E7FA6', earColor:'#4A443C', marks:[PATCH('#4A443C'), BLAZE] },
+    'Chihuahua':           { ear:'bigprick', coat:'#CFA26A', muzzle:'short', snout:'#AE7C44', earColor:'#B4834B' },
+    'Shih Tzu':            { ear:'longdrop', coat:'#DCC9A6', muzzle:'flat',  snout:'#3A2A1C', nose:'#0B0906', fluff:true },
+    'Great Dane':          { ear:'semi',     coat:'#8C8378', muzzle:'long',  snout:'#645C52', nose:'#0B0906', earColor:'#71695F' },
+    'Corgi':               { ear:'bigprick', coat:'#D08B47', muzzle:'med',   snout:'#F1E9D8', earColor:'#BE7A38', marks:[BLAZE] },
+    'Mixed breed':         { ear:'drop',     coat:'#B98A5A', muzzle:'med',   snout:'#94663B', earColor:'#9E7143' },
+
+    'Domestic Shorthair':  { ear:'prick', muzzle:'cat', eyeStyle:'slit', coat:'#9C8B72', eye:'#8FAF63', nose:'#B26A62', marks:[STRIPES('#6E5F4B')] },
+    'Domestic Longhair':   { ear:'tuft',  muzzle:'cat', eyeStyle:'slit', coat:'#B0A088', eye:'#8FAF63', nose:'#B26A62', fluff:true, marks:[STRIPES('#7E6F58')] },
+    'Maine Coon':          { ear:'tuft',  muzzle:'cat', eyeStyle:'slit', coat:'#8A6A46', eye:'#C89A3A', nose:'#B26A62', fluff:true, marks:[STRIPES('#5C452C')] },
+    'Siamese':             { ear:'bigprick', muzzle:'cat', eyeStyle:'slit', coat:'#E2D5BB', eye:'#6FA8C9', nose:'#5B4636', earColor:'#5B4636', marks:[POINTS('#5B4636')] },
+    'Ragdoll':             { ear:'prick', muzzle:'cat', eyeStyle:'slit', coat:'#E8DCC6', eye:'#6FA8C9', nose:'#B98F7A', earColor:'#7B6450', fluff:true, marks:[POINTS('#7B6450')] },
+    'British Shorthair':   { ear:'small', muzzle:'cat', eyeStyle:'slit', coat:'#8D9AA4', eye:'#C87F32', nose:'#7E6C63' },
+    'Bengal':              { ear:'prick', muzzle:'cat', eyeStyle:'slit', coat:'#C79A54', eye:'#8FAF63', nose:'#B26A62', marks:[SPOTS('#4A3A22')] },
+    'Persian':             { ear:'small', muzzle:'flat', coat:'#DCCBA8', eyeStyle:'round', eye:'#C87F32', snout:'#C9B694', nose:'#B98F7A', fluff:true },
+    'Sphynx':              { ear:'bigprick', muzzle:'cat', eyeStyle:'slit', coat:'#D8B39E', eye:'#8FAF63', nose:'#B98F7A', earColor:'#C79C86' },
+    'Russian Blue':        { ear:'bigprick', muzzle:'cat', eyeStyle:'slit', coat:'#7E8C97', eye:'#7FA86A', nose:'#6E6058' },
+    'Abyssinian':          { ear:'bigprick', muzzle:'cat', eyeStyle:'slit', coat:'#B27A45', eye:'#C89A3A', nose:'#B26A62' },
+    'Scottish Fold':       { ear:'fold',  muzzle:'cat', eyeStyle:'slit', coat:'#9AA0A6', eye:'#C89A3A', nose:'#B98F7A' },
+    'Norwegian Forest':    { ear:'tuft',  muzzle:'cat', eyeStyle:'slit', coat:'#A08A6C', eye:'#8FAF63', nose:'#B26A62', fluff:true, marks:[STRIPES('#6E5B42')] }
+  };
+
+  var FALLBACK = {
+    dog: { ear:'drop',  coat:'#B98A5A', muzzle:'med', snout:'#94663B', earColor:'#9E7143' },
+    cat: { ear:'prick', coat:'#17140F', muzzle:'cat', eyeStyle:'slit', eye:'oklch(0.74 0.17 62)', nose:'oklch(0.7 0.12 28)' }
+  };
+
+  function petSvg(spec, w, h) {
+    var coat = spec.coat, ear = spec.earColor || coat;
+    var s = _ears(spec.ear, ear);
+    if (spec.fluff) s += _e(13.3, 4.0, 2.3, 2.1, coat) + _e(19.7, 4.0, 2.3, 2.1, coat) + _e(16.5, 3.3, 2.6, 2.3, coat);
+    s += _e(16.5, 8.3, 6.1, 5.3, coat);
+    (spec.marks || []).forEach(function (m) { s += m; });
+    s += _eyes(spec.eyeStyle || 'round', spec.eye || '#17140F');
+    s += _muzzle(spec.muzzle, spec.snout || coat, spec.nose || '#17140F');
+    return '<svg width="' + w + '" height="' + h + '" viewBox="' + VB + '" fill="none" aria-hidden="true" ' +
+      'style="display:block; overflow:visible;">' + s + '</svg>';
+  }
+
+  function petIcon(pet, w, h) {
+    var species = (pet && pet.species) || 'dog';
+    var spec = (pet && SPECS[pet.breed]) || FALLBACK[species] || FALLBACK.dog;
+    if (pet && pet.breed === 'Mixed breed' && species === 'cat') spec = FALLBACK.cat;
+    return petSvg(spec, w, h);
+  }
+
+  // ---- pet profiles (stored locally per browser) ----
+  var PET_KEY = 'hb-pets';
+  var PET_KEY_LEGACY = 'hb-pet-profile';
+  var ORDER_PET_KEY = 'hb-order-pets';
+  var BREEDS = {
+    dog: ['Labrador Retriever','Golden Retriever','German Shepherd','French Bulldog','Poodle','Beagle','Dachshund','Border Collie','Boxer','Australian Shepherd','Chihuahua','Shih Tzu','Great Dane','Corgi','Mixed breed'],
+    cat: ['Domestic Shorthair','Domestic Longhair','Maine Coon','Siamese','Ragdoll','British Shorthair','Bengal','Persian','Sphynx','Russian Blue','Abyssinian','Scottish Fold','Norwegian Forest','Mixed breed']
+  };
+
+  function readPets() {
+    var list = null;
+    try { list = JSON.parse(localStorage.getItem(PET_KEY) || 'null'); } catch (e) {}
+    if (Array.isArray(list)) return list;
+    var old = null;
+    try { old = JSON.parse(localStorage.getItem(PET_KEY_LEGACY) || 'null'); } catch (e) {}
+    if (old && old.name) {
+      old.id = old.id || 'p1';
+      writePets([old]);
+      return [old];
+    }
+    return [];
+  }
+  function writePets(list) {
+    try { localStorage.setItem(PET_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  function readOrderPets() {
+    try { return JSON.parse(localStorage.getItem(ORDER_PET_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function writeOrderPets(map) {
+    try { localStorage.setItem(ORDER_PET_KEY, JSON.stringify(map)); } catch (e) {}
+  }
+
+  var petFormFor = null; // null = closed, 'new' = add, or a pet id = edit
+
+  function renderPets() {
+    var box = $('petBox');
+    if (!box) return;
+    var pets = readPets();
+    var html = '';
+
+    if (pets.length) {
+      html += '<div class="pet-list">' + pets.map(function (p) {
+        return '<div class="pet-card">' +
+            '<span class="pet-avatar">' + petIcon(p, 38, 31) + '</span>' +
+            '<span><span class="pet-name">' + esc(p.name) + '</span>' +
+            '<div class="pet-breed">' + esc(p.breed) + '</div></span>' +
+            '<span class="pet-rowacts">' +
+              '<button type="button" class="pet-edit" data-edit="' + esc(p.id) + '">Edit</button>' +
+              '<button type="button" class="pet-edit" data-remove="' + esc(p.id) + '">Remove</button>' +
+            '</span>' +
+          '</div>';
+      }).join('') + '</div>';
+    }
+
+    if (petFormFor) {
+      var editing = petFormFor === 'new' ? null : pets.filter(function (p) { return p.id === petFormFor; })[0];
+      html += petFormHtml(editing, pets.length > 0);
+    } else {
+      html += pets.length
+        ? '<button type="button" class="pet-add" id="petAdd">+ Add another pet</button>'
+        : '<p class="muted" style="margin-bottom:16px;">Tell us who the beans are for and we\'ll label your deliveries.</p>' +
+          '<button type="button" class="pet-save" id="petAdd">Add a pet</button>';
+    }
+
+    box.innerHTML = html;
+    var pc = $('petCount');
+    if (pc) pc.textContent = pets.length ? pets.length + ' registered' : '';
+    wirePetBox();
+    applyPetsToHeader(pets);
+    renderOrderPets();
+  }
+
+  function petFormHtml(pet, divider) {
+    var species = (pet && pet.species) || 'dog';
+    return (divider ? '<div class="pet-divider"></div>' : '') +
+      '<div class="pet-form">' +
+        '<div class="pet-field"><label for="petName">Pet name</label>' +
+          '<input id="petName" type="text" maxlength="32" placeholder="Beanie" value="' + esc((pet && pet.name) || '') + '"></div>' +
+        '<div class="pet-field"><label for="petSpecies">Dog or cat</label>' +
+          '<select id="petSpecies"><option value="dog"' + (species === 'dog' ? ' selected' : '') + '>Dog</option>' +
+          '<option value="cat"' + (species === 'cat' ? ' selected' : '') + '>Cat</option></select></div>' +
+        '<div class="pet-field"><label for="petBreed">Breed</label>' +
+          '<select id="petBreed">' + breedOpts(BREEDS[species], pet && pet.breed) + '</select></div>' +
+        '<div class="pet-formacts">' +
+          '<button type="button" class="pet-save" id="petSave">' + (pet ? 'Save changes' : 'Save pet') + '</button>' +
+          '<button type="button" class="pet-edit" id="petCancel">Cancel</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function breedOpts(list, sel) {
+    return list.map(function (b) {
+      return '<option value="' + esc(b) + '"' + (b === sel ? ' selected' : '') + '>' + esc(b) + '</option>';
+    }).join('');
+  }
+
+  function wirePetBox() {
+    var box = $('petBox');
+    var add = $('petAdd');
+    if (add) add.onclick = function () { petFormFor = 'new'; renderPets(); };
+
+    Array.prototype.forEach.call(box.querySelectorAll('[data-edit]'), function (b) {
+      b.onclick = function () { petFormFor = b.getAttribute('data-edit'); renderPets(); };
+    });
+    Array.prototype.forEach.call(box.querySelectorAll('[data-remove]'), function (b) {
+      b.onclick = function () {
+        var id = b.getAttribute('data-remove');
+        writePets(readPets().filter(function (p) { return p.id !== id; }));
+        var map = readOrderPets();
+        Object.keys(map).forEach(function (k) { if (map[k] === id) delete map[k]; });
+        writeOrderPets(map);
+        if (petFormFor === id) petFormFor = null;
+        renderPets();
+      };
+    });
+
+    var sp = $('petSpecies');
+    if (sp) {
+      sp.onchange = function () { $('petBreed').innerHTML = breedOpts(BREEDS[this.value], null); };
+      $('petCancel').onclick = function () { petFormFor = null; renderPets(); };
+      $('petSave').onclick = function () {
+        var name = $('petName').value.trim();
+        if (!name) { $('petName').focus(); return; }
+        var pets = readPets();
+        var next = { name: name, species: $('petSpecies').value, breed: $('petBreed').value };
+        if (petFormFor === 'new') {
+          next.id = 'p' + Date.now();
+          pets.push(next);
+        } else {
+          pets = pets.map(function (p) { return p.id === petFormFor ? { id: p.id, name: next.name, species: next.species, breed: next.breed } : p; });
+        }
+        writePets(pets);
+        petFormFor = null;
+        renderPets();
+      };
+    }
+  }
+
+  function applyPetsToHeader(pets) {
+    var slot = $('deliveriesFor');
+    if (!slot) return;
+    if (!pets.length) { slot.innerHTML = ''; return; }
+    if (pets.length === 1) {
+      slot.innerHTML = ' for ' + esc(pets[0].name) + '<span class="dash-pet">' + petIcon(pets[0], 28, 23) + '</span>';
+      return;
+    }
+    slot.innerHTML = '<span class="dash-pet dash-pets">' + pets.map(function (p) {
+      return '<span title="' + esc(p.name) + '">' + petIcon(p, 26, 21) + '</span>';
+    }).join('') + '</span>';
+  }
+
+  function renderOrderPets() {
+    var pets = readPets();
+    var map = readOrderPets();
+    Array.prototype.forEach.call(document.querySelectorAll('.o-pet'), function (slot) {
+      var id = slot.getAttribute('data-order');
+      if (pets.length < 2) { slot.innerHTML = ''; return; }
+      slot.innerHTML = '<label class="o-petlabel" for="op-' + esc(id) + '">For</label>' +
+        '<select class="o-petsel" id="op-' + esc(id) + '">' +
+          '<option value="">Not assigned</option>' +
+          pets.map(function (p) {
+            return '<option value="' + esc(p.id) + '"' + (map[id] === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>';
+          }).join('') +
+        '</select>';
+      slot.querySelector('select').onchange = function () {
+        var m = readOrderPets();
+        if (this.value) m[id] = this.value; else delete m[id];
+        writeOrderPets(m);
+      };
+    });
+  }
+
+  function wirePlanActions() {
+    var box = $('subsBox');
+    if (!box) return;
+    box.addEventListener('click', function (e) {
+      var btn = e.target.closest && e.target.closest('.plan-btn');
+      if (!btn) return;
+      var id = btn.getAttribute('data-id');
+      var act = btn.getAttribute('data-act');
+      var slot = box.querySelector('.cancel-slot[data-slot="' + id + '"]');
+      if (!slot) return;
+      if (act === 'skip') {
+        slot.innerHTML =
+          '<div class="cancel-confirm" style="border-color:rgba(200,160,50,0.4); background:oklch(0.86 0.14 92 / 0.08);">' +
+            '<p>Skip the next box? Your plan keeps running — the box after this one arrives on its normal date, and you will not be billed for the skipped cycle.</p>' +
+            '<div class="row">' +
+              '<button type="button" class="plan-btn" data-skipconfirm="1">Yes, skip it</button>' +
+              '<button type="button" class="plan-btn" data-skipconfirm="0">Keep it coming</button>' +
+            '</div>' +
+          '</div>';
+        slot.querySelector('[data-skipconfirm="0"]').onclick = function () { slot.innerHTML = ''; };
+        slot.querySelector('[data-skipconfirm="1"]').onclick = function () {
+          planRequest(id, 'skip', slot, 'Skipping your next box…', 'Next box skipped — the one after arrives on schedule.');
+        };
+        return;
+      }
+      slot.innerHTML =
+        '<div class="cancel-confirm">' +
+          '<p>Cancel your care plan? Peptide results build over months, so most owners skip a box instead. You can restart any time.</p>' +
+          '<div class="row">' +
+            '<button type="button" class="plan-btn danger" data-confirm="1">Yes, cancel my plan</button>' +
+            '<button type="button" class="plan-btn" data-confirm="0">Keep my plan</button>' +
+          '</div>' +
+        '</div>';
+      slot.querySelector('[data-confirm="0"]').onclick = function () { slot.innerHTML = ''; };
+      slot.querySelector('[data-confirm="1"]').onclick = function () {
+        planRequest(id, 'cancel', slot, 'Cancelling…', 'Your care plan is cancelled. A confirmation is on its way to your inbox.');
+      };
+    });
+  }
+
+  function planRequest(id, action, slot, pending, done) {
+    slot.innerHTML = '<div class="plan-note">' + pending + '</div>';
+    if (DEMO) {
+      setTimeout(function () {
+        slot.innerHTML = '<div class="plan-note" style="color:oklch(0.44 0.07 152);">' + done + '</div>';
+      }, 500);
+      return;
+    }
+    fetch('/api/account/subscription', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id, action: action })
+    }).then(function (r) { return r.ok ? r.json() : null; }).then(function (b) {
+      if (b && b.ok) slot.innerHTML = '<div class="plan-note" style="color:oklch(0.44 0.07 152);">' + done + '</div>';
+      else planFallback(slot, action);
+    }).catch(function () { planFallback(slot, action); });
+  }
+
+  function planFallback(slot, action) {
+    slot.innerHTML = '<div class="plan-note">We could not reach the plan service just now. Email ' +
+      '<a href="mailto:hello@happybeanie.com?subject=' + (action === 'cancel' ? 'Cancel my care plan' : 'Skip my next box') +
+      '">hello@happybeanie.com</a> and the pharmacist desk will handle it the same business day.</div>';
+  }
+
+  var DEMO = params.get('demo') === '1';
   var ERRORS = {
     not_configured: 'The member area isn’t quite ready — we’re finishing the wiring. For anything order-related, the pharmacist desk has you: hello@happybeanie.com.',
     state_mismatch: 'That sign-in link had gone stale. One more try should do it.',
@@ -338,13 +1066,13 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
   }
 
   // Demo mode: preview the dashboard design without signing in.
-  if (params.get('demo') === '1') {
+  if (DEMO) {
     renderDash({
-      firstName: 'Jordan', tags: ['wholesale'],
-      emailAddress: { emailAddress: 'jordan@scottsdaleanimal.com' },
+      firstName: 'Jordan', tags: [],
+      emailAddress: { emailAddress: 'jordan@example.com' },
       creationDate: '2026-03-14T00:00:00Z',
       defaultAddress: { id: 'a1' },
-      addresses: { nodes: [{ id: 'a1', formatted: ['Scottsdale Animal Hospital', '1421 N Scottsdale Rd', 'Scottsdale AZ 85257', 'United States'] }] },
+      addresses: { nodes: [{ id: 'a1', formatted: ['Jordan Vance', '1421 N Scottsdale Rd', 'Scottsdale AZ 85257', 'United States'] }] },
       orders: { nodes: [
         { id: 'o3', name: '#1043', processedAt: '2026-07-28T00:00:00Z', financialStatus: 'PAID',
           totalPrice: { amount: '278.60', currencyCode: 'USD' },
@@ -363,6 +1091,15 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     });
     return;
   }
+
+  function resync() {
+    if (DEMO || document.hidden) return;
+    fetch('/api/account/data', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (b) { if (b && b.ok && b.customer) renderDash(b.customer); })
+      .catch(function () {});
+  }
+  setInterval(resync, 60000);
 
   fetch('/api/account/data', { credentials: 'same-origin' }).then(function (res) {
     if (res.status === 401) { show('out'); return null; }
