@@ -965,24 +965,38 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
 
         <div>
-          <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 18px;">Shared benefit profile</div>
-          <h3 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.08; margin: 0 0 24px; max-width: 22em;">Ten benefits, <span style="color: oklch(0.44 0.07 152);">either formula.</span></h3>
-          <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
-            <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(23,20,15,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(23,20,15,0.04) 1px, transparent 1px); background-size: 38px 38px;"></div>
-            <div data-m="two" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1px; background: rgba(23,20,15,0.12);">
-              <sc-for list="{{ benefits }}" as="bn2" hint-placeholder-count="10">
-                <div style="display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: center; padding: 15px 22px; background: #FCFAF4; border-bottom: 1px solid rgba(23,20,15,0.08); transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
-                  <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: oklch(0.44 0.07 152);">{{ bn2.n }}</span>
-                  <span style="font-size: 15px; line-height: 1.4; color: #17140F;">{{ bn2.label }}</span>
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
+        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em;">Ten benefits, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
+        <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
+          <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(23,20,15,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(23,20,15,0.04) 1px, transparent 1px); background-size: 38px 38px;"></div>
+                    <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03); font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;">
+            <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Benefit profile</span>
+          </div>
+          <div data-m="acrow" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: rgba(23,20,15,0.12); border-bottom: 1px solid rgba(23,20,15,0.12);">
+            <sc-for list="{{ actives }}" as="ac" hint-placeholder-count="3">
+              <div style="background: #FCFAF4; padding: 20px 22px 22px; transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px;">
+                  <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #FCFAF4; background: #17140F; padding: 5px 9px; border-radius: 2px;">{{ ac.code }}</span>
+                  <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;">Active</span>
                 </div>
-              </sc-for>
-            </div>
-            <div style="position: relative; padding: 12px 22px 13px; border-top: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03);">
-              <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Disclaimer</div>
-              <p style="font-size: 11.5px; line-height: 1.55; color: #6A6055; margin: 0;">These statements have not been evaluated by the Food and Drug Administration. None of the ingredients listed above have been evaluated by the FDA for the benefits described, and this product is not intended to diagnose, treat, cure, or prevent any disease. Happy Beanie is a food supplement, not a medication.</p>
-            </div>
+                <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 19px; line-height: 1.2; margin-bottom: 0;">{{ ac.name }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1px; background: rgba(23,20,15,0.12);">
+            <sc-for list="{{ benefits }}" as="bn" hint-placeholder-count="10">
+              <div style="display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: center; padding: 17px 22px; background: #FCFAF4; border-bottom: 1px solid rgba(23,20,15,0.08); transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
+                <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: oklch(0.44 0.07 152);">{{ bn.n }}</span>
+                <span style="font-size: 15px; line-height: 1.4; color: #17140F;">{{ bn.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position: relative; padding: 12px 22px 13px; border-top: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03);">
+            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Disclaimer</div>
+            <p style="font-size: 11.5px; line-height: 1.55; color: #6A6055; margin: 0; max-width: none;">These statements have not been evaluated by the Food and Drug Administration. None of the ingredients listed above have been evaluated by the FDA for the benefits described, and this product is not intended to diagnose, treat, cure, or prevent any disease. Happy Beanie is a food supplement, not a medication.</p>
           </div>
         </div>
+      </div>
 
         <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-top: 44px; padding: 34px 36px; background: #17140F; border-radius: 4px;">
           <div>
@@ -1098,40 +1112,6 @@ window.hbShopifyCheckout = async function (rows, buyer) {
                 <div style="font-size: 15px; line-height: 1.4;">{{ sp2.v }}</div>
               </div>
             </sc-for>
-          </div>
-        </div>
-      </div>
-
-      <div data-m="tight" style="max-width: 1180px; margin: 88px auto 0;">
-        <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
-        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em;">Ten benefits, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
-        <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
-          <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(23,20,15,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(23,20,15,0.04) 1px, transparent 1px); background-size: 38px 38px;"></div>
-                    <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03); font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;">
-            <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Benefit profile</span>
-          </div>
-          <div data-m="acrow" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: rgba(23,20,15,0.12); border-bottom: 1px solid rgba(23,20,15,0.12);">
-            <sc-for list="{{ actives }}" as="ac" hint-placeholder-count="3">
-              <div style="background: #FCFAF4; padding: 20px 22px 22px; transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px;">
-                  <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #FCFAF4; background: #17140F; padding: 5px 9px; border-radius: 2px;">{{ ac.code }}</span>
-                  <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;">Active</span>
-                </div>
-                <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 19px; line-height: 1.2; margin-bottom: 0;">{{ ac.name }}</div>
-              </div>
-            </sc-for>
-          </div>
-          <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1px; background: rgba(23,20,15,0.12);">
-            <sc-for list="{{ benefits }}" as="bn" hint-placeholder-count="10">
-              <div style="display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: center; padding: 17px 22px; background: #FCFAF4; border-bottom: 1px solid rgba(23,20,15,0.08); transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
-                <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: oklch(0.44 0.07 152);">{{ bn.n }}</span>
-                <span style="font-size: 15px; line-height: 1.4; color: #17140F;">{{ bn.label }}</span>
-              </div>
-            </sc-for>
-          </div>
-          <div style="position: relative; padding: 12px 22px 13px; border-top: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03);">
-            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Disclaimer</div>
-            <p style="font-size: 11.5px; line-height: 1.55; color: #6A6055; margin: 0; max-width: none;">These statements have not been evaluated by the Food and Drug Administration. None of the ingredients listed above have been evaluated by the FDA for the benefits described, and this product is not intended to diagnose, treat, cure, or prevent any disease. Happy Beanie is a food supplement, not a medication.</p>
           </div>
         </div>
       </div>
