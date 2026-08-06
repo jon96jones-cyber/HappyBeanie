@@ -434,6 +434,20 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     [data-m~="spimg"] { height: 116px !important; }
     [data-m~="heromos"] { gap: 8px !important; }
   }
+
+  /* Quiz intro: fit a single phone screen; only the footer scrolls below */
+  @media (max-width: 620px) {
+    [data-m~="qzintro"] { padding: 24px 20px 30px !important; }
+    [data-m~="qzintro"] div[style*="max-width: 720px"] > div:first-child { margin-bottom: 12px !important; font-size: 10px !important; }
+    [data-m~="qzintro"] h1 { font-size: 30px !important; line-height: 1.06 !important; margin-bottom: 12px !important; }
+    [data-m~="qzintro"] div[style*="max-width: 720px"] > p { font-size: 14.5px !important; line-height: 1.55 !important; margin-bottom: 20px !important; }
+    [data-m~="qzintro"] button { padding: 15px 30px !important; }
+    [data-m~="qzintro"] div[style*="max-width: 620px"] { margin-top: 20px !important; }
+    [data-m~="qzintro"] [data-m~="two"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    [data-m~="qzintro"] [data-m~="two"] > div { padding: 10px 12px !important; }
+    [data-m~="qzintro"] [data-m~="two"] > div > div:first-child { font-size: 16px !important; margin-bottom: 4px !important; }
+    [data-m~="qzintro"] [data-m~="two"] > div > div:last-child { font-size: 7.5px !important; letter-spacing: 0.12em !important; }
+  }
 </style>
 </helmet>
 
@@ -1693,7 +1707,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
   <div style="background: #F5F0E6;">
 
     <sc-if value="{{ qzIntro }}" hint-placeholder-val="{{ true }}">
-    <section data-m="pad short" style="position: relative; padding: 104px 44px 116px; background: radial-gradient(110% 70% at 50% 0%, #FCFAF4 0%, #F5F0E6 50%, #EFE8D9 100%); overflow: hidden;">
+    <section data-m="pad short qzintro" style="position: relative; padding: 104px 44px 116px; background: radial-gradient(110% 70% at 50% 0%, #FCFAF4 0%, #F5F0E6 50%, #EFE8D9 100%); overflow: hidden;">
       <div aria-hidden="true" style="position: absolute; top: -220px; left: 50%; width: 1000px; height: 520px; margin-left: -500px; border-radius: 50%; background: radial-gradient(closest-side, oklch(0.88 0.15 96 / 0.28), transparent); filter: blur(24px); animation: qzGlow 10s ease-in-out infinite; pointer-events: none;"></div>
       <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(23,20,15,0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(23,20,15,0.055) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(120% 80% at 50% 20%, #000 30%, transparent 78%); -webkit-mask-image: radial-gradient(120% 80% at 50% 20%, #000 30%, transparent 78%);"></div>
       <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 90px; height: 1px; background: linear-gradient(90deg, transparent, oklch(0.44 0.07 152 / 0.45), transparent); animation: qzScan 6.5s cubic-bezier(0.4,0,0.6,1) infinite; pointer-events: none;"></div>
