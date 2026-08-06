@@ -5,6 +5,8 @@
 <meta name="description" content="Sign in to your Happy Beanie account to view orders, track deliveries, and manage your subscription.">
 <meta name="robots" content="noindex">
 <meta property="og:image" content="https://www.happybeanie.com/assets/og-image-2.jpg">
+<meta property="og:image:secure_url" content="https://www.happybeanie.com/assets/og-image-2.jpg">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -226,22 +228,90 @@ footer.site a:hover { color:oklch(0.86 0.14 92); border-bottom:none; }
   .mark b { font-size:19px; }
   .mark small { display:none; }
   .back { font-size:9.5px; letter-spacing:0.14em; white-space:nowrap; }
-  main { padding:26px 0 64px; }
-  .con-top { padding:13px 18px; gap:10px 16px; }
-  .con-body { padding:26px 18px 24px; }
+  main { padding:18px 0 44px; }
+  .con-top { padding:10px 14px; gap:8px 12px; }
+  .con-body { padding:18px 14px 16px; }
   .readouts { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .ro { padding:16px 16px 18px; }
-  .ro-val { font-size:26px; }
-  .ro-val small { font-size:10px; margin-left:5px; }
-  .who { line-height:1.7; }
-  .panel-head { padding:13px 16px; }
-  .panel-body { padding:20px 16px 22px; }
-  .order { padding:20px 16px 22px; }
-  .pet-list { margin:-20px -16px 0; }
-  .pet-card { padding:16px; }
-  .rn-lab { font-size:8px; letter-spacing:0.08em; }
+  .ro { padding:10px 12px 11px; }
+  .ro-lab { font-size:7.5px; letter-spacing:0.14em; }
+  .ro-val { font-size:19px; margin-top:5px; }
+  .ro-val small { font-size:9px; margin-left:4px; }
+  .ro-sub { font-size:8.5px; margin-top:5px; }
+  .who { line-height:1.6; font-size:9px; margin-top:10px; }
+  .trade-line { margin-top:12px; padding:7px 12px; font-size:9px; }
+  .grid { gap:12px; margin-top:12px; }
+  .aside { gap:12px; }
+  .panel-head { padding:10px 14px; }
+  .panel-body { padding:14px 14px 16px; }
+  .order { padding:14px 14px 16px; }
+  .o-items { font-size:13.5px; margin-top:7px; }
+  .rail { margin-top:14px; }
+  .o-foot { margin-top:14px; padding-top:11px; font-size:8.5px; gap:8px 14px; }
+  .pet-list { margin:-14px -14px 0; }
+  .pet-card { padding:12px 14px; }
+  .rn-lab { font-size:8px; letter-spacing:0.08em; margin-top:8px; }
   footer.site .shell { flex-direction:column; gap:8px; }
 }
+
+/* ---------- brand pass ---------- */
+.panel, .card {
+  background:linear-gradient(168deg,#FFFDF7 0%,#F7F2E8 100%);
+  border:1px solid #E4DBC9; border-radius:8px; overflow:hidden;
+  box-shadow:0 18px 32px -26px rgba(23,20,15,0.45), 0 1px 0 rgba(255,255,255,0.9) inset;
+  transition:box-shadow .35s ease, border-color .3s ease, transform .35s cubic-bezier(0.2,0.7,0.2,1);
+}
+.panel:hover { box-shadow:0 26px 44px -28px rgba(23,20,15,0.5), 0 1px 0 rgba(255,255,255,0.95) inset; }
+.panel-head {
+  background:transparent; border-bottom:1px solid #E7DECC; padding:16px 24px;
+}
+.panel-head h2 { color:oklch(0.44 0.07 152); letter-spacing:0.2em; font-size:10px; }
+.panel-head .count { font-size:9px; letter-spacing:0.16em; }
+.panel-body { padding:26px 24px 28px; }
+
+.orders { gap:10px; background:transparent; padding:10px; }
+.order {
+  background:linear-gradient(168deg,#FFFDF7 0%,#F7F2E8 100%);
+  border:1px solid #E4DBC9; border-radius:6px; padding:22px 22px 24px;
+  box-shadow:0 10px 20px -18px rgba(23,20,15,0.45), 0 1px 0 rgba(255,255,255,0.9) inset;
+  transition:transform .35s cubic-bezier(0.2,0.7,0.2,1), box-shadow .35s ease, border-color .3s ease;
+}
+.order:hover {
+  transform:translateY(-3px); border-color:oklch(0.44 0.07 152 / 0.45);
+  box-shadow:0 26px 40px -26px rgba(23,20,15,0.5), 0 1px 0 rgba(255,255,255,0.95) inset;
+}
+.o-id { font-size:11px; letter-spacing:0.14em; color:oklch(0.44 0.07 152); }
+.o-total { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.03em; font-size:19px; color:#17140F; }
+.o-items { font-size:15px; line-height:1.5; color:#3D372D; }
+.o-foot { border-top:1px solid #E7DECC; }
+.tracklink { border-bottom:1px solid oklch(0.44 0.07 152 / 0.5); }
+
+.pet-card {
+  background:linear-gradient(168deg,#FFFDF7 0%,#F5F0E6 100%);
+  border:1px solid #E4DBC9; border-radius:6px;
+  box-shadow:0 10px 20px -18px rgba(23,20,15,0.4), 0 1px 0 rgba(255,255,255,0.9) inset;
+  transition:transform .35s cubic-bezier(0.2,0.7,0.2,1), border-color .3s ease, box-shadow .35s ease;
+}
+.pet-card:hover { transform:translateY(-2px); border-color:oklch(0.44 0.07 152 / 0.45); }
+.pet-avatar { border-radius:6px; }
+.pet-add, .bz-drop {
+  border:1px dashed oklch(0.44 0.07 152 / 0.6); border-radius:6px;
+  background:linear-gradient(168deg,#FFFDF7 0%,#F2EBDC 100%);
+  box-shadow:0 12px 22px -18px rgba(23,20,15,0.45), 0 1px 0 rgba(255,255,255,0.9) inset;
+  transition:transform .3s cubic-bezier(0.2,0.7,0.2,1), border-color .3s ease, box-shadow .3s ease;
+}
+.pet-add:hover, .bz-drop:hover { transform:translateY(-2px); border-color:oklch(0.44 0.07 152); border-style:solid; }
+
+.plan-btn { border-radius:3px; letter-spacing:0.16em; transition:transform .3s cubic-bezier(0.2,0.7,0.2,1), background .25s ease, color .25s ease, border-color .25s ease; }
+.plan-btn:hover { transform:translateY(-2px); }
+.plan-btn:not(.danger) { background:#17140F; color:#F5F0E6; border-color:#17140F; }
+.plan-btn:not(.danger):hover { background:oklch(0.44 0.07 152); border-color:oklch(0.44 0.07 152); }
+.bz-code { border-radius:4px; }
+.panel-head h2 { flex-wrap:wrap; }
+#deliveriesFor { display:inline-flex; align-items:center; gap:8px; }
+.dash-pet { vertical-align:0; margin-left:0; line-height:0; }
+.dash-pet svg { display:block; }
+
+
 @media (prefers-reduced-motion: reduce) { * { animation:none !important; } }
 </style>
 </head><body>
