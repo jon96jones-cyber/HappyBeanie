@@ -2,6 +2,10 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/(home|shop|product|certs|about|contact|quiz|cart|checkout)",
+      "destination": "/index.html"
+    },
+    {
       "source": "/((?!assets/|policies|api/|admin|wholesale|account|favicon).*)",
       "destination": "/index.html"
     }
