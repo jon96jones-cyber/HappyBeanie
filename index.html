@@ -2472,6 +2472,7 @@ class Component extends DCLogic {
           v.preload = 'auto';
           v.src = cands[i];
           this._heroVideoSrc = cands[i];
+          this._heroVideoProbing = false;
           ['loadeddata', 'canplay', 'playing'].forEach(ev => v.addEventListener(ev, reveal));
           v.load();
           const p = v.play(); if (p && p.catch) p.catch(() => {});
@@ -2562,6 +2563,15 @@ class Component extends DCLogic {
   componentDidUpdate() {
     requestAnimationFrame(() => this.scan());
     const page = this.state.page || 'home';
+    // The hero <video> lives inside the home section, so SPA nav back to home
+    // remounts a fresh, src-less element. Re-run the probe to re-attach it.
+    if (page === 'home') {
+      const hv = document.getElementById('heroVideo');
+      if (hv && !hv.getAttribute('src') && !this._heroVideoProbing) {
+        this._heroVideoSrc = null;
+        this.heroVideo(0);
+      }
+    }
     if (page === 'home' && !this._heroVideoSrc) requestAnimationFrame(() => this.startField()); else this.stopField();
     if (page === 'certs') requestAnimationFrame(() => this.startPings()); else this.stopPings();
   }
