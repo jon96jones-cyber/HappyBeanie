@@ -294,7 +294,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     [data-m~="coarow"] { grid-template-columns: 1fr auto !important; gap: 6px 12px !important; }
     [data-m~="coarow"] > :nth-child(1) { grid-column: 1 / -1; font-weight: 700; }
     [data-m~="coahead"] { display: none !important; }
-    [data-m~="tall"] { height: 300px !important; }
+    [data-m~="tall"] { height: auto !important; }
     [data-m~="rth2"] { margin-bottom: 26px !important; }
     [data-m~="tpvbox"] { padding: 24px 20px !important; }
     [data-m~="mobonly"] { display: block !important; }
@@ -654,23 +654,24 @@ window.hbShopifyCheckout = async function (rows, buyer) {
   <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
   <div>
   <section data-m="pad short herosec" style="position: relative; background: #17140F; color: #F5F0E6; padding: 86px 44px 0; overflow: hidden;">
+    <video id="heroVideo" muted="" loop="" playsinline="" preload="none" aria-hidden="true" style="position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: cover; object-position: center; pointer-events: none; opacity: 0; transition: opacity 0.9s ease;"></video>
     <div id="hbField" style="position: absolute; inset: 0; z-index: 0; pointer-events: none;">
       <canvas id="hbFieldCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
     </div>
     <div data-m="hero" style="position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; text-align: center;">
-      <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 26px;">Peptide-infused daily care</div>
-      <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(38px, 4.8vw, 72px); line-height: 1.0; letter-spacing: -0.042em; margin: 0 auto 22px; max-width: 18em; text-wrap: balance;">The next chapter of pet longevity <span style="color: oklch(0.86 0.14 92);">starts here.</span></h1>
-      <p style="font-size: 16.5px; line-height: 1.65; color: #B9AF9C; max-width: 34em; margin: 0 auto 32px; text-wrap: pretty;">Two formulations — one for dogs, one for cats. A single system of bioactive peptides, compounded by US pharmacists to support the way your animal's body repairs itself, every single day.</p>
-      <div data-m="herocta" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 56px;">
+      <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 16px;">Peptide-infused daily care</div>
+      <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(38px, 4.8vw, 72px); line-height: 1.0; letter-spacing: -0.042em; margin: 0 auto 16px; max-width: 18em; text-wrap: balance;">The next chapter of pet longevity <span style="color: oklch(0.86 0.14 92);">starts here.</span></h1>
+      <p style="font-size: 16.5px; line-height: 1.6; color: #B9AF9C; max-width: 34em; margin: 0 auto 26px; text-wrap: pretty;">Two formulations — one for dogs, one for cats. A single system of bioactive peptides, compounded by US pharmacists to support the way your animal's body repairs itself, every single day.</p>
+      <div data-m="herocta" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px;">
         <a href="#product" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; padding: 17px 32px; background: oklch(0.86 0.14 92); color: #17140F; border-radius: 2px;" style-hover="background: #F5F0E6;">Try Happy Beanie</a>
         <a href="#formula" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; padding: 17px 32px; border: 1px solid rgba(245,240,230,0.3); color: #F5F0E6; border-radius: 2px;" style-hover="border-color: #F5F0E6;">The science</a>
       </div>
-      <div data-m="heromos" style="display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 20px; align-items: end;">
-        <div data-m="heropic" style="position: relative; z-index: 1; height: 340px; border-radius: 3px; overflow: hidden; background: #1C1811;">
-          <image-slot id="hbv2-hero-pack" placeholder="Product pack shot on seamless backdrop" style="width: 100%; height: 100%;"></image-slot>
+      <div data-m="heromos" style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 20px; align-items: end;">
+        <div data-m="heropic" style="position: relative; z-index: 1; height: 470px; border-radius: 3px; overflow: hidden; background: transparent; box-shadow: 0 34px 52px -28px rgba(0,0,0,0.8); animation: hbFloatA 6.8s ease-in-out 0.6s infinite;">
+          <image-slot id="hbv2-hero-pack" placeholder="Product pack shot on seamless backdrop" style="width: 100%; height: 100%; display: block; border-radius: inherit; overflow: hidden;"></image-slot>
         </div>
-        <div data-m="heropic2" style="position: relative; z-index: 1; height: 420px; border-radius: 3px; overflow: hidden; background: #1C1811;">
-          <image-slot id="hbv2-hero-dog" placeholder="Editorial photo: calm dog, natural light" style="width: 100%; height: 100%;"></image-slot>
+        <div data-m="heropic2" style="position: relative; z-index: 1; height: 510px; border-radius: 3px; overflow: hidden; background: transparent; box-shadow: 0 40px 60px -30px rgba(0,0,0,0.85); animation: hbFloatB 7.8s ease-in-out infinite;">
+          <image-slot id="hbv2-hero-dog" placeholder="Editorial photo: calm dog, natural light" style="width: 100%; height: 100%; display: block; border-radius: inherit; overflow: hidden;"></image-slot>
         </div>
       </div>
     </div>
@@ -768,7 +769,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     </div>
     <div data-m="stack gap hmgrid" style="position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 68px; align-items: start; max-width: 1180px; margin: 0 auto; padding: 74px 0 104px;">
       <div data-m="nostick" style="position: sticky; top: 96px; display: grid; gap: 14px;">
-        <div data-m="tall" style="height: 520px; border-radius: 3px; overflow: hidden;">
+        <div data-m="tall" style="width: 100%; aspect-ratio: 1308 / 816; border-radius: 3px; overflow: hidden;">
           <image-slot id="{{ pdpSlotMain }}" placeholder="{{ pdpPhMain }}" style="width: 100%; height: 100%;"></image-slot>
         </div>
         <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
@@ -924,19 +925,9 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
       <h2 data-m="vith2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(34px, 3.9vw, 58px); line-height: 1.04; letter-spacing: -0.042em; margin: 0 0 34px; max-width: 18em; text-wrap: balance;">You take vitamins. <span style="color: oklch(0.44 0.07 152);">Why doesn't your bean?</span></h2>
     </div>
-    <div data-m="stack gap" style="position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; max-width: 1180px; margin: 0 auto;">
-      <div data-m="vitimg" style="height: 380px; border-radius: 3px; overflow: hidden;">
+    <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
+      <div data-m="vitimg" style="height: 520px; border-radius: 5px; overflow: hidden; box-shadow: 0 40px 70px -44px rgba(23,20,15,0.5);">
         <image-slot id="hbv2-why" placeholder="Owner and pet, quiet domestic moment" style="width: 100%; height: 100%;"></image-slot>
-      </div>
-      <div>
-        <div data-m="two vitstats" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #D5CAB5;">
-          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
-            <div data-m="vitcell" style="padding: 26px 18px 0 0;">
-              <div data-m="vitn" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 46px; line-height: 1; margin-bottom: 8px;">{{ s.n }}</div>
-              <div data-m="vitl" style="font-size: 13px; line-height: 1.45; color: #6A6055;">{{ s.label }}</div>
-            </div>
-          </sc-for>
-        </div>
       </div>
     </div>
   </section>
@@ -1142,8 +1133,8 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       </div>
 
       <div data-m="stack gap" style="position: relative; z-index: 1; display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 54px; align-items: start; max-width: 1180px; margin: 0 auto;">
-        <div data-m="nostick collage" style="display: grid; grid-template-columns: 1.32fr 1fr; grid-template-rows: 244px 244px 198px; gap: 12px;">
-          <div style="grid-column: 1; grid-row: 1 / span 2; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.5);">
+        <div data-m="nostick collage" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto 150px; gap: 12px;">
+          <div style="grid-column: 1 / -1; grid-row: 1; align-self: start; width: 100%; aspect-ratio: 1308 / 816; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.5);">
             <div style="width: 100%; height: 100%; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.045);"><image-slot id="{{ pdpSlotMain }}" placeholder="{{ pdpPhMain }}" style="width: 100%; height: 100%;"></image-slot></div>
           </div>
           <sc-for list="{{ pdpCollage }}" as="cg" hint-placeholder-count="3">
@@ -2448,7 +2439,50 @@ class Component extends DCLogic {
     if (this.fieldCv) { this.fieldCv.__on = false; this.fieldCv = null; }
   }
 
+  heroVideo(tries) {
+    if (this._heroVideoSrc) return;
+    const v = document.getElementById('heroVideo');
+    if (!v) {
+      const n = (tries || 0) + 1;
+      if (n < 40) setTimeout(() => this.heroVideo(n), 150);
+      return;
+    }
+    if (this._heroVideoProbing) return;
+    this._heroVideoProbing = true;
+    // Probe candidates in browser-support order; only attach a src that exists,
+    // so a missing file never produces a console error.
+    const canWebmAlpha = v.canPlayType('video/webm; codecs="vp9"') !== '';
+    const wide = typeof window !== 'undefined' && window.innerWidth > 900;
+    const cands = (canWebmAlpha ? ['/assets/video/hero-alpha.webm'] : [])
+      .concat(wide ? ['/assets/video/hero-desktop.mp4'] : [])
+      .concat(['/assets/video/hero-alpha.mov', '/assets/video/hero.mp4']);
+    const reveal = () => {
+      if (v.videoWidth === 0) return;
+      v.style.opacity = '1';
+      const f = document.getElementById('hbField');
+      if (f) f.style.display = 'none';
+      if (this.stopField) this.stopField();
+    };
+    const tryNext = (i) => {
+      if (i >= cands.length) { this._heroVideoProbing = false; return; }
+      fetch(cands[i], { method: 'HEAD' })
+        .then(r => {
+          if (!r.ok) return tryNext(i + 1);
+          v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true; v.autoplay = true;
+          v.preload = 'auto';
+          v.src = cands[i];
+          this._heroVideoSrc = cands[i];
+          ['loadeddata', 'canplay', 'playing'].forEach(ev => v.addEventListener(ev, reveal));
+          v.load();
+          const p = v.play(); if (p && p.catch) p.catch(() => {});
+        })
+        .catch(() => tryNext(i + 1));
+    };
+    tryNext(0);
+  }
+
   componentDidMount() {
+    this.heroVideo(0);
     const VALID_PAGES = ['home','shop','product','certs','about','contact','quiz','cart','checkout'];
     const pathPage = window.location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
     if (VALID_PAGES.includes(pathPage) && pathPage !== (this.state.page || 'home')) {
@@ -2528,7 +2562,7 @@ class Component extends DCLogic {
   componentDidUpdate() {
     requestAnimationFrame(() => this.scan());
     const page = this.state.page || 'home';
-    if (page === 'home') requestAnimationFrame(() => this.startField()); else this.stopField();
+    if (page === 'home' && !this._heroVideoSrc) requestAnimationFrame(() => this.startField()); else this.stopField();
     if (page === 'certs') requestAnimationFrame(() => this.startPings()); else this.stopPings();
   }
 
@@ -2801,7 +2835,7 @@ class Component extends DCLogic {
       pdpSlotMain: copy.main.slot,
       pdpPhMain: copy.main.ph,
       pdpThumbs: copy.thumbs,
-      pdpCollage: copy.thumbs.map((t, i) => ({ ...t, col: i === 2 ? '1 / span 2' : '2', row: i === 2 ? '3' : String(i + 1) })),
+      pdpCollage: copy.thumbs.map(t => ({ ...t, col: 'auto', row: '2' })),
       pdpOther: copy.other,
       qzChrome: page === 'quiz' ? 'qzhidebar' : '',
       qzHdr: page === 'quiz' ? 'qzstatic' : '',
