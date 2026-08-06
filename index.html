@@ -247,6 +247,10 @@ window.hbShopifyCheckout = async function (rows, buyer) {
   @keyframes shLock { 0% { transform: scale(0.6); opacity: 0; } 4% { transform: scale(1.25); opacity: 0.8; } 22% { transform: scale(1); opacity: 0.35; } 46% { opacity: 0; } 100% { opacity: 0; } }
   @keyframes pingRing { 0% { transform: scale(0.7); opacity: 0.9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }
   @keyframes checkPop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes navDrop { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes navItem { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes hbFloatA { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+  @keyframes hbFloatB { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-13px); } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
   @media (max-width: 1180px) { [data-m~="hidewide"] { display: none !important; } }
   @media (max-width: 900px) {
@@ -298,6 +302,15 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     [data-m~="bnrows"] > div > span:last-child { font-size: 12.5px !important; line-height: 1.3 !important; }
     [data-m~="bnrows"] > div > span:first-child { font-size: 10.5px !important; }
     [data-m~="hmgrid"] { padding-top: 26px !important; padding-bottom: 40px !important; }
+    [data-m~="herosec"] { padding-top: 34px !important; }
+    [data-m~="hero"] > div:first-child { font-size: 9.5px !important; letter-spacing: 0.18em !important; margin-bottom: 14px !important; }
+    [data-m~="hero"] h1 { font-size: clamp(30px, 8.6vw, 42px) !important; line-height: 1.02 !important; margin-bottom: 14px !important; }
+    [data-m~="hero"] p { font-size: 15px !important; line-height: 1.55 !important; margin-bottom: 22px !important; }
+    [data-m~="hero"] [data-m~="herocta"] { gap: 9px !important; margin-bottom: 30px !important; }
+    [data-m~="hero"] [data-m~="herocta"] a { padding: 14px 20px !important; font-size: 10.5px !important; letter-spacing: 0.13em !important; }
+    [data-m~="heromos"] { grid-template-columns: 1.24fr 0.76fr !important; gap: 8px !important; align-items: start !important; }
+    [data-m~="heropic"] { height: 164px !important; margin-top: 52px !important; animation: hbFloatA 6.4s ease-in-out 0.8s infinite; box-shadow: 0 22px 34px -22px rgba(0,0,0,0.75) !important; }
+    [data-m~="heropic2"] { order: -1 !important; height: 216px !important; animation: hbFloatB 7.6s ease-in-out infinite; box-shadow: 0 28px 42px -24px rgba(0,0,0,0.8) !important; }
     [data-m~="hmeye"] { font-size: 9.5px !important; margin-bottom: 10px !important; }
     [data-m~="hmbody"] { font-size: 14.5px !important; line-height: 1.5 !important; margin-bottom: 16px !important; }
     [data-m~="hmspecs"] { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px !important; margin-bottom: 18px !important; }
@@ -315,6 +328,38 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     [data-m~="hmplan"] div > div:last-child { font-size: 11.5px !important; }
     [data-m~="hmplan"] > :nth-child(3) > div:first-child { font-size: 21px !important; }
     [data-m~="sppick"] { margin-bottom: 0 !important; }
+    [data-m~="cartsec"] { padding-top: 16px !important; padding-bottom: 34px !important; }
+    [data-m~="carteye"] { margin-bottom: 10px !important; font-size: 9px !important; }
+    [data-m~="carthead"] { font-size: 25px !important; margin-bottom: 14px !important; }
+    [data-m~="citem"] { padding: 12px !important; gap: 12px !important; grid-template-columns: 74px minmax(0, 1fr) auto !important; }
+    [data-m~="ciimg"] { height: 74px !important; }
+    [data-m~="citem"] > div:nth-child(2) > div:nth-child(1) { margin-bottom: 4px !important; }
+    [data-m~="citem"] > div:nth-child(2) > div:nth-child(2) { font-size: 16px !important; margin-bottom: 3px !important; }
+    [data-m~="citem"] > div:nth-child(2) > div:nth-child(4) { margin-top: 9px !important; }
+    [data-m~="citem"] > div:nth-child(3) > div:first-child { font-size: 19px !important; }
+    [data-m~="cgift"] { grid-template-columns: auto minmax(0, 1fr) !important; gap: 10px !important; padding: 11px 12px !important; }
+    [data-m~="cgift"] > span:last-child { font-size: 11.5px !important; line-height: 1.45 !important; }
+    [data-m~="cartsum"] { padding: 18px 18px 20px !important; }
+    [data-m~="cartsum"] > div:nth-child(2) { margin-bottom: 12px !important; }
+    [data-m~="cartsum"] [data-m~="ctotal"] { padding: 12px 0 14px !important; }
+    [data-m~="ctotal"] > span:last-child { font-size: 27px !important; }
+    [data-m~="cbtn"] { padding: 15px !important; }
+    [data-m~="ctrust"] { margin-top: 12px !important; gap: 5px !important; }
+    [data-m~="ctrust"] > span:nth-child(n+2) { display: none !important; }
+    [data-m~="hdr"] { padding-top: 11px !important; padding-bottom: 11px !important; gap: 8px 14px !important; }
+    [data-m~="hdrmark"] > span:first-child { font-size: 19px !important; }
+    [data-m~="hdrmark"] > span:last-child { font-size: 8px !important; letter-spacing: 0.14em !important; }
+    [data-m~="hdrbtn"] { width: 38px !important; height: 38px !important; gap: 4px !important; }
+    [data-m~="hdrbtn"] > span { width: 17px !important; }
+    [data-m~="navpanel"] { padding: 4px 20px 16px !important; animation: navDrop 0.28s cubic-bezier(0.2,0.7,0.2,1) both; box-shadow: 0 22px 30px -26px rgba(23,20,15,0.6); }
+    [data-m~="navpanel"] > a { padding: 12px 2px !important; font-size: 19px !important; animation: navItem 0.32s cubic-bezier(0.2,0.7,0.2,1) both; }
+    [data-m~="navpanel"] > a:nth-child(1) { animation-delay: 0.04s; }
+    [data-m~="navpanel"] > a:nth-child(2) { animation-delay: 0.08s; }
+    [data-m~="navpanel"] > a:nth-child(3) { animation-delay: 0.12s; }
+    [data-m~="navpanel"] > a:nth-child(4) { animation-delay: 0.16s; }
+    [data-m~="navpanel"] > a:nth-child(5) { animation-delay: 0.20s; }
+    [data-m~="navpanel"] > a:nth-child(6) { animation-delay: 0.24s; }
+    [data-m~="navpanel"] > a:nth-child(7) { animation-delay: 0.28s; }
     [data-m~="qzsec"] { padding-top: 20px !important; padding-bottom: 40px !important; }
     [data-m~="qzcardbox"] { padding: 20px 16px 22px !important; border-radius: 5px !important; }
     [data-m~="qzbar"] { margin-bottom: 16px !important; }
@@ -359,10 +404,10 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     [data-m~="upcell"] { grid-row: auto / span 2 !important; padding: 16px 16px 18px !important; gap: 8px !important; }
     [data-m~="upcell"] > :nth-child(3) span:nth-child(2) { font-size: 19px !important; }
     [data-m~="qzcta"] { display: block !important; width: 100% !important; min-height: 52px !important; text-align: center !important; padding: 17px 18px !important; border-radius: 999px !important; font-size: 11px !important; color: #FCFAF4 !important; background: oklch(0.36 0.055 152) !important; box-shadow: 0 16px 30px -18px oklch(0.36 0.055 152 / 0.85) !important; }
-    [data-m~="spimg"] { display: none !important; }
-    [data-m~="spcard"] { grid-template-columns: 1fr !important; justify-items: center; text-align: center; gap: 10px !important; padding: 22px 14px 24px !important; }
+    [data-m~="spimg"] { height: 132px !important; }
+    [data-m~="spcard"] { grid-template-columns: 1fr !important; justify-items: center; text-align: center; gap: 8px !important; padding: 16px 12px 18px !important; }
     [data-m~="spcard"] > :nth-child(1) { width: 13px !important; height: 13px !important; }
-    [data-m~="spcard"] div > div:first-child { font-size: 22px !important; }
+    [data-m~="spcard"] div > div:first-child { font-size: 19px !important; }
     [data-m~="spcard"] div > div:last-child { display: none !important; }
   }
   @media (max-width: 620px) {
@@ -378,16 +423,22 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     [data-m~="modal"] { padding: 24px 16px 28px !important; }
     [data-m~="tap"]   { min-height: 48px !important; }
     [data-m~="footlinks"] { gap: 0 !important; }
+    [data-m~="herosec"] { padding-top: 30px !important; }
+    [data-m~="cartsec"] { padding-top: 16px !important; padding-bottom: 34px !important; }
+    [data-m~="hdr"] { padding-top: 9px !important; padding-bottom: 9px !important; }
+    [data-m~="ticker"] { padding: 7px 14px !important; font-size: 9px !important; letter-spacing: 0.1em !important; }
+    [data-m~="spimg"] { height: 116px !important; }
+    [data-m~="heromos"] { gap: 8px !important; }
   }
 </style>
 </helmet>
 
 <div style="font-family: 'DM Sans', system-ui, sans-serif; color: #17140F; background: #F5F0E6;">
 
-  <div data-m="{{ qzChrome }}" style="background: #17140F; color: #DED5C4; text-align: center; padding: 10px 16px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;">Compounded in Scottsdale, AZ · Third-party tested · 90-day money-back guarantee</div>
+  <div data-m="ticker {{ qzChrome }}" style="background: #17140F; color: #DED5C4; text-align: center; padding: 10px 16px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;">Compounded in Scottsdale, AZ · Third-party tested · 90-day money-back guarantee</div>
 
-  <header data-m="pad {{ qzHdr }}" style="position: sticky; top: 0; z-index: 60; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 20px 44px; background: rgba(245,240,230,0.93); backdrop-filter: blur(10px); border-bottom: 1px solid #DDD3C0;">
-    <div sc-camel-on-click="{{ goHome }}" style="display: flex; align-items: baseline; gap: 9px; cursor: pointer;">
+  <header data-m="pad hdr {{ qzHdr }}" style="position: sticky; top: 0; z-index: 60; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 20px 44px; background: rgba(245,240,230,0.93); backdrop-filter: blur(10px); border-bottom: 1px solid #DDD3C0;">
+    <div sc-camel-on-click="{{ goHome }}" data-m="hdrmark" style="display: flex; align-items: baseline; gap: 9px; cursor: pointer;">
       <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 23px; letter-spacing: -0.045em; white-space: nowrap;">happy bean<span style="position: relative;"><span style="position: absolute; left: 50%; top: 0.19em; width: 0.42em; height: 0.26em; margin-left: -0.21em; border-radius: 46% 54% 50% 50% / 58% 42% 58% 42%; background: oklch(0.88 0.15 96); transform: rotate(-7deg);"></span><span style="position: relative; z-index: 1;">i</span></span>e</span>
       <span style="font-family: 'DM Mono', monospace; font-weight: 400; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap;">peptide care</span>
     </div>
@@ -463,15 +514,15 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       </sc-if>
       <a sc-camel-on-click="{{ goProduct }}" style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; padding: 12px clamp(12px, 1.6vw, 20px); border-radius: 2px; background: #17140F; color: #F5F0E6; cursor: pointer;" style-hover="background: oklch(0.5 0.07 152); color: #F5F0E6;">Try Happy Beanie</a>
     </nav>
-    <button sc-camel-on-click="{{ toggleMenu }}" data-m="showf" aria-label="Menu" style="position: relative; display: none; flex-direction: column; gap: 5px; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid #17140F; border-radius: 2px; background: transparent; cursor: pointer;">
-      <span style="display: block; width: 20px; height: 1.5px; background: #17140F;"></span>
-      <span style="display: block; width: 20px; height: 1.5px; background: #17140F;"></span>
+    <button sc-camel-on-click="{{ toggleMenu }}" data-m="showf hdrbtn" aria-label="Menu" style="position: relative; display: none; flex-direction: column; gap: 5px; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid #17140F; border-radius: 2px; background: transparent; cursor: pointer;">
+      <span style="display: block; width: 20px; height: 1.5px; background: #17140F; transition: transform 0.28s cubic-bezier(0.2,0.7,0.2,1); transform: {{ navBar1 }};"></span>
+      <span style="display: block; width: 20px; height: 1.5px; background: #17140F; transition: transform 0.28s cubic-bezier(0.2,0.7,0.2,1), opacity 0.2s ease; transform: {{ navBar2 }}; opacity: {{ navBar2Op }};"></span>
       <sc-if value="{{ cartAdded }}" hint-placeholder-val="{{ false }}">
         <span style="position: absolute; top: -1px; right: -3px; min-width: 19px; height: 19px; padding: 0 5px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: oklch(0.88 0.15 96); border: 1px solid #17140F; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.02em; color: #17140F; animation: checkPop 0.4s cubic-bezier(0.2,0.7,0.2,1) both;">{{ cartQty }}</span>
       </sc-if>
     </button>
     <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
-      <div style="position: absolute; top: 100%; left: 0; right: 0; background: #F5F0E6; border-bottom: 1px solid #DDD3C0; padding: 8px 20px 22px; display: grid; gap: 1px;">
+      <div data-m="navpanel" style="position: absolute; top: 100%; left: 0; right: 0; background: #F5F0E6; border-bottom: 1px solid #DDD3C0; padding: 8px 20px 22px; display: grid; gap: 1px;">
         <sc-for list="{{ mobileLinks }}" as="ml" hint-placeholder-count="4">
           <a sc-camel-on-click="{{ ml.go }}" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">{{ ml.label }}</a>
         </sc-for>
@@ -486,28 +537,23 @@ window.hbShopifyCheckout = async function (rows, buyer) {
 
   <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
   <div>
-  <section data-m="pad short" style="position: relative; background: #17140F; color: #F5F0E6; padding: 86px 44px 0; overflow: hidden;">
+  <section data-m="pad short herosec" style="position: relative; background: #17140F; color: #F5F0E6; padding: 86px 44px 0; overflow: hidden;">
     <div id="hbField" style="position: absolute; inset: 0; z-index: 0; pointer-events: none;">
       <canvas id="hbFieldCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
-      <div aria-hidden="true" style="position: absolute; left: 44px; top: 20px; display: flex; align-items: center; gap: 20px; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055; pointer-events: none;">
-        <span style="display: flex; align-items: center; gap: 8px; color: #8A7F6E;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.86 0.14 92); animation: hbFlicker 1.8s ease-in-out infinite;"></span>Cellular repair field · live</span>
-        <span data-m="hide">Move your cursor to signal</span>
-      </div>
-      <div aria-hidden="true" id="hbFieldCount" style="position: absolute; right: 44px; top: 20px; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055; pointer-events: none;">Cells signalled 0</div>
     </div>
-    <div style="position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; text-align: center;">
+    <div data-m="hero" style="position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; text-align: center;">
       <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 26px;">Peptide-infused daily care</div>
       <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(46px, 6.2vw, 96px); line-height: 0.98; letter-spacing: -0.042em; margin: 0 auto 26px; max-width: 17em; text-wrap: balance;">The next chapter of pet longevity <span style="color: oklch(0.86 0.14 92);">starts here.</span></h1>
-      <p style="font-size: 18px; line-height: 1.6; color: #B9AF9C; max-width: 34em; margin: 0 auto 34px; text-wrap: pretty;">Two formulations — one for dogs, one for cats. A single system of bioactive peptides, compounded by licensed pharmacists to support the way your animal's body repairs itself, every single day.</p>
-      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 56px;">
+      <p style="font-size: 18px; line-height: 1.6; color: #B9AF9C; max-width: 34em; margin: 0 auto 34px; text-wrap: pretty;">Two formulations — one for dogs, one for cats. A single system of bioactive peptides, compounded by US pharmacists to support the way your animal's body repairs itself, every single day.</p>
+      <div data-m="herocta" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 56px;">
         <a href="#product" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; padding: 17px 32px; background: oklch(0.86 0.14 92); color: #17140F; border-radius: 2px;" style-hover="background: #F5F0E6;">Try Happy Beanie</a>
         <a href="#formula" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; padding: 17px 32px; border: 1px solid rgba(245,240,230,0.3); color: #F5F0E6; border-radius: 2px;" style-hover="border-color: #F5F0E6;">The science</a>
       </div>
-      <div data-m="stack gap" style="display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 20px; align-items: end;">
-        <div style="position: relative; z-index: 1; height: 340px; border-radius: 3px; overflow: hidden; background: #1C1811;">
+      <div data-m="heromos" style="display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 20px; align-items: end;">
+        <div data-m="heropic" style="position: relative; z-index: 1; height: 340px; border-radius: 3px; overflow: hidden; background: #1C1811;">
           <image-slot id="hbv2-hero-pack" placeholder="Product pack shot on seamless backdrop" style="width: 100%; height: 100%;"></image-slot>
         </div>
-        <div data-m="auto first" style="position: relative; z-index: 1; height: 420px; border-radius: 3px; overflow: hidden; background: #1C1811;">
+        <div data-m="heropic2" style="position: relative; z-index: 1; height: 420px; border-radius: 3px; overflow: hidden; background: #1C1811;">
           <image-slot id="hbv2-hero-dog" placeholder="Editorial photo: calm dog, natural light" style="width: 100%; height: 100%;"></image-slot>
         </div>
       </div>
@@ -553,7 +599,6 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div style="display: grid; gap: 14px;">
         <sc-for list="{{ layers }}" as="l" hint-placeholder-count="3">
           <div sc-camel-on-mouse-enter="{{ l.open }}" sc-camel-on-click="{{ l.open }}" style="position: relative; border: 1px solid {{ l.border }}; border-radius: 4px; background: {{ l.bg }}; box-shadow: {{ l.shadow }}; transform: {{ l.lift }}; transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.2,0.7,0.2,1); cursor: pointer; overflow: hidden;">
-            <div aria-hidden="true" style="position: absolute; right: 22px; top: -18px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 150px; line-height: 1; color: rgba(245,240,230,0.05); opacity: {{ l.ghostOpacity }}; transition: opacity 0.35s ease; pointer-events: none;">{{ l.n }}</div>
             <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: 108px 1fr; gap: 40px; padding: 34px 38px; align-items: center;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <span style="width: 26px; height: 1px; background: {{ l.rule }}; transition: background 0.3s ease;"></span>
@@ -561,7 +606,6 @@ window.hbShopifyCheckout = async function (rows, buyer) {
               </div>
               <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center;">
                 <h3 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(26px, 2.4vw, 34px); line-height: 1.15; margin: 0;">{{ l.title }} <span style="color: oklch(0.86 0.14 92);">{{ l.accent }}</span></h3>
-                <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap;">{{ l.tag }}</div>
               </div>
             </div>
             <div style="max-height: {{ l.maxHeight }}; opacity: {{ l.bodyOpacity }}; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.2,0.7,0.2,1), opacity 0.35s ease;">
@@ -958,16 +1002,36 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div style="max-width: 1180px; margin: 0 auto; display: flex; gap: 10px;"><span sc-camel-on-click="{{ goShop }}" style="cursor: pointer; color: oklch(0.44 0.07 152);">Shop</span><span>/</span><span>{{ pdpEyebrow }}</span></div>
       <div style="max-width: 1180px; margin: 18px auto 0; display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid #E4DBC9;">
         <span aria-hidden="true" style="flex: 0 0 auto; width: 26px; height: 1px; background: oklch(0.44 0.07 152);"></span>
-        <h2 style="flex: 1 1 auto; min-width: 0; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.034em; text-transform: none; font-size: clamp(17px, 1.7vw, 22px); line-height: 1.22; color: #17140F; margin: 0; text-wrap: pretty;">The world’s most powerful anti aging pet supplement</h2>
-        <span data-m="hide" style="flex: 0 0 auto; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Est. 2022 · Scottsdale</span>
+        <h2 style="flex: 1 1 auto; min-width: 0; font-family: 'DM Sans', sans-serif; font-weight: 400; letter-spacing: -0.012em; text-transform: none; font-size: clamp(15px, 1.35vw, 17.5px); line-height: 1.45; color: #6A6055; margin: 0; text-wrap: pretty;">The world’s most powerful anti aging pet supplement</h2>
+        <span data-m="hide" style="flex: 0 0 auto; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;"></span>
+      </div>
+    </div>
+    <div data-m="pad" style="background: #FCFAF4; padding: 46px 44px 0;">
+      <div style="max-width: 1180px; margin: 0 auto; text-align: center;">
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 22px;">Choose your animal</div>
+        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(32px, 3.8vw, 56px); line-height: 1.03; margin: 0 auto 34px; max-width: 20em;">Two species. <span style="color: oklch(0.44 0.07 152);">Two formulas.</span></h2>
+      </div>
+      <div data-m="sppick" style="position: relative; z-index: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 3px; max-width: 1180px; margin: 0 auto; overflow: hidden;">
+        <sc-for list="{{ species }}" as="sz" hint-placeholder-count="2">
+          <button sc-camel-on-click="{{ sz.pick }}" style="position: relative; display: block; text-align: left; border: none; cursor: pointer; padding: 0; background: {{ sz.bg }}; font-family: 'DM Sans', sans-serif; transition: background 0.2s ease;">
+            <div data-m="spimg" style="height: 250px; overflow: hidden; opacity: {{ sz.imgOpacity }}; transition: opacity 0.2s ease;">
+              <image-slot id="{{ sz.slot }}" placeholder="{{ sz.ph }}" style="width: 100%; height: 100%;"></image-slot>
+            </div>
+            <div data-m="spcard" style="display: grid; grid-template-columns: 20px 1fr auto; gap: 16px; align-items: center; padding: 26px 30px 30px;">
+              <span style="width: 15px; height: 15px; border-radius: 50%; border: 1px solid #17140F; background: {{ sz.dot }}; box-shadow: {{ sz.ring }};"></span>
+              <div>
+                <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1.1; color: #17140F; margin-bottom: 6px;">{{ sz.label }}</div>
+                <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #6A6055;">{{ sz.meta }}</div>
+              </div>
+              <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ sz.cueColor }};">{{ sz.cue }}</span>
+            </div>
+          </button>
+        </sc-for>
       </div>
     </div>
     <section data-m="pad short barpad" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 34px 44px 104px; overflow: hidden;">
       <div aria-hidden="true" data-m="hide" style="position: absolute; left: 0; right: 0; top: 0; height: 720px; overflow: hidden; pointer-events: none;">
-        <div aria-hidden="true" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(23,20,15,0.055) 1px, transparent 1px); background-size: 30px 30px; mask-image: radial-gradient(90% 70% at 50% 0%, #000 10%, transparent 78%); -webkit-mask-image: radial-gradient(90% 70% at 50% 0%, #000 10%, transparent 78%); animation: pdDrift 9s ease-in-out infinite;"></div>
-        <div aria-hidden="true" style="position: absolute; left: 50%; top: 40px; width: 760px; height: 760px; border-radius: 50%; border: 1px solid rgba(23,20,15,0.16); transform: translate(-50%, -50%); animation: pdEmit 11s cubic-bezier(0.3,0,0.3,1) 0s infinite both; pointer-events: none;"></div>
-        <div aria-hidden="true" style="position: absolute; left: 50%; top: 40px; width: 760px; height: 760px; border-radius: 50%; border: 1px solid rgba(23,20,15,0.16); transform: translate(-50%, -50%); animation: pdEmit 11s cubic-bezier(0.3,0,0.3,1) 3.7s infinite both; pointer-events: none;"></div>
-        <div aria-hidden="true" style="position: absolute; left: 50%; top: 40px; width: 760px; height: 760px; border-radius: 50%; border: 1px solid rgba(23,20,15,0.16); transform: translate(-50%, -50%); animation: pdEmit 11s cubic-bezier(0.3,0,0.3,1) 7.4s infinite both; pointer-events: none;"></div>
+        <div aria-hidden="true" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(23,20,15,0.055) 1px, transparent 1px); background-size: 30px 30px; mask-image: radial-gradient(90% 70% at 50% 0%, #000 10%, transparent 78%); -webkit-mask-image: radial-gradient(90% 70% at 50% 0%, #000 10%, transparent 78%); opacity: 0.7;"></div>
       </div>
 
       <div data-m="stack gap" style="position: relative; z-index: 1; display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 54px; align-items: start; max-width: 1180px; margin: 0 auto;">
@@ -1000,14 +1064,6 @@ window.hbShopifyCheckout = async function (rows, buyer) {
               <span style="display: block; font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35;">Is Happy Beanie right for your pet?</span>
               <span data-m="qzcta" style="display: block; text-align: center; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 12px 14px; border-radius: 999px;">Check eligibility →</span>
             </a>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 18px;">
-            <sc-for list="{{ species }}" as="sy" hint-placeholder-count="2">
-              <button sc-camel-on-click="{{ sy.pick }}" style="display: flex; align-items: center; gap: 11px; text-align: left; padding: 13px 16px; border: 1px solid {{ sy.border }}; background: {{ sy.bg }}; border-radius: 4px; cursor: pointer; font-family: 'DM Sans', sans-serif; box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset; transition: border-color 0.2s ease, background 0.2s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.28s ease;" style-hover="border-color: #17140F; transform: translateY(-2px); box-shadow: 0 14px 26px -18px rgba(23,20,15,0.5);">
-                <span style="width: 13px; height: 13px; border-radius: 50%; border: 1px solid #17140F; background: {{ sy.dot }}; box-shadow: {{ sy.ring }};"></span>
-                <span style="font-size: 15px; font-weight: 700; color: #17140F;">{{ sy.label }}</span>
-              </button>
-            </sc-for>
           </div>
           <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 9px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">
             <span>Choose your supply</span>
@@ -1051,9 +1107,8 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em;">Ten benefits, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
         <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
           <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(23,20,15,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(23,20,15,0.04) 1px, transparent 1px); background-size: 38px 38px;"></div>
-          <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 1px; background: linear-gradient(90deg, transparent, oklch(0.44 0.07 152 / 0.5), transparent); animation: qzScan 8s cubic-bezier(0.4,0,0.6,1) infinite; pointer-events: none;"></div>
-          <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03); font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;">
-            <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.44 0.07 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Benefit profile</span>
+                    <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03); font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;">
+            <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Benefit profile</span>
           </div>
           <div data-m="acrow" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: rgba(23,20,15,0.12); border-bottom: 1px solid rgba(23,20,15,0.12);">
             <sc-for list="{{ actives }}" as="ac" hint-placeholder-count="3">
@@ -1094,7 +1149,6 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 11px 0; border-top: 1px solid rgba(245,240,230,0.16); border-bottom: 1px solid rgba(245,240,230,0.16); margin-bottom: 1px; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">
           <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.86 0.14 92); animation: qzBlip 1.6s ease-in-out infinite;"></span>Owner-reported timeline</span>
           <span data-m="hide" style="display: flex; align-items: flex-end; gap: 3px; height: 14px;"><span style="display: block; width: 3px; height: 7px; background: oklch(0.86 0.14 92 / 0.6); transform-origin: bottom; animation: qzBar 1.1s 0s ease-in-out infinite alternate;"></span><span style="display: block; width: 3px; height: 12px; background: oklch(0.86 0.14 92 / 0.6); transform-origin: bottom; animation: qzBar 1.1s 0.15s ease-in-out infinite alternate;"></span><span style="display: block; width: 3px; height: 9px; background: oklch(0.86 0.14 92 / 0.6); transform-origin: bottom; animation: qzBar 1.1s 0.3s ease-in-out infinite alternate;"></span><span style="display: block; width: 3px; height: 14px; background: oklch(0.86 0.14 92 / 0.6); transform-origin: bottom; animation: qzBar 1.1s 0.45s ease-in-out infinite alternate;"></span><span style="display: block; width: 3px; height: 8px; background: oklch(0.86 0.14 92 / 0.6); transform-origin: bottom; animation: qzBar 1.1s 0.6s ease-in-out infinite alternate;"></span></span>
-          <span>n=412 · 90-day survey</span>
         </div>
         <div data-m="two gap" style="position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: rgba(245,240,230,0.16);">
           <sc-for list="{{ weeks }}" as="wk" hint-placeholder-count="4">
@@ -1116,7 +1170,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
             </div>
           </sc-for>
         </div>
-        <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 26px 0 0;">*Self-reported owner survey, n=412. Individual results vary. Not a treatment for disease.</p>
+        <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 26px 0 0;">*Self-reported owner survey. Individual results vary. Not a treatment for disease.</p>
       </div>
 
       <div style="max-width: 1180px; margin: 88px auto 0;">
@@ -1207,7 +1261,6 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div data-m="inset" data-rv="1" style="position: relative; max-width: 1180px; margin: 88px auto 0; background: #17140F; border-radius: 5px; padding: 64px 56px; overflow: hidden; opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);">
         <div aria-hidden="true" style="position: absolute; left: -130px; top: -170px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, oklch(0.72 0.08 152 / 0.14), transparent 70%); pointer-events: none;"></div>
         <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.05) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(120% 90% at 80% 0%, #000 20%, transparent 80%); -webkit-mask-image: radial-gradient(120% 90% at 80% 0%, #000 20%, transparent 80%);"></div>
-        <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 40px; height: 1px; background: linear-gradient(90deg, transparent, oklch(0.72 0.08 152 / 0.5), transparent); animation: qzScan 9s cubic-bezier(0.4,0,0.6,1) infinite; pointer-events: none;"></div>
         <div aria-hidden="true" style="position: absolute; top: 14px; left: 14px; width: 9px; height: 9px; border-top: 1px solid rgba(245,240,230,0.5); border-left: 1px solid rgba(245,240,230,0.5);"></div>
         <div aria-hidden="true" style="position: absolute; top: 14px; right: 14px; width: 9px; height: 9px; border-top: 1px solid rgba(245,240,230,0.5); border-right: 1px solid rgba(245,240,230,0.5);"></div>
         <div aria-hidden="true" style="position: absolute; bottom: 14px; left: 14px; width: 9px; height: 9px; border-bottom: 1px solid rgba(245,240,230,0.5); border-left: 1px solid rgba(245,240,230,0.5);"></div>
@@ -1290,12 +1343,13 @@ window.hbShopifyCheckout = async function (rows, buyer) {
           <div>
             <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 22px;">Nothing to lose</div>
             <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.03; color: #F5F0E6; margin: 0 0 20px; max-width: 20em;">Try it for ninety days. <span style="color: oklch(0.86 0.14 92);">Keep the box either way.</span></h2>
-            <p style="font-size: 16px; line-height: 1.7; color: #B9AF9C; margin: 0 0 32px; max-width: 32em;">If you do not see the change you were hoping for, tell us and we refund the order in full — opened, half-empty, no return shipment. We would rather earn the second month than argue about the first.</p>
+            <p style="font-size: 16px; line-height: 1.7; color: #B9AF9C; margin: 0 0 32px; max-width: 32em;">If you do not see the change you were hoping for, tell us and we refund the order in full — opened, half-empty, no return shipment.</p>
             <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
               <button sc-camel-on-click="{{ cartCta }}" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 20px 36px; border: none; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 38px -22px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">{{ cartLabel }}</button>
               <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;">{{ planRecap }}</span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.72 0.08 152);"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.72 0.08 152);"></span>Order today, ships within 24 hours from Scottsdale</div>
+            <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; line-height: 1.6; color: #8A7F6E; margin: 14px 0 0;">Terms and conditions apply. <a href="/policies/refunds#guarantee" target="_blank" rel="noopener" style="color: oklch(0.72 0.08 152); text-decoration: none; border-bottom: 1px solid oklch(0.72 0.08 152 / 0.45);">Read the guarantee terms</a></p>
           </div>
           <div data-m="auto" style="height: 320px; border-radius: 4px; overflow: hidden; box-shadow: 0 26px 60px rgba(0,0,0,0.5);">
             <image-slot id="hbv2-close" placeholder="Pet mid-play, joyful, warm light" style="width: 100%; height: 100%;"></image-slot>
@@ -1813,19 +1867,19 @@ window.hbShopifyCheckout = async function (rows, buyer) {
 
   <sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
   <div>
-    <section data-m="pad short barpad" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 44%, #F2EBDC 100%); padding: 40px 44px 96px; overflow: hidden;">
+    <section data-m="pad short barpad cartsec" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 44%, #F2EBDC 100%); padding: 40px 44px 96px; overflow: hidden;">
       <div aria-hidden="true" data-m="hide" style="position: absolute; left: 0; right: 0; top: 0; height: 420px; overflow: hidden; pointer-events: none;">
         <div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(23,20,15,0.05) 1px, transparent 1px); background-size: 30px 30px; mask-image: radial-gradient(90% 70% at 50% 0%, #000 8%, transparent 76%); -webkit-mask-image: radial-gradient(90% 70% at 50% 0%, #000 8%, transparent 76%); animation: pdDrift 9s ease-in-out infinite;"></div>
       </div>
 
       <div style="position: relative; max-width: 1180px; margin: 0 auto;">
-        <div style="display: flex; align-items: center; gap: 12px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 18px;">
+        <div data-m="carteye" style="display: flex; align-items: center; gap: 12px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 18px;">
           <span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.44 0.07 152); animation: qzBlip 1.8s ease-in-out infinite;"></span>
           <span>Your cart</span>
           <span aria-hidden="true" style="flex: 1; height: 1px; background: #DDD3C0;"></span>
           <span>{{ cartCount }}</span>
         </div>
-        <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 4vw, 56px); line-height: 1.02; margin: 0 0 30px; max-width: 20em;">{{ cartHead }} <span style="color: oklch(0.44 0.07 152);">{{ cartHeadAccent }}</span></h1>
+        <h1 data-m="carthead" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 4vw, 56px); line-height: 1.02; margin: 0 0 30px; max-width: 20em;">{{ cartHead }} <span style="color: oklch(0.44 0.07 152);">{{ cartHeadAccent }}</span></h1>
 
         <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
           <div style="border: 1.5px solid #8A7F6E; border-radius: 8px; background: #FCFAF4; padding: 44px 30px 46px; text-align: center; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.3), 0 0 0 5px rgba(138,127,110,0.1);">
@@ -1865,7 +1919,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
                 </div>
               </sc-for>
 
-              <div data-m="citem" style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; background: oklch(0.96 0.032 152); border: 1px dashed oklch(0.44 0.07 152); border-radius: 8px; padding: 16px 18px;">
+              <div data-m="citem cgift" style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; background: oklch(0.96 0.032 152); border: 1px dashed oklch(0.44 0.07 152); border-radius: 8px; padding: 16px 18px;">
                 <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 7px 10px; border-radius: 999px; white-space: nowrap;">{{ cartGiftTag }}</span>
                 <span style="font-size: 13.5px; line-height: 1.5; color: #17140F;">{{ cartGiftNote }}</span>
               </div>
@@ -1881,12 +1935,12 @@ window.hbShopifyCheckout = async function (rows, buyer) {
                   </div>
                 </sc-for>
               </div>
-              <div style="position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 18px 0 22px;">
+              <div data-m="ctotal" style="position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 18px 0 22px;">
                 <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Total</span>
                 <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.045em; font-size: 34px; line-height: 1;">{{ cartTotal }}</span>
               </div>
-              <button sc-camel-on-click="{{ goCheckout }}" data-m="tap" style="position: relative; width: 100%; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 36px -20px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">Checkout →</button>
-              <div style="position: relative; display: grid; gap: 8px; margin-top: 18px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E;">
+              <button sc-camel-on-click="{{ goCheckout }}" data-m="tap cbtn" style="position: relative; width: 100%; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 36px -20px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">Checkout →</button>
+              <div data-m="ctrust" style="position: relative; display: grid; gap: 8px; margin-top: 18px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E;">
                 <span>90-day money-back guarantee</span>
                 <span>Ships within 24 hours · Scottsdale AZ</span>
                 <span>Cancel or pause any time</span>
@@ -1981,7 +2035,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
                   </div>
                 </sc-for>
               </div>
-              <div style="position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 18px 0 22px;">
+              <div data-m="ctotal" style="position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 18px 0 22px;">
                 <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Total</span>
                 <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.045em; font-size: 34px; line-height: 1;">{{ cartTotal }}</span>
               </div>
@@ -2033,7 +2087,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       </div>
     </div>
     <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 16px; max-width: 1180px; margin: 0 auto; padding-top: 26px; border-top: 1px solid rgba(245,240,230,0.14); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A7F6E;">
-      <span>© 2026 Happy Beanie Pet Health, LLC</span>
+      <span>© 2026 Happy Beanie</span>
       <span><a href="/account" style="color: inherit; text-decoration: none;">Account</a> · <a href="/wholesale" style="color: inherit; text-decoration: none;">Wholesale</a> · <a href="/policies/terms" style="color: inherit; text-decoration: none;">Terms</a> · <a href="/policies/privacy" style="color: inherit; text-decoration: none;">Privacy</a> · <a href="/policies/shipping" style="color: inherit; text-decoration: none;">Shipping</a> · <a href="/policies/refunds" style="color: inherit; text-decoration: none;">Refunds</a> · <a href="/policies/subscriptions" style="color: inherit; text-decoration: none;">Subscriptions</a> · <a href="/policies/disclaimer" style="color: inherit; text-decoration: none;">Disclaimer</a></span>
     </div>
   </footer>
@@ -2582,6 +2636,9 @@ class Component extends DCLogic {
       qzChrome: page === 'quiz' ? 'qzhidebar' : '',
       qzHdr: page === 'quiz' ? 'qzstatic' : '',
       menuOpen: this.state.menuOpen,
+      navBar1: this.state.menuOpen ? 'translateY(3px) rotate(45deg)' : 'none',
+      navBar2: this.state.menuOpen ? 'translateY(-3px) rotate(-45deg)' : 'none',
+      navBar2Op: 1,
       toggleMenu: () => this.setState(s => ({ menuOpen: !s.menuOpen })),
       isHome: page === 'home',
       isShop: page === 'shop',
@@ -2969,9 +3026,9 @@ class Component extends DCLogic {
       coa: this.state.coa || {},
       coaPanels: this.state.coa ? this.state.coa.panels : [],
       layers: [
-        { n: '01', title: 'The signalling layer', accent: '| Bioactive peptides', tag: 'Short-chain · route-matched', slot: 'hbv2-layer1', ph: 'Peptide vials on light table', body: 'Peptides are the body\u2019s instruction set — chains short enough to reach tissue and specific enough to tell it what to do. Beanie doses them to the animal and the route they take into the body.', chips: ['Collagen fragments', 'Signal amino acids'] },
-        { n: '02', title: 'The nutritional layer', accent: '| Whole-food carriers', tag: 'Organic-certified inputs', slot: 'hbv2-layer2', ph: 'Raw whole-food inputs, overhead', body: 'Good signals need good fuel. Every chew carries the nutrients a body draws on to repair itself — B12, iron, zinc, taurine and vitamin A — and they come from real whole-food sources, never synthetic shortcuts.', chips: ['Vitamin A', 'B12', 'Heme iron', 'Taurine'] },
-        { n: '03', title: 'The delivery layer', accent: '| How it stays intact', tag: 'Stability tested to 24 months', slot: 'hbv2-layer3', ph: 'Sealed pack, cold-blend line', body: 'Peptides are delicate, so we treat them that way. Every batch is blended cold, never overheated, and sealed in light-proof packaging that keeps air out — so the dose on the label is the dose in the bowl.', chips: ['Cold blend', 'pH buffered', 'Opaque pack', 'Lot-coded'] }
+        { n: '01', title: 'The nutritional layer', accent: '| Whole-food carriers', tag: 'Organic-certified inputs', slot: 'hbv2-layer2', ph: 'Raw whole-food inputs, overhead', body: 'Good signals need good fuel. Every chew carries the nutrients a body draws on to repair itself — B12, iron, zinc, taurine and vitamin A — and they come from real whole-food sources, never synthetic shortcuts.', chips: ['Wide Vitamin Scale', 'Complex B Vitamins'] },
+        { n: '02', title: 'The signalling layer', accent: '| Bioactive peptides', tag: 'Short-chain · route-matched', slot: 'hbv2-layer1', ph: 'Peptide vials on light table', body: 'Peptides are the body\u2019s instruction set — chains short enough to reach tissue and specific enough to tell it what to do. Beanie doses them to the animal and the route they take into the body.', chips: ['Collagen fragments', 'Signal amino acids'] },
+        { n: '03', title: 'The delivery layer', accent: '| How it stays intact', tag: 'Stability tested to 180 days', slot: 'hbv2-layer3', ph: 'Sealed pack, cold-blend line', body: 'Every batch is blended cold, never overheated, and sealed in light-proof packaging that keeps air out. Due to this engineering, Happy Beanie has a shelf life up to 6 months.', chips: ['Cold blend', 'Lot-coded'] }
       ].map((l, i) => {
         const on = this.state.layer === i;
         return { ...l,

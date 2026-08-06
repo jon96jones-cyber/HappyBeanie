@@ -525,7 +525,8 @@
         // — without it, Replace/Edit clicks in Edit mode are swallowed by
         // element selection and the controls look dead.
         '<div class="ctl" popover="manual" data-dc-edit-transparent><button data-act="replace" title="Replace image">Replace</button>' +
-        '  <button data-act="edit" title="Reframe image">Edit</button></div>' +
+        '  <button data-act="edit" title="Reframe image">Edit</button>' +
+        '  <button data-act="remove" title="Remove image">Remove</button></div>' +
         '<input type="file" accept="' + ACCEPT.join(',') + '" hidden>';
       this._frame = root.querySelector('.frame');
       this._ring = root.querySelector('.ring');
@@ -582,6 +583,17 @@
           this.dispatchEvent(new CustomEvent('image-slot:pick', {
             bubbles: true, composed: true, detail: { id: this.id || null }
           }));
+        }
+        if (act === 'remove') {
+          this._exitReframe(false);
+          this._gen++;
+          this._swapGen = 0;
+          this.removeAttribute('data-swapping');
+          this._userUrl = null;
+          this._local = null;
+          if (this.id) setSlot(this.id, null);
+          else this._render();
+          return;
         }
         if (act === 'edit') {
           if (!this._reframes()) return;
