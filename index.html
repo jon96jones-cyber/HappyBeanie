@@ -2484,6 +2484,18 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.heroVideo(0);
+    // Restore the cart from localStorage so a page refresh keeps items.
+    try {
+      const saved = JSON.parse(localStorage.getItem('hbCart') || 'null');
+      if (saved && (saved.cartDog > 0 || saved.cartCat > 0)) {
+        this.setState({
+          cartDog: saved.cartDog || 0,
+          cartCat: saved.cartCat || 0,
+          cartPlanDog: saved.cartPlanDog || 1,
+          cartPlanCat: saved.cartPlanCat || 1
+        });
+      }
+    } catch (e) {}
     const VALID_PAGES = ['home','shop','product','certs','about','contact','quiz','cart','checkout'];
     const pathPage = window.location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
     if (VALID_PAGES.includes(pathPage) && pathPage !== (this.state.page || 'home')) {
@@ -2562,6 +2574,12 @@ class Component extends DCLogic {
 
   componentDidUpdate() {
     requestAnimationFrame(() => this.scan());
+    // Persist the cart whenever it changes (guarded so scroll updates don't rewrite it).
+    try {
+      const s = this.state;
+      const cart = JSON.stringify({ cartDog: s.cartDog, cartCat: s.cartCat, cartPlanDog: s.cartPlanDog, cartPlanCat: s.cartPlanCat });
+      if (cart !== this._lastCart) { this._lastCart = cart; localStorage.setItem('hbCart', cart); }
+    } catch (e) {}
     const page = this.state.page || 'home';
     // The hero <video> lives inside the home section, so SPA nav back to home
     // remounts a fresh, src-less element. Re-run the probe to re-attach it.
