@@ -20,6 +20,12 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.happybeanie.com/assets/og-image-7.jpg">
 <script>
+// When mobile Safari restores this page from its back-forward cache (bfcache),
+// it can show a frozen snapshot from an earlier deploy (stale copy/layout).
+// Force a fresh load on bfcache restore so visitors always see the current site.
+window.addEventListener('pageshow', function (e) {
+  if (e.persisted) window.location.reload();
+});
 window.HB_SHOPIFY = {
   domain: 'pxv2u2-kc.myshopify.com',
   token: '8d2ebcaeb6c98f834078f575873a77ac',
