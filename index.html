@@ -55,12 +55,11 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       query: 'mutation cartCreate($input: CartInput!) { cartCreate(input: $input) { cart { checkoutUrl } userErrors { field message } } }',
       variables: { input: (function () {
         const input = { lines: lines };
-        if (buyer && buyer.email) {
+        if (buyer && (buyer.addr || buyer.email)) {
           const parts = String(buyer.name || '').trim().split(/\s+/);
           const firstName = parts.slice(0, -1).join(' ') || parts[0] || '';
           const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
-          input.buyerIdentity = {
-            email: buyer.email,
+          const bi = {
             countryCode: 'US',
             deliveryAddressPreferences: [{
               deliveryAddress: {
@@ -70,6 +69,11 @@ window.hbShopifyCheckout = async function (rows, buyer) {
               }
             }]
           };
+          // Only pre-associate the email (which links/creates the account) when
+          // the shopper left the account opt-in checked. Opting out still
+          // pre-fills shipping but hands off as a guest.
+          if (buyer.email && buyer.wantAccount !== false) bi.email = buyer.email;
+          input.buyerIdentity = bi;
         }
         return input;
       })() }
@@ -2193,6 +2197,33 @@ window.hbShopifyCheckout = async function (rows, buyer) {
                   </div>
                 </div>
               </sc-for>
+
+              <div style="background: linear-gradient(#1D1913, #17140F); border: 1px solid rgba(245,240,230,0.16); border-radius: 8px; padding: 22px 24px 24px; box-shadow: 0 22px 42px -30px rgba(23,20,15,0.4);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                  <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; background: oklch(0.86 0.14 92); padding: 5px 9px; border-radius: 2px;">03</span>
+                  <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 18px; color: #F5F0E6;">Your account</span>
+                  <span aria-hidden="true" style="flex: 1; height: 1px; background: rgba(245,240,230,0.14);"></span>
+                  <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ acctStateColor }};">{{ acctState }}</span>
+                </div>
+                <label data-m="tap" style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 2px 0;">
+                  <input type="checkbox" checked="{{ acctMark }}" sc-camel-on-change="{{ toggleAccount }}" style="position: absolute; width: 1px; height: 1px; opacity: 0;">
+                  <span aria-hidden="true" style="position: relative; width: 20px; height: 20px; flex: 0 0 auto; margin-top: 2px; border: 1px solid {{ acctBorder }}; border-radius: 4px; background: {{ acctDot }}; transition: background 0.2s ease, border-color 0.2s ease;">
+                    <span style="position: absolute; left: 4px; top: 5px; opacity: {{ acctMark }}; transition: opacity 0.2s ease;">
+                      <svg width="11" height="9" sc-camel-view-box="0 0 11 9" fill="none"><path d="M1 4.6 4 7.5 10 1" stroke="#17140F" sc-camel-stroke-width="1.8" sc-camel-stroke-linecap="round" sc-camel-stroke-linejoin="round"></path></svg>
+                    </span>
+                  </span>
+                  <span style="font-size: 14px; line-height: 1.5; color: #F5F0E6;">Set up my Happy Beanie account for faster reorders &amp; to manage my plan</span>
+                </label>
+                <div style="margin: 14px 0 0 32px; display: grid; gap: 9px;">
+                  <sc-for list="{{ acctPerks }}" as="ap" hint-placeholder-count="3">
+                    <div style="display: flex; align-items: baseline; gap: 9px; font-size: 13px; line-height: 1.5; color: #CFC6B4;">
+                      <span aria-hidden="true" style="flex: 0 0 auto; color: oklch(0.86 0.14 92);">→</span>
+                      <span style="color: #CFC6B4;">{{ ap }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="margin: 16px 0 0 32px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E; line-height: 1.7;">{{ acctNote }}</div>
+              </div>
             </div>
 
             <div data-m="cartsum" style="position: sticky; top: 96px; border: 1px solid rgba(245,240,230,0.16); border-radius: 8px; background: linear-gradient(#1D1913, #17140F); color: #F5F0E6; padding: 26px 26px 28px; overflow: hidden; box-shadow: 0 40px 70px -40px rgba(0,0,0,0.85);">
@@ -2278,7 +2309,7 @@ class Component extends DCLogic {
     coa: null, certFilter: 'all',
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
-      bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true };
+      bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, wantAccount: true };
 
   setCo(k) {
     return e => {
@@ -3083,11 +3114,25 @@ class Component extends DCLogic {
       orderBtnFg: coReady ? '#17140F' : '#8A7F6E',
       orderBtnCursor: coReady ? 'pointer' : 'not-allowed',
       orderHint: coReady ? 'Payment happens next on our secure checkout.' : 'Fill in contact and shipping to continue.',
+      acctMark: this.state.wantAccount ? 1 : 0,
+      acctDot: this.state.wantAccount ? 'oklch(0.86 0.14 92)' : 'transparent',
+      acctBorder: this.state.wantAccount ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.4)',
+      acctState: this.state.wantAccount ? 'On' : 'Skipped',
+      acctStateColor: this.state.wantAccount ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
+      acctPerks: [
+        'Track shipments and reorder in one tap',
+        'Pause, skip, or change your plan anytime',
+        'Upload your Bean’s bandana photo for 15% off'
+      ],
+      acctNote: this.state.wantAccount
+        ? 'No password — sign in anytime with ' + (String(this.state.co.email || '').trim() || 'your email') + ' and a one-time code.'
+        : 'You can still create your account later from any order confirmation email.',
+      toggleAccount: () => this.setState(st => ({ wantAccount: !st.wantAccount })),
       placeOrder: () => {
         if (!coReady) return;
         window.hbShopifyCheckout(
           M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })),
-          { ...this.state.co }
+          { ...this.state.co, wantAccount: this.state.wantAccount }
         ).catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
       },
       wallHasPhoto: !!this.state.wallPhoto,
