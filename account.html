@@ -528,6 +528,14 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
           <h1 id="helloLine">Welcome back.</h1>
           <div class="who" id="whoLine" style="display:none"></div>
           <div id="badgeRow"></div>
+          <form id="nameCapture" style="display:none; margin-top:20px;">
+            <div style="font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-bottom:9px;">What should we call you?</div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; max-width:420px;">
+              <input id="nameInput" type="text" maxlength="40" placeholder="First name" autocomplete="given-name" style="flex:1 1 200px; min-width:0; font-family:inherit; font-size:15px; color:#F5F0E6; background:rgba(245,240,230,0.06); border:1px solid rgba(245,240,230,0.22); border-radius:3px; padding:12px 14px;">
+              <button type="submit" id="nameSave" class="btn-dark" style="flex:0 0 auto;">Save</button>
+            </div>
+            <div id="nameMsg" style="font-size:12px; line-height:1.5; color:#8A7F6E; margin-top:9px; display:none;"></div>
+          </form>
         </div>
         <div class="readouts" id="readouts"></div>
       </div>
@@ -901,9 +909,37 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     el.textContent = 'Synced ' + pad(t.getHours()) + ':' + pad(t.getMinutes()) + ':' + pad(t.getSeconds());
   }
 
+  function saveName(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    var input = $('nameInput');
+    var name = ((input && input.value) || '').trim();
+    var msg = $('nameMsg');
+    function say(text, err) { if (msg) { msg.style.display = 'block'; msg.style.color = err ? '#E0A08F' : '#8A7F6E'; msg.textContent = text; } }
+    if (!name) { say('Please enter a name.', true); return; }
+    var firstWord = name.split(/\s+/)[0];
+    function done(fn) {
+      $('helloLine').innerHTML = 'Welcome back, <em>' + esc(fn) + '.</em>';
+      var nc = $('nameCapture'); if (nc) nc.style.display = 'none';
+    }
+    say('Saving…', false);
+    if (typeof DEMO !== 'undefined' && DEMO) { done(firstWord); return; }
+    fetch('/api/account/profile', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name })
+    }).then(function (r) { return r.json().catch(function () { return null; }); })
+      .then(function (b) {
+        if (b && b.ok) { done(b.firstName || firstWord); return; }
+        say('Could not save just now — try again, or email hello@happybeanie.com.', true);
+      })
+      .catch(function () { say('Could not save just now — try again, or email hello@happybeanie.com.', true); });
+  }
+
   function renderDash(c) {
     var first = c.firstName || '';
     $('helloLine').innerHTML = first ? 'Welcome back, <em>' + esc(first) + '.</em>' : 'Welcome back.';
+    var ncEl = $('nameCapture');
+    if (ncEl) { ncEl.style.display = first ? 'none' : 'block'; if (!ncEl._wired) { ncEl._wired = true; ncEl.onsubmit = saveName; } }
     var email = c.emailAddress && c.emailAddress.emailAddress;
     var since = c.creationDate ? 'member since ' + fmtDate(c.creationDate) : '';
     $('whoLine').textContent = [email, since].filter(Boolean).join('  ·  ');
