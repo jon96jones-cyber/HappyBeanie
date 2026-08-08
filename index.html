@@ -799,7 +799,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <a sc-camel-on-click="{{ goQuiz }}" data-m="hmquiz" style="cursor: pointer; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px 20px; padding: 22px 24px; border: 1px solid #E0D6C2; border-radius: 3px; background: #F5F0E6; margin-bottom: 30px; color: #17140F;" style-hover="border-color: #17140F;">
           <span style="flex: 1 1 260px; min-width: 0;">
             <span data-m="hmqh" style="display: block; font-weight: 700; font-size: 15px; margin-bottom: 4px;">Not sure Happy Beanie is right for your pet?</span>
-            <span data-m="hmqs" style="display: block; font-size: 13px; line-height: 1.5; color: #6A6055;">Two minutes, eight questions, screened against every input on the formulation sheet.</span>
+            <span data-m="hmqs" style="display: block; font-size: 13px; line-height: 1.5; color: #6A6055;">One minute, eight questions, screened against every ingredient on the formulation sheet.</span>
           </span>
           <span data-m="qzcta" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152); white-space: nowrap;">Check eligibility →</span>
         </a>
@@ -916,9 +916,9 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div data-m="stack gap" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 0; border: 1px solid rgba(245,240,230,0.16);">
         <div data-m="tpvbox" style="padding: 34px 34px;">
           <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 16px;">Third-party verification</div>
-          <p data-m="tpvhead" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 21px; line-height: 1.35; margin: 0 0 16px; color: #F5F0E6;">Every lot is assayed by an independent lab for ingredient identity, milligram accuracy against label claim, and potency at release.</p>
-          <p data-m="tpvsub" style="font-size: 14px; line-height: 1.6; color: #B9AF9C; margin: 0 0 18px;">Certificates of analysis are published by lot number and stay online for the life of the product. Scan the code on the box to pull yours.</p>
-          <span sc-camel-on-click="{{ goCerts }}" style="display: inline-block; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.86 0.14 92); border-bottom: 1px solid oklch(0.86 0.14 92); padding-bottom: 3px; cursor: pointer;">Browse COAs by lot</span>
+          <p data-m="tpvhead" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 21px; line-height: 1.35; margin: 0 0 16px; color: #F5F0E6;">Every batch is inspected by an independent lab for milligram accuracy and potency.</p>
+          <p data-m="tpvsub" style="font-size: 14px; line-height: 1.6; color: #B9AF9C; margin: 0 0 18px;">Lot numbers stay online for the life of the product. Scan the code on the box to pull yours.</p>
+          <span sc-camel-on-click="{{ goCerts }}" style="display: inline-block; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.86 0.14 92); border-bottom: 1px solid oklch(0.86 0.14 92); padding-bottom: 3px; cursor: pointer;">Browse our certificates</span>
         </div>
         <div data-m="auto" style="height: 100%; min-height: 240px; border-left: 1px solid rgba(245,240,230,0.16);">
           <image-slot id="hbv2-lab" placeholder="Compounding lab / vials on bench" style="width: 100%; height: 100%;"></image-slot>
@@ -945,7 +945,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div>
         <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 22px;">Our lab</div>
         <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.05; margin: 0 0 24px;">Pharmacists first, <span style="color: oklch(0.86 0.14 92);">pet brand second.</span></h2>
-        <p style="font-size: 16px; line-height: 1.7; color: #B9AF9C; margin: 0 0 30px; max-width: 32em;">Happy Beanie is made by a compounding team with fifteen years of human sterile-prep experience. Same room, same standards, same COAs — formulated for dogs, cats, horses, livestock and exotics.</p>
+        <p style="font-size: 16px; line-height: 1.7; color: #B9AF9C; margin: 0 0 30px; max-width: 32em;">Happy Beanie is made by a compounding team with fifteen years of human sterile-prep experience. Same room, same standards, same COAs — formulated for dogs and cats.</p>
         <div data-m="creds2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: rgba(245,240,230,0.16);">
           <sc-for list="{{ credentials }}" as="cr" hint-placeholder-count="4">
             <div style="background: #17140F; padding: 22px 20px;">
@@ -1091,10 +1091,10 @@ window.hbShopifyCheckout = async function (rows, buyer) {
 
         <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-top: 44px; padding: 34px 36px; background: #17140F; border-radius: 4px;">
           <div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.25; color: #F5F0E6;">Still unsure which fits? <span style="color: oklch(0.86 0.14 92);">Ask a pharmacist.</span></div>
-            <p style="font-size: 15px; line-height: 1.6; color: #B9AF9C; margin: 10px 0 0; max-width: 40em;">Send your animal's species, age and weight — we will tell you the format and dose we would actually start with.</p>
+            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.25; color: #F5F0E6;">Still unsure which fits? <span style="color: oklch(0.86 0.14 92);">Take our eligibility quiz.</span></div>
+            <p style="font-size: 15px; line-height: 1.6; color: #B9AF9C; margin: 10px 0 0; max-width: 40em;">We will help you screen the ingredients specifically for your bean.</p>
           </div>
-          <button sc-camel-on-click="{{ goContact }}" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; padding: 18px 30px; border: none; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; white-space: nowrap;" style-hover="background: #F5F0E6;">Get a recommendation</button>
+          <button sc-camel-on-click="{{ goQuiz }}" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; padding: 18px 30px; border: none; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; white-space: nowrap;" style-hover="background: #F5F0E6;">1 Minute Quiz, Full Transparency</button>
         </div>
       </div>
     </section>
@@ -1451,7 +1451,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; align-items: center;">
           <div>
             <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 22px;">Nothing to lose</div>
-            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.03; color: #F5F0E6; margin: 0 0 20px; max-width: 20em;">Try it for ninety days. <span style="color: oklch(0.86 0.14 92);">Keep the box either way.</span></h2>
+            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.03; color: #F5F0E6; margin: 0 0 20px; max-width: 20em;">Try it for thirty days. <span style="color: oklch(0.86 0.14 92);">Keep the box either way.</span></h2>
             <p style="font-size: 16px; line-height: 1.7; color: #B9AF9C; margin: 0 0 32px; max-width: 32em;">If you do not see the change you were hoping for, tell us and we refund the order in full — opened, half-empty, no return shipment.</p>
             <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
               <button sc-camel-on-click="{{ cartCta }}" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 20px 36px; border: none; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 38px -22px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">{{ cartLabel }}</button>
@@ -1502,7 +1502,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
         <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 22px;">About Happy Beanie</div>
         <h1 data-m="abh1" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(38px, 5.2vw, 74px); line-height: 0.99; margin: 0 0 22px; max-width: 18em;">We started with one <span style="color: oklch(0.86 0.14 92);">very good dog.</span></h1>
-        <p data-m="absub" style="font-size: 18px; line-height: 1.65; color: #B9AF9C; max-width: 36em; margin: 0 0 44px;">Beanie was a fourteen-year-old lab mix who could not get up the back steps. Her owner ran a compounding pharmacy. Pick a year to see what happened next.</p>
+        <p data-m="absub" style="font-size: 18px; line-height: 1.65; color: #B9AF9C; max-width: 36em; margin: 0 0 44px;">We started Happy Beanie with one mission: pet longevity. You have a longevity stack — why shouldn't your bean?</p>
 
         <div data-m="stack gap" style="display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 22px; align-items: stretch;">
           <div data-m="ablist" style="display: grid; align-content: start; gap: 8px;">
@@ -1540,8 +1540,8 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <div data-m="abimg" style="height: 540px; border-radius: 8px; overflow: hidden; background: #EFE8D9; box-shadow: 0 40px 70px -40px rgba(23,20,15,0.5), 0 8px 18px -12px rgba(23,20,15,0.16);"><image-slot id="hbv2-about-story" placeholder="Founder with dog, documentary style" style="width: 100%; height: 100%;"></image-slot></div>
         <div>
           <h2 data-m="hpsh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.4vw, 48px); line-height: 1.05; margin: 0 0 22px;">Human pharmacy standards, <span style="color: oklch(0.44 0.07 152);">pointed at animals.</span></h2>
-          <p data-m="hpsp" style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 18px;">Most pet supplements are made by contract manufacturers with no analytical lab and no reason to prove what is in the bag. We came from the other side of that line: sterile human compounding, where every batch is assayed before it leaves the room.</p>
-          <p data-m="hpsp" style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 30px;">So Happy Beanie is small on purpose. We make to order, publish every certificate of analysis, and refuse to sell a format we cannot dose honestly by body weight.</p>
+          <p data-m="hpsp" style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 18px;">Most pet supplements are made by contract manufacturers with no analytical lab and no reason to prove what is in the bag. We came from the other side of that line: sterile human compounding, where every batch is inspected before it leaves the room.</p>
+          <p data-m="hpsp" style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 30px;">So Happy Beanie is small on purpose. We make to order, and refuse to sell a product we cannot dose honestly.</p>
           <div data-m="creds" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; border-top: 1px solid #D5CAB5; padding-top: 26px;">
             <sc-for list="{{ credentials }}" as="cr2" hint-placeholder-count="4">
               <div>
@@ -1575,7 +1575,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
         <div>
           <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 22px;">The facility</div>
           <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.4vw, 48px); line-height: 1.05; margin: 0 0 20px;">One suite in Scottsdale, <span style="color: oklch(0.44 0.07 152);">nothing outsourced.</span></h2>
-          <p style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 26px; max-width: 32em;">Nine hundred square feet, cGMP licensed, with a cold-blend room and an analytical bench. Every box you receive was weighed, blended and sealed here — then held until its assay comes back clean.</p>
+          <p style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 26px; max-width: 32em;">Over 3000 square feet, with a cold-blend room and an analytical bench. Every box you receive was weighed, blended and sealed here.</p>
           <div style="display: grid; gap: 0; margin-bottom: 30px;">
             <sc-for list="{{ facilityFacts }}" as="ff" hint-placeholder-count="4">
               <div style="display: grid; grid-template-columns: auto 1fr; gap: 18px; padding: 15px 0; border-top: 1px solid #D5CAB5; align-items: baseline;">
@@ -1594,7 +1594,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; max-width: 1180px; margin: 0 auto;">
         <div>
           <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.03; margin: 0 0 16px; max-width: 20em;">Start with the animal <span style="color: oklch(0.86 0.14 92);">in front of you.</span></h2>
-          <p style="font-size: 16px; line-height: 1.7; color: #B9AF9C; margin: 0; max-width: 34em;">Two formulations, dosed by weight, refundable for ninety days. Pick the one that matches your bean and we will do the rest.</p>
+          <p style="font-size: 16px; line-height: 1.7; color: #B9AF9C; margin: 0; max-width: 34em;">Two formulations. Pick the one that matches your bean and we will do the rest.</p>
         </div>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
           <button sc-camel-on-click="{{ goShop }}" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; padding: 18px 30px; border: none; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; white-space: nowrap;" style-hover="background: #F5F0E6;">Compare the two</button>
@@ -1612,7 +1612,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
         <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 22px;">Contact</div>
         <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(38px, 5vw, 72px); line-height: 1.0; margin: 0 0 20px; max-width: 18em;">A pharmacist answers <span style="color: oklch(0.86 0.14 92);">the email.</span></h1>
-        <p style="font-size: 17px; line-height: 1.65; color: #B9AF9C; max-width: 34em; margin: 0 0 30px;">Dosing questions, a lot number to look up, a vet who wants the data — send it here. Weekday replies inside one business day.</p>
+        <p style="font-size: 17px; line-height: 1.65; color: #B9AF9C; max-width: 34em; margin: 0 0 30px;">General questions, a vet who wants more info — send it here. Weekday replies within 1-2 business days.</p>
         <div style="display: inline-flex; align-items: center; gap: 11px; padding: 11px 18px; border: 1px solid rgba(245,240,230,0.24); border-radius: 0; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #DED5C4;">
           <span style="position: relative; width: 8px; height: 8px;">
             <span style="position: absolute; inset: 0; border-radius: 50%; background: oklch(0.72 0.17 145);"></span>
@@ -1775,7 +1775,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
         <div style="display: flex; align-items: center; gap: 10px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 22px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.08 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Certificate library · <span id="ctCount" style="color: #8A7F6E;">live assay feed</span></div>
         <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(38px, 5vw, 72px); line-height: 1.0; margin: 0 0 20px; max-width: 18em;">Every lot, <span style="color: oklch(0.86 0.14 92);">including the bad one.</span></h1>
-        <p style="font-size: 17px; line-height: 1.65; color: #B9AF9C; max-width: 34em; margin: 0;">Independent assay results for each batch we have made, published by lot number and kept online for the life of the product. Open any report — the destroyed lot stays here too.</p>
+        <p style="font-size: 17px; line-height: 1.65; color: #B9AF9C; max-width: 34em; margin: 0;">Published by lot number and kept online for the life of the product. Open any report — the expired lot stays here too.</p>
       </div>
     </section>
     <section data-m="pad short" style="position: relative; background: radial-gradient(120% 80% at 50% 0%, #FDFCF7 0%, #FCFAF4 44%, #F1EADB 100%); padding: 62px 44px 100px;">
