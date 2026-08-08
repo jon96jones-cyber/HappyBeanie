@@ -1957,12 +1957,25 @@ window.hbShopifyCheckout = async function (rows, buyer) {
           <h2 style="position: relative; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(32px, 4.4vw, 58px); line-height: 1.04; margin: 0 0 18px; max-width: 18em; text-wrap: balance;">{{ qzVerdictHead }} <span style="color: {{ qzVerdictAccent }};">{{ qzVerdictItalic }}</span></h2>
           <p style="display: {{ qzVerdictCopyDisplay }}; font-size: 17px; line-height: 1.68; color: {{ qzVerdictBody }}; margin: 0; max-width: 36em; text-wrap: pretty;">{{ qzVerdictCopy }}</p>
           <sc-if value="{{ qzCanBuy }}" hint-placeholder-val="{{ false }}">
-            <div data-m="wrapflex" style="position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 30px; padding-top: 26px; border-top: 1px solid {{ qzBuyRule }};">
-              <button sc-camel-on-click="{{ qzGoBuy }}" data-m="tap w100" style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 17px 28px; border: none; border-radius: 999px; background: {{ qzVerdictAccent }}; color: #17140F; cursor: pointer; box-shadow: 0 18px 34px -20px rgba(0,0,0,0.5); transition: transform 0.25s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.25s ease;" style-hover="transform: translateY(-2px); box-shadow: 0 24px 42px -20px rgba(0,0,0,0.55);">{{ qzBuyLabel }}</button>
-              <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ qzVerdictBody }};">{{ qzBuyNote }}</span>
+            <div style="position: relative; margin-top: 30px; padding-top: 26px; border-top: 1px solid {{ qzBuyRule }};">
+              <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: {{ qzVerdictEyeColor }}; margin-bottom: 14px;">Matched to your answers</div>
+              <div data-m="stack qzbuycard" style="display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 22px; align-items: center; background: rgba(252,250,244,0.06); border: 1px solid rgba(245,240,230,0.16); border-radius: 8px; padding: 16px 22px 16px 16px; box-shadow: 0 30px 54px -34px rgba(0,0,0,0.6);">
+                <div data-m="qzbuyimg" style="width: 100%; aspect-ratio: 1308 / 816; border-radius: 5px; overflow: hidden; background: #EFE8D9;">
+                  <image-slot id="{{ qzBuySlot }}" placeholder="Product pack shot" style="width: 100%; height: 100%;"></image-slot>
+                </div>
+                <div>
+                  <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 22px; line-height: 1.15; margin-bottom: 4px;">{{ qzBuyName }}</div>
+                  <div style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ qzVerdictBody }}; margin-bottom: 14px;">{{ qzBuyNote }} · $99/mo subscribed</div>
+                  <div data-m="wrapflex" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;">
+                    <button sc-camel-on-click="{{ qzBuyAdd }}" data-m="tap w100" style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding: 15px 26px; border: none; border-radius: 999px; background: {{ qzVerdictAccent }}; color: #17140F; cursor: pointer; box-shadow: 0 18px 34px -20px rgba(0,0,0,0.5); transition: transform 0.25s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.25s ease;" style-hover="transform: translateY(-2px); box-shadow: 0 24px 42px -20px rgba(0,0,0,0.55);">{{ qzBuyAddLabel }}</button>
+                    <a sc-camel-on-click="{{ qzGoBuy }}" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ qzVerdictFg }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid rgba(245,240,230,0.35);" style-hover="border-color: {{ qzVerdictFg }};">View full details</a>
+                  </div>
+                </div>
+              </div>
             </div>
           </sc-if>
         </div>
+        <sc-if value="{{ qzShowProfile }}" hint-placeholder-val="{{ false }}">
         <div data-m="stack" style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 3px; overflow: hidden; margin-bottom: 14px;">
           <sc-for list="{{ qzProfile }}" as="p" hint-placeholder-count="4">
             <div style="background: #FCFAF4; padding: 22px 24px;">
@@ -1971,6 +1984,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
             </div>
           </sc-for>
         </div>
+        </sc-if>
         <sc-if value="{{ qzHasFlags }}" hint-placeholder-val="{{ false }}">
           <div style="margin-bottom: 14px;">
             <div style="display: grid; gap: 10px;">
@@ -1993,6 +2007,41 @@ window.hbShopifyCheckout = async function (rows, buyer) {
               <div style="display: {{ qzOrderSubDisplay }}; font-size: 15px; line-height: 1.6; color: #B9AF9C; max-width: 34em;">{{ qzOrderSub }}</div>
             </div>
             <span sc-camel-on-click="{{ qzGoBuy }}" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; padding: 17px 32px; background: oklch(0.86 0.14 92); color: #17140F; border-radius: 2px; white-space: nowrap; cursor: pointer;" style-hover="background: #F5F0E6;">Continue to the formula</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ qzCanBuy }}" hint-placeholder-val="{{ false }}">
+          <div style="margin: 40px 0 40px;">
+            <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
+            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(26px, 3vw, 40px); line-height: 1.05; color: #17140F; margin: 0 0 26px; max-width: 22em;">Ten benefits, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
+            <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
+              <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03); font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;">
+                <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Benefit profile · {{ qzBuyName }}</span>
+              </div>
+              <div data-m="acrow" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: rgba(23,20,15,0.12); border-bottom: 1px solid rgba(23,20,15,0.12);">
+                <sc-for list="{{ qzActives }}" as="ac" hint-placeholder-count="3">
+                  <div style="background: #FCFAF4; padding: 20px 22px 22px; transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px;">
+                      <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #FCFAF4; background: #17140F; padding: 5px 9px; border-radius: 2px;">{{ ac.code }}</span>
+                      <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;">{{ ac.dose }}</span>
+                    </div>
+                    <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 19px; line-height: 1.2; color: #17140F; margin-bottom: 8px;">{{ ac.name }}</div>
+                    <p style="font-size: 13px; line-height: 1.55; color: #6A6055; margin: 0; text-wrap: pretty;">{{ ac.role }}</p>
+                  </div>
+                </sc-for>
+              </div>
+              <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1px; background: rgba(23,20,15,0.12);">
+                <sc-for list="{{ benefits }}" as="bn" hint-placeholder-count="10">
+                  <div style="display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: center; padding: 17px 22px; background: #FCFAF4; border-bottom: 1px solid rgba(23,20,15,0.08); transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
+                    <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: oklch(0.44 0.07 152);">{{ bn.n }}</span>
+                    <span style="font-size: 15px; line-height: 1.4; color: #17140F;">{{ bn.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="position: relative; padding: 12px 22px 13px; border-top: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03);">
+                <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Disclaimer</div>
+                <p style="font-size: 11.5px; line-height: 1.55; color: #6A6055; margin: 0; max-width: none;">These statements have not been evaluated by the Food and Drug Administration. None of the ingredients listed above have been evaluated by the FDA for the benefits described, and this product is not intended to diagnose, treat, cure, or prevent any disease. Happy Beanie is a food supplement, not a medication.</p>
+              </div>
+            </div>
           </div>
         </sc-if>
         <div style="border: 1px solid #DDD3C0; border-radius: 3px; padding: 30px 34px; margin-bottom: 26px;">
@@ -3466,7 +3515,7 @@ Object.assign(Component.prototype, {
       qzAsking: stage === 'quiz',
       qzResult: stage === 'result',
       qzStart: () => { this.setState({ qzStage: 'quiz', qzStep: 0 }); window.scrollTo(0, 0); },
-      qzRestart: () => { this.setState({ qzStage: 'intro', qzStep: 0, qzAnswers: {} }); window.scrollTo(0, 0); },
+      qzRestart: () => { this.setState({ qzStage: 'intro', qzStep: 0, qzAnswers: {}, qzAdded: false }); window.scrollTo(0, 0); },
       qzBack: () => {
         window.scrollTo(0, 0);
         if (stage === 'result') { this.setState({ qzStage: 'quiz', qzStep: list.length - 1 }); return; }
@@ -3520,6 +3569,25 @@ Object.assign(Component.prototype, {
       qzBuyRule: 'rgba(245,240,230,0.22)',
       qzBuyLabel: 'Get ' + (a.species === 'cat' ? 'Happy Beans for Cats' : 'Happy Beans for Dogs') + ' →',
       qzBuyNote: verdict === 'ok' ? 'One chew daily · 30-day box' : 'Start at ½ dose for week one',
+      qzBuySlot: a.species === 'cat' ? 'hbv2-pdp-cat-main' : 'hbv2-pdp-dog-main',
+      qzActives: a.species === 'cat' ? [
+        { code: 'A1', name: 'Proprietary peptide blend', dose: '180mg per chew', role: 'Copper-free signalling, dosed to a cat\u2019s faster clearance rate.' },
+        { code: 'A2', name: 'Taurine & salmon blend', dose: '250mg per chew', role: 'The amino acid cats cannot make enough of, with salmon oil for absorption.' },
+        { code: 'A3', name: 'Mushroom extract blend', dose: '150mg per chew', role: 'Lion\u2019s mane, reishi and turkey tail for immune, gut and nerve support.' }
+      ] : [
+        { code: 'A1', name: 'Proprietary peptide blend', dose: '420mg per chew', role: 'The signalling layer \u2014 instructs repair in joint, skin and connective tissue.' },
+        { code: 'A2', name: 'Elk blend', dose: '500mg per chew', role: 'Whole-food velvet antler and organ nutrition: the cofactors repair actually spends.' },
+        { code: 'A3', name: 'Mushroom extract blend', dose: '300mg per chew', role: 'Lion\u2019s mane, reishi and turkey tail for immune, gut and nerve support.' }
+      ],
+      qzBuyName: a.species === 'cat' ? 'Happy Beans for Cats™' : 'Happy Beans™ for Dogs',
+      qzBuyAddLabel: this.state.qzAdded ? 'Added — view cart →' : 'Add to cart',
+      qzBuyAdd: () => {
+        if (this.state.qzAdded) { this.setState({ page: 'cart', menuOpen: false }); window.scrollTo({ top: 0 }); return; }
+        this.setState(st => a.species === 'cat'
+          ? { qzAdded: true, cartCat: st.cartCat + 1, cartPlanCat: 1 }
+          : { qzAdded: true, cartDog: st.cartDog + 1, cartPlanDog: 1 });
+      },
+      qzShowProfile: verdict !== 'ok',
       qzGoBuy: () => {
         this.setState({ page: 'product', sp: a.species === 'cat' ? 'cat' : 'dog', plan: 1, added: false, ordered: false, menuOpen: false });
         window.scrollTo({ top: 0 });
