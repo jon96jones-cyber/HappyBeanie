@@ -298,6 +298,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
   @media (max-width: 1180px) { [data-m~="hidewide"] { display: none !important; } }
   @media (max-width: 900px) {
     [data-m~="stack"] { grid-template-columns: minmax(0, 1fr) !important; }
+    [data-m~="cofield"] { grid-column: 1 / -1 !important; min-width: 0 !important; }
     [data-m~="two"]   { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
     [data-m~="gap"]   { gap: 28px !important; }
     [data-m~="pad"]   { padding-left: 20px !important; padding-right: 20px !important; }
@@ -538,6 +539,21 @@ image-slot:not([data-filled]) { color: transparent !important; }
   }
   @media (max-width: 620px) {
     [data-m~="two"]   { grid-template-columns: minmax(0, 1fr) !important; }
+    [data-m~="cosec"] { padding: 20px 18px 22px !important; border-radius: 8px !important; }
+    [data-m~="cosec"] [data-m~="stack"] { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: 12px !important; }
+    [data-m~="cofield"] { grid-column: 1 / -1 !important; min-width: 0 !important; }
+    [data-m~="cofield"] input { min-height: 46px !important; padding: 12px 13px !important; font-size: 15px !important; }
+    [data-m~="cosechead"] { gap: 10px !important; margin-bottom: 16px !important; }
+    [data-m~="cosechead"] > span:nth-child(2) { font-size: 17px !important; }
+    [data-m~="acctpanel"] { padding: 22px 18px 24px !important; border-radius: 8px !important; }
+    [data-m~="acctsplit"] { grid-template-columns: 1fr !important; gap: 22px !important; }
+    [data-m~="accthead"] { font-size: 25px !important; margin-bottom: 11px !important; }
+    [data-m~="acctlede"] { font-size: 14px !important; margin-bottom: 18px !important; }
+    [data-m~="acctperk"] { padding: 13px 15px !important; gap: 12px !important; }
+    [data-m~="acctperk"] span:nth-child(3) { font-size: 13.5px !important; }
+    [data-m~="acctperk"] span:last-child { font-size: 8.5px !important; }
+    [data-m~="acctfine"] { font-size: 9px !important; margin-top: 16px !important; }
+    [data-m~="acctfine"] br { display: none !important; }
     [data-m~="pad"]   { padding-left: 16px !important; padding-right: 16px !important; }
     [data-m~="short"] { padding-top: 44px !important; padding-bottom: 44px !important; }
     [data-m~="gap"]   { gap: 22px !important; }
@@ -2195,65 +2211,40 @@ image-slot:not([data-filled]) { color: transparent !important; }
           <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 4vw, 52px); line-height: 1.02; margin: 0 0 30px;">One screen, <span style="color: oklch(0.44 0.07 152);">then done.</span></h1>
 
           <div data-m="stack gap" style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 26px; align-items: start;">
-            <div style="display: grid; gap: 12px;">
+            <div style="display: grid; gap: 0; border: 1px solid rgba(245,240,230,0.14); border-radius: 10px; overflow: hidden; background: linear-gradient(168deg, #1D1913 0%, #14110B 100%); box-shadow: 0 40px 70px -44px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.05) inset;">
               <sc-for list="{{ checkoutSections }}" as="cs" hint-placeholder-count="3">
-                <div style="background: #FCFAF4; border: 1px solid rgba(23,20,15,0.12); border-radius: 8px; padding: 24px 24px 26px; box-shadow: 0 22px 42px -30px rgba(23,20,15,0.3), 0 1px 0 rgba(255,255,255,0.9) inset;">
-                  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                    <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #FCFAF4; background: #17140F; padding: 5px 9px; border-radius: 2px;">{{ cs.n }}</span>
-                    <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 18px;">{{ cs.title }}</span>
-                    <span aria-hidden="true" style="flex: 1; height: 1px; background: #E4DBC9;"></span>
+                <div data-m="cosec" style="position: relative; overflow: hidden; background: {{ cs.bg }}; border: 0; border-top: {{ cs.borderTop }}; border-radius: {{ cs.radius }}; padding: {{ cs.padTop }} 26px 28px; color: #F5F0E6; box-shadow: {{ cs.shadow }};">
+                  <div aria-hidden="true" style="position: absolute; left: -90px; top: -130px; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.09), transparent 70%); opacity: {{ cs.glow }}; pointer-events: none;"></div>
+                  <div data-m="cosechead" style="position: relative; display: flex; align-items: center; gap: 12px; margin-bottom: 22px;">
+                    <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; background: oklch(0.86 0.14 92); padding: 5px 9px; border-radius: 3px;">{{ cs.n }}</span>
+                    <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 19px;">{{ cs.title }}</span>
+                    <span aria-hidden="true" style="flex: 1; min-width: 16px; height: 1px; background: rgba(245,240,230,0.16);"></span>
                     <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ cs.stateColor }};">{{ cs.state }}</span>
                   </div>
                   <sc-if value="{{ cs.hasToggle }}" hint-placeholder-val="{{ false }}">
-                    <label data-m="tap" style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 0 2px; font-size: 14px; color: #17140F;">
+                    <label data-m="tap" style="position: relative; display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 0 2px; font-size: 14.5px; color: #DED5C4;">
                       <input type="checkbox" checked="{{ cs.toggleMark }}" sc-camel-on-change="{{ cs.flipSame }}" style="position: absolute; width: 1px; height: 1px; opacity: 0;">
-                      <span aria-hidden="true" style="position: relative; width: 20px; height: 20px; flex: 0 0 auto; border: 1px solid {{ cs.toggleBorder }}; border-radius: 4px; background: {{ cs.toggleDot }}; transition: background 0.2s ease, border-color 0.2s ease;">
+                      <span aria-hidden="true" style="position: relative; width: 20px; height: 20px; flex: 0 0 auto; border: 1px solid {{ cs.toggleBorder }}; border-radius: 5px; background: {{ cs.toggleDot }}; transition: background 0.22s ease, border-color 0.22s ease;">
                         <span style="position: absolute; left: 4px; top: 5px; opacity: {{ cs.toggleMark }}; transition: opacity 0.2s ease;">
-                          <svg width="11" height="9" sc-camel-view-box="0 0 11 9" fill="none"><path d="M1 4.6 4 7.5 10 1" stroke="#FCFAF4" sc-camel-stroke-width="1.8" sc-camel-stroke-linecap="round" sc-camel-stroke-linejoin="round"></path></svg>
+                          <svg width="11" height="9" sc-camel-view-box="0 0 11 9" fill="none"><path d="M1 4.6 4 7.5 10 1" stroke="#17140F" sc-camel-stroke-width="2" sc-camel-stroke-linecap="round" sc-camel-stroke-linejoin="round"></path></svg>
                         </span>
                       </span>
                       <span>{{ cs.toggleLabel }}</span>
                     </label>
                   </sc-if>
-                  <div data-m="stack" style="display: {{ cs.fieldsDisplay }}; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: {{ cs.fieldsGap }};">
+                  <div data-m="stack" style="position: relative; display: {{ cs.fieldsDisplay }}; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: {{ cs.fieldsGap }};">
                     <sc-for list="{{ cs.fields }}" as="cfd" hint-placeholder-count="4">
-                      <label data-m="cofield" style="display: grid; gap: 7px; font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500; color: #6A6055; grid-column: {{ cfd.span }};">{{ cfd.label }}
-                        <input value="{{ cfd.value }}" sc-camel-on-change="{{ cfd.set }}" placeholder="{{ cfd.ph }}" inputmode="{{ cfd.mode }}" style="border: 1px solid #E0D6C2; background: #F5F0E6; border-radius: 3px; padding: 14px 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: #17140F; min-height: 48px;" style-focus="border-color: #17140F; outline: none; background: #FCFAF4;">
+                      <label data-m="cofield" style="display: grid; gap: 8px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; grid-column: {{ cfd.span }};">{{ cfd.label }}
+                        <input value="{{ cfd.value }}" sc-camel-on-change="{{ cfd.set }}" placeholder="{{ cfd.ph }}" inputmode="{{ cfd.mode }}" style="border: 1px solid rgba(245,240,230,0.18); background: rgba(245,240,230,0.05); border-radius: 5px; padding: 14px 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; letter-spacing: 0; text-transform: none; color: #F5F0E6; min-height: 50px; transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;" style-focus="border-color: oklch(0.86 0.14 92); outline: none; background: rgba(245,240,230,0.08); box-shadow: 0 0 0 3px oklch(0.86 0.14 92 / 0.14);">
                       </label>
                     </sc-for>
                   </div>
                 </div>
               </sc-for>
-
-              <div style="background: linear-gradient(#1D1913, #17140F); border: 1px solid rgba(245,240,230,0.16); border-radius: 8px; padding: 22px 24px 24px; box-shadow: 0 22px 42px -30px rgba(23,20,15,0.4);">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-                  <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; background: oklch(0.86 0.14 92); padding: 5px 9px; border-radius: 2px;">03</span>
-                  <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 18px; color: #F5F0E6;">Your account</span>
-                  <span aria-hidden="true" style="flex: 1; height: 1px; background: rgba(245,240,230,0.14);"></span>
-                  <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ acctStateColor }};">{{ acctState }}</span>
-                </div>
-                <label data-m="tap" style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 2px 0;">
-                  <input type="checkbox" checked="{{ acctMark }}" sc-camel-on-change="{{ toggleAccount }}" style="position: absolute; width: 1px; height: 1px; opacity: 0;">
-                  <span aria-hidden="true" style="position: relative; width: 20px; height: 20px; flex: 0 0 auto; margin-top: 2px; border: 1px solid {{ acctBorder }}; border-radius: 4px; background: {{ acctDot }}; transition: background 0.2s ease, border-color 0.2s ease;">
-                    <span style="position: absolute; left: 4px; top: 5px; opacity: {{ acctMark }}; transition: opacity 0.2s ease;">
-                      <svg width="11" height="9" sc-camel-view-box="0 0 11 9" fill="none"><path d="M1 4.6 4 7.5 10 1" stroke="#17140F" sc-camel-stroke-width="1.8" sc-camel-stroke-linecap="round" sc-camel-stroke-linejoin="round"></path></svg>
-                    </span>
-                  </span>
-                  <span style="font-size: 14px; line-height: 1.5; color: #F5F0E6;">Set up my Happy Beanie account for faster reorders &amp; to manage my plan</span>
-                </label>
-                <div style="margin: 14px 0 0 32px; display: grid; gap: 9px;">
-                  <sc-for list="{{ acctPerks }}" as="ap" hint-placeholder-count="3">
-                    <div style="display: flex; align-items: baseline; gap: 9px; font-size: 13px; line-height: 1.5; color: #CFC6B4;">
-                      <span aria-hidden="true" style="flex: 0 0 auto; color: oklch(0.86 0.14 92);">→</span>
-                      <span style="color: #CFC6B4;">{{ ap }}</span>
-                    </div>
-                  </sc-for>
-                </div>
-                <div style="margin: 16px 0 0 32px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E; line-height: 1.7;">{{ acctNote }}</div>
-              </div>
             </div>
 
-            <div data-m="cartsum" style="position: sticky; top: 96px; border: 1px solid rgba(245,240,230,0.16); border-radius: 8px; background: linear-gradient(#1D1913, #17140F); color: #F5F0E6; padding: 26px 26px 28px; overflow: hidden; box-shadow: 0 40px 70px -40px rgba(0,0,0,0.85);">
+            <div data-m="cartsumwrap" style="align-self: stretch;">
+            <div data-m="cartsum" style="position: sticky; top: 96px; border: 1px solid rgba(245,240,230,0.16); border-radius: 10px; background: linear-gradient(#1D1913, #17140F); color: #F5F0E6; padding: 26px 26px 28px; overflow: hidden; box-shadow: 0 40px 70px -40px rgba(0,0,0,0.85);">
               <div aria-hidden="true" style="position: absolute; right: -70px; top: -90px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.14), transparent 70%); pointer-events: none;"></div>
               <div style="position: relative; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 18px;">Order summary</div>
               <div style="position: relative; display: grid; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid rgba(245,240,230,0.12);">
@@ -2277,6 +2268,43 @@ image-slot:not([data-filled]) { color: transparent !important; }
               </div>
               <button sc-camel-on-click="{{ placeOrder }}" disabled="{{ orderDisabled }}" data-m="tap" style="position: relative; width: 100%; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: {{ orderBtnBg }}; color: {{ orderBtnFg }}; cursor: {{ orderBtnCursor }}; box-shadow: 0 20px 36px -20px rgba(0,0,0,0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: translateY(-2px);">{{ orderBtnLabel }}</button>
               <div style="position: relative; margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E; line-height: 1.6;">{{ orderHint }}</div>
+            </div>
+            </div>
+
+            <div data-m="acctpanel" style="grid-column: 1 / -1; position: relative; overflow: hidden; border: 1px solid rgba(245,240,230,0.14); border-radius: 10px; background: linear-gradient(168deg, #1D1913 0%, #14110B 100%); color: #F5F0E6; padding: 30px 32px 32px; box-shadow: 0 40px 70px -44px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.05) inset;">
+              <div aria-hidden="true" style="position: absolute; right: -110px; top: -150px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.13), transparent 70%); pointer-events: none;"></div>
+              <div data-m="acctsplit" style="position: relative; display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.28fr); gap: 34px; align-items: center;">
+
+                <div>
+                  <div data-m="acctpanelhead" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">
+                    <span style="width: 22px; height: 1px; background: oklch(0.86 0.14 92);"></span>
+                    <span>Optional</span>
+                  </div>
+                  <div data-m="accthead" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(26px, 2.5vw, 34px); line-height: 1.08; margin-bottom: 14px;">Keep track of your orders</div>
+                  <p data-m="acctlede" style="font-size: 15px; line-height: 1.6; color: #B9AF9C; margin: 0 0 24px; max-width: 26em;">One simple click now and you'll have full access to our Happy Beanie tracking portal.</p>
+
+                  <button sc-camel-on-click="{{ flipAcct }}" data-m="accttoggle" role="switch" aria-checked="{{ acctOn }}" style="display: inline-flex; align-items: center; gap: 15px; cursor: pointer; border: 1px solid {{ acctSwitchRing }}; background: {{ acctSwitchWell }}; border-radius: 999px; padding: 9px 20px 9px 10px; transition: border-color 0.3s ease, background 0.3s ease;">
+                    <span aria-hidden="true" style="position: relative; width: 46px; height: 26px; flex: 0 0 auto; border-radius: 999px; background: {{ acctTrackBg }}; box-shadow: inset 0 1px 3px rgba(0,0,0,0.55); transition: background 0.3s ease;">
+                      <span style="position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: {{ acctKnobBg }}; transform: {{ acctKnobX }}; box-shadow: 0 3px 8px -2px rgba(0,0,0,0.7); transition: transform 0.34s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease;"></span>
+                    </span>
+                    <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: {{ acctStateColor }}; white-space: nowrap; transition: color 0.3s ease;">{{ acctState }}</span>
+                  </button>
+
+                  <div data-m="acctfine" style="margin-top: 20px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #6E6558; line-height: 1.7;">No password. A one-time code <br>signs you in whenever you need it.</div>
+                </div>
+
+                <div data-m="acctperks" style="display: grid; gap: 10px;">
+                  <sc-for list="{{ acctPerks }}" as="ap" hint-placeholder-count="3">
+                    <div data-m="acctperk" style="position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 17px 20px; border: 1px solid {{ ap.border }}; border-radius: 8px; background: {{ ap.bg }}; opacity: {{ ap.opacity }}; transform: {{ ap.shift }}; transition: border-color 0.35s ease, background 0.35s ease, opacity 0.35s ease, transform 0.45s cubic-bezier(0.2,0.7,0.2,1);">
+                      <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; color: {{ ap.numColor }}; transition: color 0.35s ease;">{{ ap.n }}</span>
+                      <span aria-hidden="true" style="position: absolute; left: 0; top: 12px; bottom: 12px; width: 2px; border-radius: 0 2px 2px 0; background: {{ ap.rail }}; transition: background 0.35s ease;"></span>
+                      <span style="font-size: 15px; line-height: 1.4; color: {{ ap.textColor }}; transition: color 0.35s ease;">{{ ap.label }}</span>
+                      <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ ap.tagColor }}; white-space: nowrap; transition: color 0.35s ease;">{{ ap.tag }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+
+              </div>
             </div>
           </div>
         </sc-if>
@@ -2336,7 +2364,7 @@ class Component extends DCLogic {
     coa: null, certFilter: 'all',
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
-      bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, wantAccount: true };
+      bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
 
   setCo(k) {
     return e => {
@@ -3109,28 +3137,35 @@ class Component extends DCLogic {
       orderNote: 'We compound to order, so your chews are blended fresh and leave Scottsdale in the morning. A confirmation and the lot number for your batch are on the way by email.',
       checkoutSections: [
         { n: '01', title: 'Contact', fields: [
-          { label: 'Email', ph: 'you@email.com', value: co.email, set: this.setCo('email'), mode: 'email', span: 'span 2' },
-          { label: 'Full name', ph: 'Jamie Rivera', value: co.name, set: this.setCo('name'), mode: 'text', span: 'span 2' }
+          { label: 'Email', ph: '', value: co.email, set: this.setCo('email'), mode: 'email', span: 'span 2' },
+          { label: 'Full name', ph: '', value: co.name, set: this.setCo('name'), mode: 'text', span: 'span 2' }
         ] },
         { n: '02', title: 'Shipping', fields: [
-          { label: 'Street address', ph: '1421 N Scottsdale Rd', value: co.addr, set: this.setCo('addr'), mode: 'text', span: 'span 2' },
-          { label: 'City', ph: 'Scottsdale', value: co.city, set: this.setCo('city'), mode: 'text', span: 'span 1' },
-          { label: 'State', ph: 'AZ', value: co.state, set: this.setCo('state'), mode: 'text', span: 'span 1' },
-          { label: 'ZIP', ph: '85257', value: co.zip, set: this.setCo('zip'), mode: 'numeric', span: 'span 2' }
+          { label: 'Street address', ph: '', value: co.addr, set: this.setCo('addr'), mode: 'text', span: 'span 2' },
+          { label: 'City', ph: '', value: co.city, set: this.setCo('city'), mode: 'text', span: 'span 1' },
+          { label: 'State', ph: '', value: co.state, set: this.setCo('state'), mode: 'text', span: 'span 1' },
+          { label: 'ZIP', ph: '', value: co.zip, set: this.setCo('zip'), mode: 'numeric', span: 'span 2' }
         ] }
-      ].map(sec => {
+      ].map((sec, i, arr) => {
         const done = sec.fields.length > 0 && sec.fields.every(f => String(f.value || '').trim().length > 0);
         const same = !!this.state.billSame;
+        const first = i === 0, last = i === arr.length - 1;
         return { ...sec,
+          bg: 'transparent',
+          padTop: '26px',
+          borderTop: '0',
+          radius: '0',
+          glow: first ? 1 : 0,
+          shadow: last ? '0 40px 70px -44px rgba(0,0,0,0.85)' : 'none',
           state: sec.toggle ? (same ? 'Same as shipping' : (done ? 'Complete' : 'Required')) : (done ? 'Complete' : 'Required'),
-          stateColor: sec.toggle ? (same || done ? 'oklch(0.44 0.07 152)' : '#A2977F') : (done ? 'oklch(0.44 0.07 152)' : '#A2977F'),
+          stateColor: sec.toggle ? (same || done ? 'oklch(0.86 0.14 92)' : '#8A7F6E') : (done ? 'oklch(0.86 0.14 92)' : '#8A7F6E'),
           hasToggle: !!sec.toggle,
           hasFields: sec.fields.length > 0,
           fieldsDisplay: sec.fields.length > 0 ? 'grid' : 'none',
           fieldsGap: sec.toggle ? '16px' : '0px',
           toggleLabel: 'Billing address is the same as shipping',
-          toggleDot: same ? '#17140F' : 'transparent',
-          toggleBorder: same ? '#17140F' : '#C9BEA8',
+          toggleDot: same ? 'oklch(0.86 0.14 92)' : 'transparent',
+          toggleBorder: same ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.32)',
           toggleMark: same ? 1 : 0,
           flipSame: () => this.setState(st => ({ billSame: !st.billSame }))
         };
@@ -3141,25 +3176,38 @@ class Component extends DCLogic {
       orderBtnFg: coReady ? '#17140F' : '#8A7F6E',
       orderBtnCursor: coReady ? 'pointer' : 'not-allowed',
       orderHint: coReady ? 'Payment happens next on our secure checkout.' : 'Fill in contact and shipping to continue.',
-      acctMark: this.state.wantAccount ? 1 : 0,
-      acctDot: this.state.wantAccount ? 'oklch(0.86 0.14 92)' : 'transparent',
-      acctBorder: this.state.wantAccount ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.4)',
-      acctState: this.state.wantAccount ? 'On' : 'Skipped',
-      acctStateColor: this.state.wantAccount ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
+      acctOn: this.state.acctOptIn !== false,
+      acctState: this.state.acctOptIn !== false ? 'Creating my account' : 'No account, thanks',
+      acctStateColor: this.state.acctOptIn !== false ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
+      acctTrackBg: this.state.acctOptIn !== false ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.14)',
+      acctKnobBg: this.state.acctOptIn !== false ? '#17140F' : '#8A7F6E',
+      acctKnobX: this.state.acctOptIn !== false ? 'translateX(20px)' : 'translateX(0px)',
+      acctSwitchRing: this.state.acctOptIn !== false ? 'oklch(0.86 0.14 92 / 0.45)' : 'rgba(245,240,230,0.18)',
+      acctSwitchWell: this.state.acctOptIn !== false ? 'oklch(0.86 0.14 92 / 0.08)' : 'rgba(245,240,230,0.03)',
+      flipAcct: () => this.setState(s => ({ acctOptIn: s.acctOptIn === false })),
       acctPerks: [
-        'Track shipments and reorder in one tap',
-        'Pause, skip, or change your plan anytime',
-        'Upload your Bean’s bandana photo for 15% off'
-      ],
-      acctNote: this.state.wantAccount
-        ? 'No password — sign in anytime with ' + (String(this.state.co.email || '').trim() || 'your email') + ' and a one-time code.'
-        : 'You can still create your account later from any order confirmation email.',
-      toggleAccount: () => this.setState(st => ({ wantAccount: !st.wantAccount })),
+        { label: 'Track every box from the bench to your door', tag: 'Live' },
+        { label: 'Pause, skip or change the plan yourself', tag: 'Anytime' },
+        { label: 'Bandana photo unlocks 15% off', tag: '15% off' }
+      ].map((p, i) => {
+        const on = this.state.acctOptIn !== false;
+        return { ...p,
+          n: '0' + (i + 1),
+          border: on ? 'oklch(0.86 0.14 92 / 0.3)' : 'rgba(245,240,230,0.1)',
+          bg: on ? 'rgba(245,240,230,0.045)' : 'rgba(245,240,230,0.018)',
+          rail: on ? 'oklch(0.86 0.14 92)' : 'transparent',
+          numColor: on ? 'oklch(0.86 0.14 92)' : '#5F5749',
+          textColor: on ? '#F5F0E6' : '#7E7365',
+          tagColor: on ? '#8A7F6E' : '#5F5749',
+          opacity: on ? 1 : 0.5,
+          shift: on ? 'translateX(0px)' : 'translateX(-6px)'
+        };
+      }),
       placeOrder: () => {
         if (!coReady) return;
         window.hbShopifyCheckout(
           M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })),
-          { ...this.state.co, wantAccount: this.state.wantAccount }
+          { ...this.state.co, wantAccount: this.state.acctOptIn !== false }
         ).catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
       },
       wallHasPhoto: !!this.state.wallPhoto,
