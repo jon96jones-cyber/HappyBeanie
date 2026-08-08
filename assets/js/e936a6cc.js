@@ -1579,8 +1579,13 @@
       const cls = "scp" + (n++).toString(36);
       const isPseudoElement = pseudo === "before" || pseudo === "after";
       const sel = isPseudoElement ? "." + cls + "::" + pseudo : "." + cls + ":" + pseudo;
+      const body = sel + "{" + (isPseudoElement ? css : importantify(css)) + "}";
+      // Gate :hover styles behind (hover: hover). On touch devices :hover is
+      // "sticky": the first tap only applies the hover style and the click
+      // needs a second tap. Restricting hover rules to hover-capable pointers
+      // makes touch taps activate on the first tap; desktop is unchanged.
       el.sheet.insertRule(
-        sel + "{" + (isPseudoElement ? css : importantify(css)) + "}",
+        pseudo === "hover" ? "@media (hover: hover){" + body + "}" : body,
         el.sheet.cssRules.length
       );
       cache.set(k, cls);
