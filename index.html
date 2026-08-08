@@ -300,6 +300,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
   [data-m~="askbox"][data-open="1"] { max-height: 460px; opacity: 1; margin-top: 10px; padding: 20px 20px 22px; border: 1px solid #E4DBC9; box-shadow: 0 20px 36px -26px rgba(23,20,15,0.45), 0 1px 0 rgba(255,255,255,0.9) inset; }
   @media (max-width: 1180px) { [data-m~="hidewide"] { display: none !important; } }
   @media (max-width: 900px) {
+    /* iOS Safari zooms in (and shifts the layout off-center) when a focused
+       input's font-size is under 16px. Force every form field to 16px on
+       small screens so focusing/autofilling a field never triggers that zoom.
+       Desktop keeps the designed sizes. */
+    input, textarea, select { font-size: 16px !important; }
     [data-m~="stack"] { grid-template-columns: minmax(0, 1fr) !important; }
     [data-m~="cofield"] { grid-column: 1 / -1 !important; min-width: 0 !important; }
     [data-m~="two"]   { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
@@ -343,7 +348,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="cbval"] { font-size: 16px !important; line-height: 1.2 !important; margin-bottom: 4px !important; }
     [data-m~="cbnote"] { font-size: 12.5px !important; line-height: 1.5 !important; }
     [data-m~="cform"] label { gap: 5px !important; font-size: 12px !important; }
-    [data-m~="cform"] input, [data-m~="cform"] textarea { padding: 11px 12px !important; font-size: 14px !important; }
+    [data-m~="cform"] input, [data-m~="cform"] textarea { padding: 11px 12px !important; font-size: 16px !important; }
     [data-m~="cform"] textarea { min-height: 104px !important; }
     [data-m~="cform"] [data-m~="stack"] { gap: 12px !important; }
     [data-m~="cform"] button { font-size: 13px !important; padding: 9px 13px !important; }
@@ -545,7 +550,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="cosec"] { padding: 20px 18px 22px !important; border-radius: 8px !important; }
     [data-m~="cosec"] [data-m~="stack"] { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: 12px !important; }
     [data-m~="cofield"] { grid-column: 1 / -1 !important; min-width: 0 !important; }
-    [data-m~="cofield"] input { min-height: 46px !important; padding: 12px 13px !important; font-size: 15px !important; }
+    [data-m~="cofield"] input { min-height: 46px !important; padding: 12px 13px !important; font-size: 16px !important; }
     [data-m~="cosechead"] { gap: 10px !important; margin-bottom: 16px !important; }
     [data-m~="cosechead"] > span:nth-child(2) { font-size: 17px !important; }
     [data-m~="acctpanel"] { padding: 22px 18px 24px !important; border-radius: 8px !important; }
