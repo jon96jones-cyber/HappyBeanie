@@ -297,6 +297,9 @@ window.hbShopifyCheckout = async function (rows, buyer) {
     [data-m~="first"] { order: -1 !important; }
     [data-m~="nostick"] { position: static !important; }
     [data-m~="auto"]  { height: auto !important; min-height: 0 !important; }
+    /* Lab image is a 1:1 source; on mobile give the box a square frame so the
+       full composition fits with no crop (desktop keeps its inline height). */
+    [data-m~="labimg"] { height: auto !important; aspect-ratio: 1 / 1 !important; }
     [data-m~="w100"]  { width: 100% !important; }
     [data-m~="qzbuycard"] { grid-template-columns: 1fr !important; gap: 14px !important; padding: 14px !important; }
     [data-m~="inset"] { padding: 36px 22px !important; }
@@ -959,7 +962,7 @@ window.hbShopifyCheckout = async function (rows, buyer) {
           </sc-for>
         </div>
       </div>
-      <div data-m="auto" style="height: 520px; border-radius: 3px; overflow: hidden;">
+      <div data-m="labimg" style="height: 520px; border-radius: 3px; overflow: hidden;">
         <image-slot id="hbv2-lab2" placeholder="Pharmacist at compounding hood" style="width: 100%; height: 100%;"></image-slot>
       </div>
     </div>
