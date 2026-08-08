@@ -2250,10 +2250,16 @@ image-slot:not([data-filled]) { color: transparent !important; }
               <div style="position: relative; display: grid; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid rgba(245,240,230,0.12);">
                 <sc-for list="{{ cartItems }}" as="cl" hint-placeholder-count="1">
                   <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px;">
-                    <span style="font-size: 13.5px; line-height: 1.4; color: #DED5C4;">{{ cl.summaryLine }}</span>
+                    <span style="font-size: 13.5px; line-height: 1.4; color: #DED5C4;">{{ cl.summaryLine }}
+                      <span style="display: block; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase; color: {{ cl.planColor }}; margin-top: 4px;">{{ cl.planShort }}</span>
+                    </span>
                     <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.03em; font-size: 15px; white-space: nowrap;">{{ cl.lineTotal }}</span>
                   </div>
                 </sc-for>
+              </div>
+              <div style="position: relative; display: {{ subNoteDisplay }}; align-items: flex-start; gap: 9px; margin-top: 14px; padding: 12px 14px; border: 1px solid oklch(0.86 0.14 92 / 0.28); border-radius: 6px; background: oklch(0.86 0.14 92 / 0.06);">
+                <span aria-hidden="true" style="flex: 0 0 auto; font-size: 13px; line-height: 1.3; color: oklch(0.86 0.14 92);">↻</span>
+                <span style="font-size: 11.5px; line-height: 1.55; color: #C9BFAE;">{{ subNote }}</span>
               </div>
               <div style="position: relative; display: grid; gap: 0;">
                 <sc-for list="{{ cartTotals }}" as="ct3" hint-placeholder-count="3">
@@ -2613,8 +2619,8 @@ class Component extends DCLogic {
         this.setState({
           cartDog: saved.cartDog || 0,
           cartCat: saved.cartCat || 0,
-          cartPlanDog: saved.cartPlanDog || 1,
-          cartPlanCat: saved.cartPlanCat || 1
+          cartPlanDog: saved.cartPlanDog != null ? saved.cartPlanDog : 1,
+          cartPlanCat: saved.cartPlanCat != null ? saved.cartPlanCat : 1
         });
       }
     } catch (e) {}
@@ -3116,10 +3122,16 @@ class Component extends DCLogic {
         unit: '$' + i.unitPrice + ' each',
         lineTotal: '$' + i.line,
         summaryLine: i.name + ' × ' + i.qty,
+        planShort: i.plan === 1 ? 'Subscription · auto-renews every 30 days'
+          : (i.plan === 2 ? 'Buy 3, get 1 free · one-time' : 'One-time purchase'),
+        planColor: i.plan === 1 ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
         inc: () => this.setState(st => i.key === 'cat' ? { cartCat: st.cartCat + 1, ordered: false } : { cartDog: st.cartDog + 1, ordered: false }),
         dec: () => this.setState(st => i.key === 'cat' ? { cartCat: Math.max(0, st.cartCat - 1) } : { cartDog: Math.max(0, st.cartDog - 1) }),
         remove: () => this.setState(i.key === 'cat' ? { cartCat: 0 } : { cartDog: 0 })
       })),
+      hasSubscription: M.items.some(i => i.plan === 1),
+      subNote: 'Subscriptions renew automatically every 30 days at the same price. Skip, pause, or cancel anytime from your account — no fees.',
+      subNoteDisplay: M.items.some(i => i.plan === 1) ? 'flex' : 'none',
       cartTotals: [
         { k: 'Subtotal', v: '$' + M.sub, color: '#8A7F6E' },
         ...(M.disc ? [{ k: 'Bean wall · BEAN15', v: '−$' + M.disc, color: 'oklch(0.86 0.14 92)' }] : []),
