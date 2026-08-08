@@ -251,7 +251,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
 <style>
   html, body { margin: 0; padding: 0; background: #17140F; }
   * { box-sizing: border-box; }
-  body { overflow-x: hidden; }
+  /* Lock the page to vertical scrolling only. body alone doesn't hold on iOS
+     (the viewport/html still pans), so clip both. overflow-x:clip clips
+     without creating a scroll container, so position:sticky keeps working. */
+  html, body { overflow-x: clip; max-width: 100%; }
   a { color: #17140F; text-decoration: none; }
   a:hover { color: oklch(0.5 0.07 152); }
   ::selection { background: oklch(0.86 0.14 92); color: #17140F; }
@@ -2235,7 +2238,8 @@ image-slot:not([data-filled]) { color: transparent !important; }
                   <div data-m="stack" style="position: relative; display: {{ cs.fieldsDisplay }}; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: {{ cs.fieldsGap }};">
                     <sc-for list="{{ cs.fields }}" as="cfd" hint-placeholder-count="4">
                       <label data-m="cofield" style="display: grid; gap: 8px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; grid-column: {{ cfd.span }};">{{ cfd.label }}
-                        <input value="{{ cfd.value }}" sc-camel-on-change="{{ cfd.set }}" placeholder="{{ cfd.ph }}" inputmode="{{ cfd.mode }}" style="border: 1px solid rgba(245,240,230,0.18); background: rgba(245,240,230,0.05); border-radius: 5px; padding: 14px 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; letter-spacing: 0; text-transform: none; color: #F5F0E6; min-height: 50px; transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;" style-focus="border-color: oklch(0.86 0.14 92); outline: none; background: rgba(245,240,230,0.08); box-shadow: 0 0 0 3px oklch(0.86 0.14 92 / 0.14);">
+                        <input value="{{ cfd.value }}" sc-camel-on-change="{{ cfd.set }}" placeholder="{{ cfd.ph }}" inputmode="{{ cfd.mode }}" style="border: 1px solid {{ cfd.inputBorder }}; background: rgba(245,240,230,0.05); border-radius: 5px; padding: 14px 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; letter-spacing: 0; text-transform: none; color: #F5F0E6; min-height: 50px; transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;" style-focus="border-color: oklch(0.86 0.14 92); outline: none; background: rgba(245,240,230,0.08); box-shadow: 0 0 0 3px oklch(0.86 0.14 92 / 0.14);">
+                        <span style="display: {{ cfd.errDisplay }}; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 0; text-transform: none; color: oklch(0.72 0.17 25); line-height: 1.4;">{{ cfd.err }}</span>
                       </label>
                     </sc-for>
                   </div>
@@ -2273,7 +2277,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
                 <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.045em; font-size: 34px; line-height: 1;">{{ cartTotal }}</span>
               </div>
               <button sc-camel-on-click="{{ placeOrder }}" disabled="{{ orderDisabled }}" data-m="tap" style="position: relative; width: 100%; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: {{ orderBtnBg }}; color: {{ orderBtnFg }}; cursor: {{ orderBtnCursor }}; box-shadow: 0 20px 36px -20px rgba(0,0,0,0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: translateY(-2px);">{{ orderBtnLabel }}</button>
-              <div style="position: relative; margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E; line-height: 1.6;">{{ orderHint }}</div>
+              <div style="position: relative; margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: {{ orderHintColor }}; line-height: 1.6;">{{ orderHint }}</div>
             </div>
             </div>
 
@@ -2792,7 +2796,10 @@ class Component extends DCLogic {
     }));
     const co = this.state.co;
     const coKeys = ['email', 'name', 'addr', 'city', 'state', 'zip'];
-    const coReady = coKeys.every(k => String(co[k] || '').trim().length > 0) && M.items.length > 0;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(co.email || '').trim());
+    const zipOk = /^\d{5}(-\d{4})?$/.test(String(co.zip || '').trim());
+    const allFilled = coKeys.every(k => String(co[k] || '').trim().length > 0);
+    const coReady = allFilled && emailOk && zipOk && M.items.length > 0;
     const joinReady = /.+@.+\..+/.test(String(this.state.joinEmail || '').trim());
     const pages = [
       { key: 'shop', label: 'Shop' },
@@ -3149,31 +3156,46 @@ class Component extends DCLogic {
       orderNote: 'We compound to order, so your chews are blended fresh and leave Scottsdale in the morning. A confirmation and the lot number for your batch are on the way by email.',
       checkoutSections: [
         { n: '01', title: 'Contact', fields: [
-          { label: 'Email', ph: '', value: co.email, set: this.setCo('email'), mode: 'email', span: 'span 2' },
-          { label: 'Full name', ph: '', value: co.name, set: this.setCo('name'), mode: 'text', span: 'span 2' }
+          { key: 'email', label: 'Email', value: co.email, set: this.setCo('email'), mode: 'email', span: 'span 2' },
+          { key: 'name', label: 'Full name', value: co.name, set: this.setCo('name'), mode: 'text', span: 'span 2' }
         ] },
         { n: '02', title: 'Shipping', fields: [
-          { label: 'Street address', ph: '', value: co.addr, set: this.setCo('addr'), mode: 'text', span: 'span 2' },
-          { label: 'City', ph: '', value: co.city, set: this.setCo('city'), mode: 'text', span: 'span 1' },
-          { label: 'State', ph: '', value: co.state, set: this.setCo('state'), mode: 'text', span: 'span 1' },
-          { label: 'ZIP', ph: '', value: co.zip, set: this.setCo('zip'), mode: 'numeric', span: 'span 2' }
+          { key: 'addr', label: 'Street address', value: co.addr, set: this.setCo('addr'), mode: 'text', span: 'span 2' },
+          { key: 'city', label: 'City', value: co.city, set: this.setCo('city'), mode: 'text', span: 'span 1' },
+          { key: 'state', label: 'State', value: co.state, set: this.setCo('state'), mode: 'text', span: 'span 1' },
+          { key: 'zip', label: 'ZIP', value: co.zip, set: this.setCo('zip'), mode: 'numeric', span: 'span 2' }
         ] }
       ].map((sec, i, arr) => {
-        const done = sec.fields.length > 0 && sec.fields.every(f => String(f.value || '').trim().length > 0);
         const same = !!this.state.billSame;
         const first = i === 0, last = i === arr.length - 1;
-        return { ...sec,
+        // Per-field validation. A field only flags an error once the shopper
+        // has typed something invalid (empty required fields read as "Required"
+        // on the section, not as an inline error), so nothing shouts on arrival.
+        const fields = sec.fields.map(f => {
+          const v = String(f.value || '').trim();
+          const empty = v.length === 0;
+          let bad = false, err = '';
+          if (f.key === 'email') { bad = !empty && !emailOk; if (bad) err = 'Enter a valid email — e.g. name@email.com'; }
+          else if (f.key === 'zip') { bad = !empty && !zipOk; if (bad) err = 'Enter a 5-digit ZIP code'; }
+          return { ...f, ph: '', invalid: bad, err: err,
+            errDisplay: bad ? 'block' : 'none',
+            inputBorder: bad ? 'oklch(0.62 0.19 25)' : 'rgba(245,240,230,0.18)' };
+        });
+        const anyEmpty = fields.some(f => String(f.value || '').trim().length === 0);
+        const anyInvalid = fields.some(f => f.invalid);
+        const done = fields.length > 0 && !anyEmpty && !anyInvalid;
+        return { ...sec, fields: fields,
           bg: 'transparent',
           padTop: '26px',
           borderTop: '0',
           radius: '0',
           glow: first ? 1 : 0,
           shadow: last ? '0 40px 70px -44px rgba(0,0,0,0.85)' : 'none',
-          state: sec.toggle ? (same ? 'Same as shipping' : (done ? 'Complete' : 'Required')) : (done ? 'Complete' : 'Required'),
-          stateColor: sec.toggle ? (same || done ? 'oklch(0.86 0.14 92)' : '#8A7F6E') : (done ? 'oklch(0.86 0.14 92)' : '#8A7F6E'),
+          state: done ? 'Complete' : (anyInvalid ? 'Check details' : 'Required'),
+          stateColor: done ? 'oklch(0.86 0.14 92)' : (anyInvalid ? 'oklch(0.7 0.18 25)' : '#8A7F6E'),
           hasToggle: !!sec.toggle,
-          hasFields: sec.fields.length > 0,
-          fieldsDisplay: sec.fields.length > 0 ? 'grid' : 'none',
+          hasFields: fields.length > 0,
+          fieldsDisplay: fields.length > 0 ? 'grid' : 'none',
           fieldsGap: sec.toggle ? '16px' : '0px',
           toggleLabel: 'Billing address is the same as shipping',
           toggleDot: same ? 'oklch(0.86 0.14 92)' : 'transparent',
@@ -3187,7 +3209,12 @@ class Component extends DCLogic {
       orderBtnBg: coReady ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.14)',
       orderBtnFg: coReady ? '#17140F' : '#8A7F6E',
       orderBtnCursor: coReady ? 'pointer' : 'not-allowed',
-      orderHint: coReady ? 'Payment happens next on our secure checkout.' : 'Fill in contact and shipping to continue.',
+      orderHint: coReady ? 'Payment happens next on our secure checkout.'
+        : (!allFilled ? 'Fill in every contact and shipping field to continue.'
+          : (!emailOk ? 'That email doesn’t look right — check it to continue.'
+            : (!zipOk ? 'Enter a valid 5-digit ZIP code to continue.'
+              : 'Check the highlighted fields to continue.'))),
+      orderHintColor: coReady ? '#8A7F6E' : (allFilled ? 'oklch(0.72 0.17 25)' : '#8A7F6E'),
       acctOn: this.state.acctOptIn !== false,
       acctState: this.state.acctOptIn !== false ? 'Creating my account' : 'No account, thanks',
       acctStateColor: this.state.acctOptIn !== false ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
