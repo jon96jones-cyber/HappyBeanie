@@ -2000,15 +2000,6 @@ window.hbShopifyCheckout = async function (rows, buyer) {
             </div>
           </div>
         </sc-if>
-        <sc-if value="{{ qzShowOrder }}" hint-placeholder-val="{{ false }}">
-          <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 28px; align-items: center; background: #17140F; color: #F5F0E6; border-radius: 4px; padding: 40px 44px; margin-bottom: 14px;">
-            <div>
-              <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1.2; margin-bottom: 8px;">{{ qzOrderHead }}</div>
-              <div style="display: {{ qzOrderSubDisplay }}; font-size: 15px; line-height: 1.6; color: #B9AF9C; max-width: 34em;">{{ qzOrderSub }}</div>
-            </div>
-            <span sc-camel-on-click="{{ qzGoBuy }}" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; padding: 17px 32px; background: oklch(0.86 0.14 92); color: #17140F; border-radius: 2px; white-space: nowrap; cursor: pointer;" style-hover="background: #F5F0E6;">Continue to the formula</span>
-          </div>
-        </sc-if>
         <sc-if value="{{ qzCanBuy }}" hint-placeholder-val="{{ false }}">
           <div style="margin: 40px 0 40px;">
             <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
