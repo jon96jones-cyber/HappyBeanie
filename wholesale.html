@@ -50,6 +50,11 @@ header.site .bar { max-width:1180px; margin:0 auto; padding:20px 24px; display:f
 .back { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:#C9BEA8; }
 .hdr-cta { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; padding:11px 18px; border-radius:2px; background:#F0C64B; color:#17140F; transition:background 0.2s ease, transform 0.2s ease; }
 .hdr-cta:hover { background:#f4d268; border-bottom:none; transform:translateY(-1px); }
+.site-nav { display:flex; flex:1 1 auto; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:9px clamp(12px,1.7vw,20px); font-family:'DM Sans',sans-serif; font-size:14px; min-width:0; }
+.site-nav a { color:#F5F0E6; white-space:nowrap; padding-bottom:3px; border-bottom:1px solid transparent; }
+.site-nav a:hover { color:oklch(0.86 0.14 92); border-bottom:none; }
+.site-nav a.current { border-bottom-color:oklch(0.86 0.14 92); color:oklch(0.86 0.14 92); }
+@media (max-width:900px){ .site-nav{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; justify-content:flex-start; gap:9px 15px; font-size:13px; scrollbar-width:none; } .site-nav::-webkit-scrollbar{ display:none; } .site-nav a.hdr-cta{ display:none; } }
 @media (max-width:640px){ .hdr-cta { display:none; } }
 
 /* ---------- hero ---------- */
@@ -228,10 +233,17 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 <header class="site">
   <div class="bar">
     <a class="mark" href="/"><b>happy bean<span class="bean"><span>i</span></span>e</b><span>hormone care</span></a>
-    <div class="hdr-actions">
-      <a class="back" href="/">&larr; Back to site</a>
+    <nav class="site-nav">
+      <a href="/shop">Shop</a>
+      <a href="/product">Products</a>
+      <a href="/certs">Certificates</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/wholesale" class="current">Wholesale</a>
+      <a href="/account">Account</a>
+      <a href="/quiz">Eligibility</a>
       <a class="hdr-cta" href="#apply">Apply now</a>
-    </div>
+    </nav>
   </div>
 </header>
 
