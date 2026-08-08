@@ -90,6 +90,16 @@ window.hbShopifyCheckout = async function (rows, buyer) {
 
 <script src="/assets/js/e936a6cc.js"></script>
 
+<style>
+/* First-load polish: image data lives in a base64 sidecar that streams in
+   after the layout renders. Until a slot is filled it draws the design-tool
+   empty state (dashed frame, icon, and the internal caption label) in its
+   shadow DOM using currentColor. Zero out the slot's color while unfilled so
+   that scaffolding stays invisible — the box just reads as an empty image
+   area — then the real color returns the moment the image lands. */
+image-slot:not([data-filled]) { color: transparent !important; }
+</style>
+
 </head>
 <body>
 <x-dc>
