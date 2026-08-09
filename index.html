@@ -2688,15 +2688,16 @@ class Component extends DCLogic {
     };
     window.addEventListener('scroll', this.onScroll, { passive: true });
     requestAnimationFrame(() => this.startField());
-    if (!this.reduced) {
-      this.io = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-          if (!e.isIntersecting) return;
-          this.show(e.target);
-          this.io.unobserve(e.target);
-        });
-      }, { rootMargin: '0px 0px -10% 0px', threshold: 0.06 });
-    }
+    // Always create the observer. Under reduced-motion we still reveal, but as
+    // an opacity-only fade (no transform) — a fade isn't vestibular motion, so
+    // it stays accessibility-safe while still giving mobile users a visible cue.
+    this.io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        this.show(e.target);
+        this.io.unobserve(e.target);
+      });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.06 });
     this.scan();
     this.onScroll();
   }
@@ -2709,9 +2710,12 @@ class Component extends DCLogic {
   }
 
   prep(el, travel, delay) {
+    var t = this.reduced ? 0 : travel;
     el.style.opacity = '0';
-    el.style.transform = 'translateY(' + travel + 'px)';
-    el.style.transition = 'opacity 900ms cubic-bezier(0.22,0.61,0.36,1), transform 1000ms cubic-bezier(0.22,0.61,0.36,1)';
+    el.style.transform = t ? ('translateY(' + t + 'px)') : 'none';
+    el.style.transition = this.reduced
+      ? 'opacity 800ms ease'
+      : 'opacity 900ms cubic-bezier(0.22,0.61,0.36,1), transform 1000ms cubic-bezier(0.22,0.61,0.36,1)';
     el.style.transitionDelay = (delay || 0) + 'ms';
     el.style.willChange = 'opacity, transform';
     el.setAttribute('data-rv-prepped', '1');
@@ -2721,20 +2725,24 @@ class Component extends DCLogic {
   scan() {
     (this.rvNodes || []).forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
     document.querySelectorAll('[data-rv-done]').forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
-    if (this.reduced || !this.io) {
+    if (!this.io) {
       document.querySelectorAll('[data-rv]').forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
       return;
     }
+    var mobile = window.innerWidth <= 620;
     document.querySelectorAll('[data-rv]:not([data-rv-done]):not([data-rv-observed])').forEach(el => {
       el.setAttribute('data-rv-observed', '1');
       const d = parseInt(el.getAttribute('data-rv-delay') || '0', 10);
+      // Reduced-motion: strip the movement but keep an opacity fade.
+      if (this.reduced) { el.style.transform = 'none'; el.style.transition = 'opacity 800ms ease'; }
       el.style.transitionDelay = d + 'ms';
       this.io.observe(el);
     });
     document.querySelectorAll('section').forEach(sec => {
       const wrap = sec.querySelector(':scope > div:not([aria-hidden]):not([data-rv]):not([data-rv-prepped])');
       if (!wrap || wrap.querySelector('[data-rv]')) return;
-      this.prep(wrap, 16, 0);
+      // A touch more travel on phones so the reveal actually registers.
+      this.prep(wrap, mobile ? 26 : 16, 0);
     });
     clearTimeout(this.rvFallback);
     this.rvFallback = setTimeout(() => {
