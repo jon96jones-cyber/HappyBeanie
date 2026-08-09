@@ -122,9 +122,16 @@ documents for headless storefronts — is:
 > Only the **subdomain** points to Shopify. The apex `happybeanie.com` stays with Vercel, so the
 > storefront is unaffected. Shopify auto-provisions the SSL certificate for the subdomain.
 
-After this goes live, update the site's **Checkout** link/button (and any hardcoded
-`pxv2u2-kc.myshopify.com/cart` or checkout URLs) to use `checkout.happybeanie.com` so the honest
-domain shows from the first click. Search the repo for the current checkout URL before flipping it.
+**Status: done ✅** — `checkout.happybeanie.com` is connected and set as the Shopify primary domain
+(SSL active).
+
+No site code change is needed for this. The checkout button doesn't hold a hardcoded URL: the site
+calls the Storefront API's `cartCreate` and redirects to the `checkoutUrl` Shopify returns
+(`window.hbShopifyCheckout` in `index.html`), and Shopify builds that URL on the **primary domain**.
+Because the primary domain is now the subdomain, new carts already send buyers to
+`checkout.happybeanie.com` automatically. (The `pxv2u2-kc.myshopify.com` value in `index.html` is the
+Storefront **API endpoint** — leave it; changing it breaks the API call.) The Shop Pay flow is the
+one exception and always stays on `shop.app`.
 
 ---
 
@@ -155,9 +162,9 @@ To make the Shop Pay header itself carry our brand: **Settings → General → B
 - [ ] Colours entered: bg `#F5F0E6`, accent `#325E3F`, button `#25452F`, button text `#FCFAF4`, text `#17140F`
 - [ ] Fonts set to DM Sans (heading + body)
 - [ ] Saved + previewed a real checkout, compared to the site
-- [ ] `checkout` CNAME → `shops.myshopify.com` added at DNS
-- [ ] `checkout.happybeanie.com` connected in Shopify, set Target = Online Store, **Primary**
-- [ ] Site's checkout link updated to `checkout.happybeanie.com`
+- [x] `checkout` CNAME → `shops.myshopify.com` added at DNS
+- [x] `checkout.happybeanie.com` connected in Shopify, set Target = Online Store, **Primary**
+- [x] Site checkout link — automatic (dynamic `checkoutUrl` follows the primary domain; no code change)
 - [ ] Shop Pay enabled; Apple Pay + Google Pay checked; express buttons on
 - [ ] Brand assets (logo + colours) set in Settings → General for the Shop Pay header
 
