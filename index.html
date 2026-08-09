@@ -396,6 +396,13 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="fmh3"] { font-size: 19px !important; }
     [data-m~="fmp"] { font-size: 13.5px !important; line-height: 1.55 !important; margin-bottom: 12px !important; }
     [data-m~="fmchip"] { font-size: 9px !important; padding: 5px 8px !important; }
+    /* Formula layers, mobile: put number inline with the title, shrink card
+       padding, and trim the expanded photo — cuts the section's height by ~a
+       third without touching desktop. */
+    [data-m~="fmhead"] { grid-template-columns: auto minmax(0, 1fr) !important; gap: 11px !important; padding: 15px 18px !important; align-items: baseline !important; }
+    [data-m~="fmhead"] > :first-child { transform: translateY(1px) !important; }
+    [data-m~="fmbody"] { padding: 0 18px 18px !important; gap: 14px !important; }
+    [data-m~="fmimg"] { height: 140px !important; }
     [data-m~="tpvhead"] { font-size: 17px !important; line-height: 1.3 !important; margin-bottom: 12px !important; }
     [data-m~="tpvsub"] { font-size: 13px !important; line-height: 1.55 !important; margin-bottom: 14px !important; }
     [data-m~="rtgrid"] { gap: 28px !important; }
@@ -746,7 +753,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
       <div style="display: grid; gap: 10px;">
         <sc-for list="{{ layers }}" as="l" hint-placeholder-count="3">
           <div sc-camel-on-mouse-enter="{{ l.open }}" sc-camel-on-click="{{ l.open }}" style="position: relative; border: 1px solid {{ l.border }}; border-radius: 4px; background: {{ l.bg }}; box-shadow: {{ l.shadow }}; transform: {{ l.lift }}; transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.2,0.7,0.2,1); cursor: pointer; overflow: hidden;">
-            <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: 92px 1fr; gap: 28px; padding: 24px 30px; align-items: center;" "="">
+            <div data-m="stack gap fmhead" style="position: relative; display: grid; grid-template-columns: 92px 1fr; gap: 28px; padding: 24px 30px; align-items: center;" "="">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <span style="width: 26px; height: 1px; background: {{ l.rule }}; transition: background 0.3s ease;"></span>
                 <span style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.1em; color: {{ l.numColor }}; transition: color 0.3s ease;">{{ l.n }}</span>
@@ -756,7 +763,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
               </div>
             </div>
             <div style="max-height: {{ l.maxHeight }}; opacity: {{ l.bodyOpacity }}; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.2,0.7,0.2,1), opacity 0.35s ease;">
-              <div data-m="stack gap" style="display: grid; grid-template-columns: 92px 1.15fr 0.85fr; gap: 28px; padding: 2px 30px 28px; align-items: start;">
+              <div data-m="stack gap fmbody" style="display: grid; grid-template-columns: 92px 1.15fr 0.85fr; gap: 28px; padding: 2px 30px 28px; align-items: start;">
                 <div data-m="hide"></div>
                 <div>
                   <p data-m="fmp" style="font-size: 15px; line-height: 1.65; color: #C6BCA8; margin: 0 0 16px; text-wrap: pretty;">{{ l.body }}</p>
@@ -766,7 +773,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
                     </sc-for>
                   </div>
                 </div>
-                <div style="height: 158px; border-radius: 3px; overflow: hidden; box-shadow: 0 18px 40px rgba(0,0,0,0.45);">
+                <div data-m="fmimg" style="height: 158px; border-radius: 3px; overflow: hidden; box-shadow: 0 18px 40px rgba(0,0,0,0.45);">
                   <image-slot id="{{ l.slot }}" placeholder="{{ l.ph }}" style="width: 100%; height: 100%;"></image-slot>
                 </div>
               </div>
