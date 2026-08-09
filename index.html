@@ -603,7 +603,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
       <sc-for list="{{ navLinks }}" as="nl" hint-placeholder-count="4">
         <a sc-camel-on-click="{{ nl.go }}" style="color: {{ nl.color }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ nl.rule }};" style-hover="color: oklch(0.5 0.07 152);">{{ nl.label }}</a>
       </sc-for>
-      <a href="wholesale.html" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">Wholesale</a>
       <a href="account.html" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">Account</a>
       <a sc-camel-on-click="{{ goQuiz }}" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">Eligibility</a>
       <sc-if value="{{ cartAdded }}" hint-placeholder-val="{{ false }}">
@@ -683,7 +682,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <sc-for list="{{ mobileLinks }}" as="ml" hint-placeholder-count="4">
           <a sc-camel-on-click="{{ ml.go }}" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">{{ ml.label }}</a>
         </sc-for>
-        <a href="wholesale.html" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">Wholesale</a>
         <a href="account.html" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">Account</a>
         <sc-if value="{{ cartAdded }}" hint-placeholder-val="{{ false }}">
           <a sc-camel-on-click="{{ goCart }}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F;">Your cart<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152);">{{ cartCount }}</span></a>
@@ -3551,7 +3549,8 @@ class Component extends DCLogic {
           { label: 'About Happy Beanie', go: this.nav('about') },
           { label: 'Certificate library', go: this.nav('certs') },
           { label: 'Contact us', go: this.nav('contact') },
-          { label: 'For veterinarians', go: this.nav('contact') }
+          { label: 'For veterinarians', go: this.nav('contact') },
+          { label: 'Wholesale', go: () => { window.location.href = 'wholesale.html'; } }
         ] }
       ]
     };
