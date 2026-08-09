@@ -46,7 +46,21 @@ header.site .bar { max-width:1140px; margin:0 auto; padding:20px 24px; display:f
 .site-nav a.current { border-bottom-color:oklch(0.86 0.14 92); color:oklch(0.86 0.14 92); }
 .site-nav a.hdr-cta { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; padding:12px 18px; border-radius:2px; background:oklch(0.86 0.14 92); color:#17140F; border-bottom:none; }
 .site-nav a.hdr-cta:hover { background:#F5F0E6; color:#17140F; }
-@media (max-width:900px){ .site-nav{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; justify-content:flex-start; gap:9px 16px; font-size:13px; scrollbar-width:none; } .site-nav::-webkit-scrollbar{ display:none; } .site-nav a.hdr-cta{ display:none; } }
+.nav-toggle { display:none; }
+.nav-burger { display:none; }
+@media (max-width:900px){
+  header.site .bar { position:relative; flex-wrap:nowrap; }
+  .nav-burger { display:inline-flex; flex-direction:column; justify-content:center; align-items:center; gap:5px; width:44px; height:44px; margin:-10px -8px -10px 0; cursor:pointer; flex:0 0 auto; }
+  .nav-burger span { display:block; width:22px; height:2px; border-radius:2px; background:#F5F0E6; transition:transform .3s ease, opacity .2s ease; }
+  .nav-toggle:checked ~ .nav-burger span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+  .nav-toggle:checked ~ .nav-burger span:nth-child(2){ opacity:0; }
+  .nav-toggle:checked ~ .nav-burger span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+  .site-nav { position:absolute; top:100%; left:0; right:0; flex-direction:column; align-items:stretch; justify-content:flex-start; flex-wrap:nowrap; gap:0; font-size:16px; background:#17140F; border-bottom:1px solid rgba(245,240,230,0.12); padding:0 24px; overflow:hidden; max-height:0; transition:max-height .35s cubic-bezier(0.2,0.7,0.2,1); }
+  .nav-toggle:checked ~ .site-nav { max-height:calc(100vh - 70px); padding:4px 24px 16px; }
+  .site-nav a { width:100%; padding:14px 2px; border-bottom:1px solid rgba(245,240,230,0.08); white-space:normal; }
+  .site-nav a.current { border-bottom:1px solid rgba(245,240,230,0.08); color:oklch(0.86 0.14 92); }
+  .site-nav a.hdr-cta{ display:block; margin-top:14px; text-align:center; border-bottom:none; }
+}
 
 main { flex:1 1 auto; padding:56px 0 100px; }
 h1 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(32px,4.2vw,50px); line-height:1.03; }
@@ -463,7 +477,9 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
 
 <header class="site">
   <div class="bar">
-    <a class="mark" href="/"><b>happy bean<span class="bean"><span>i</span></span>e</b><small>hormone care</small></a>
+    <a class="mark" href="/"><b>happy bean<span style="position: relative;"><span style="position: absolute; left: 50%; top: 0.19em; width: 0.42em; height: 0.26em; margin-left: -0.21em; border-radius: 46% 54% 50% 50% / 58% 42% 58% 42%; background: oklch(0.88 0.15 96); transform: rotate(-7deg);"></span><span style="position: relative; z-index: 1;">i</span></span>e</b><small>hormone care</small></a>
+    <input type="checkbox" id="navtoggle" class="nav-toggle" aria-label="Toggle navigation menu">
+    <label for="navtoggle" class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></label>
     <nav class="site-nav">
       <a href="/shop">Shop</a>
       <a href="/product">Products</a>
