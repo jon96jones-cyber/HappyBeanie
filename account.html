@@ -280,7 +280,8 @@ body { background:#12100C; color:#E9E2D4; }
 body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
   background:radial-gradient(120% 80% at 50% -10%, oklch(0.86 0.14 92 / 0.07), transparent 60%),
              radial-gradient(90% 60% at 110% 110%, oklch(0.44 0.07 152 / 0.10), transparent 60%); }
-main, header.site, footer.site { position:relative; z-index:1; }
+main, footer.site { position:relative; z-index:1; }
+header.site { position:relative; z-index:60; }
 
 a { color:#E9E2D4; border-bottom-color:rgba(233,226,212,0.28); }
 a:hover { color:oklch(0.86 0.14 92); border-color:oklch(0.86 0.14 92); }
