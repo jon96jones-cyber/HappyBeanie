@@ -16,6 +16,9 @@ files** — they aren't served by the site; you paste each into the Shopify admi
 | `paused.html` | Subscription paused | muted | `[[TOKENS]]` |
 | `resumed.html` | Subscription resumed | green | `[[TOKENS]]` |
 | `cancelled.html` | Subscription cancelled | muted | `[[TOKENS]]` |
+| `shipping-confirmation.html` | **Shipping confirmation** (every shipment) | green | real Liquid |
+| `order-canceled.html` | **Order canceled** | muted | real Liquid |
+| `refund-notification.html` | **Refund notification** | muted | real Liquid + `[[REFUND_AMOUNT]]` |
 
 > Not every store has every subscription notification. If a template has no matching
 > notification in your admin, just skip that file.
@@ -55,6 +58,13 @@ delete its whole detail `<div>` box; the layout collapses cleanly.
 | `[[SHIPPING_ADDRESS]]` | one-line shipping address | new-sub |
 | `[[CARD_BRAND]]` / `[[CARD_LAST4]]` | card brand + last 4 | payment-failed, card-expiring |
 | `[[CARD_EXPIRY]]` | card expiry (MM/YY) | card-expiring |
+| `[[REFUND_AMOUNT]]` | `{{ amount \| money }}` (refund notification) | refund |
+
+**Shipping confirmation** uses `fulfillment.fulfillment_line_items` (each with `.line_item`
+and `.quantity`), `fulfillment.tracking_company` / `tracking_number` / `tracking_url`, and
+`order_status_url` as the track-button fallback. On Send test, confirm the item list +
+tracking block render; if your Shopify version names the fulfillment line items differently,
+tell me and I'll adjust.
 
 ## Notes
 
