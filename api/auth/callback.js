@@ -6,15 +6,22 @@ const auth = require('../_lib/customer-auth.js');
 
 module.exports = async function handler(req, res) {
   const q = req.query || {};
+  const stash = auth.readOauthCookie(req);
+  // A silent SSO attempt (prompt=none) with no active Shopify session comes back
+  // as login_required / interaction_required — that's the expected "nobody's
+  // logged in" answer, not a failure. Send those quietly to the normal sign-in
+  // screen with no error banner.
+  const benign = ['login_required', 'interaction_required', 'consent_required', 'account_selection_required'];
+  const silent = !!(stash && stash.silent) || benign.indexOf(String(q.error)) !== -1;
 
   if (q.error) {
-    res.setHeader('Location', '/account?error=' + encodeURIComponent(String(q.error)));
+    res.setHeader('Set-Cookie', auth.cookieString('hb_oauth', '', 0));
+    res.setHeader('Location', silent ? '/account?sso=none' : '/account?error=' + encodeURIComponent(String(q.error)));
     return res.status(302).end();
   }
 
-  const stash = auth.readOauthCookie(req);
   if (!stash || !q.state || stash.state !== q.state || !q.code) {
-    res.setHeader('Location', '/account?error=state_mismatch');
+    res.setHeader('Location', silent ? '/account?sso=none' : '/account?error=state_mismatch');
     return res.status(302).end();
   }
 
@@ -29,7 +36,7 @@ module.exports = async function handler(req, res) {
     return res.status(302).end();
   } catch (err) {
     console.error('[auth/callback]', err && err.message);
-    res.setHeader('Location', '/account?error=exchange_failed');
+    res.setHeader('Location', silent ? '/account?sso=none' : '/account?error=exchange_failed');
     return res.status(302).end();
   }
 };

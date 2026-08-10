@@ -613,6 +613,23 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
 
   var params = new URLSearchParams(location.search);
 
+  // One silent SSO attempt per browser session. If the shopper already has a
+  // Shopify session (e.g. they just finished checkout), this logs them straight
+  // back in with no code — so the account "just opens". If there's no session,
+  // Shopify answers login_required and the callback returns us to ?sso=none,
+  // where we simply show the normal sign-in. Guarded so it never loops.
+  function trySilentSSO() {
+    try {
+      if (typeof DEMO !== 'undefined' && DEMO) return false;
+      if (params.get('sso') === 'none' || params.get('error')) return false;
+      if (sessionStorage.getItem('hb_sso') === '1') return false;
+      sessionStorage.setItem('hb_sso', '1');
+      show('loading');
+      location.replace('/api/auth/login?silent=1');
+      return true;
+    } catch (e) { return false; }
+  }
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -1384,7 +1401,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   setInterval(resync, 60000);
 
   fetch('/api/account/data', { credentials: 'same-origin' }).then(function (res) {
-    if (res.status === 401) { show('out'); return null; }
+    if (res.status === 401) { if (trySilentSSO()) return null; show('out'); return null; }
     if (res.status === 503) {
       show('out');
       $('errBar').textContent = ERRORS.not_configured;
