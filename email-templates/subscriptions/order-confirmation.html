@@ -1,0 +1,96 @@
+<!--
+  Happy Beanie · ORDER CONFIRMATION
+  Paste into: Settings → Notifications → Order confirmation → Edit code.
+  Uses standard Shopify order Liquid — near drop-in. It shows the subscription
+  plan per line and a "renews" note automatically when the order is a subscription.
+  If your Liquid preview flags a variable, check the README notes.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Your Happy Beanie order</title>
+</head>
+<body style="margin:0; padding:0; background:#e7decb;">
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#e7decb; font-size:1px; line-height:1px;">
+    Order {{ order_name }} confirmed — compounding fresh in Scottsdale.
+  </div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e7decb;">
+    <tr><td align="center" style="padding:28px 12px;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background:#fcfaf4; border:1px solid #e0d6c2; border-radius:10px; overflow:hidden;">
+
+        <!-- header -->
+        <tr><td style="background:#17140f; padding:22px 30px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td align="left" style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:20px; font-weight:700; letter-spacing:-0.5px; color:#f5f0e6;">happy&nbsp;beanie</td>
+            <td align="right" style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Hormone&nbsp;care</td>
+          </tr></table>
+        </td></tr>
+        <tr><td style="height:3px; background:#f2ce59; font-size:0; line-height:0;">&nbsp;</td></tr>
+
+        <!-- body -->
+        <tr><td style="padding:38px 34px 6px;">
+          <p style="margin:0 0 14px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#325e3f;">● &nbsp;Order · confirmed &nbsp;·&nbsp; {{ order_name }}</p>
+          <h1 style="margin:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:27px; line-height:1.1; letter-spacing:-1px; font-weight:700; color:#17140f;">Thank you, {{ customer.first_name | default: "friend" }}.</h1>
+          <p style="margin:0 0 26px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15.5px; line-height:1.62; color:#554c40;">We’re compounding your order fresh in Scottsdale. You’ll get a note the moment it ships.</p>
+
+          <!-- order card -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#17140f; border-radius:10px;">
+            <tr><td style="padding:24px 24px 22px;">
+              <p style="margin:0 0 16px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:#7eb38c;">Order summary</p>
+
+              {% for line in subtotal_line_items %}
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid rgba(245,240,230,0.12);"><tr>
+                <td valign="top" style="padding:0 0 14px;">
+                  <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15px; font-weight:600; color:#f5f0e6;">{{ line.title }} <span style="color:#8a7f6e; font-weight:400;">× {{ line.quantity }}</span></div>
+                  {% if line.variant.title and line.variant.title != "Default Title" %}<div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:12.5px; color:#b9af9c; padding-top:3px;">{{ line.variant.title }}</div>{% endif %}
+                  {% if line.selling_plan_allocation %}<div style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:#f2ce59; padding-top:5px;">{{ line.selling_plan_allocation.selling_plan.name }}</div>{% endif %}
+                </td>
+                <td valign="top" align="right" style="padding:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15px; font-weight:600; color:#f5f0e6; white-space:nowrap;">{{ line.final_line_price | money }}</td>
+              </tr></table>
+              {% endfor %}
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px; font-family:'DM Sans',Helvetica,Arial,sans-serif;">
+                <tr><td style="padding:5px 0; font-size:13px; color:#b9af9c;">Subtotal</td><td align="right" style="padding:5px 0; font-size:13px; color:#ded5c4;">{{ subtotal_price | money }}</td></tr>
+                <tr><td style="padding:5px 0; font-size:13px; color:#b9af9c;">Shipping</td><td align="right" style="padding:5px 0; font-size:13px; color:#ded5c4;">{% if shipping_price == 0 %}Free{% else %}{{ shipping_price | money }}{% endif %}</td></tr>
+                <tr><td style="padding:12px 0 0; border-top:1px solid rgba(245,240,230,0.12); font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Total</td><td align="right" style="padding:12px 0 0; border-top:1px solid rgba(245,240,230,0.12); font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:20px; font-weight:600; color:#f5f0e6;">{{ total_price | money }}</td></tr>
+              </table>
+
+              {% assign is_sub = false %}{% for line in line_items %}{% if line.selling_plan_allocation %}{% assign is_sub = true %}{% endif %}{% endfor %}
+              {% if is_sub %}
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;"><tr><td style="padding:12px 14px; background:rgba(242,206,89,0.06); border:1px solid rgba(242,206,89,0.28); border-radius:6px;">
+                <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:12.5px; line-height:1.55; color:#ded5c4;">↻ &nbsp;This order includes a subscription. It renews automatically until you skip, pause, or cancel — anytime from your account, no fees.</div>
+              </td></tr></table>
+              {% endif %}
+            </td></tr>
+          </table>
+
+          <!-- CTA -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 8px;"><tr>
+            <td align="center" bgcolor="#f2ce59" style="border-radius:999px;">
+              <a href="https://www.happybeanie.com/account" style="display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#17140f; text-decoration:none;">View your order →</a>
+            </td>
+          </tr></table>
+          <p style="margin:0 0 30px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#8a7f6e; text-align:center;">
+            Shipping to {{ shipping_address.name }} · {{ shipping_address.city }}, {{ shipping_address.province_code }}
+          </p>
+        </td></tr>
+
+        <!-- footer -->
+        <tr><td style="background:#f5f0e6; border-top:1px solid #e0d6c2; padding:26px 34px 30px;" align="center">
+          <p style="margin:0 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Compounded fresh · Scottsdale, AZ</p>
+          <p style="margin:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:12.5px; color:#554c40;">
+            <a href="https://www.happybeanie.com/account" style="color:#325e3f; text-decoration:none;">Your account</a> &nbsp;·&nbsp;
+            <a href="https://www.happybeanie.com/policies/shipping.html" style="color:#325e3f; text-decoration:none;">Shipping</a> &nbsp;·&nbsp;
+            <a href="https://www.happybeanie.com/policies/refunds.html" style="color:#325e3f; text-decoration:none;">Refunds</a>
+          </p>
+          <p style="margin:0; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:11px; line-height:1.6; color:#8a7f6e;">Questions? A human reads every note — <a href="mailto:hello@happybeanie.com" style="color:#325e3f; text-decoration:none;">hello@happybeanie.com</a><br>© 2026 Happy Beanie</p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
