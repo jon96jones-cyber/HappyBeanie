@@ -83,6 +83,9 @@ window.hbShopifyCheckout = async function (rows, buyer) {
   const errs = (json.errors || []).concat((json.data && json.data.cartCreate && json.data.cartCreate.userErrors) || []);
   const url = json.data && json.data.cartCreate && json.data.cartCreate.cart && json.data.cartCreate.cart.checkoutUrl;
   if (!url) throw new Error('Checkout failed: ' + (errs.map(function(e){return e.message}).join('; ') || 'no checkout URL returned'));
+  // Remember the email so the account sign-in can pre-fill it after checkout —
+  // turns a returning guest's sign-in into "tap continue + enter code".
+  try { if (buyer && buyer.email) localStorage.setItem('hb_email', buyer.email); } catch (e) {}
   window.location.href = url;
 };
 </script>

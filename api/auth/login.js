@@ -15,6 +15,9 @@ module.exports = async function handler(req, res) {
   // no code. With no session, Shopify returns login_required and the callback
   // falls back to the normal sign-in screen (never Shopify's login page).
   const silent = String((req.query && req.query.silent) || '') === '1';
+  // Optional email pre-fill carried over from checkout (login_hint is standard
+  // OIDC; Shopify uses it to pre-fill the email on its sign-in screen).
+  const loginHint = String((req.query && req.query.login_hint) || '').slice(0, 320);
 
   const c = auth.config();
   const d = await auth.discover();
@@ -32,6 +35,7 @@ module.exports = async function handler(req, res) {
     code_challenge_method: 'S256'
   });
   if (silent) params.set('prompt', 'none');
+  if (loginHint) params.set('login_hint', loginHint);
 
   res.setHeader('Set-Cookie', auth.oauthCookie({ state: r.state, verifier: r.verifier, ru: redirectUri, silent: silent }));
   res.setHeader('Location', d.authorization_endpoint + '?' + params.toString());
