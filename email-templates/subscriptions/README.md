@@ -19,6 +19,9 @@ files** — they aren't served by the site; you paste each into the Shopify admi
 | `shipping-confirmation.html` | **Shipping confirmation** (every shipment) | green | real Liquid |
 | `order-canceled.html` | **Order canceled** | muted | real Liquid |
 | `refund-notification.html` | **Refund notification** | muted | real Liquid + `[[REFUND_AMOUNT]]` |
+| `shipping-update.html` | **Shipping update** | gold | real Liquid |
+| `out-for-delivery.html` | **Out for delivery** | green | real Liquid |
+| `delivered.html` | **Delivered** | green | real Liquid |
 
 > Not every store has every subscription notification. If a template has no matching
 > notification in your admin, just skip that file.
