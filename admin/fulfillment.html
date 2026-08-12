@@ -138,8 +138,8 @@ main { padding:28px 0 90px; }
         <button class="chip" data-range="30d">30 days</button>
         <input id="search" type="text" autocomplete="off" placeholder="Search order # or customer">
         <select id="sortsel">
+          <option value="new" selected>Newest first</option>
           <option value="old">Oldest first</option>
-          <option value="new">Newest first</option>
         </select>
       </div>
       <div class="orders" id="orders"></div>
@@ -157,7 +157,7 @@ main { padding:28px 0 90px; }
   var CARRIERS = ['USPS', 'UPS', 'FedEx', 'DHL Express', 'DHL eCommerce', 'Other'];
 
   // Filter + pagination state. `all` accumulates pages; a reset load clears it.
-  var state = { range: 'all', q: '', sort: 'old' };
+  var state = { range: 'all', q: '', sort: 'new' };
   var all = [];
   var total = 0;
   var agedCount = 0;
