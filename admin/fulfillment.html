@@ -43,6 +43,20 @@ main { padding:28px 0 90px; }
 .chip { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; padding:9px 13px; border:1px solid #DDD3C0; border-radius:999px; background:transparent; color:#3D372D; cursor:pointer; }
 .chip:hover { border-color:#17140F; }
 .chip.on { background:#17140F; color:#F5F0E6; border-color:#17140F; }
+.chip.late { display:none; border-color:rgba(180,71,44,0.55); color:#B4472C; font-weight:700; }
+.chip.late.show { display:inline-block; }
+.chip.late:hover { border-color:#B4472C; }
+.chip.late.on { background:#B4472C; color:#FCFAF4; border-color:#B4472C; }
+
+.agetag { display:inline-block; font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.1em; text-transform:uppercase; color:#B4472C; background:rgba(224,122,95,0.1); border:1px solid rgba(180,71,44,0.35); border-radius:2px; padding:3px 7px; margin-left:10px; vertical-align:2px; }
+.detect { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.1em; text-transform:uppercase; color:#8A7F6E; }
+.confirmrow { padding:13px 20px; border-top:1px solid #EDE6D8; background:#F7F2E8; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.confirmq { font-family:'DM Mono',monospace; font-size:11.5px; letter-spacing:0.05em; color:#17140F; flex:1 1 auto; }
+.confirmq b { color:#325E3F; }
+.dupwarn { flex-basis:100%; font-size:12.5px; color:#8C4630; }
+.carderr { margin:12px 20px 16px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:10px 12px; font-size:13px; }
+.remember { display:flex; gap:9px; align-items:center; margin-top:13px; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; cursor:pointer; user-select:none; }
+.remember input { width:auto; margin:0; accent-color:#325E3F; cursor:pointer; }
 .filters input { flex:1 1 190px; min-width:150px; font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.04em; padding:9px 14px; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:999px; color:#17140F; }
 .filters input:focus { outline:none; border-color:oklch(0.44 0.07 152); }
 .filters select { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; padding:9px 12px; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:999px; color:#17140F; cursor:pointer; }
@@ -104,6 +118,7 @@ main { padding:28px 0 90px; }
     <div id="gate" class="gate">
       <label class="lab" for="key">Fulfillment key</label>
       <input id="key" type="password" autocomplete="off" placeholder="FULFILLMENT_KEY">
+      <label class="remember"><input type="checkbox" id="rememberKey"> Remember on this device</label>
       <div style="margin-top:14px;"><button class="btn" id="unlock">Open the queue</button></div>
       <div class="fine">The key is the FULFILLMENT_KEY environment variable. It is held in this tab only.</div>
       <div id="gateErr"></div>
@@ -115,6 +130,7 @@ main { padding:28px 0 90px; }
         <button class="btn ghost" id="refresh">Refresh</button>
       </div>
       <div class="filters">
+        <button class="chip late" data-range="aged" id="lateChip">⚠ Late · <span id="lateN">0</span></button>
         <button class="chip on" data-range="all">All open</button>
         <button class="chip" data-range="today">Today</button>
         <button class="chip" data-range="yesterday">Yesterday</button>
@@ -144,9 +160,33 @@ main { padding:28px 0 90px; }
   var state = { range: 'all', q: '', sort: 'old' };
   var all = [];
   var total = 0;
+  var agedCount = 0;
+  var agedCutoff = '';
   var cursor = null;
   var hasMore = false;
   var loading = false;
+
+  // Tracking numbers shipped from this device (survives refresh, not reboot) —
+  // catches the "pasted the previous label's number again" mistake.
+  function usedMap() {
+    try { return JSON.parse(sessionStorage.getItem('hb_used') || '{}'); } catch (e) { return {}; }
+  }
+  function markUsed(num, orderName) {
+    var m = usedMap(); m[num] = orderName;
+    try { sessionStorage.setItem('hb_used', JSON.stringify(m)); } catch (e) {}
+  }
+
+  // Carrier fingerprints — auto-select the dropdown from the number's shape.
+  function cleanTrack(v) { return String(v || '').replace(/\s+/g, '').toUpperCase(); }
+  function detectCarrier(n) {
+    if (/^1Z[0-9A-Z]{16}$/.test(n)) return 'UPS';
+    if (/^9[2-5]\d{19,21}$/.test(n)) return 'USPS';
+    if (/^\d{20,22}$/.test(n)) return 'USPS';
+    if (/^(\d{12}|\d{15})$/.test(n)) return 'FedEx';
+    if (/^\d{10}$/.test(n)) return 'DHL Express';
+    return '';
+  }
+  function validTrack(n) { return /^[A-Z0-9]{8,34}$/.test(n); }
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -179,6 +219,7 @@ main { padding:28px 0 90px; }
     $('gateErr').innerHTML = '';
     api({}, filterParams(null)).then(function (b) {
       if (!b.ok && (b.error === 'bad_key' || b.error === 'not_configured' || b.error === 'unreachable' || b.error === 'bad_response')) {
+        if (b.error === 'bad_key') { try { localStorage.removeItem('hb_fkey'); } catch (e) {} }
         $('gateErr').innerHTML = '<div class="err">' +
           (b.error === 'bad_key' ? 'That key was not accepted.' :
            b.error === 'not_configured' ? 'Set SHOPIFY_ADMIN_TOKEN and FULFILLMENT_KEY on the deployment first.' :
@@ -188,6 +229,10 @@ main { padding:28px 0 90px; }
       }
       // Key was accepted (token errors like read_failed / token_rejected still
       // open the queue so the reason renders in place of the order list).
+      try {
+        if ($('rememberKey').checked) localStorage.setItem('hb_fkey', key);
+        else localStorage.removeItem('hb_fkey');
+      } catch (e) {}
       $('gate').style.display = 'none';
       $('queue').style.display = 'block';
       absorb(b, true);
@@ -196,6 +241,17 @@ main { padding:28px 0 90px; }
   };
   $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('unlock').click(); });
   $('refresh').onclick = function () { load(true); };
+
+  // A remembered key opens the queue on arrival — no typing, no clicks.
+  (function () {
+    var saved = '';
+    try { saved = localStorage.getItem('hb_fkey') || ''; } catch (e) {}
+    if (saved) {
+      $('key').value = saved;
+      $('rememberKey').checked = true;
+      $('unlock').click();
+    }
+  })();
 
   // Filter wiring — every change resets to page one with the new filters.
   Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (chip) {
@@ -237,9 +293,15 @@ main { padding:28px 0 90px; }
     if (b && b.ok) {
       all = reset ? (b.orders || []) : all.concat(b.orders || []);
       total = typeof b.total === 'number' ? b.total : all.length;
+      agedCount = typeof b.agedCount === 'number' ? b.agedCount : 0;
+      agedCutoff = b.agedCutoff || agedCutoff;
       cursor = b.cursor || null;
       hasMore = !!b.hasMore;
     }
+    // The red Late tab appears whenever anything has waited 48h+ (and stays
+    // visible while you're on it, so you can always tap back off it).
+    $('lateN').textContent = agedCount;
+    $('lateChip').classList.toggle('show', agedCount > 0 || state.range === 'aged');
     draw(all, b || {});
   }
 
@@ -277,9 +339,12 @@ main { padding:28px 0 90px; }
         '</div>';
       }).join('');
       var opts = CARRIERS.map(function (c) { return '<option value="' + esc(c === 'Other' ? '' : c) + '">' + esc(c) + '</option>'; }).join('');
-      return '<div class="ord" data-fo="' + esc(o.fulfillmentOrderId) + '" data-i="' + idx + '">' +
+      var aged = agedCutoff && o.placedAt && o.placedAt < agedCutoff;
+      var waitDays = aged ? Math.max(2, Math.floor((Date.now() - new Date(o.placedAt).getTime()) / 86400000)) : 0;
+      return '<div class="ord" data-fo="' + esc(o.fulfillmentOrderId) + '" data-name="' + esc(o.orderName) + '" data-i="' + idx + '">' +
         '<div class="ord-h">' +
-          '<span class="ordname">' + esc(o.orderName) + '</span>' +
+          '<span class="ordname">' + esc(o.orderName) +
+            (aged ? '<span class="agetag">⚠ waiting ' + waitDays + 'd</span>' : '') + '</span>' +
           '<span class="ordmeta"><span class="paid">' + esc(o.financial) + '</span> · ' + esc(o.customer || 'Customer') + ' · placed ' + fmt(o.placedAt) + '</span>' +
         '</div>' +
         '<div class="ord-b">' +
@@ -289,34 +354,87 @@ main { padding:28px 0 90px; }
           '</div>' +
         '</div>' +
         '<div class="fulfill">' +
-          '<input type="text" placeholder="Tracking number" data-track>' +
+          '<input type="text" placeholder="Tracking number — scan or type" data-track>' +
           '<select data-carrier>' + opts + '</select>' +
+          '<span class="detect" data-detect></span>' +
           '<button class="btn" data-ship>Mark shipped →</button>' +
         '</div>' +
+        '<div data-slot></div>' +
       '</div>';
     }).join('');
 
-    Array.prototype.forEach.call($('orders').querySelectorAll('[data-ship]'), function (btn) {
-      btn.onclick = function () {
-        var card = btn.closest('.ord');
-        var num = card.querySelector('[data-track]').value.trim();
-        var carrier = card.querySelector('[data-carrier]').value;
-        if (!num) { card.querySelector('[data-track]').focus(); return; }
-        btn.disabled = true; btn.textContent = 'Shipping…';
+    Array.prototype.forEach.call($('orders').querySelectorAll('.ord'), function (card) {
+      var input = card.querySelector('[data-track]');
+      var select = card.querySelector('[data-carrier]');
+      var detectEl = card.querySelector('[data-detect]');
+      var shipBtn = card.querySelector('[data-ship]');
+      var slot = card.querySelector('[data-slot]');
+
+      // Auto-detect the carrier as the number is typed or scanned in.
+      input.addEventListener('input', function () {
+        var found = detectCarrier(cleanTrack(input.value));
+        if (found) { select.value = found; detectEl.textContent = '✓ ' + found; }
+        else detectEl.textContent = '';
+      });
+      // Barcode scanners end a scan with Enter — jump straight to confirm.
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') beginConfirm(); });
+      shipBtn.onclick = beginConfirm;
+
+      function cardError(msg) {
+        slot.innerHTML = msg ? '<div class="carderr">' + esc(msg) + '</div>' : '';
+      }
+
+      function beginConfirm() {
+        var num = cleanTrack(input.value);
+        if (!validTrack(num)) {
+          cardError(num ? 'That doesn’t look like a tracking number — 8+ letters/digits, no punctuation.' : 'Enter or scan the tracking number first.');
+          input.focus();
+          return;
+        }
+        var carrier = select.value;
+        var name = card.getAttribute('data-name');
+        var priorUse = usedMap()[num];
+        var dup = (priorUse && priorUse !== name) ? priorUse : '';
+        shipBtn.disabled = true;
+        slot.innerHTML = '<div class="confirmrow">' +
+          '<span class="confirmq">Ship <b>' + esc(name) + '</b> via <b>' + esc(carrier || 'no carrier') + '</b> · …' + esc(num.slice(-6)) + ' ?</span>' +
+          (dup ? '<span class="dupwarn">⚠ This tracking number was already used on ' + esc(dup) + ' from this device. Ship anyway?</span>' : '') +
+          '<button class="btn" data-confirm>' + (dup ? 'Yes, ship anyway' : 'Confirm ✓') + '</button>' +
+          '<button class="btn ghost" data-cancel>Cancel</button>' +
+        '</div>';
+        var confirmBtn = slot.querySelector('[data-confirm]');
+        confirmBtn.focus();
+        slot.querySelector('[data-cancel]').onclick = function () {
+          slot.innerHTML = '';
+          shipBtn.disabled = false;
+          input.focus();
+        };
+        confirmBtn.onclick = function () { doShip(num, carrier, name, confirmBtn); };
+      }
+
+      function doShip(num, carrier, name, confirmBtn) {
+        confirmBtn.disabled = true; confirmBtn.textContent = 'Shipping…';
         api({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ fulfillmentOrderId: card.getAttribute('data-fo'), trackingNumber: num, trackingCompany: carrier })
         }).then(function (b) {
-          if (!b.ok) {
-            btn.disabled = false; btn.textContent = 'Mark shipped →';
-            alert(b.message || 'That did not go through.');
+          if (b.ok) {
+            markUsed(num, name);
+            slot.innerHTML = '';
+            card.style.opacity = '0.4';
+            load(true);
             return;
           }
-          card.style.opacity = '0.4';
-          load(true);
+          if (b.error === 'already_shipped') {
+            slot.innerHTML = '<div class="carderr">' + esc(b.message || 'Already shipped — refreshing…') + '</div>';
+            setTimeout(function () { load(true); }, 1400);
+            return;
+          }
+          shipBtn.disabled = false;
+          cardError(b.message || 'That did not go through — nothing was shipped. Try again.');
         });
-      };
+      }
     });
   }
 })();

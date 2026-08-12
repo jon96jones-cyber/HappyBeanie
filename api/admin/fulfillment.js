@@ -29,8 +29,9 @@ async function admin(token, query, variables) {
   return { status: res.status, json: json };
 }
 
-const QUEUE = `query Queue($q: String!, $after: String, $reverse: Boolean!) {
+const QUEUE = `query Queue($q: String!, $aq: String!, $after: String, $reverse: Boolean!) {
   ordersCount(query: $q, limit: 10000) { count precision }
+  aged: ordersCount(query: $aq, limit: 10000) { count precision }
   orders(first: 25, after: $after, query: $q, sortKey: CREATED_AT, reverse: $reverse) {
     pageInfo { hasNextPage endCursor }
     nodes {
@@ -101,6 +102,12 @@ function phoenixDate(daysAgo) {
   return d.toISOString().slice(0, 10);
 }
 
+// An order counts as "aged" once it has been waiting more than 48 hours.
+const AGED_HOURS = 48;
+function agedCutoff() {
+  return new Date(Date.now() - AGED_HOURS * 3600 * 1000).toISOString();
+}
+
 // Builds the Shopify orders search string from the desk's filter params.
 function buildQuery(params) {
   const parts = ['fulfillment_status:unfulfilled', 'status:open', 'financial_status:paid'];
@@ -114,6 +121,8 @@ function buildQuery(params) {
     parts.push("created_at:>='" + phoenixDate(6) + TZ_SUFFIX + "'");
   } else if (range === '30d') {
     parts.push("created_at:>='" + phoenixDate(29) + TZ_SUFFIX + "'");
+  } else if (range === 'aged') {
+    parts.push("created_at:<'" + agedCutoff() + "'");
   }
   // Search: order numbers get an exact name match; anything else is free text
   // (Shopify matches it against customer name, email, order name, etc.).
@@ -155,6 +164,7 @@ module.exports = async function handler(req, res) {
       const after = String(p.after || '') || null;
       const out = await admin(token, QUEUE, {
         q: buildQuery(p),
+        aq: buildQuery({ range: 'aged' }),
         after: after,
         reverse: String(p.sort || '') === 'new'
       });
@@ -207,10 +217,13 @@ module.exports = async function handler(req, res) {
       }).filter(function (o) { return o.fulfillmentOrderId && o.items.length; });
       const pageInfo = (out.json.data.orders && out.json.data.orders.pageInfo) || {};
       const totalNode = out.json.data.ordersCount || {};
+      const agedNode = out.json.data.aged || {};
       return res.status(200).json({
         ok: true,
         orders: orders,
         total: typeof totalNode.count === 'number' ? totalNode.count : orders.length,
+        agedCount: typeof agedNode.count === 'number' ? agedNode.count : 0,
+        agedCutoff: agedCutoff(),
         hasMore: !!pageInfo.hasNextPage,
         cursor: pageInfo.endCursor || null
       });
@@ -223,10 +236,16 @@ module.exports = async function handler(req, res) {
 
     const body = readBody(req);
     const fulfillmentOrderId = String(body.fulfillmentOrderId || '');
-    const trackingNumber = String(body.trackingNumber || '').trim();
+    const trackingNumber = String(body.trackingNumber || '').replace(/\s+/g, '');
     const trackingCompany = String(body.trackingCompany || '').trim();
     if (!fulfillmentOrderId || !trackingNumber) {
       return res.status(400).json({ ok: false, error: 'bad_request' });
+    }
+    // Second line of defense behind the desk's own validation: tracking numbers
+    // are 8-34 letters/digits across every carrier we ship with.
+    if (!/^[A-Za-z0-9]{8,34}$/.test(trackingNumber)) {
+      return res.status(400).json({ ok: false, error: 'bad_tracking',
+        message: 'That tracking number does not look valid (8-34 letters/digits).' });
     }
 
     const tracking = { number: trackingNumber };
@@ -243,6 +262,13 @@ module.exports = async function handler(req, res) {
     const errs = (node && node.userErrors) || [];
     if (errs.length || (out.json && out.json.errors && out.json.errors.length)) {
       const msg = errs.length ? errs[0].message : JSON.stringify(out.json.errors);
+      // A fulfillment order that is already closed/fulfilled means someone else
+      // shipped it first — report that distinctly so the desk can just refresh
+      // instead of showing a scary failure (and no duplicate email fires).
+      if (/closed|already|fulfilled|nothing left|no line items/i.test(msg)) {
+        return res.status(200).json({ ok: false, error: 'already_shipped',
+          message: 'This order was already marked shipped (possibly in another tab).' });
+      }
       console.error('[admin/fulfillment] fulfill:', msg);
       return res.status(502).json({ ok: false, error: 'upstream', message: errs.length ? errs[0].message : undefined });
     }
