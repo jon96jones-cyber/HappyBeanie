@@ -14,31 +14,30 @@ each **line item** (name, variant, quantity, SKU, a subscription badge, and any
 **personalization** captured at checkout), the **shipping address**, and any order
 note. A tracking field + carrier dropdown + **"Mark shipped →"** button per order.
 
-## One-time setup (~5 min)
+## One-time setup — DONE (Aug 2026)
 
-### 1. Give the Admin API token the fulfillment scopes
-The desk reuses your existing `SHOPIFY_ADMIN_TOKEN` (the custom app from the wholesale
-setup). Open that app in **Settings → Apps and sales channels → Develop apps →
-[your app] → Configuration → Admin API scopes** and make sure these are granted:
+This store runs on Shopify's new **Dev Dashboard**, which doesn't hand out static
+Admin tokens. The working setup (completed):
 
-- `read_orders`
-- `read_merchant_managed_fulfillment_orders`, `write_merchant_managed_fulfillment_orders`
-- `read_assigned_fulfillment_orders`, `write_assigned_fulfillment_orders`
+1. The **Happy Beanie** app (client ID `69fd8f7a…`) carries the scopes, released as
+   a version via `shopify app deploy` from `~/hb-app/shopify.app.toml` on Jon's Mac
+   (browser can't edit versions). Scopes include `read/write_orders`,
+   `read/write_customers`, `read/write_discounts`, and the four
+   merchant-managed + assigned fulfillment-order scopes.
+2. The permanent Admin token was minted by the one-time OAuth connect flow on the
+   site itself — see `FULFILLMENT-CONNECT.md` (`/api/oauth/install` →
+   approve → token shown once).
+3. Vercel env vars: `SHOPIFY_ADMIN_TOKEN` (the OAuth token), `SHOPIFY_API_KEY` /
+   `SHOPIFY_API_SECRET` (the app's Client ID / Secret), `FULFILLMENT_KEY`
+   (the desk's gate key).
 
-**Save**, then re-install/update the app if prompted. (If the token can't read orders
-or write fulfillments, the queue loads empty or shipping fails.)
+**To change scopes later:** edit the toml, rerun
+`npx -y @shopify/cli@latest app deploy --allow-updates` (needs an App automation
+token from the app's Settings), then re-run `/api/oauth/install` and save the new
+token into `SHOPIFY_ADMIN_TOKEN`.
 
-### 2. Add the fulfillment key to Vercel
-Project → **Settings → Environment Variables**:
-
-| Name | Value |
-|---|---|
-| `FULFILLMENT_KEY` | any long random string (a password generator is fine) |
-
-`SHOPIFY_ADMIN_TOKEN`, `SHOPIFY_STORE_DOMAIN`, and `SHOPIFY_ADMIN_API_VERSION` are
-already set from the wholesale setup — no change needed.
-
-**Redeploy** so the variable takes effect.
+**To rotate desk access:** change `FULFILLMENT_KEY` in Vercel and redeploy — the
+old key stops working immediately.
 
 ### 3. Hand the supplier the link + key
 - URL: `https://www.happybeanie.com/admin/fulfillment`
