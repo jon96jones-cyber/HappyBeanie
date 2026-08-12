@@ -29,8 +29,10 @@ async function admin(token, query, variables) {
   return { status: res.status, json: json };
 }
 
-const QUEUE = `query Queue {
-  orders(first: 40, query: "fulfillment_status:unfulfilled AND status:open AND financial_status:paid", sortKey: CREATED_AT) {
+const QUEUE = `query Queue($q: String!, $after: String, $reverse: Boolean!) {
+  ordersCount(query: $q, limit: 10000) { count precision }
+  orders(first: 25, after: $after, query: $q, sortKey: CREATED_AT, reverse: $reverse) {
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       name
@@ -89,6 +91,45 @@ function visibleProps(attrs) {
     .map(function (p) { return { name: p.key, value: p.value }; });
 }
 
+// The store runs on Arizona time (America/Phoenix, UTC-7 year-round — no DST),
+// so "today" boundaries are computed against a fixed -07:00 offset.
+const TZ_OFFSET_MS = 7 * 3600 * 1000;
+const TZ_SUFFIX = 'T00:00:00-07:00';
+
+function phoenixDate(daysAgo) {
+  const d = new Date(Date.now() - TZ_OFFSET_MS - (daysAgo || 0) * 86400000);
+  return d.toISOString().slice(0, 10);
+}
+
+// Builds the Shopify orders search string from the desk's filter params.
+function buildQuery(params) {
+  const parts = ['fulfillment_status:unfulfilled', 'status:open', 'financial_status:paid'];
+  const range = String(params.range || 'all');
+  if (range === 'today') {
+    parts.push("created_at:>='" + phoenixDate(0) + TZ_SUFFIX + "'");
+  } else if (range === 'yesterday') {
+    parts.push("created_at:>='" + phoenixDate(1) + TZ_SUFFIX + "'");
+    parts.push("created_at:<'" + phoenixDate(0) + TZ_SUFFIX + "'");
+  } else if (range === '7d') {
+    parts.push("created_at:>='" + phoenixDate(6) + TZ_SUFFIX + "'");
+  } else if (range === '30d') {
+    parts.push("created_at:>='" + phoenixDate(29) + TZ_SUFFIX + "'");
+  }
+  // Search: order numbers get an exact name match; anything else is free text
+  // (Shopify matches it against customer name, email, order name, etc.).
+  const raw = String(params.q || '').slice(0, 80);
+  const cleaned = raw
+    .replace(/["'\\():*-]/g, ' ')          // syntax characters (wildcards, negation, field prefixes)
+    .replace(/\b(AND|OR|NOT)\b/gi, ' ')     // connective keywords — search terms only
+    .replace(/\s+/g, ' ').trim();
+  if (cleaned) {
+    const num = cleaned.match(/^#?(\d{3,})$/);
+    if (num) parts.push('name:#' + num[1]);
+    else parts.push(cleaned);
+  }
+  return parts.join(' AND ');
+}
+
 const crypto = require('crypto');
 function keyOk(req) {
   const expected = process.env.FULFILLMENT_KEY;
@@ -110,7 +151,13 @@ module.exports = async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const out = await admin(token, QUEUE);
+      const p = req.query || {};
+      const after = String(p.after || '') || null;
+      const out = await admin(token, QUEUE, {
+        q: buildQuery(p),
+        after: after,
+        reverse: String(p.sort || '') === 'new'
+      });
       // Surface the real reason the read failed instead of showing an empty
       // queue: a token without read_orders / fulfillment scopes, an invalid
       // token (401), or a throttle all otherwise look identical to "no orders."
@@ -158,7 +205,15 @@ module.exports = async function handler(req, res) {
           items: items
         };
       }).filter(function (o) { return o.fulfillmentOrderId && o.items.length; });
-      return res.status(200).json({ ok: true, orders: orders });
+      const pageInfo = (out.json.data.orders && out.json.data.orders.pageInfo) || {};
+      const totalNode = out.json.data.ordersCount || {};
+      return res.status(200).json({
+        ok: true,
+        orders: orders,
+        total: typeof totalNode.count === 'number' ? totalNode.count : orders.length,
+        hasMore: !!pageInfo.hasNextPage,
+        cursor: pageInfo.endCursor || null
+      });
     }
 
     if (req.method !== 'POST') {

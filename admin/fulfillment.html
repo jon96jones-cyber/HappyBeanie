@@ -35,9 +35,20 @@ main { padding:28px 0 90px; }
 .btn.ghost { background:transparent; color:#3D372D; border:1px solid #DDD3C0; }
 .btn.ghost:hover { background:transparent; border-color:#17140F; }
 
-.bar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
+.bar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px; }
 .count { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; }
 .count b { color:#17140F; font-size:15px; }
+
+.filters { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:20px; }
+.chip { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; padding:9px 13px; border:1px solid #DDD3C0; border-radius:999px; background:transparent; color:#3D372D; cursor:pointer; }
+.chip:hover { border-color:#17140F; }
+.chip.on { background:#17140F; color:#F5F0E6; border-color:#17140F; }
+.filters input { flex:1 1 190px; min-width:150px; font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.04em; padding:9px 14px; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:999px; color:#17140F; }
+.filters input:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.filters select { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; padding:9px 12px; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:999px; color:#17140F; cursor:pointer; }
+.filters select:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.morewrap { margin-top:14px; }
+.morewrap .btn { width:100%; padding:15px; }
 
 .orders { display:grid; gap:14px; }
 .ord { background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; overflow:hidden; }
@@ -100,10 +111,23 @@ main { padding:28px 0 90px; }
 
     <div id="queue" style="display:none;">
       <div class="bar">
-        <span class="count"><b id="n">0</b> &nbsp;orders to ship</span>
+        <span class="count"><b id="n">0</b> &nbsp;to ship <span id="shown"></span></span>
         <button class="btn ghost" id="refresh">Refresh</button>
       </div>
+      <div class="filters">
+        <button class="chip on" data-range="all">All open</button>
+        <button class="chip" data-range="today">Today</button>
+        <button class="chip" data-range="yesterday">Yesterday</button>
+        <button class="chip" data-range="7d">7 days</button>
+        <button class="chip" data-range="30d">30 days</button>
+        <input id="search" type="text" autocomplete="off" placeholder="Search order # or customer">
+        <select id="sortsel">
+          <option value="old">Oldest first</option>
+          <option value="new">Newest first</option>
+        </select>
+      </div>
       <div class="orders" id="orders"></div>
+      <div class="morewrap" id="moreWrap" style="display:none;"><button class="btn ghost" id="more">Load more ↓</button></div>
       <div class="fine">Live from Shopify · auto-refreshes every 45s · marking shipped records tracking and emails the customer their branded shipping confirmation</div>
     </div>
   </div>
@@ -116,6 +140,14 @@ main { padding:28px 0 90px; }
   var timer = null;
   var CARRIERS = ['USPS', 'UPS', 'FedEx', 'DHL Express', 'DHL eCommerce', 'Other'];
 
+  // Filter + pagination state. `all` accumulates pages; a reset load clears it.
+  var state = { range: 'all', q: '', sort: 'old' };
+  var all = [];
+  var total = 0;
+  var cursor = null;
+  var hasMore = false;
+  var loading = false;
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -126,10 +158,17 @@ main { padding:28px 0 90px; }
     try { return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
     catch (e) { return esc(iso); }
   }
-  function api(opts) {
+  function api(opts, params) {
     opts = opts || {};
     opts.headers = Object.assign({ 'x-fulfillment-key': key }, opts.headers || {});
-    return fetch('/api/admin/fulfillment', opts).then(function (r) {
+    var qs = '';
+    if (params) {
+      var pairs = Object.keys(params).filter(function (k) { return params[k]; }).map(function (k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+      });
+      if (pairs.length) qs = '?' + pairs.join('&');
+    }
+    return fetch('/api/admin/fulfillment' + qs, opts).then(function (r) {
       return r.json().catch(function () { return { ok: false, error: 'bad_response' }; });
     }).catch(function () { return { ok: false, error: 'unreachable' }; });
   }
@@ -138,7 +177,7 @@ main { padding:28px 0 90px; }
     key = $('key').value.trim();
     if (!key) return;
     $('gateErr').innerHTML = '';
-    api({}).then(function (b) {
+    api({}, filterParams(null)).then(function (b) {
       if (!b.ok && (b.error === 'bad_key' || b.error === 'not_configured' || b.error === 'unreachable' || b.error === 'bad_response')) {
         $('gateErr').innerHTML = '<div class="err">' +
           (b.error === 'bad_key' ? 'That key was not accepted.' :
@@ -151,28 +190,73 @@ main { padding:28px 0 90px; }
       // open the queue so the reason renders in place of the order list).
       $('gate').style.display = 'none';
       $('queue').style.display = 'block';
-      draw(b.orders, b);
-      timer = setInterval(function () { if (!document.hidden) load(); }, 45000);
+      absorb(b, true);
+      timer = setInterval(function () { if (!document.hidden && !loading) load(true); }, 45000);
     });
   };
   $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('unlock').click(); });
-  $('refresh').onclick = function () { load(); };
+  $('refresh').onclick = function () { load(true); };
 
-  function load() {
-    api({}).then(function (b) { draw(b.orders, b); });
+  // Filter wiring — every change resets to page one with the new filters.
+  Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (chip) {
+    chip.onclick = function () {
+      Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) { c.classList.remove('on'); });
+      chip.classList.add('on');
+      state.range = chip.getAttribute('data-range');
+      load(true);
+    };
+  });
+  var searchTimer = null;
+  $('search').addEventListener('input', function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () {
+      state.q = $('search').value.trim();
+      load(true);
+    }, 400);
+  });
+  $('sortsel').onchange = function () { state.sort = $('sortsel').value; load(true); };
+  $('more').onclick = function () { if (hasMore && !loading) load(false); };
+
+  function filterParams(afterCursor) {
+    return { range: state.range === 'all' ? '' : state.range, q: state.q, sort: state.sort === 'old' ? '' : state.sort, after: afterCursor || '' };
+  }
+
+  function load(reset) {
+    loading = true;
+    if (reset) $('more').textContent = 'Load more ↓';
+    else { $('more').textContent = 'Loading…'; }
+    api({}, filterParams(reset ? null : cursor)).then(function (b) {
+      loading = false;
+      $('more').textContent = 'Load more ↓';
+      absorb(b, reset);
+    });
+  }
+
+  // Folds a page of results into the accumulated list and redraws.
+  function absorb(b, reset) {
+    if (b && b.ok) {
+      all = reset ? (b.orders || []) : all.concat(b.orders || []);
+      total = typeof b.total === 'number' ? b.total : all.length;
+      cursor = b.cursor || null;
+      hasMore = !!b.hasMore;
+    }
+    draw(all, b || {});
   }
 
   function draw(orders, resp) {
     orders = orders || [];
     resp = resp || {};
-    $('n').textContent = orders.length;
+    $('n').textContent = total;
+    $('shown').textContent = (orders.length && orders.length < total) ? '· showing ' + orders.length : '';
+    $('moreWrap').style.display = hasMore ? 'block' : 'none';
     // Token/permission problem — show why instead of a false "queue clear."
     if (!resp.ok && (resp.error === 'read_failed' || resp.error === 'token_rejected')) {
       $('orders').innerHTML = '<div class="err">' + esc(resp.message || 'Shopify would not return orders.') + '</div>';
       return;
     }
     if (!orders.length) {
-      $('orders').innerHTML = '<div class="empty">Queue clear — nothing waiting to ship</div>';
+      $('orders').innerHTML = '<div class="empty">' +
+        (state.q || state.range !== 'all' ? 'Nothing matches these filters' : 'Queue clear — nothing waiting to ship') + '</div>';
       return;
     }
     $('orders').innerHTML = orders.map(function (o, idx) {
@@ -230,7 +314,7 @@ main { padding:28px 0 90px; }
             return;
           }
           card.style.opacity = '0.4';
-          load();
+          load(true);
         });
       };
     });
