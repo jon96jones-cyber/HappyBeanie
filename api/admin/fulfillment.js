@@ -86,6 +86,24 @@ module.exports = async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const out = await admin(token, QUEUE);
+      // Surface the real reason the read failed instead of showing an empty
+      // queue: a token without read_orders / fulfillment scopes, an invalid
+      // token (401), or a throttle all otherwise look identical to "no orders."
+      const gqlErrors = (out.json && out.json.errors) || [];
+      const noData = !out.json || !out.json.data;
+      if (out.status === 401 || out.status === 403) {
+        return res.status(200).json({ ok: false, error: 'token_rejected', status: out.status,
+          message: 'Shopify rejected the Admin token (' + out.status + '). Regenerate it and update SHOPIFY_ADMIN_TOKEN.' });
+      }
+      if (gqlErrors.length || noData) {
+        const first = gqlErrors[0] || {};
+        const code = (first.extensions && first.extensions.code) || '';
+        const msg = first.message || 'Unknown read error';
+        return res.status(200).json({ ok: false, error: 'read_failed', code: code,
+          message: (code === 'ACCESS_DENIED' || /access denied/i.test(msg))
+            ? 'The Admin token is missing order/fulfillment permissions (' + msg + ').'
+            : ('Shopify read error: ' + msg) });
+      }
       const nodes = (out.json && out.json.data && out.json.data.orders && out.json.data.orders.nodes) || [];
       const orders = nodes.map(function (o) {
         // The OPEN fulfillment order is the one the supplier acts on.

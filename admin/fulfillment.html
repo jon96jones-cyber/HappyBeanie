@@ -139,7 +139,7 @@ main { padding:28px 0 90px; }
     if (!key) return;
     $('gateErr').innerHTML = '';
     api({}).then(function (b) {
-      if (!b.ok) {
+      if (!b.ok && (b.error === 'bad_key' || b.error === 'not_configured' || b.error === 'unreachable' || b.error === 'bad_response')) {
         $('gateErr').innerHTML = '<div class="err">' +
           (b.error === 'bad_key' ? 'That key was not accepted.' :
            b.error === 'not_configured' ? 'Set SHOPIFY_ADMIN_TOKEN and FULFILLMENT_KEY on the deployment first.' :
@@ -147,9 +147,11 @@ main { padding:28px 0 90px; }
            'Could not reach the queue.') + '</div>';
         return;
       }
+      // Key was accepted (token errors like read_failed / token_rejected still
+      // open the queue so the reason renders in place of the order list).
       $('gate').style.display = 'none';
       $('queue').style.display = 'block';
-      draw(b.orders);
+      draw(b.orders, b);
       timer = setInterval(function () { if (!document.hidden) load(); }, 45000);
     });
   };
@@ -157,12 +159,18 @@ main { padding:28px 0 90px; }
   $('refresh').onclick = function () { load(); };
 
   function load() {
-    api({}).then(function (b) { if (b.ok) draw(b.orders); });
+    api({}).then(function (b) { draw(b.orders, b); });
   }
 
-  function draw(orders) {
+  function draw(orders, resp) {
     orders = orders || [];
+    resp = resp || {};
     $('n').textContent = orders.length;
+    // Token/permission problem — show why instead of a false "queue clear."
+    if (!resp.ok && (resp.error === 'read_failed' || resp.error === 'token_rejected')) {
+      $('orders').innerHTML = '<div class="err">' + esc(resp.message || 'Shopify would not return orders.') + '</div>';
+      return;
+    }
     if (!orders.length) {
       $('orders').innerHTML = '<div class="empty">Queue clear — nothing waiting to ship</div>';
       return;
