@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fulfillment desk — Happy Beanie</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="../favicon.png">
+<style>
+@font-face { font-family:'DM Mono'; font-weight:400; src:url('../assets/fonts/23b5af97.woff2') format('woff2'); }
+@font-face { font-family:'DM Mono'; font-weight:500; src:url('../assets/fonts/b847e313.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:400; src:url('../assets/fonts/d7200164.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:700; src:url('../assets/fonts/d7200164.woff2') format('woff2'); }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#F5F0E6; color:#17140F; font-family:'DM Sans',-apple-system,sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh; }
+.shell { max-width:1040px; margin:0 auto; padding:0 24px; }
+
+.console { position:relative; overflow:hidden; background:#17140F; color:#F5F0E6; }
+.veil { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(245,240,230,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.045) 1px, transparent 1px); background-size:34px 34px; -webkit-mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); }
+.con-top { position:relative; display:flex; align-items:center; gap:22px; padding:16px 0; border-bottom:1px solid rgba(245,240,230,0.14); font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.live { display:flex; align-items:center; gap:9px; color:oklch(0.78 0.1 152); }
+.pulse { position:relative; width:7px; height:7px; border-radius:50%; background:oklch(0.72 0.16 152); }
+.pulse::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1px solid oklch(0.72 0.16 152); opacity:0; animation:ping 2.4s ease-out infinite; }
+@keyframes ping { 0% { transform:scale(0.7); opacity:0.9; } 70% { transform:scale(1.9); opacity:0; } 100% { opacity:0; } }
+.con-body { position:relative; padding:32px 0 30px; }
+h1 { font-weight:700; letter-spacing:-0.042em; font-size:clamp(28px,3.4vw,40px); line-height:1.05; }
+.sub { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-top:12px; }
+
+main { padding:28px 0 90px; }
+.lab { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.gate { max-width:420px; }
+.gate input { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:0.08em; color:#17140F; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:2px; padding:13px 14px; width:100%; margin-top:9px; }
+.gate input:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.btn { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; padding:12px 18px; border:none; border-radius:2px; background:#17140F; color:#F5F0E6; cursor:pointer; }
+.btn:hover { background:oklch(0.44 0.07 152); }
+.btn:disabled { opacity:0.6; cursor:default; }
+.btn.ghost { background:transparent; color:#3D372D; border:1px solid #DDD3C0; }
+.btn.ghost:hover { background:transparent; border-color:#17140F; }
+
+.bar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
+.count { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; }
+.count b { color:#17140F; font-size:15px; }
+
+.orders { display:grid; gap:14px; }
+.ord { background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; overflow:hidden; }
+.ord-h { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:16px 20px; border-bottom:1px solid #EDE6D8; }
+.ordname { font-family:'DM Mono',monospace; font-size:15px; letter-spacing:0.06em; color:#17140F; }
+.ordmeta { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; }
+.paid { color:oklch(0.5 0.09 152); }
+.ord-b { display:grid; grid-template-columns:1fr 260px; gap:0; }
+@media (max-width:760px){ .ord-b { grid-template-columns:1fr; } }
+.items { padding:16px 20px; display:grid; gap:14px; }
+.it { display:grid; grid-template-columns:46px 1fr auto; gap:14px; align-items:start; }
+.itimg { width:46px; height:46px; border-radius:5px; object-fit:cover; background:#EDE6D8; border:1px solid #E0D6C2; display:block; }
+.ittitle { font-weight:700; letter-spacing:-0.02em; font-size:15.5px; line-height:1.25; }
+.itsub { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#8A7F6E; margin-top:4px; line-height:1.7; }
+.subbadge { display:inline-block; font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.1em; text-transform:uppercase; color:#6a5a10; background:oklch(0.86 0.14 92 / 0.22); border:1px solid oklch(0.86 0.14 92 / 0.5); border-radius:2px; padding:3px 6px; margin-top:6px; }
+.props { margin-top:8px; display:grid; gap:4px; }
+.prop { font-size:13px; color:#3D372D; }
+.prop b { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.08em; text-transform:uppercase; color:#8A7F6E; margin-right:6px; }
+.qty { font-family:'DM Mono',monospace; font-size:13px; color:#17140F; white-space:nowrap; }
+.ship { padding:16px 20px; background:#F7F2E8; border-left:1px solid #EDE6D8; }
+@media (max-width:760px){ .ship { border-left:none; border-top:1px solid #EDE6D8; } }
+.ship .lab { margin-bottom:8px; display:block; }
+.addr { font-size:14px; color:#17140F; line-height:1.5; white-space:pre-line; }
+.note { margin-top:12px; font-size:13px; color:#8C4630; background:rgba(224,122,95,0.08); border:1px solid rgba(196,88,60,0.28); border-radius:4px; padding:8px 10px; }
+.fulfill { padding:14px 20px; border-top:1px solid #EDE6D8; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.fulfill input, .fulfill select { font-family:'DM Mono',monospace; font-size:13px; color:#17140F; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:2px; padding:11px 12px; }
+.fulfill input { flex:1 1 200px; min-width:0; }
+.fulfill select { flex:0 0 auto; }
+.fulfill input:focus, .fulfill select:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+
+.empty { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; padding:40px 22px; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; text-align:center; }
+.err { margin-top:18px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:13px 16px; font-size:14px; }
+.fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
+</style>
+</head><body>
+
+<div class="console">
+  <span class="veil"></span>
+  <div class="shell">
+    <div class="con-top">
+      <span class="live"><span class="pulse"></span>Fulfillment desk</span>
+      <span>Compound &amp; ship</span>
+    </div>
+    <div class="con-body">
+      <h1>Compounding queue</h1>
+      <div class="sub">Paid orders waiting to be made and shipped · marking one shipped notifies the customer</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="shell">
+    <div id="gate" class="gate">
+      <label class="lab" for="key">Fulfillment key</label>
+      <input id="key" type="password" autocomplete="off" placeholder="FULFILLMENT_KEY">
+      <div style="margin-top:14px;"><button class="btn" id="unlock">Open the queue</button></div>
+      <div class="fine">The key is the FULFILLMENT_KEY environment variable. It is held in this tab only.</div>
+      <div id="gateErr"></div>
+    </div>
+
+    <div id="queue" style="display:none;">
+      <div class="bar">
+        <span class="count"><b id="n">0</b> &nbsp;orders to ship</span>
+        <button class="btn ghost" id="refresh">Refresh</button>
+      </div>
+      <div class="orders" id="orders"></div>
+      <div class="fine">Live from Shopify · auto-refreshes every 45s · marking shipped records tracking and emails the customer their branded shipping confirmation</div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var key = '';
+  var timer = null;
+  var CARRIERS = ['USPS', 'UPS', 'FedEx', 'DHL Express', 'DHL eCommerce', 'Other'];
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmt(iso) {
+    if (!iso) return '';
+    try { return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
+    catch (e) { return esc(iso); }
+  }
+  function api(opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ 'x-fulfillment-key': key }, opts.headers || {});
+    return fetch('/api/admin/fulfillment', opts).then(function (r) {
+      return r.json().catch(function () { return { ok: false, error: 'bad_response' }; });
+    }).catch(function () { return { ok: false, error: 'unreachable' }; });
+  }
+
+  $('unlock').onclick = function () {
+    key = $('key').value.trim();
+    if (!key) return;
+    $('gateErr').innerHTML = '';
+    api({}).then(function (b) {
+      if (!b.ok) {
+        $('gateErr').innerHTML = '<div class="err">' +
+          (b.error === 'bad_key' ? 'That key was not accepted.' :
+           b.error === 'not_configured' ? 'Set SHOPIFY_ADMIN_TOKEN and FULFILLMENT_KEY on the deployment first.' :
+           b.error === 'unreachable' ? 'No backend here — this page only works on the deployed site.' :
+           'Could not reach the queue.') + '</div>';
+        return;
+      }
+      $('gate').style.display = 'none';
+      $('queue').style.display = 'block';
+      draw(b.orders);
+      timer = setInterval(function () { if (!document.hidden) load(); }, 45000);
+    });
+  };
+  $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('unlock').click(); });
+  $('refresh').onclick = function () { load(); };
+
+  function load() {
+    api({}).then(function (b) { if (b.ok) draw(b.orders); });
+  }
+
+  function draw(orders) {
+    orders = orders || [];
+    $('n').textContent = orders.length;
+    if (!orders.length) {
+      $('orders').innerHTML = '<div class="empty">Queue clear — nothing waiting to ship</div>';
+      return;
+    }
+    $('orders').innerHTML = orders.map(function (o, idx) {
+      var items = o.items.map(function (it) {
+        var props = (it.properties || []).map(function (p) {
+          return '<div class="prop"><b>' + esc(p.name) + '</b>' + esc(p.value) + '</div>';
+        }).join('');
+        return '<div class="it">' +
+          (it.image ? '<img class="itimg" src="' + esc(it.image) + '" alt="">' : '<span class="itimg"></span>') +
+          '<div>' +
+            '<div class="ittitle">' + esc(it.title) + '</div>' +
+            (it.variant ? '<div class="itsub">' + esc(it.variant) + (it.sku ? ' · SKU ' + esc(it.sku) : '') + '</div>' :
+              (it.sku ? '<div class="itsub">SKU ' + esc(it.sku) + '</div>' : '')) +
+            (it.subscription ? '<div class="subbadge">↻ ' + esc(it.subscription) + '</div>' : '') +
+            (props ? '<div class="props">' + props + '</div>' : '') +
+          '</div>' +
+          '<div class="qty">×' + esc(it.qty) + '</div>' +
+        '</div>';
+      }).join('');
+      var opts = CARRIERS.map(function (c) { return '<option value="' + esc(c === 'Other' ? '' : c) + '">' + esc(c) + '</option>'; }).join('');
+      return '<div class="ord" data-fo="' + esc(o.fulfillmentOrderId) + '" data-i="' + idx + '">' +
+        '<div class="ord-h">' +
+          '<span class="ordname">' + esc(o.orderName) + '</span>' +
+          '<span class="ordmeta"><span class="paid">' + esc(o.financial) + '</span> · ' + esc(o.customer || 'Customer') + ' · placed ' + fmt(o.placedAt) + '</span>' +
+        '</div>' +
+        '<div class="ord-b">' +
+          '<div class="items">' + items + '</div>' +
+          '<div class="ship"><span class="lab">Ship to</span><div class="addr">' + esc(o.address) + '</div>' +
+            (o.note ? '<div class="note">' + esc(o.note) + '</div>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="fulfill">' +
+          '<input type="text" placeholder="Tracking number" data-track>' +
+          '<select data-carrier>' + opts + '</select>' +
+          '<button class="btn" data-ship>Mark shipped →</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    Array.prototype.forEach.call($('orders').querySelectorAll('[data-ship]'), function (btn) {
+      btn.onclick = function () {
+        var card = btn.closest('.ord');
+        var num = card.querySelector('[data-track]').value.trim();
+        var carrier = card.querySelector('[data-carrier]').value;
+        if (!num) { card.querySelector('[data-track]').focus(); return; }
+        btn.disabled = true; btn.textContent = 'Shipping…';
+        api({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fulfillmentOrderId: card.getAttribute('data-fo'), trackingNumber: num, trackingCompany: carrier })
+        }).then(function (b) {
+          if (!b.ok) {
+            btn.disabled = false; btn.textContent = 'Mark shipped →';
+            alert(b.message || 'That did not go through.');
+            return;
+          }
+          card.style.opacity = '0.4';
+          load();
+        });
+      };
+    });
+  }
+})();
+</script>
+</body></html>
