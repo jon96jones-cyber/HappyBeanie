@@ -29,13 +29,38 @@ async function admin(token, query, variables) {
   return { status: res.status, json: json };
 }
 
-const QUEUE = 'query Queue { orders(first: 40, query: "fulfillment_status:unfulfilled AND status:open AND financial_status:paid", sortKey: CREATED_AT) ' +
-  '{ nodes { id name createdAt displayFinancialStatus note ' +
-  'customer { firstName lastName } ' +
-  'shippingAddress { name address1 address2 city provinceCode zip country phone } ' +
-  'fulfillmentOrders(first: 5) { nodes { id status ' +
-  'lineItems(first: 25) { nodes { remainingQuantity ' +
-  'lineItem { title variantTitle sku sellingPlan { name } image { url } customAttributes { key value } } } } } } } }';
+const QUEUE = `query Queue {
+  orders(first: 40, query: "fulfillment_status:unfulfilled AND status:open AND financial_status:paid", sortKey: CREATED_AT) {
+    nodes {
+      id
+      name
+      createdAt
+      displayFinancialStatus
+      note
+      customer { firstName lastName }
+      shippingAddress { name address1 address2 city provinceCode zip country phone }
+      fulfillmentOrders(first: 5) {
+        nodes {
+          id
+          status
+          lineItems(first: 25) {
+            nodes {
+              remainingQuantity
+              lineItem {
+                title
+                variantTitle
+                sku
+                sellingPlan { name }
+                image { url }
+                customAttributes { key value }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`;
 
 const FULFILL = 'mutation Fulfill($fulfillment: FulfillmentInput!) { fulfillmentCreate(fulfillment: $fulfillment) ' +
   '{ fulfillment { id status } userErrors { field message } } }';
