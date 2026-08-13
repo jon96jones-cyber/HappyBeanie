@@ -1321,6 +1321,31 @@ image-slot:not([data-filled]) { color: transparent !important; }
         </div>
       </div>
 
+      <div data-m="inset" data-rv="1" style="position: relative; max-width: 1180px; margin: 88px auto 0; background: linear-gradient(168deg, #201C15 0%, #17140F 46%, #120F0B 100%); border-radius: 5px; padding: 72px 56px 64px; overflow: hidden; box-shadow: 0 44px 90px -40px rgba(23,20,15,0.75), 0 1px 0 rgba(245,240,230,0.09) inset; opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);">
+        <div aria-hidden="true" style="position: absolute; left: -180px; top: -220px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.10), transparent 70%); pointer-events: none;"></div>
+        <div style="position: relative; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 20px;">
+          <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152);">Ingredient evidence</span>
+          <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; background: oklch(0.86 0.14 92); padding: 5px 10px; border-radius: 2px;">{{ pdpInsideLabel }}</span>
+        </div>
+        <h2 style="position: relative; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; color: #F5F0E6; margin: 0 0 18px; max-width: 22em;">Three actives, <span style="color: oklch(0.86 0.14 92);">published research.</span></h2>
+        <p style="position: relative; font-size: 15.5px; line-height: 1.65; color: #DED5C4; margin: 0 0 48px; max-width: 38em; text-wrap: pretty;">Every layer of the formula traces back to peer-reviewed work. Read the studies yourself — each one opens in a new tab.</p>
+        <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+          <sc-for list="{{ pdpEvidence }}" as="ev" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; border-radius: 4px; padding: 26px 24px 24px; background: linear-gradient(165deg, rgba(245,240,230,0.055), rgba(245,240,230,0.015)); box-shadow: 0 1px 0 rgba(245,240,230,0.08) inset; transition: background 0.35s ease;" style-hover="background: linear-gradient(165deg, rgba(245,240,230,0.085), rgba(245,240,230,0.03));">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px;">
+                <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; background: rgba(245,240,230,0.82); padding: 5px 9px; border-radius: 2px;">{{ ev.code }}</span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ ev.tagColor }};">{{ ev.tag }}</span>
+              </div>
+              <h3 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 20px; line-height: 1.2; color: #F5F0E6; margin: 0 0 14px;">{{ ev.name }}</h3>
+              <p style="font-size: 14px; line-height: 1.7; color: #DED5C4; margin: 0 0 18px; text-wrap: pretty; flex: 1 1 auto;">{{ ev.finding }}</p>
+              <div style="font-family: 'DM Mono', monospace; font-size: 9.5px; line-height: 1.6; color: #8A7F6E; margin-bottom: 16px;">{{ ev.cite }}</div>
+              <a href="{{ ev.href }}" target="_blank" rel="noopener" style="align-self: flex-start; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.86 0.14 92); border-bottom: 1px solid oklch(0.86 0.14 92); padding-bottom: 2px;" style-hover="color: #F5F0E6; border-color: #F5F0E6;">Read the study →</a>
+            </div>
+          </sc-for>
+        </div>
+        <p style="position: relative; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 40px 0 0; line-height: 1.7;">Studies cited examine individual ingredients, not the finished Happy Beanie formula. Not a treatment for disease.</p>
+      </div>
+
       <div data-m="inset" data-rv="1" style="position: relative; max-width: 1180px; margin: 88px auto 0; background: linear-gradient(168deg, #201C15 0%, #17140F 46%, #120F0B 100%); border-radius: 5px; padding: 72px 56px; overflow: hidden; box-shadow: 0 44px 90px -40px rgba(23,20,15,0.75), 0 1px 0 rgba(245,240,230,0.09) inset; opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);">
         <div aria-hidden="true" style="position: absolute; right: -180px; top: -220px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.10), transparent 70%); pointer-events: none;"></div>
         <div style="position: relative; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 20px;">What to expect</div>
@@ -3426,6 +3451,35 @@ class Component extends DCLogic {
         { code: 'A3', name: 'Green-lipped mussel', dose: '150mg per chew', role: 'Whole New Zealand green-lipped mussel — natural glucosamine, chondroitin and rare omega-3s for joints.' }
       ]),
       pdpInsideLabel: isDog ? 'For dogs' : 'For cats',
+      // Ingredient evidence cards — one published study per active, per species.
+      // Links open in a new tab (journals block iframing via X-Frame-Options).
+      pdpEvidence: (isDog ? [
+        { code: 'A1', name: 'Peptide blend', tag: 'Peer-reviewed',
+          finding: 'Peer-reviewed, open-access research into oral collagen-peptide supplementation — the signalling approach the A1 layer is built on.',
+          cite: 'PubMed Central (open access)',
+          href: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6789547/' },
+        { code: 'A2', name: 'Elk blend', tag: 'Peer-reviewed',
+          finding: 'Controlled veterinary research on velvet antler supplementation — the whole-food foundation the A2 layer draws from.',
+          cite: 'Research in Veterinary Science · ScienceDirect',
+          href: 'https://www.sciencedirect.com/science/article/abs/pii/S0034528814002483' },
+        { code: 'A3', name: 'Mushroom extract blend', tag: 'Clinical trial',
+          finding: 'Dogs with naturally occurring hemangiosarcoma given a single-agent turkey tail polysaccharopeptide showed delayed metastasis and among the longest survival times reported for the disease — with no other treatment given.',
+          cite: 'Brown DC, Reetz J. Evid Based Complement Alternat Med, 2012 · University of Pennsylvania',
+          href: 'https://ivcjournal.com/single-agent-polysaccharopeptide-delays-metastases-and-improves-survival-in-naturally-occurring-hemangiosarcoma/' }
+      ] : [
+        { code: 'A1', name: 'Peptide blend', tag: 'Clinical study',
+          finding: 'Cats with degenerative joint disease supplemented with undenatured type II collagen showed improvement in mobility and daily activity over the study period.',
+          cite: 'Undenatured Type II Collagen in Cats with Degenerative Joint Disease · 2024',
+          href: 'https://www.researchgate.net/publication/381552574_UNDENATURED_TYPE_II_COLLAGEN_IN_CATS_WITH_DEGENERATIVE_JOINT_DISEASE' },
+        { code: 'A2', name: 'Taurine & salmon blend', tag: 'Landmark study',
+          finding: 'The landmark Science paper that proved taurine is essential to the feline heart: cats in myocardial failure with low plasma taurine recovered normal heart function on supplementation — the finding that reshaped feline nutrition.',
+          cite: 'Pion PD, Kittleson MD, Rogers QR, Morris JG. Science, 1987;237:764–768',
+          href: 'https://www.science.org/doi/10.1126/science.3616607' },
+        { code: 'A3', name: 'Green-lipped mussel', tag: 'Clinical trial',
+          finding: 'Cats with degenerative joint disease fed a diet built around green-lipped mussel, omega-3s and glucosamine/chondroitin increased their objectively measured activity compared with cats on a control diet.',
+          cite: 'Lascelles BDX, et al. J Vet Intern Med, 2010;24:487–495',
+          href: 'https://www.researchgate.net/publication/42588045_Evaluation_of_a_Therapeutic_Diet_for_Feline_Degenerative_Joint_Disease' }
+      ]).map((e, i) => ({ ...e, tagColor: e.tag === 'Peer-reviewed' ? '#8A7F6E' : 'oklch(0.86 0.14 92)' })),
       benefits: [
         'Supports brain, heart & joint health',
         'Cellular antioxidant defense',
