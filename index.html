@@ -2673,7 +2673,7 @@ class Component extends DCLogic {
     // Live small-batch counter — real availability from actual orders. Quietly
     // absent until it loads (or if the API is unreachable, e.g. local preview).
     fetch('/api/batch').then(r => r.json()).then(b => {
-      if (b && b.ok && typeof b.remaining === 'number') this.setState({ batch: b });
+      if (b && b.ok && b.dog && typeof b.dog.remaining === 'number') this.setState({ batch: b });
     }).catch(() => {});
     // Restore the cart from localStorage so a page refresh keeps items.
     try {
@@ -3149,8 +3149,10 @@ class Component extends DCLogic {
       compare: compareRows,
       dosing: dosingRows,
       ...(() => {
-        // Small-batch tracker — real numbers from /api/batch, hidden until loaded.
-        const b = this.state.batch;
+        // Small-batch tracker — real numbers from /api/batch, hidden until
+        // loaded. Each species has its own run; show the one being viewed.
+        const runs = this.state.batch;
+        const b = runs && runs[this.state.sp === 'cat' ? 'cat' : 'dog'];
         if (!b) return { batchShow: 'none', batchLeft: '', batchTotal: '', batchPct: 0, batchBarColor: '#F2CE59', batchNumColor: '#17140F', batchNote: '', batchPulse: 'oklch(0.72 0.16 152)' };
         const pct = Math.max(0, Math.min(100, Math.round((b.remaining / b.total) * 100)));
         const low = b.remaining > 0 && pct <= 15;

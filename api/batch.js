@@ -12,11 +12,20 @@
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
 const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 
-const BATCH_TOTAL = parseInt(process.env.BATCH_TOTAL || '500', 10);
 const BATCH_START = process.env.BATCH_START || '2026-08-13T00:00:00-07:00';
-// Boxes already gone when tracking began (pre-orders, samples, holdbacks) —
-// the tracker opens at TOTAL − OFFSET and drains from real orders after that.
-const BATCH_OFFSET = parseInt(process.env.BATCH_OFFSET || '48', 10);
+// Each species runs its own batch. OFFSET is boxes already gone when tracking
+// began (pre-orders, samples, holdbacks) — a tracker opens at TOTAL − OFFSET
+// and drains from that species' real orders after that.
+const RUNS = {
+  dog: {
+    total: parseInt(process.env.BATCH_TOTAL_DOG || '500', 10),
+    offset: parseInt(process.env.BATCH_OFFSET_DOG || '48', 10)
+  },
+  cat: {
+    total: parseInt(process.env.BATCH_TOTAL_CAT || '500', 10),
+    offset: parseInt(process.env.BATCH_OFFSET_CAT || '67', 10)
+  }
+};
 
 const QUERY = `query Batch($q: String!, $after: String) {
   orders(first: 100, after: $after, query: $q) {
@@ -25,12 +34,16 @@ const QUERY = `query Batch($q: String!, $after: String) {
   }
 }`;
 
-// Boxes per unit by SKU: the 4-pack ships four boxes; every other Happy Beanie
-// SKU is one box. Non-HB SKUs (accessories etc.) don't draw from the batch.
-function boxesFor(sku, qty) {
+// Which run a SKU draws from, and how many boxes per unit: the 4-pack ships
+// four boxes; everything else is one. Non-HB SKUs don't touch either batch.
+function speciesFor(sku) {
   const s = String(sku || '');
-  if (!/^HB-/i.test(s)) return 0;
-  return (/4PK/i.test(s) ? 4 : 1) * (qty || 0);
+  if (/^HB-CAT/i.test(s)) return 'cat';
+  if (/^HB-DOG/i.test(s)) return 'dog';
+  return null;
+}
+function boxesFor(sku, qty) {
+  return (/4PK/i.test(String(sku || '')) ? 4 : 1) * (qty || 0);
 }
 
 module.exports = async function handler(req, res) {
@@ -43,7 +56,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const q = "created_at:>='" + BATCH_START + "' AND -status:cancelled";
-    let sold = 0;
+    const sold = { dog: 0, cat: 0 };
     let after = null;
     for (let page = 0; page < 10; page++) { // 1,000 orders ≫ any single batch
       const r = await fetch('https://' + STORE_DOMAIN + '/admin/api/' + API_VERSION + '/graphql.json', {
@@ -59,18 +72,22 @@ module.exports = async function handler(req, res) {
       }
       conn.nodes.forEach(function (o) {
         ((o.lineItems && o.lineItems.nodes) || []).forEach(function (li) {
-          sold += boxesFor(li.sku, li.quantity);
+          const sp = speciesFor(li.sku);
+          if (sp) sold[sp] += boxesFor(li.sku, li.quantity);
         });
       });
       if (!conn.pageInfo.hasNextPage) break;
       after = conn.pageInfo.endCursor;
     }
 
-    const remaining = Math.max(0, BATCH_TOTAL - BATCH_OFFSET - sold);
+    function runOut(sp) {
+      const r = RUNS[sp];
+      return { total: r.total, remaining: Math.max(0, r.total - r.offset - sold[sp]), sold: sold[sp] };
+    }
     // Edge cache: fresh for 60s, serve stale while revalidating. The counter
     // never needs to be second-perfect — it needs to be true.
     res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
-    return res.status(200).json({ ok: true, total: BATCH_TOTAL, remaining: remaining, sold: sold });
+    return res.status(200).json({ ok: true, dog: runOut('dog'), cat: runOut('cat') });
   } catch (err) {
     console.error('[batch]', err && err.message);
     return res.status(502).json({ ok: false, error: 'upstream' });
