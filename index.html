@@ -2897,7 +2897,7 @@ class Component extends DCLogic {
         points: [
           { k: 'A1 Peptides', v: 'Proprietary peptide blend · 420mg' },
           { k: 'A2 Whole-food', v: 'Taurine & salmon blend · 250mg' },
-          { k: 'A3 Mushroom', v: 'Lion\u2019s mane, reishi, turkey tail · 150mg' },
+          { k: 'A3 Mussel', v: 'Green-lipped mussel, whole powder · 150mg' },
           { k: 'Weight range', v: '4\u201322 lb' },
           { k: 'Ritual', v: 'One chew each morning' }
         ] }
@@ -2906,7 +2906,7 @@ class Component extends DCLogic {
       { k: 'Format', dog: 'Soft chew, scored', cat: 'Soft chew, scored' },
       { k: 'A1 Peptide blend', dog: '420mg per chew', cat: '180mg per chew' },
       { k: 'A2 Whole-food base', dog: 'Elk blend · 500mg', cat: 'Taurine & salmon · 250mg' },
-      { k: 'A3 Mushroom blend', dog: '300mg per chew', cat: '150mg per chew' },
+      { k: 'A3 Third active', dog: 'Mushroom blend · 300mg', cat: 'Green-lipped mussel · 150mg' },
       { k: 'Copper', dog: 'Included as cofactor', cat: 'None — removed entirely' },
       { k: 'Dosing', dog: 'One chew daily', cat: 'One chew daily' },
       { k: 'Weight range', dog: '6–120 lb', cat: '4–22 lb' },
@@ -3423,7 +3423,7 @@ class Component extends DCLogic {
       ] : [
         { code: 'A1', name: 'Proprietary peptide blend', dose: '180mg per chew', role: 'Copper-free signalling, dosed to a cat’s faster clearance rate.' },
         { code: 'A2', name: 'Taurine & salmon blend', dose: '250mg per chew', role: 'The amino acid cats cannot make enough of, with salmon oil for absorption.' },
-        { code: 'A3', name: 'Mushroom extract blend', dose: '150mg per chew', role: 'Lion’s mane, reishi and turkey tail for immune, gut and nerve support.' }
+        { code: 'A3', name: 'Green-lipped mussel', dose: '150mg per chew', role: 'Whole New Zealand green-lipped mussel — natural glucosamine, chondroitin and rare omega-3s for joints.' }
       ]),
       pdpInsideLabel: isDog ? 'For dogs' : 'For cats',
       benefits: [
@@ -3660,14 +3660,15 @@ const QZ_QUESTIONS = [
     { v: 'fish', label: 'Fish or salmon', meta: 'Salmon oil is priority 01 in both formulas', tag: 'Not eligible', flags: [QZ_F('block', 'Omega-3 EPA/DHA (Salmon Oil)', 'Pri. 01', 'Salmon oil is the backbone of both formulas and cannot be removed. There is no fish-free version of Happy Beanie today.')] },
     { v: 'shellfish', label: 'Shellfish', meta: 'Relevant to the cat formula', flags: [
       { speciesOnly: 'cat', ...QZ_F('block', 'Green-Lipped Mussel', 'Pri. 04', 'The feline joint input is a mollusc powder. Shellfish-allergic cats are not eligible for the cat chew.') } ] },
-    { v: 'mushroom', label: 'Mushrooms or fungal extracts', meta: 'Turkey tail and lion\u2019s mane are priority 03', tag: 'Not eligible', flags: [QZ_F('block', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'The immune layer is a mushroom extract and is present in both formulas at a functional dose.')] },
+    { v: 'mushroom', label: 'Mushrooms or fungal extracts', meta: 'Relevant to the dog formula', flags: [
+      { speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'The dog formula\u2019s immune layer is a mushroom extract at a functional dose. The cat formula is mushroom-free.') } ] },
     { v: 'beef', label: 'Beef', meta: '' },
     { v: 'organ', label: 'Organ meat or game', meta: '', flags: [{ speciesOnly: 'dog', ...QZ_F('caution', 'Elk Liver (freeze-dried)', 'Pri. 05', 'The dog formula carries freeze-dried elk liver. Game and organ meat sit close enough to it to matter — introduce at half dose for a week and watch for itching or loose stool.') }] },
     { v: 'ragweed', label: 'Ragweed, daisy or pollen sensitivity', meta: 'Chamomile is in the same botanical family', flags: [QZ_F('caution', 'Chamomile Extract', 'Dog Pri. 12 · Cat Pri. 11', 'Chamomile is an Asteraceae botanical and can cross-react with ragweed-family allergies. Start at half dose and watch the face and ears for 48 hours.')] } ] },
   { id: 'meds', kind: 'multi', eyebrow: 'Question 06 · Medication', title: 'Is your pet on any of these medications?', help: 'This is the most important question on the screener. Select everything currently prescribed, including anything given seasonally.', options: [
     { v: 'none', label: 'No medication at all', meta: 'Nothing prescription, nothing daily', exclusive: true },
     { v: 'anticoag', label: 'Blood thinner or anticoagulant', meta: 'Clopidogrel, warfarin, aspirin therapy', flags: [QZ_F('caution', 'Omega-3 · Curcumin · CoQ10', 'Pri. 01 · 02 · 09', 'Three inputs independently affect platelet function and clotting time. Read this one carefully and decide deliberately before the first chew — this is not a start-and-see-how-it-goes situation.')] },
-    { v: 'immuno', label: 'Immunosuppressant or long-term steroid', meta: 'Cyclosporine, prednisone, Atopica', flags: [QZ_F('block', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'The mushroom layer is an immune modulator and works directly against a drug prescribed to suppress immunity. These two pull in opposite directions — weigh that carefully before stacking them.')] },
+    { v: 'immuno', label: 'Immunosuppressant or long-term steroid', meta: 'Cyclosporine, prednisone, Atopica', flags: [{ speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'The dog formula\u2019s mushroom layer is an immune modulator and works directly against a drug prescribed to suppress immunity. These two pull in opposite directions — weigh that carefully before stacking them.') }] },
     { v: 'sedative', label: 'Sedative, anti-anxiety or anticonvulsant', meta: 'Trazodone, gabapentin, phenobarbital, fluoxetine', flags: [QZ_F('caution', 'Chamomile · L-Carnitine', 'Pri. 12 · 10', 'Chamomile is mildly sedating and can compound drowsiness; carnitine can shift seizure-medication levels. Weigh both against your pet’s current medication before adding.')] },
     { v: 'thyroid', label: 'Thyroid or cardiac medication', meta: 'Levothyroxine, pimobendan, methimazole', flags: [QZ_F('caution', 'CoQ10 · L-Carnitine', 'Pri. 09 · 10', 'Both inputs act on cardiac energy metabolism. Beneficial in many cases — just account for them before any dose adjustments.')] },
     { v: 'daily', label: 'Any other daily oral medication', meta: 'Given by mouth on a schedule' } ] },
@@ -3679,7 +3680,7 @@ const QZ_QUESTIONS = [
     { v: 'urinary', label: 'Calcium oxalate stones or urinary crystals', meta: 'Relevant to the cat formula', flags: [
       { speciesOnly: 'cat', ...QZ_F('block', 'Organic Cranberry Extract', 'Pri. 07', 'Cranberry is oxalate-rich and acidifies urine — the wrong direction entirely for an oxalate former.') } ] },
     { v: 'kidney', label: 'Kidney disease', meta: 'Any stage of CKD', flags: [QZ_F('caution', 'Collagen Peptide Blend', 'Pri. 11', 'Collagen is a protein load and should be counted against a renal diet. A reduced dose may make more sense here than skipping it entirely.')] },
-    { v: 'autoimmune', label: 'Autoimmune disease', meta: 'IMHA, IBD, lupus, allergic skin disease', flags: [QZ_F('caution', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'Immune modulation in an already dysregulated immune system can cut either way — something to weigh carefully and watch closely if you start.')] },
+    { v: 'autoimmune', label: 'Autoimmune disease', meta: 'IMHA, IBD, lupus, allergic skin disease', flags: [{ speciesOnly: 'dog', ...QZ_F('caution', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'Immune modulation in an already dysregulated immune system can cut either way — something to weigh carefully and watch closely if you start. Applies to the dog formula\u2019s mushroom layer.') }] },
     { v: 'diabetes', label: 'Diabetes', meta: 'Insulin-managed or diet-managed' } ] },
   { id: 'surgery', kind: 'single', eyebrow: 'Question 08 · Next 14 days', title: 'Is any surgery or dental procedure scheduled?', help: 'Three inputs affect bleeding time, so they are best stopped a week or two ahead of anaesthesia.', options: [
     { v: 'no', label: 'Nothing scheduled', meta: 'No procedure planned' },
@@ -3827,7 +3828,7 @@ Object.assign(Component.prototype, {
       qzActives: a.species === 'cat' ? [
         { code: 'A1', name: 'Proprietary peptide blend', dose: '180mg per chew', role: 'Copper-free signalling, dosed to a cat\u2019s faster clearance rate.' },
         { code: 'A2', name: 'Taurine & salmon blend', dose: '250mg per chew', role: 'The amino acid cats cannot make enough of, with salmon oil for absorption.' },
-        { code: 'A3', name: 'Mushroom extract blend', dose: '150mg per chew', role: 'Lion\u2019s mane, reishi and turkey tail for immune, gut and nerve support.' }
+        { code: 'A3', name: 'Green-lipped mussel', dose: '150mg per chew', role: 'Whole New Zealand green-lipped mussel \u2014 natural glucosamine, chondroitin and rare omega-3s for joints.' }
       ] : [
         { code: 'A1', name: 'Proprietary peptide blend', dose: '420mg per chew', role: 'The signalling layer \u2014 instructs repair in joint, skin and connective tissue.' },
         { code: 'A2', name: 'Elk blend', dose: '500mg per chew', role: 'Whole-food velvet antler and organ nutrition: the cofactors repair actually spends.' },
