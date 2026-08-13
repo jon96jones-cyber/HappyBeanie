@@ -93,6 +93,20 @@ main { padding:28px 0 90px; }
 .fulfill select { flex:0 0 auto; }
 .fulfill input:focus, .fulfill select:focus { outline:none; border-color:oklch(0.44 0.07 152); }
 
+.scanbtn { flex:0 0 auto; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; padding:11px 13px; border:1px solid #DDD3C0; border-radius:2px; background:transparent; color:#3D372D; cursor:pointer; }
+.scanbtn:hover { border-color:#17140F; }
+
+.scanui { position:fixed; inset:0; z-index:60; background:#17140F; display:none; flex-direction:column; }
+.scanui.open { display:flex; }
+.scanui video { flex:1; width:100%; object-fit:cover; min-height:0; }
+.scan-top { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 18px; }
+.scan-title { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:#F5F0E6; }
+.scan-close { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; background:transparent; border:1px solid rgba(245,240,230,0.35); color:#F5F0E6; border-radius:999px; padding:10px 16px; cursor:pointer; }
+.scan-hint { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; text-align:center; padding:16px 20px calc(18px + env(safe-area-inset-bottom)); }
+.scan-hint.err { color:#E07A5F; text-transform:none; letter-spacing:0.02em; font-size:12px; }
+.scan-frame { position:absolute; left:8%; right:8%; top:50%; height:130px; transform:translateY(-50%); border:2px solid #F2CE59; border-radius:10px; box-shadow:0 0 0 200vmax rgba(23,20,15,0.35); pointer-events:none; }
+.scan-stage { position:relative; flex:1; display:flex; min-height:0; }
+
 .empty { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; padding:40px 22px; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; text-align:center; }
 .err { margin-top:18px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:13px 16px; font-size:14px; }
 .fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
@@ -149,6 +163,18 @@ main { padding:28px 0 90px; }
   </div>
 </main>
 
+<div class="scanui" id="scanui">
+  <div class="scan-top">
+    <span class="scan-title">Scan the tracking barcode</span>
+    <button class="scan-close" id="scanClose">✕ Close</button>
+  </div>
+  <div class="scan-stage">
+    <video id="scanVideo" autoplay muted playsinline></video>
+    <div class="scan-frame"></div>
+  </div>
+  <div class="scan-hint" id="scanHint">Point the camera at the barcode on the shipping label</div>
+</div>
+
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
@@ -187,6 +213,111 @@ main { padding:28px 0 90px; }
     return '';
   }
   function validTrack(n) { return /^[A-Z0-9]{8,34}$/.test(n); }
+
+  // Label barcodes often wrap the tracking number in routing digits (USPS IMpb
+  // is 420 + ZIP + the 9xx tracking number) — dig the real number out.
+  function extractTracking(raw) {
+    var s = String(raw || '').replace(/[^0-9A-Za-z]/g, '').toUpperCase();
+    var m = s.match(/1Z[0-9A-Z]{16}/); if (m) return m[0];
+    m = s.match(/9[2-5]\d{19,21}/); if (m) return m[0];
+    return s;
+  }
+
+  // ---- Camera barcode scanner --------------------------------------------
+  // Native BarcodeDetector where the browser has it (Android/Chrome); the
+  // vendored ZXing decoder everywhere else (iPhone Safari). One overlay,
+  // whichever card's 📷 button opened it receives the result.
+  var scan = { stream: null, timer: null, zxing: null, onResult: null };
+
+  function scanMsg(msg, isErr) {
+    var h = $('scanHint');
+    h.textContent = msg;
+    h.className = 'scan-hint' + (isErr ? ' err' : '');
+  }
+
+  function closeScanner() {
+    if (scan.timer) { clearInterval(scan.timer); scan.timer = null; }
+    if (scan.zxing) { try { scan.zxing.reset(); } catch (e) {} scan.zxing = null; }
+    if (scan.stream) {
+      scan.stream.getTracks().forEach(function (t) { t.stop(); });
+      scan.stream = null;
+    }
+    $('scanVideo').srcObject = null;
+    $('scanui').classList.remove('open');
+    scan.onResult = null;
+  }
+  $('scanClose').onclick = closeScanner;
+
+  function openScanner(onResult) {
+    scan.onResult = onResult;
+    $('scanui').classList.add('open');
+    scanMsg('Point the camera at the barcode on the shipping label');
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      scanMsg('This browser has no camera access — type the number instead.', true);
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+      .catch(function () {
+        // No rear camera (or the constraint failed) — take any camera.
+        return navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      })
+      .then(function (stream) {
+        scan.stream = stream;
+        var video = $('scanVideo');
+        video.srcObject = stream;
+        return video.play().catch(function () {}).then(function () { startDetection(video); });
+      })
+      .catch(function (err) {
+        scanMsg((err && err.name === 'NotAllowedError')
+          ? 'Camera permission was blocked — allow it in your browser settings, or type the number.'
+          : 'Could not open the camera — type the number instead.', true);
+      });
+  }
+
+  function found(raw) {
+    var num = extractTracking(raw);
+    if (!validTrack(num)) return false; // keep scanning past stray QR codes etc.
+    var cb = scan.onResult;
+    closeScanner();
+    if (cb) cb(num);
+    return true;
+  }
+
+  function startDetection(video) {
+    if (window.BarcodeDetector) {
+      var det;
+      try {
+        det = new BarcodeDetector({ formats: ['code_128', 'code_39', 'itf', 'ean_13', 'upc_a', 'qr_code', 'data_matrix'] });
+      } catch (e) { det = null; }
+      if (det) {
+        scan.timer = setInterval(function () {
+          if (video.readyState < 2) return;
+          det.detect(video).then(function (codes) {
+            for (var i = 0; i < codes.length; i++) if (found(codes[i].rawValue)) return;
+          }).catch(function () {});
+        }, 250);
+        return;
+      }
+    }
+    // No native detector — lazy-load the vendored ZXing decoder.
+    scanMsg('Loading scanner…');
+    var s = document.createElement('script');
+    s.src = '/assets/vendor/zxing.min.js';
+    s.onload = function () {
+      if (!scan.onResult) return; // closed while loading
+      scanMsg('Point the camera at the barcode on the shipping label');
+      try {
+        scan.zxing = new ZXing.BrowserMultiFormatReader();
+        scan.zxing.decodeFromStream(scan.stream, $('scanVideo'), function (result) {
+          if (result) found(result.getText());
+        });
+      } catch (e) {
+        scanMsg('Scanner failed to start — type the number instead.', true);
+      }
+    };
+    s.onerror = function () { scanMsg('Scanner failed to load — type the number instead.', true); };
+    document.head.appendChild(s);
+  }
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -355,6 +486,7 @@ main { padding:28px 0 90px; }
         '</div>' +
         '<div class="fulfill">' +
           '<input type="text" placeholder="Tracking number — scan or type" data-track>' +
+          '<button class="scanbtn" data-scan title="Scan the barcode with your camera">📷 Scan</button>' +
           '<select data-carrier>' + opts + '</select>' +
           '<span class="detect" data-detect></span>' +
           '<button class="btn" data-ship>Mark shipped →</button>' +
@@ -380,6 +512,17 @@ main { padding:28px 0 90px; }
       input.addEventListener('keydown', function (e) { if (e.key === 'Enter') beginConfirm(); });
       shipBtn.onclick = beginConfirm;
 
+      // 📷 Scan: camera reads the label, fills the field, and goes straight
+      // to the confirm step with the carrier auto-selected.
+      card.querySelector('[data-scan]').onclick = function () {
+        openScanner(function (num) {
+          input.value = num;
+          var c = detectCarrier(num);
+          if (c) { select.value = c; detectEl.textContent = '✓ ' + c; }
+          beginConfirm();
+        });
+      };
+
       function cardError(msg) {
         slot.innerHTML = msg ? '<div class="carderr">' + esc(msg) + '</div>' : '';
       }
@@ -403,7 +546,10 @@ main { padding:28px 0 90px; }
           '<button class="btn ghost" data-cancel>Cancel</button>' +
         '</div>';
         var confirmBtn = slot.querySelector('[data-confirm]');
-        confirmBtn.focus();
+        // Arm after a beat: hardware scanners can send a trailing second Enter
+        // (CR+LF), which must never confirm a ship the human hasn't seen.
+        confirmBtn.disabled = true;
+        setTimeout(function () { confirmBtn.disabled = false; confirmBtn.focus(); }, 350);
         slot.querySelector('[data-cancel]').onclick = function () {
           slot.innerHTML = '';
           shipBtn.disabled = false;
