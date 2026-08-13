@@ -864,6 +864,16 @@ image-slot:not([data-filled]) { color: transparent !important; }
           </span>
           <span data-m="qzcta" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152); white-space: nowrap;">Check eligibility →</span>
         </a>
+        <div data-m="hmbatch" style="display: {{ batchShow }}; border: 1px solid #E0D6C2; border-radius: 3px; background: #FCFAF4; padding: 18px 22px 20px; margin-bottom: 30px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px 18px; flex-wrap: wrap; margin-bottom: 12px;">
+            <span style="display: flex; align-items: center; gap: 8px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ batchPulse }}; animation: qzBlip 1.6s ease-in-out infinite;"></span>Small batch · current run</span>
+            <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: {{ batchNumColor }};"><b style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: -0.02em;">{{ batchLeft }}</b> of {{ batchTotal }} boxes left</span>
+          </div>
+          <div style="height: 6px; border-radius: 999px; background: #EDE6D8; overflow: hidden;">
+            <div style="height: 100%; width: {{ batchPct }}%; min-width: 4px; background: {{ batchBarColor }}; border-radius: 999px; transition: width 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);"></div>
+          </div>
+          <div style="margin-top: 11px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">{{ batchNote }}</div>
+        </div>
         <div data-m="hmsupply" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 14px;">Choose your supply</div>
         <div data-m="hmplans" style="display: grid; gap: 10px; margin-bottom: 26px;">
           <sc-for list="{{ plans }}" as="p" hint-placeholder-count="3">
@@ -1230,6 +1240,16 @@ image-slot:not([data-filled]) { color: transparent !important; }
               <span style="display: block; font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35;">Is Happy Beanie right for your pet?</span>
               <span data-m="qzcta" style="display: block; text-align: center; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 12px 14px; border-radius: 999px;">Check eligibility →</span>
             </a>
+          </div>
+          <div data-m="pdbatch" style="display: {{ batchShow }}; border: 1px solid #E0D6C2; border-radius: 4px; background: #FCFAF4; padding: 15px 18px 16px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px 18px; flex-wrap: wrap; margin-bottom: 10px;">
+              <span style="display: flex; align-items: center; gap: 8px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ batchPulse }}; animation: qzBlip 1.6s ease-in-out infinite;"></span>Small batch · current run</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.08em; color: {{ batchNumColor }};"><b style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14.5px; letter-spacing: -0.02em;">{{ batchLeft }}</b> of {{ batchTotal }} boxes left</span>
+            </div>
+            <div style="height: 6px; border-radius: 999px; background: #EDE6D8; overflow: hidden;">
+              <div style="height: 100%; width: {{ batchPct }}%; min-width: 4px; background: {{ batchBarColor }}; border-radius: 999px; transition: width 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);"></div>
+            </div>
+            <div style="margin-top: 10px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">{{ batchNote }}</div>
           </div>
           <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 9px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">
             <span>Choose your supply</span>
@@ -2405,7 +2425,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
 class Component extends DCLogic {
   state = { wkSel: 1, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
-    coa: null, certFilter: 'all',
+    coa: null, certFilter: 'all', batch: null,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
@@ -2650,6 +2670,11 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.heroVideo(0);
+    // Live small-batch counter — real availability from actual orders. Quietly
+    // absent until it loads (or if the API is unreachable, e.g. local preview).
+    fetch('/api/batch').then(r => r.json()).then(b => {
+      if (b && b.ok && typeof b.remaining === 'number') this.setState({ batch: b });
+    }).catch(() => {});
     // Restore the cart from localStorage so a page refresh keeps items.
     try {
       const saved = JSON.parse(localStorage.getItem('hbCart') || 'null');
@@ -3123,6 +3148,28 @@ class Component extends DCLogic {
       evGlow: this.evRecs()[this.state.evRec || 0].grade === 'Level I' ? 'oklch(0.86 0.14 92 / 0.16)' : 'oklch(0.72 0.08 152 / 0.14)',
       compare: compareRows,
       dosing: dosingRows,
+      ...(() => {
+        // Small-batch tracker — real numbers from /api/batch, hidden until loaded.
+        const b = this.state.batch;
+        if (!b) return { batchShow: 'none', batchLeft: '', batchTotal: '', batchPct: 0, batchBarColor: '#F2CE59', batchNumColor: '#17140F', batchNote: '', batchPulse: 'oklch(0.72 0.16 152)' };
+        const pct = Math.max(0, Math.min(100, Math.round((b.remaining / b.total) * 100)));
+        const low = b.remaining > 0 && pct <= 15;
+        const out = b.remaining <= 0;
+        return {
+          batchShow: 'block',
+          batchLeft: b.remaining.toLocaleString('en-US'),
+          batchTotal: b.total.toLocaleString('en-US'),
+          batchPct: pct,
+          batchBarColor: out ? '#B4472C' : (low ? '#B4472C' : '#F2CE59'),
+          batchNumColor: (low || out) ? '#B4472C' : '#17140F',
+          batchPulse: (low || out) ? '#B4472C' : 'oklch(0.72 0.16 152)',
+          batchNote: out
+            ? 'This run is sold out — the next batch is compounding now. Join the list below to hear first.'
+            : (low
+              ? 'Almost gone — once this run sells out, the next batch starts from scratch.'
+              : 'Compounded in one small run. When these are gone, the batch is gone.')
+        };
+      })(),
       plans: planDefs.map((p, i) => {
         const on = this.state.plan === i;
         return {
