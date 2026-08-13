@@ -12,8 +12,11 @@
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
 const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 
-const BATCH_TOTAL = parseInt(process.env.BATCH_TOTAL || '452', 10);
+const BATCH_TOTAL = parseInt(process.env.BATCH_TOTAL || '500', 10);
 const BATCH_START = process.env.BATCH_START || '2026-08-13T00:00:00-07:00';
+// Boxes already gone when tracking began (pre-orders, samples, holdbacks) —
+// the tracker opens at TOTAL − OFFSET and drains from real orders after that.
+const BATCH_OFFSET = parseInt(process.env.BATCH_OFFSET || '48', 10);
 
 const QUERY = `query Batch($q: String!, $after: String) {
   orders(first: 100, after: $after, query: $q) {
@@ -63,7 +66,7 @@ module.exports = async function handler(req, res) {
       after = conn.pageInfo.endCursor;
     }
 
-    const remaining = Math.max(0, BATCH_TOTAL - sold);
+    const remaining = Math.max(0, BATCH_TOTAL - BATCH_OFFSET - sold);
     // Edge cache: fresh for 60s, serve stale while revalidating. The counter
     // never needs to be second-perfect — it needs to be true.
     res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
