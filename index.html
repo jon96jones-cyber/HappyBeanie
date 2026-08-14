@@ -554,14 +554,16 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="spcard"] > :nth-child(1) { width: 13px !important; height: 13px !important; }
     [data-m~="spcard"] div > div:first-child { font-size: 19px !important; }
     [data-m~="spcard"] div > div:last-child { display: none !important; }
-    /* Evidence tab reader: drop the file-tab metaphor on mobile — full-width
-       stacked buttons with all four borders, no lift, card gets its own radius. */
+    /* Evidence tab reader on mobile: keep the file-tab metaphor — all three
+       tabs on one row with compact labels; the joined edge survives. */
     [data-m~="evsec"] { margin-top: 56px !important; }
     [data-m~="evh2"] { white-space: normal !important; font-size: 24px !important; }
     [data-m~="evhead"] { grid-template-columns: 1fr !important; align-items: start !important; }
-    [data-m~="evtabs"] { grid-template-columns: 1fr !important; gap: 6px !important; }
-    [data-m~="evtab"] { transform: none !important; margin-bottom: 0 !important; border-bottom: 1px solid #E0D6C2 !important; border-radius: 5px !important; }
-    [data-m~="evcard"] { padding: 22px 18px !important; border-radius: 6px !important; margin-top: 6px !important; }
+    [data-m~="evtabs"] { gap: 5px !important; }
+    [data-m~="evtab"] { padding: 10px 11px 12px !important; gap: 4px !important; }
+    [data-m~="evtabname"] { display: none !important; }
+    [data-m~="evtabshort"] { display: block !important; }
+    [data-m~="evcard"] { padding: 22px 18px !important; }
     [data-m~="evtitle"] { font-size: 20px !important; }
     [data-m~="evresult"] { font-size: 16.5px !important; }
   }
@@ -1348,6 +1350,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <button sc-camel-on-click="{{ ev.pick }}" data-m="evtab" style="position: relative; z-index: {{ ev.tabZ }}; margin-bottom: -1px; display: grid; gap: 5px; text-align: left; cursor: pointer; padding: 15px 17px 16px; border-top: 1px solid {{ ev.tabBorder }}; border-left: 1px solid {{ ev.tabBorder }}; border-right: 1px solid {{ ev.tabBorder }}; border-bottom: 1px solid {{ ev.tabEdge }}; border-radius: 5px 5px 0 0; background: {{ ev.tabBg }}; transition: background 0.28s ease, border-color 0.28s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1); transform: {{ ev.tabLift }};">
               <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: {{ ev.tabKicker }}; transition: color 0.28s ease;">Active {{ ev.n }}</span>
               <span data-m="evtabname" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.028em; font-size: 15.5px; line-height: 1.2; color: {{ ev.tabColor }}; transition: color 0.28s ease;">{{ ev.active }}</span>
+              <span data-m="evtabshort" style="display: none; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 13.5px; line-height: 1.2; color: {{ ev.tabColor }}; transition: color 0.28s ease;">{{ ev.short }}</span>
             </button>
           </sc-for>
         </div>
@@ -2833,6 +2836,7 @@ class Component extends DCLogic {
     return (isDog ? [
         {
           active: 'Proprietary peptide blend',
+          short: 'Peptides',
           dose: '420mg per chew',
           source: 'PubMed Central',
           title: 'Collagen peptides and the repair signalling pathways behind joint and connective tissue',
@@ -2842,6 +2846,7 @@ class Component extends DCLogic {
         },
         {
           active: 'Elk blend',
+          short: 'Elk',
           dose: '500mg per chew',
           source: 'Research in Veterinary Science',
           design: 'Placebo-controlled trial',
@@ -2852,6 +2857,7 @@ class Component extends DCLogic {
         },
         {
           active: 'Mushroom extract blend',
+          short: 'Mushroom',
           dose: '200mg per chew',
           source: 'IVC Journal',
           design: 'Randomised, dose-escalation',
@@ -2863,6 +2869,7 @@ class Component extends DCLogic {
       ] : [
         {
           active: 'Green-lipped mussel',
+          short: 'Mussel',
           dose: '300mg per chew',
           source: 'Journal of Veterinary Internal Medicine',
           design: 'Randomised, controlled, masked',
@@ -2873,6 +2880,7 @@ class Component extends DCLogic {
         },
         {
           active: 'Taurine & salmon blend',
+          short: 'Taurine',
           dose: '250mg per chew',
           source: 'Science',
           design: 'Controlled feeding trial',
@@ -2883,6 +2891,7 @@ class Component extends DCLogic {
         },
         {
           active: 'Proprietary peptide blend',
+          short: 'Peptides',
           dose: '180mg per chew',
           design: 'Clinical trial',
           title: 'Undenatured type II collagen in cats with degenerative joint disease',
