@@ -1480,58 +1480,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
         </div>
       </div>
       <div style="max-width: 1180px; margin: 14px auto 0; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; color: #8A7F6E;">Bandanas ship free with every first order. One discount per household.</div>
-      <div data-m="inset" data-rv="1" style="position: relative; max-width: 1180px; margin: 88px auto 0; background: #17140F; border-radius: 5px; padding: 64px 56px; overflow: hidden; opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);">
-        <div aria-hidden="true" style="position: absolute; left: -130px; top: -170px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(circle, oklch(0.72 0.08 152 / 0.14), transparent 70%); pointer-events: none;"></div>
-        <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.05) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(120% 90% at 80% 0%, #000 20%, transparent 80%); -webkit-mask-image: radial-gradient(120% 90% at 80% 0%, #000 20%, transparent 80%);"></div>
-        <div aria-hidden="true" style="position: absolute; top: 14px; left: 14px; width: 9px; height: 9px; border-top: 1px solid rgba(245,240,230,0.5); border-left: 1px solid rgba(245,240,230,0.5);"></div>
-        <div aria-hidden="true" style="position: absolute; top: 14px; right: 14px; width: 9px; height: 9px; border-top: 1px solid rgba(245,240,230,0.5); border-right: 1px solid rgba(245,240,230,0.5);"></div>
-        <div aria-hidden="true" style="position: absolute; bottom: 14px; left: 14px; width: 9px; height: 9px; border-bottom: 1px solid rgba(245,240,230,0.5); border-left: 1px solid rgba(245,240,230,0.5);"></div>
-        <div aria-hidden="true" style="position: absolute; bottom: 14px; right: 14px; width: 9px; height: 9px; border-bottom: 1px solid rgba(245,240,230,0.5); border-right: 1px solid rgba(245,240,230,0.5);"></div>
-        <div style="position: relative; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 20px;">The evidence</div>
-        <h2 style="position: relative; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; color: #F5F0E6; margin: 0 0 30px; max-width: 22em;">What the research <span style="color: oklch(0.86 0.14 92);">actually supports.</span></h2>
-        <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 1px; background: rgba(245,240,230,0.16); border: 1px solid rgba(245,240,230,0.16); border-radius: 4px; overflow: hidden;">
-          <div style="background: #17140F; display: grid; align-content: start;">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 18px; border-bottom: 1px solid rgba(245,240,230,0.16); font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">
-              <span>Registry · 4 records</span><span>07 · 2026</span>
-            </div>
-            <sc-for list="{{ evRecords }}" as="er" hint-placeholder-count="4">
-              <button sc-camel-on-click="{{ er.pick }}" sc-camel-on-mouse-enter="{{ er.pick }}" style="position: relative; text-align: left; border: none; border-bottom: 1px solid rgba(245,240,230,0.1); background: {{ er.bg }}; cursor: pointer; padding: 16px 18px 17px 22px; display: grid; gap: 7px; transition: background 0.3s ease, padding 0.35s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #221E17;">
-                <span style="position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: {{ er.rule }}; transform: scaleY({{ er.ruleScale }}); transform-origin: center; transition: transform 0.4s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease;"></span>
-                <span style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                  <span style="font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: {{ er.recColor }};">{{ er.rec }} · {{ er.year }}</span>
-                  <span style="font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ er.gradeColor }}; border: 1px solid {{ er.gradeBorder }}; padding: 3px 6px; border-radius: 2px;">{{ er.grade }}</span>
-                </span>
-                <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 16px; line-height: 1.2; color: {{ er.titleColor }}; transition: color 0.3s ease;">{{ er.title }}</span>
-              </button>
-            </sc-for>
-          </div>
-          <div style="position: relative; background: #17140F; padding: 30px 32px 34px; min-height: 340px; overflow: hidden;">
-            <div aria-hidden="true" style="position: absolute; right: -60px; top: -80px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, {{ evGlow }}, transparent 70%); transition: background 0.5s ease; pointer-events: none;"></div>
-            <div style="position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 22px; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">
-              <span style="color: #17140F; background: rgba(245,240,230,0.82); padding: 4px 8px; border-radius: 2px;">{{ evSel.rec }}</span>
-              <span>{{ evSel.design }}</span>
-              <span style="color: #DED5C4;">{{ evSel.n }}</span>
-              <span style="flex: 1; height: 1px; background: rgba(245,240,230,0.16); min-width: 20px;"></span>
-              <span style="color: {{ evSel.gradeColor }};">{{ evSel.grade }} evidence</span>
-            </div>
-            <div style="position: relative; margin-bottom: 24px;">
-              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 8px;">
-                <span>Strength of evidence</span><span style="color: #DED5C4;">{{ evSel.strength }}</span>
-              </div>
-              <div style="position: relative; height: 5px; border-radius: 3px; background: rgba(245,240,230,0.12); overflow: hidden;">
-                <span style="position: absolute; left: 0; top: 0; bottom: 0; width: {{ evSel.strength }}; background: oklch(0.86 0.14 92); border-radius: 3px; transition: width 0.65s cubic-bezier(0.2,0.7,0.2,1), background 0.4s ease;"></span>
-              </div>
-            </div>
-            <div style="position: relative; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: {{ evSel.evColor }}; margin-bottom: 12px;">{{ evSel.evLabel }}</div>
-            <p style="position: relative; font-size: 15.5px; line-height: 1.65; color: #DED5C4; margin: 0 0 18px; max-width: 44em; text-wrap: pretty;">{{ evSel.evFinding }}</p>
-            <div style="position: relative; font-family: 'DM Mono', monospace; font-size: 10px; line-height: 1.5; color: #8A7F6E;">{{ evSel.evCite }}</div>
-            <sc-if value="{{ evSel.hasLink }}" hint-placeholder-val="{{ false }}">
-              <a href="{{ evSel.evHref }}" target="_blank" rel="noopener" style="position: relative; display: inline-block; margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.86 0.14 92); border-bottom: 1px solid oklch(0.86 0.14 92); padding-bottom: 2px;" style-hover="color: #F5F0E6; border-color: #F5F0E6;">Read on PubMed →</a>
-            </sc-if>
-          </div>
-        </div>
-        <p style="position: relative; font-size: 13px; line-height: 1.65; color: #8A7F6E; margin: 26px 0 0; max-width: 52em;">Published trials cited here evaluate the ingredient class our carriers are drawn from, not Happy Beanie as a finished product. We link the primary source so you can read the method and judge it yourself.</p>
-      </div>
 
       <div data-m="stack gap" style="display: none; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; max-width: 1180px; margin: 88px auto 0;">
         <div data-m="auto" style="height: 520px; border-radius: 5px; overflow: hidden; box-shadow: 0 34px 60px -38px rgba(23,20,15,0.5);"><image-slot id="hbv2-pdp-story" placeholder="Beanie, the dog this began with" style="width: 100%; height: 100%;"></image-slot></div>
