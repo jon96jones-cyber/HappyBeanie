@@ -1402,12 +1402,27 @@ image-slot:not([data-filled]) { color: transparent !important; }
                     <g style="{{ wkTiltStyle }}">
                       <path d="{{ wkFace.earL }}" fill="oklch(0.66 0.13 62)" stroke="#17140F" stroke-width="1.3" stroke-linejoin="round"></path>
                       <path d="{{ wkFace.earR }}" fill="oklch(0.66 0.13 62)" stroke="#17140F" stroke-width="1.3" stroke-linejoin="round"></path>
+                      <path d="{{ wkFace.earInL }}" fill="#F0A8BE" opacity="{{ wkFace.catOp }}"></path>
+                      <path d="{{ wkFace.earInR }}" fill="#F0A8BE" opacity="{{ wkFace.catOp }}"></path>
                       <path d="M17 7.4 Q26.4 7.4 26.4 17.4 Q26.4 26.6 17 26.6 Q7.6 26.6 7.6 17.4 Q7.6 7.4 17 7.4 Z" fill="#F5F0E6" stroke="#17140F" stroke-width="1.4"></path>
-                      <path d="M17 7.4 Q26.4 7.4 26.4 17.4 Q26.4 22 24 24.4 Q20.6 20.6 20.4 15 Q20.2 9.6 17 7.4 Z" fill="oklch(0.66 0.13 62)"></path>
+                      <path d="M17 7.4 Q26.4 7.4 26.4 17.4 Q26.4 22 24 24.4 Q20.6 20.6 20.4 15 Q20.2 9.6 17 7.4 Z" fill="oklch(0.66 0.13 62)" opacity="{{ wkFace.dogOp }}"></path>
                       <path d="M17 7.4 Q26.4 7.4 26.4 17.4 Q26.4 26.6 17 26.6 Q7.6 26.6 7.6 17.4 Q7.6 7.4 17 7.4 Z" fill="none" stroke="#17140F" stroke-width="1.4"></path>
+                      <g opacity="{{ wkFace.catOp }}" stroke="oklch(0.66 0.13 62)" stroke-width="1.2" stroke-linecap="round">
+                        <path d="M14.4 8.2 L13.9 10.8"></path>
+                        <path d="M17 7.6 L17 10.4"></path>
+                        <path d="M19.6 8.2 L20.1 10.8"></path>
+                      </g>
+                      <g opacity="{{ wkFace.catOp }}" stroke="rgba(245,240,230,0.65)" stroke-width="0.8" stroke-linecap="round">
+                        <path d="M8 17.8 L2 16.8"></path>
+                        <path d="M8 19.3 L1.6 19.3"></path>
+                        <path d="M8 20.8 L2 21.8"></path>
+                        <path d="M26 17.8 L32 16.8"></path>
+                        <path d="M26 19.3 L32.4 19.3"></path>
+                        <path d="M26 20.8 L32 21.8"></path>
+                      </g>
                       <circle cx="13.4" cy="{{ wkFace.eye }}" r="{{ wkFace.eyeR }}" fill="#17140F"></circle>
                       <circle cx="21" cy="{{ wkFace.eye }}" r="{{ wkFace.eyeR }}" fill="#17140F"></circle>
-                      <ellipse cx="17" cy="19.2" rx="2.4" ry="1.8" fill="#17140F"></ellipse>
+                      <ellipse cx="17" cy="19.2" rx="{{ wkFace.noseRx }}" ry="{{ wkFace.noseRy }}" fill="{{ wkFace.noseFill }}"></ellipse>
                       <path d="M15.5 22.2 Q15.5 25.9 17 25.9 Q18.5 25.9 18.5 22.2 Z" fill="oklch(0.63 0.16 22)" stroke="#17140F" stroke-width="0.9" stroke-linejoin="round" opacity="{{ wkFace.tongue }}"></path>
                       <path d="{{ wkFace.mouth }}" stroke="#17140F" stroke-width="1.4" stroke-linecap="round" fill="none"></path>
                     </g>
@@ -3066,19 +3081,47 @@ class Component extends DCLogic {
         ].filter(Boolean).map((m, j) => ({ ...m, border: j === 0 ? '0' : '1px solid #E0D6C2', padLeft: j === 0 ? '0px' : '20px' }))
       }));
   }
-  wkFaces() {
+  wkFaces(isCat) {
+    // Mouth / eye / tilt / tongue morphs are shared; ears (and the cat's pink
+    // inner ears) are the species-specific geometry. Cat ears go flattened →
+    // half-raised → tall as the stages improve, mirroring the dog's droop→perk.
     const droopL = 'M7.4 12.6 Q3.2 14.4 4.6 22.4 Q8.2 20.2 8.8 14.2 Z';
     const droopR = 'M26.6 12.6 Q30.8 14.4 29.4 22.4 Q25.8 20.2 25.2 14.2 Z';
     const halfL = 'M7.4 12.4 Q2.6 12.2 3.4 18.6 Q7.4 17.4 8.8 13.8 Z';
     const halfR = 'M26.6 12.4 Q31.4 12.2 30.6 18.6 Q26.6 17.4 25.2 13.8 Z';
     const perkL = 'M7.6 12.8 Q4.2 7.6 6.4 3.4 Q9.6 7.4 9 13.4 Z';
     const perkR = 'M26.4 12.8 Q29.8 7.6 27.6 3.4 Q24.4 7.4 25 13.4 Z';
+    const cFlatL = 'M7.8 13 L2.8 8 L12.8 8.8 Z';
+    const cFlatR = 'M26.2 13 L31.2 8 L21.2 8.8 Z';
+    const cHalfL = 'M7.9 12.6 L4.8 5 L13.6 8.2 Z';
+    const cHalfR = 'M26.1 12.6 L29.2 5 L20.4 8.2 Z';
+    const cTallL = 'M8 12.4 L6 3 L14.4 7.8 Z';
+    const cTallR = 'M26 12.4 L28 3 L19.6 7.8 Z';
+    const cFlatInL = 'M8.4 12 L4.8 8.5 L11.7 8.9 Z';
+    const cFlatInR = 'M25.6 12 L29.2 8.5 L22.3 8.9 Z';
+    const cHalfInL = 'M8.7 11.6 L6.3 6.3 L12.3 8.5 Z';
+    const cHalfInR = 'M25.3 11.6 L27.7 6.3 L21.7 8.5 Z';
+    const cTallInL = 'M8.9 11.2 L7.4 4.9 L12.7 8.2 Z';
+    const cTallInR = 'M25.1 11.2 L26.6 4.9 L21.3 8.2 Z';
+    const ears = isCat
+      ? [
+          { earL: cFlatL, earR: cFlatR, earInL: cFlatInL, earInR: cFlatInR },
+          { earL: cHalfL, earR: cHalfR, earInL: cHalfInL, earInR: cHalfInR },
+          { earL: cTallL, earR: cTallR, earInL: cTallInL, earInR: cTallInR },
+          { earL: cTallL, earR: cTallR, earInL: cTallInL, earInR: cTallInR }
+        ]
+      : [
+          { earL: droopL, earR: droopR, earInL: droopL, earInR: droopR },
+          { earL: halfL, earR: halfR, earInL: halfL, earInR: halfR },
+          { earL: perkL, earR: perkR, earInL: perkL, earInR: perkR },
+          { earL: perkL, earR: perkR, earInL: perkL, earInR: perkR }
+        ];
     return [
-      { mouth: 'M13.8 22.6 L20.2 22.6', eye: 15.2, eyeR: 1.5, tilt: 0, tongue: 0, earL: droopL, earR: droopR },
-      { mouth: 'M13.8 22.2 Q17 23.4 20.2 22.2', eye: 15.1, eyeR: 1.6, tilt: -3, tongue: 0, earL: halfL, earR: halfR },
-      { mouth: 'M13.6 21.8 Q17 24.4 20.4 21.8', eye: 14.9, eyeR: 1.7, tilt: 4, tongue: 0, earL: perkL, earR: perkR },
-      { mouth: 'M13.2 21.6 Q17 25.4 20.8 21.6', eye: 14.6, eyeR: 1.8, tilt: -5.5, tongue: 1, earL: perkL, earR: perkR }
-    ];
+      { mouth: 'M13.8 22.6 L20.2 22.6', eye: 15.2, eyeR: 1.5, tilt: 0, tongue: 0 },
+      { mouth: 'M13.8 22.2 Q17 23.4 20.2 22.2', eye: 15.1, eyeR: 1.6, tilt: -3, tongue: 0 },
+      { mouth: 'M13.6 21.8 Q17 24.4 20.4 21.8', eye: 14.9, eyeR: 1.7, tilt: 4, tongue: 0 },
+      { mouth: 'M13.2 21.6 Q17 25.4 20.8 21.6', eye: 14.6, eyeR: 1.8, tilt: -5.5, tongue: 1 }
+    ].map((f, i) => ({ ...f, ...ears[i] }));
   }
 
   wkStop() {
@@ -3166,7 +3209,6 @@ class Component extends DCLogic {
       const a = Math.PI - (i / 3) * Math.PI;
       return { cx: (110 + 90 * Math.cos(a)).toFixed(1), cy: (118 - 90 * Math.sin(a)).toFixed(1), fill: i <= wkSelIdx ? wkGold : 'rgba(245,240,230,0.22)' };
     });
-    const wkF = this.wkFaces()[wkSelIdx];
     const wkS = wkBase[wkSelIdx];
     const co = this.state.co;
     const coKeys = ['email', 'name', 'addr', 'city', 'state', 'zip'];
@@ -3293,6 +3335,7 @@ class Component extends DCLogic {
       { q: 'Where are the certificates of analysis?', a: 'Lab tests can be seen here, and they stay online for the life of the product.', cta: 'View lab tests', ctaPage: 'certs' }
     ];
     const isDog = this.state.sp === 'dog';
+    const wkF = this.wkFaces(!isDog)[wkSelIdx];
     const base = (this.props.basePrice ?? 68) - (isDog ? 0 : 6);
     const planDefs = [
       { title: 'One-time', sub: '30-day supply, shipped once', price: 115, save: '', badge: '' },
@@ -3705,7 +3748,7 @@ class Component extends DCLogic {
       wkSel: { key: 'w' + wkSelIdx, when: wkS.when, title: wkS.title, body: wkS.body, mood: wkMoods[wkSelIdx], num: '0' + (wkSelIdx + 1) },
       wkDialOffset: 100 - (wkSelIdx / 3) * 100,
       wkNeedleStyle: { transformOrigin: '110px 118px', transform: 'rotate(' + (-78 + wkSelIdx * 52) + 'deg)', transition: 'transform 0.6s cubic-bezier(0.2,0.7,0.2,1)' },
-      wkFace: wkF,
+      wkFace: { ...wkF, catOp: isDog ? 0 : 1, dogOp: isDog ? 1 : 0, noseFill: isDog ? '#17140F' : '#E8A2B8', noseRx: isDog ? 2.4 : 1.9, noseRy: isDog ? 1.8 : 1.5 },
       wkTiltStyle: { transformOrigin: '17px 18px', transform: 'rotate(' + wkF.tilt + 'deg)', transition: 'transform 0.5s cubic-bezier(0.2,0.7,0.2,1)' },
       wkBadgeStyle: {
         display: 'grid', placeItems: 'center', width: '62px', height: '62px', flex: '0 0 auto', borderRadius: '50%',
