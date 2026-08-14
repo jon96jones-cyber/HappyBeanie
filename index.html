@@ -554,6 +554,16 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="spcard"] > :nth-child(1) { width: 13px !important; height: 13px !important; }
     [data-m~="spcard"] div > div:first-child { font-size: 19px !important; }
     [data-m~="spcard"] div > div:last-child { display: none !important; }
+    /* Evidence tab reader: drop the file-tab metaphor on mobile — full-width
+       stacked buttons with all four borders, no lift, card gets its own radius. */
+    [data-m~="evsec"] { margin-top: 56px !important; }
+    [data-m~="evh2"] { white-space: normal !important; font-size: 24px !important; }
+    [data-m~="evhead"] { grid-template-columns: 1fr !important; align-items: start !important; }
+    [data-m~="evtabs"] { grid-template-columns: 1fr !important; gap: 6px !important; }
+    [data-m~="evtab"] { transform: none !important; margin-bottom: 0 !important; border-bottom: 1px solid #E0D6C2 !important; border-radius: 5px !important; }
+    [data-m~="evcard"] { padding: 22px 18px !important; border-radius: 6px !important; margin-top: 6px !important; }
+    [data-m~="evtitle"] { font-size: 20px !important; }
+    [data-m~="evresult"] { font-size: 16.5px !important; }
   }
   @media (max-width: 620px) {
     [data-m~="two"]   { grid-template-columns: minmax(0, 1fr) !important; }
@@ -1319,6 +1329,53 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <p style="font-size: 11.5px; line-height: 1.55; color: #6A6055; margin: 0; max-width: none;">These statements have not been evaluated by the Food and Drug Administration. None of the ingredients listed above have been evaluated by the FDA for the benefits described, and this product is not intended to diagnose, treat, cure, or prevent any disease. Happy Beanie is a food supplement, not a medication.</p>
           </div>
         </div>
+      </div>
+
+      <div data-m="evsec" style="position: relative; max-width: 980px; margin: 96px auto 0;">
+        <div data-m="evhead" style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; margin-bottom: 26px;">
+          <div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 16px;">The evidence</div>
+            <h2 data-m="evh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(20px, 2.35vw, 33px); line-height: 1.06; margin: 0; max-width: none; white-space: nowrap;">Three active ingredients. <span style="color: oklch(0.44 0.07 152);">Three published studies.</span></h2>
+          </div>
+          <div data-m="evtag" style="display: flex; align-items: center; gap: 9px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055; white-space: nowrap; padding-bottom: 5px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152);"></span>
+            <span>{{ evScope }}</span>
+          </div>
+        </div>
+
+        <div data-m="evtabs" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 0;">
+          <sc-for list="{{ evidence }}" as="ev" hint-placeholder-count="3">
+            <button sc-camel-on-click="{{ ev.pick }}" data-m="evtab" style="position: relative; z-index: {{ ev.tabZ }}; margin-bottom: -1px; display: grid; gap: 5px; text-align: left; cursor: pointer; padding: 15px 17px 16px; border-top: 1px solid {{ ev.tabBorder }}; border-left: 1px solid {{ ev.tabBorder }}; border-right: 1px solid {{ ev.tabBorder }}; border-bottom: 1px solid {{ ev.tabEdge }}; border-radius: 5px 5px 0 0; background: {{ ev.tabBg }}; transition: background 0.28s ease, border-color 0.28s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1); transform: {{ ev.tabLift }};">
+              <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: {{ ev.tabKicker }}; transition: color 0.28s ease;">Active {{ ev.n }}</span>
+              <span data-m="evtabname" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.028em; font-size: 15.5px; line-height: 1.2; color: {{ ev.tabColor }}; transition: color 0.28s ease;">{{ ev.active }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div data-m="evcard" key="{{ evOne.key }}" style="position: relative; border: 1px solid #17140F; border-radius: 0 0 6px 6px; background: #FCFAF4; padding: 34px 36px 32px; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.3);">
+          <div data-m="evchips" style="display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 20px;">
+            <sc-for list="{{ evOne.meta }}" as="mt" hint-placeholder-count="3">
+              <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #554C40; background: #F2EBDC; border: 1px solid #E0D6C2; border-radius: 3px; padding: 6px 10px;">{{ mt.k }} <span style="color: #8A7F6E;">/</span> {{ mt.v }}</span>
+            </sc-for>
+          </div>
+
+          <h3 data-m="evtitle" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.032em; font-size: 25px; line-height: 1.2; color: #17140F; margin: 0 0 18px; max-width: 26em; text-wrap: pretty;">{{ evOne.title }}</h3>
+
+          <div data-m="evsplit">
+            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 11px;">What it found</div>
+            <p data-m="evresult" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 19px; line-height: 1.46; letter-spacing: -0.016em; color: #17140F; margin: 0; max-width: 34em; text-wrap: pretty;">{{ evOne.result }}</p>
+          </div>
+
+          <div data-m="evfoot" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #E4DBC9;">
+            <a href="{{ evOne.url }}" target="_blank" rel="noopener noreferrer" data-m="evlink" style="display: inline-flex; align-items: center; gap: 11px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #F5F0E6; background: #17140F; border: 1px solid #17140F; border-radius: 3px; padding: 12px 18px; text-decoration: none; transition: background 0.25s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: oklch(0.44 0.07 152); border-color: oklch(0.44 0.07 152); transform: translateY(-2px);">
+              <span>Read the study</span>
+              <span aria-hidden="true">&#8599;</span>
+            </a>
+            <span data-m="evcite" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E;">{{ evOne.cite }}</span>
+          </div>
+        </div>
+
+        <p data-m="evnote" style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.7; text-transform: uppercase; color: #8A7F6E; margin: 18px 0 0;">Opens at the publisher in a new tab. Published research on an ingredient is not a claim about this product.</p>
       </div>
 
       <div data-m="inset" data-rv="1" style="position: relative; max-width: 1180px; margin: 88px auto 0; background: linear-gradient(168deg, #201C15 0%, #17140F 46%, #120F0B 100%); border-radius: 5px; padding: 72px 56px; overflow: hidden; box-shadow: 0 44px 90px -40px rgba(23,20,15,0.75), 0 1px 0 rgba(245,240,230,0.09) inset; opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);">
@@ -2820,6 +2877,90 @@ class Component extends DCLogic {
     };
   }
 
+  // Product-page ingredient-evidence tabs: study data + per-tab derived
+  // styling (from the design handoff). Species set is a pure function of
+  // isDog; state.evSel is the local tab index (0-2, valid for both sets).
+  evList(isDog) {
+    const evSel = this.state.evSel || 0;
+    return (isDog ? [
+        {
+          active: 'Proprietary peptide blend',
+          dose: '420mg per chew',
+          source: 'PubMed Central',
+          title: 'Collagen peptides and the repair signalling pathways behind joint and connective tissue',
+          result: 'Collagen peptides taken by mouth survived digestion, reached connective tissue, and measurably shifted cells toward rebuilding it rather than breaking it down.',
+          cite: 'PubMed Central · PMC6789547',
+          url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6789547/'
+        },
+        {
+          active: 'Elk blend',
+          dose: '500mg per chew',
+          source: 'Research in Veterinary Science',
+          design: 'Placebo-controlled trial',
+          title: 'Elk velvet antler supplementation in dogs with osteoarthritis',
+          result: 'Dogs on elk velvet antler put more weight on their affected limbs and moved better than dogs on placebo, with no adverse effects across the trial.',
+          cite: 'Research in Veterinary Science · 2014',
+          url: 'https://www.sciencedirect.com/science/article/abs/pii/S0034528814002483'
+        },
+        {
+          active: 'Mushroom extract blend',
+          dose: '200mg per chew',
+          source: 'IVC Journal',
+          design: 'Randomised, dose-escalation',
+          title: 'A mushroom compound, used alone, slowed cancer spread in dogs',
+          result: 'Dogs given the mushroom compound alone — no chemotherapy — survived longer and their cancer spread more slowly, with the highest dose performing best.',
+          cite: 'Brown & Reetz · IVC Journal · “Single-agent polysaccharopeptide delays metastases and improves survival in naturally occurring canine hemangiosarcoma”',
+          url: 'https://ivcjournal.com/single-agent-polysaccharopeptide-delays-metastases-and-improves-survival-in-naturally-occurring-hemangiosarcoma/'
+        }
+      ] : [
+        {
+          active: 'Green-lipped mussel',
+          dose: '300mg per chew',
+          source: 'Journal of Veterinary Internal Medicine',
+          design: 'Randomised, controlled, masked',
+          title: 'Evaluation of a therapeutic diet for feline degenerative joint disease',
+          result: 'Cats fed green-lipped mussel and omega-3s were measurably more active than cats on the control diet, tracked by device rather than owner opinion.',
+          cite: 'Lascelles et al. · 2010',
+          url: 'https://www.researchgate.net/publication/42588045_Evaluation_of_a_Therapeutic_Diet_for_Feline_Degenerative_Joint_Disease'
+        },
+        {
+          active: 'Taurine & salmon blend',
+          dose: '250mg per chew',
+          source: 'Science',
+          design: 'Controlled feeding trial',
+          title: 'Myocardial failure in cats associated with low plasma taurine: a reversible cardiomyopathy',
+          result: 'Cats in heart failure from low taurine recovered normal heart function once taurine was restored — the damage reversed, and taurine became mandatory in cat food.',
+          cite: 'Pion et al. · Science · 1987',
+          url: 'https://www.science.org/doi/10.1126/science.3616607'
+        },
+        {
+          active: 'Proprietary peptide blend',
+          dose: '180mg per chew',
+          design: 'Clinical trial',
+          title: 'Undenatured type II collagen in cats with degenerative joint disease',
+          result: 'Cats with degenerative joint disease improved in mobility and daily activity on undenatured type II collagen, confirming the mechanism works in cats and not only dogs.',
+          cite: 'ResearchGate · 381552574',
+          url: 'https://www.researchgate.net/publication/381552574_UNDENATURED_TYPE_II_COLLAGEN_IN_CATS_WITH_DEGENERATIVE_JOINT_DISEASE'
+        }
+      ]).map((e, i) => ({
+        ...e,
+        n: '0' + (i + 1),
+        key: (isDog ? 'd' : 'c') + i,
+        pick: () => this.setState({ evSel: i }),
+        tabBg: i === evSel ? '#FCFAF4' : 'rgba(23,20,15,0.032)',
+        tabBorder: i === evSel ? '#17140F' : '#E0D6C2',
+        tabColor: i === evSel ? '#17140F' : '#554C40',
+        tabKicker: i === evSel ? 'oklch(0.44 0.07 152)' : '#8A7F6E',
+        tabLift: i === evSel ? 'translateY(0px)' : 'translateY(3px)',
+        tabZ: i === evSel ? 2 : 1,
+        tabEdge: i === evSel ? '#FCFAF4' : '#E0D6C2',
+        meta: [
+          { k: 'Species', v: isDog ? 'Dogs' : 'Cats' },
+          e.source ? { k: 'Source', v: e.source } : null,
+          e.design ? { k: 'Design', v: e.design } : null
+        ].filter(Boolean).map((m, j) => ({ ...m, border: j === 0 ? '0' : '1px solid #E0D6C2', padLeft: j === 0 ? '0px' : '20px' }))
+      }));
+  }
   evRecs() {
     return [
         { year: '2022', title: 'One dog', body: 'Jon, our owner, began giving his goldendoodle Summer a wide range of vitamins that would eventually turn into our proprietary Happy Beanie formula.',
@@ -3426,6 +3567,16 @@ class Component extends DCLogic {
         { code: 'A3', name: 'Green-lipped mussel', dose: '150mg per chew', role: 'Whole New Zealand green-lipped mussel — natural glucosamine, chondroitin and rare omega-3s for joints.' }
       ]),
       pdpInsideLabel: isDog ? 'For dogs' : 'For cats',
+      // Evidence tab reader — the study list is a pure function of isDog;
+      // state.evSel picks the open record (0-2 valid for both species).
+      ...(() => {
+        const list = this.evList(isDog);
+        return {
+          evidence: list,
+          evOne: list[this.state.evSel || 0] || list[0],
+          evScope: (isDog ? 'Dog' : 'Cat') + ' formula · 3 studies'
+        };
+      })(),
       benefits: [
         'Supports brain, heart & joint health',
         'Cellular antioxidant defense',
