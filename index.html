@@ -302,6 +302,15 @@ image-slot:not([data-filled]) { color: transparent !important; }
   [data-m~="askbox"] { max-height: 0; opacity: 0; overflow: hidden; border-radius: 6px; background: linear-gradient(168deg, #FFFDF7 0%, #F5F0E6 100%); transition: max-height 0.5s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease, margin-top 0.3s ease; }
   [data-m~="askbox"][data-open="1"] { max-height: 460px; opacity: 1; margin-top: 10px; padding: 20px 20px 22px; border: 1px solid #E4DBC9; box-shadow: 0 20px 36px -26px rgba(23,20,15,0.45), 0 1px 0 rgba(255,255,255,0.9) inset; }
   @media (max-width: 1180px) { [data-m~="hidewide"] { display: none !important; } }
+  [data-m~="flipwrap"]:focus-visible { outline: 2px solid #17140F; outline-offset: -2px; }
+  [data-m~="fliparrow"] { display: none; }
+  @media (min-width: 901px) {
+    [data-m~="flipwrap"]:hover [data-m~="flipface"] { transform: translateY(-100%) !important; }
+    [data-m~="flipwrap"]:hover [data-m~="flipback"] { transform: translateY(0) !important; }
+    [data-m~="flipwrap"]:focus-visible [data-m~="flipface"] { transform: translateY(-100%) !important; }
+    [data-m~="flipwrap"]:focus-visible [data-m~="flipback"] { transform: translateY(0) !important; }
+    [data-m~="fliparrow"] { display: none; }
+  }
   @keyframes hbSlabFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
   @keyframes hbPulseRing { 0%, 100% { box-shadow: 0 0 0 0 oklch(0.86 0.14 92 / 0.34); } 50% { box-shadow: 0 0 0 9px oklch(0.86 0.14 92 / 0); } }
   @media (prefers-reduced-motion: reduce) { [data-m~="wkframe"] { animation: none !important; } }
@@ -311,6 +320,12 @@ image-slot:not([data-filled]) { color: transparent !important; }
   [data-m~="evtab"]:focus-visible { outline: 2px solid #17140F; outline-offset: -3px; }
   @media (max-width: 900px) {
     [data-m~="wksec"] { margin: 56px -20px 0 !important; padding: 52px 20px 48px !important; }
+    [data-m~="bnrows"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    [data-m~="flipwrap"] { height: 92px !important; cursor: pointer; }
+    [data-m~="fliparrow"] { display: block !important; }
+    [data-m~="flipface"], [data-m~="flipback"] { grid-template-columns: 22px 1fr !important; gap: 9px !important; padding: 12px 12px 26px 12px !important; }
+    [data-m~="ignm"] { font-size: 13.5px !important; }
+    [data-m~="flipback"] span:last-child span:last-child { font-size: 12.5px !important; line-height: 1.32 !important; }
     [data-m~="wkrail"] { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
     [data-m~="wkseg"] { padding: 9px 8px 11px !important; gap: 8px !important; justify-items: center !important; text-align: center !important; }
     [data-m~="wkwhenlong"], [data-m~="wkmoodcell"] { display: none !important; }
@@ -472,15 +487,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="upcell"] { order: -1 !important; }
     [data-m~="tight"] { margin-top: 30px !important; }
     [data-m~="shopprice"] { font-size: 22px !important; }
-    [data-m~="acrow"] > div { padding: 14px 10px 15px !important; }
-    [data-m~="acrow"] > div > div:first-child { margin-bottom: 10px !important; }
-    [data-m~="acrow"] > div > div:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
-    [data-m~="acrow"] > div > div:first-child > span:first-child { font-size: 10px !important; padding: 4px 7px !important; }
-    [data-m~="acrow"] > div > div:first-child > span:last-child { font-size: 10px !important; letter-spacing: 0.1em !important; }
-    [data-m~="acrow"] > div > div:last-child { font-size: 12.5px !important; line-height: 1.25 !important; letter-spacing: -0.02em !important; }
-    [data-m~="bnrows"] > div { padding: 12px 12px !important; grid-template-columns: 22px 1fr !important; gap: 8px !important; }
-    [data-m~="bnrows"] > div > span:last-child { font-size: 12.5px !important; line-height: 1.3 !important; }
-    [data-m~="bnrows"] > div > span:first-child { font-size: 10.5px !important; }
     [data-m~="hmgrid"] { padding-top: 26px !important; padding-bottom: 40px !important; }
     section[data-m~="herosec"] { padding-top: 34px !important; padding-bottom: 0 !important; }
     [data-m~="hero"] > div:first-child { font-size: 9.5px !important; letter-spacing: 0.18em !important; margin-bottom: 14px !important; }
@@ -1322,27 +1328,29 @@ image-slot:not([data-filled]) { color: transparent !important; }
 
       <div data-m="tight" style="max-width: 1180px; margin: 88px auto 0;">
         <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
-        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em;">Ten benefits, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
+        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em;">Ten ingredients, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
         <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
           <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03); font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;">
-            <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Benefit profile</span>
+            <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Ingredient profile</span>
           </div>
-          <div data-m="acrow" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: rgba(23,20,15,0.12); border-bottom: 1px solid rgba(23,20,15,0.12);">
-            <sc-for list="{{ actives }}" as="ac" hint-placeholder-count="3">
-              <div style="background: #FCFAF4; padding: 20px 22px 22px; transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px;">
-                  <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #FCFAF4; background: #17140F; padding: 5px 9px; border-radius: 2px;">{{ ac.code }}</span>
-                  <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;">Active</span>
+          <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: rgba(23,20,15,0.12);">
+            <sc-for list="{{ insideList }}" as="ig" hint-placeholder-count="10">
+              <div data-m="flipwrap" tabindex="0" data-open="{{ ig.openFlag }}" sc-camel-on-click="{{ ig.tap }}" style="position: relative; height: 84px; overflow: hidden; background: #FCFAF4; outline: none;"><span data-m="fliparrow" style="{{ ig.trackStyle }}" sc-camel-on-pointer-down="{{ ig.down }}" sc-camel-on-pointer-move="{{ ig.move }}" sc-camel-on-pointer-up="{{ ig.up }}" sc-camel-on-pointer-cancel="{{ ig.up }}"><span style="{{ ig.fillStyle }}"></span><span style="{{ ig.knobStyle }}"></span></span>
+                <div data-m="flipinner" style="position: absolute; inset: 0;">
+                  <div data-m="flipface" style="{{ ig.faceStyle }}">
+                    <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: #17140F;">{{ ig.n }}</span>
+                    <span style="min-width: 0;">
+                      <span data-m="ignm" style="display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.026em; font-size: 16px; line-height: 1.25; color: #17140F;">{{ ig.name }}</span>
+                    </span>
+                  </div>
+                  <div data-m="flipback" style="{{ ig.backStyle }}">
+                    <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: #F5F0E6;">{{ ig.n }}</span>
+                    <span style="min-width: 0;">
+                      <span style="display: block; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 6px;">Supports</span>
+                      <span style="display: block; font-size: 14.5px; line-height: 1.36; color: #F5F0E6; text-wrap: pretty;">{{ ig.benefit }}</span>
+                    </span>
+                  </div>
                 </div>
-                <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 19px; line-height: 1.2; margin-bottom: 0;">{{ ac.name }}</div>
-              </div>
-            </sc-for>
-          </div>
-          <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1px; background: rgba(23,20,15,0.12);">
-            <sc-for list="{{ benefits }}" as="bn" hint-placeholder-count="10">
-              <div style="display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: center; padding: 17px 22px; background: #FCFAF4; border-bottom: 1px solid rgba(23,20,15,0.08); transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
-                <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: oklch(0.44 0.07 152);">{{ bn.n }}</span>
-                <span style="font-size: 15px; line-height: 1.4; color: #17140F;">{{ bn.label }}</span>
               </div>
             </sc-for>
           </div>
@@ -2222,28 +2230,29 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <sc-if value="{{ qzCanBuy }}" hint-placeholder-val="{{ false }}">
           <div style="margin: 40px 0 40px;">
             <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
-            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(26px, 3vw, 40px); line-height: 1.05; color: #17140F; margin: 0 0 26px; max-width: 22em;">Ten benefits, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
+            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(26px, 3vw, 40px); line-height: 1.05; color: #17140F; margin: 0 0 26px; max-width: 22em;">Ten ingredients, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
             <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
               <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03); font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;">
                 <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Benefit profile · {{ qzBuyName }}</span>
               </div>
-              <div data-m="acrow" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: rgba(23,20,15,0.12); border-bottom: 1px solid rgba(23,20,15,0.12);">
-                <sc-for list="{{ qzActives }}" as="ac" hint-placeholder-count="3">
-                  <div style="background: #FCFAF4; padding: 20px 22px 22px; transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px;">
-                      <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #FCFAF4; background: #17140F; padding: 5px 9px; border-radius: 2px;">{{ ac.code }}</span>
-                      <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;">{{ ac.dose }}</span>
+              <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: rgba(23,20,15,0.12);">
+                <sc-for list="{{ insideList }}" as="ig2" hint-placeholder-count="10">
+                  <div data-m="flipwrap" tabindex="0" data-open="{{ ig2.openFlag }}" sc-camel-on-click="{{ ig2.tap }}" style="position: relative; height: 84px; overflow: hidden; background: #FCFAF4; outline: none;"><span data-m="fliparrow" style="{{ ig2.trackStyle }}" sc-camel-on-pointer-down="{{ ig2.down }}" sc-camel-on-pointer-move="{{ ig2.move }}" sc-camel-on-pointer-up="{{ ig2.up }}" sc-camel-on-pointer-cancel="{{ ig2.up }}"><span style="{{ ig2.fillStyle }}"></span><span style="{{ ig2.knobStyle }}"></span></span>
+                    <div data-m="flipinner" style="position: absolute; inset: 0;">
+                      <div data-m="flipface" style="{{ ig2.faceStyle }}">
+                        <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: #17140F;">{{ ig2.n }}</span>
+                        <span style="min-width: 0;">
+                          <span data-m="ignm" style="display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.026em; font-size: 16px; line-height: 1.25; color: #17140F;">{{ ig2.name }}</span>
+                        </span>
+                      </div>
+                      <div data-m="flipback" style="{{ ig2.backStyle }}">
+                        <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: #F5F0E6;">{{ ig2.n }}</span>
+                        <span style="min-width: 0;">
+                          <span style="display: block; font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 6px;">Supports</span>
+                          <span style="display: block; font-size: 14.5px; line-height: 1.36; color: #F5F0E6; text-wrap: pretty;">{{ ig2.benefit }}</span>
+                        </span>
+                      </div>
                     </div>
-                    <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 19px; line-height: 1.2; color: #17140F; margin-bottom: 8px;">{{ ac.name }}</div>
-                    <p style="font-size: 13px; line-height: 1.55; color: #6A6055; margin: 0; text-wrap: pretty;">{{ ac.role }}</p>
-                  </div>
-                </sc-for>
-              </div>
-              <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1px; background: rgba(23,20,15,0.12);">
-                <sc-for list="{{ benefits }}" as="bn" hint-placeholder-count="10">
-                  <div style="display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: center; padding: 17px 22px; background: #FCFAF4; border-bottom: 1px solid rgba(23,20,15,0.08); transition: background 0.25s ease;" style-hover="background: #F5F0E6;">
-                    <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: oklch(0.44 0.07 152);">{{ bn.n }}</span>
-                    <span style="font-size: 15px; line-height: 1.4; color: #17140F;">{{ bn.label }}</span>
                   </div>
                 </sc-for>
               </div>
@@ -2557,7 +2566,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;oklch(0.86 0.14 92)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;oklch(0.86 0.14 92)&quot;,&quot;oklch(0.72 0.08 152)&quot;,&quot;oklch(0.78 0.11 45)&quot;,&quot;oklch(0.8 0.06 250)&quot;],&quot;section&quot;:&quot;Brand&quot;},&quot;basePrice&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:68,&quot;min&quot;:30,&quot;max&quot;:180,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Commerce&quot;}}">
 class Component extends DCLogic {
-  state = { wkSel: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
+  state = { wkSel: 0, igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
@@ -3515,6 +3524,92 @@ class Component extends DCLogic {
               : 'Formulated in one small run. When these are gone, the batch is gone.')
         };
       })(),
+      // "What is inside" flip cards — species-aware ingredient list with
+      // per-card open state, drag handlers and live style objects.
+      insideList: (this.state.sp === 'cat' ? [
+        { name: 'Omega-3 EPA/DHA', sub: 'Salmon oil', benefit: 'Brain, heart, joints & inflammation' },
+        { name: 'Taurine', sub: '', benefit: 'Heart muscle function, eye health & nervous system' },
+        { name: 'Green-Lipped Mussel', sub: 'Powder', benefit: 'Joint repair & mobility' },
+        { name: 'Collagen Peptide Blend', sub: '', benefit: 'Cartilage & connective tissue' },
+        { name: 'Blueberry Polyphenols', sub: '', benefit: 'Cellular antioxidant defense' },
+        { name: 'Organic Cranberry Extract', sub: '', benefit: 'Urinary tract support & antioxidant protection' },
+        { name: 'B-Complex', sub: 'B12 · B6 · Riboflavin', benefit: 'Energy metabolism & nerve function' },
+        { name: 'CoQ10', sub: 'Ubiquinol', benefit: 'Cardiac energy & mitochondrial support' },
+        { name: 'L-Carnitine', sub: '', benefit: 'Fat metabolism & lean muscle maintenance' },
+        { name: 'Chamomile Extract', sub: '', benefit: 'Calming & digestive comfort' }
+      ] : [
+        { name: 'Omega-3 EPA/DHA', sub: 'Salmon oil · MCT oil', benefit: 'Brain, heart, joints & inflammation' },
+        { name: 'Curcumin', sub: '', benefit: 'Anti-inflammatory & antioxidant' },
+        { name: 'Turkey Tail', sub: 'Mushroom extract', benefit: 'Immune regulation' },
+        { name: 'Elk Velvet Antler', sub: 'Powder', benefit: 'Joint repair & mobility' },
+        { name: 'Elk Liver', sub: 'Freeze-dried', benefit: 'Whole-food vitamin A, iron & palatability' },
+        { name: 'Blueberry Polyphenols', sub: '', benefit: 'Cellular antioxidant defense' },
+        { name: 'B-Complex', sub: 'B12 · B6 · Riboflavin', benefit: 'Energy metabolism & nerve function' },
+        { name: 'CoQ10', sub: 'Ubiquinol', benefit: 'Cardiac energy & mitochondrial support' },
+        { name: 'L-Carnitine', sub: '', benefit: 'Fat metabolism & lean muscle maintenance' },
+        { name: 'Collagen Peptide Blend', sub: '', benefit: 'Cartilage & connective tissue' }
+      ]).map((x, i) => {
+        const open = (this.state.igOpen == null ? null : this.state.igOpen) === i;
+        const dragging = this.state.igDrag === i;
+        const pct = dragging && this.state.igPct != null ? this.state.igPct : (open ? 1 : 0);
+        return { ...x,
+          n: (i + 1 < 10 ? '0' : '') + (i + 1),
+          hasSub: !!x.sub,
+          tap: () => this.setState(s => ({ igOpen: s.igOpen === i ? null : i })),
+          openFlag: open ? '1' : '0',
+          faceStyle: {
+            position: 'absolute', inset: 0, display: 'grid', gridTemplateColumns: '34px 1fr',
+            gap: '14px', alignItems: 'center', padding: '15px 22px', background: '#FCFAF4',
+            transform: 'translateY(' + (-pct * 100).toFixed(1) + '%)',
+            transition: dragging ? 'none' : 'transform 0.62s cubic-bezier(0.32,0.72,0,1)'
+          },
+          backStyle: {
+            position: 'absolute', inset: 0, display: 'grid', gridTemplateColumns: '34px 1fr',
+            gap: '14px', alignItems: 'center', padding: '15px 22px', background: '#17140F',
+            transform: 'translateY(' + (100 - pct * 100).toFixed(1) + '%)',
+            transition: dragging ? 'none' : 'transform 0.62s cubic-bezier(0.32,0.72,0,1)'
+          },
+          down: (e) => {
+            const t = e.currentTarget;
+            if (t.setPointerCapture) { try { t.setPointerCapture(e.pointerId); } catch (err) {} }
+            this.setState({ igDrag: i, igW: t.getBoundingClientRect().width, igPct: open ? 1 : 0 });
+          },
+          move: (e) => {
+            if (this.state.igDrag !== i) return;
+            const r = e.currentTarget.getBoundingClientRect();
+            let p = (e.clientX - r.left) / Math.max(1, r.width);
+            p = p < 0 ? 0 : (p > 1 ? 1 : p);
+            this.setState({ igPct: p });
+          },
+          up: () => {
+            if (this.state.igDrag !== i) return;
+            const p = this.state.igPct == null ? 0 : this.state.igPct;
+            const openNow = p > 0.45;
+            this.setState({ igDrag: null, igPct: null, igOpen: openNow ? i : null });
+          },
+          trackStyle: {
+            position: 'absolute', left: '12px', right: '12px', bottom: '11px', zIndex: 4,
+            height: '4px', borderRadius: '3px', touchAction: 'none', cursor: 'pointer',
+            background: pct > 0.5 ? 'rgba(245,240,230,0.22)' : 'rgba(23,20,15,0.13)',
+            transition: 'background 0.35s ease'
+          },
+          knobStyle: {
+            position: 'absolute', top: '-6px',
+            left: 'calc(' + (pct * 100).toFixed(1) + '% - ' + (pct * 16).toFixed(1) + 'px)',
+            width: '16px', height: '16px', borderRadius: '50%', boxSizing: 'border-box',
+            background: 'oklch(0.86 0.14 92)',
+            border: '3px solid ' + (pct > 0.5 ? '#17140F' : '#FCFAF4'),
+            boxShadow: '0 2px 6px -1px rgba(23,20,15,0.5)',
+            transition: dragging ? 'none' : 'left 0.62s cubic-bezier(0.32,0.72,0,1), background 0.35s ease, border-color 0.35s ease'
+          },
+          fillStyle: {
+            position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: '3px',
+            width: (pct * 100).toFixed(1) + '%',
+            background: 'oklch(0.86 0.14 92)',
+            transition: dragging ? 'none' : 'width 0.62s cubic-bezier(0.32,0.72,0,1), background 0.35s ease'
+          }
+        };
+      }),
       plans: planDefs.map((p, i) => {
         const on = this.state.plan === i;
         return {
