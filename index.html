@@ -569,6 +569,16 @@ image-slot:not([data-filled]) { color: transparent !important; }
   }
   @media (max-width: 620px) {
     [data-m~="two"]   { grid-template-columns: minmax(0, 1fr) !important; }
+    /* "First eight weeks" panel: compact cards so the whole story fits in
+       roughly one phone screen instead of four. */
+    [data-m~="wkhead"] { font-size: 25px !important; margin-bottom: 20px !important; }
+    [data-m~="wkgrid"] { gap: 6px !important; }
+    [data-m~="wkcard"] { padding: 13px 15px 14px !important; }
+    [data-m~="wkcard"] > :nth-child(1) { margin-bottom: 9px !important; }
+    [data-m~="wkwhen"] { font-size: 9px !important; margin-bottom: 4px !important; }
+    [data-m~="wkh3"] { font-size: 16.5px !important; margin: 0 0 3px !important; }
+    [data-m~="wkp"] { font-size: 12.5px !important; line-height: 1.5 !important; margin: 0 !important; }
+    [data-m~="wkfine"] { margin-top: 18px !important; font-size: 8.5px !important; line-height: 1.6 !important; }
     /* Quiz intro: fit the whole screener (headline, button, engine card) in one
        phone viewport — keep the stats as a compact 2x2 and trim the spacing. */
     [data-m~="qzintrosec"] { padding-top: 24px !important; padding-bottom: 26px !important; }
@@ -1384,18 +1394,18 @@ image-slot:not([data-filled]) { color: transparent !important; }
       <div data-m="inset" data-rv="1" style="position: relative; max-width: 1180px; margin: 88px auto 0; background: linear-gradient(168deg, #201C15 0%, #17140F 46%, #120F0B 100%); border-radius: 5px; padding: 72px 56px; overflow: hidden; box-shadow: 0 44px 90px -40px rgba(23,20,15,0.75), 0 1px 0 rgba(245,240,230,0.09) inset; opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);">
         <div aria-hidden="true" style="position: absolute; right: -180px; top: -220px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.10), transparent 70%); pointer-events: none;"></div>
         <div style="position: relative; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 20px;">What to expect</div>
-        <h2 style="position: relative; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; color: #F5F0E6; margin: 0 0 52px; max-width: 22em;">The first eight weeks, <span style="color: oklch(0.86 0.14 92);">honestly.</span></h2>
+        <h2 data-m="wkhead" style="position: relative; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; color: #F5F0E6; margin: 0 0 52px; max-width: 22em;">The first eight weeks, <span style="color: oklch(0.86 0.14 92);">honestly.</span></h2>
         <div data-m="two gap wkgrid" style="position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px;">
           <sc-for list="{{ weeksUI }}" as="wk" hint-placeholder-count="4">
             <div data-m="wkcard" role="button" tabindex="0" sc-camel-on-click="{{ wk.onSelect }}" sc-camel-on-mouse-enter="{{ wk.onSelect }}" style="cursor: pointer; border-radius: 4px; padding: 26px 24px 30px; background: {{ wk.bg }}; box-shadow: {{ wk.shadow }}; transform: {{ wk.lift }}; transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.45s cubic-bezier(0.2,0.7,0.2,1);">
               <div style="height: 2px; border-radius: 2px; margin-bottom: 22px; background: {{ wk.rule }}; transition: background 0.4s ease;"></div>
-              <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ wk.stampColor }}; margin-bottom: 14px; transition: color 0.4s ease;">{{ wk.when }}</div>
+              <div data-m="wkwhen" style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ wk.stampColor }}; margin-bottom: 14px; transition: color 0.4s ease;">{{ wk.when }}</div>
               <h3 data-m="wkh3" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 23px; line-height: 1.15; color: #F5F0E6; margin: 0 0 10px;">{{ wk.title }}</h3>
               <p data-m="wkp" style="font-size: 14.5px; line-height: 1.7; margin: 0; text-wrap: pretty; color: {{ wk.bodyColor }}; transition: color 0.4s ease;">{{ wk.body }}</p>
             </div>
           </sc-for>
         </div>
-        <p style="position: relative; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 44px 0 0;">*Self-reported owner survey. Individual results vary. Not a treatment for disease.</p>
+        <p data-m="wkfine" style="position: relative; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 44px 0 0;">*Self-reported owner survey. Individual results vary. Not a treatment for disease.</p>
       </div>
 
       <div style="max-width: 1180px; margin: 88px auto 0;">
