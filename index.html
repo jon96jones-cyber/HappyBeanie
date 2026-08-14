@@ -2845,6 +2845,17 @@ class Component extends DCLogic {
     const evSel = this.state.evSel || 0;
     return (isDog ? [
         {
+          active: 'Mushroom extract blend',
+          short: 'Mushroom',
+          dose: '200mg per chew',
+          source: 'IVC Journal',
+          design: 'Randomised, dose-escalation',
+          title: 'A mushroom compound, used alone, slowed cancer spread in dogs',
+          result: 'Dogs given the mushroom compound alone — no chemotherapy — survived longer and their cancer spread more slowly, with the highest dose performing best.',
+          cite: 'Brown & Reetz · IVC Journal · “Single-agent polysaccharopeptide delays metastases and improves survival in naturally occurring canine hemangiosarcoma”',
+          url: 'https://ivcjournal.com/single-agent-polysaccharopeptide-delays-metastases-and-improves-survival-in-naturally-occurring-hemangiosarcoma/'
+        },
+        {
           active: 'Proprietary peptide blend',
           short: 'Peptides',
           dose: '420mg per chew',
@@ -2864,17 +2875,6 @@ class Component extends DCLogic {
           result: 'Dogs on elk velvet antler put more weight on their affected limbs and moved better than dogs on placebo, with no adverse effects across the trial.',
           cite: 'Research in Veterinary Science · 2014',
           url: 'https://www.sciencedirect.com/science/article/abs/pii/S0034528814002483'
-        },
-        {
-          active: 'Mushroom extract blend',
-          short: 'Mushroom',
-          dose: '200mg per chew',
-          source: 'IVC Journal',
-          design: 'Randomised, dose-escalation',
-          title: 'A mushroom compound, used alone, slowed cancer spread in dogs',
-          result: 'Dogs given the mushroom compound alone — no chemotherapy — survived longer and their cancer spread more slowly, with the highest dose performing best.',
-          cite: 'Brown & Reetz · IVC Journal · “Single-agent polysaccharopeptide delays metastases and improves survival in naturally occurring canine hemangiosarcoma”',
-          url: 'https://ivcjournal.com/single-agent-polysaccharopeptide-delays-metastases-and-improves-survival-in-naturally-occurring-hemangiosarcoma/'
         }
       ] : [
         {
