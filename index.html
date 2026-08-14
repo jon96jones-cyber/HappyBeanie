@@ -302,7 +302,47 @@ image-slot:not([data-filled]) { color: transparent !important; }
   [data-m~="askbox"] { max-height: 0; opacity: 0; overflow: hidden; border-radius: 6px; background: linear-gradient(168deg, #FFFDF7 0%, #F5F0E6 100%); transition: max-height 0.5s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease, margin-top 0.3s ease; }
   [data-m~="askbox"][data-open="1"] { max-height: 460px; opacity: 1; margin-top: 10px; padding: 20px 20px 22px; border: 1px solid #E4DBC9; box-shadow: 0 20px 36px -26px rgba(23,20,15,0.45), 0 1px 0 rgba(255,255,255,0.9) inset; }
   @media (max-width: 1180px) { [data-m~="hidewide"] { display: none !important; } }
+  @keyframes hbSlabFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  @keyframes hbPulseRing { 0%, 100% { box-shadow: 0 0 0 0 oklch(0.86 0.14 92 / 0.34); } 50% { box-shadow: 0 0 0 9px oklch(0.86 0.14 92 / 0); } }
+  @media (prefers-reduced-motion: reduce) { [data-m~="wkframe"] { animation: none !important; } }
+  [data-m~="wkseg"]:focus { outline: none; }
+  [data-m~="wkseg"]:focus-visible { outline: 2px solid oklch(0.86 0.14 92); outline-offset: -3px; }
+  [data-m~="evtab"]:focus { outline: none; }
+  [data-m~="evtab"]:focus-visible { outline: 2px solid #17140F; outline-offset: -3px; }
   @media (max-width: 900px) {
+    [data-m~="wksec"] { margin: 56px -20px 0 !important; padding: 52px 20px 48px !important; }
+    [data-m~="wkrail"] { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+    [data-m~="wkseg"] { padding: 9px 8px 11px !important; gap: 8px !important; justify-items: center !important; text-align: center !important; }
+    [data-m~="wkwhenlong"], [data-m~="wkmoodcell"] { display: none !important; }
+    [data-m~="wkshort"] { display: block !important; }
+    [data-m~="wkreadout"] { display: flex !important; flex-direction: column-reverse !important; }
+    [data-m~="wkdialcol"] { display: grid !important; grid-template-columns: 118px 1fr !important; gap: 14px !important; align-items: center !important; padding: 16px 16px 18px !important; border-top: 1px solid rgba(245,240,230,0.16) !important; }
+    [data-m~="wkreading"] { margin-top: 0 !important; padding-top: 0 !important; border-top: 0 !important; gap: 12px !important; }
+    [data-m~="wkbadge"] { width: 46px !important; height: 46px !important; }
+    [data-m~="wkmood"] { font-size: 18px !important; }
+    [data-m~="wkpanel"] { padding: 16px 16px 18px !important; border-left: 0 !important; }
+    [data-m~="wkh3"] { font-size: 21px !important; }
+    [data-m~="wkp"] { font-size: 15px !important; }
+    [data-m~="wkbars"] { padding: 11px 16px 12px !important; }
+    [data-m~="evsec"] { margin-top: 56px !important; }
+    [data-m~="evh2"] { white-space: normal !important; font-size: 24px !important; }
+    [data-m~="evhead"] { grid-template-columns: 1fr !important; gap: 14px !important; align-items: start !important; margin-bottom: 20px !important; }
+    [data-m~="evtag"] { padding-bottom: 0 !important; font-size: 9px !important; }
+    [data-m~="evtabs"] { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0 !important; }
+    [data-m~="evtab"] { padding: 10px 8px 12px !important; gap: 4px !important; justify-items: center !important; text-align: center !important; }
+    [data-m~="evtabname"] { display: none !important; }
+    [data-m~="evtabshort"] { display: block !important; }
+    [data-m~="evcard"] { padding: 20px 16px 22px !important; margin-top: 0 !important; }
+    [data-m~="evtitle"] { font-size: 20px !important; padding-bottom: 18px !important; }
+    [data-m~="evchips"] { gap: 5px !important; margin-bottom: 16px !important; }
+    [data-m~="evchips"] > span { font-size: 8.5px !important; padding: 4px 7px !important; gap: 5px !important; }
+    [data-m~="evsplit"] { margin-top: 18px !important; }
+    [data-m~="evfoundlab"] { margin-bottom: 11px !important; }
+    [data-m~="evfoundlab"] span:last-child { font-size: 10px !important; }
+    [data-m~="evresult"] { font-size: 16.5px !important; padding-left: 14px !important; }
+    [data-m~="evfoot"] { gap: 12px !important; margin-top: 20px !important; }
+    [data-m~="evcite"] { font-size: 9px !important; }
+    [data-m~="evnote"] { font-size: 9px !important; }
     /* iOS Safari zooms in (and shifts the layout off-center) when a focused
        input's font-size is under 16px. Force every form field to 16px on
        small screens so focusing/autofilling a field never triggers that zoom.
@@ -391,11 +431,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="faqsign"] { width: 24px !important; height: 24px !important; flex: 0 0 24px !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 50% !important; background: #EDE6D8 !important; color: #17140F !important; font-size: 13px !important; transition: background 0.3s ease, transform 0.35s ease !important; }
     [data-m~="faqrow"][data-open="1"] [data-m~="faqsign"] { background: oklch(0.44 0.07 152) !important; color: #FCFAF4 !important; transform: rotate(180deg) !important; }
     [data-m~="faqans"] { font-size: 13.5px !important; line-height: 1.6 !important; padding: 0 16px !important; margin-bottom: 16px !important; }
-    [data-m~="wkgrid"] { gap: 8px !important; }
-    [data-m~="wkcard"] { padding: 16px 16px 18px !important; }
-    [data-m~="wkcard"] > :first-child { margin-bottom: 12px !important; }
-    [data-m~="wkh3"] { font-size: 18px !important; margin-bottom: 6px !important; }
-    [data-m~="wkp"] { font-size: 13.5px !important; line-height: 1.55 !important; }
     [data-m~="fmh3"] { font-size: 19px !important; }
     [data-m~="fmp"] { font-size: 13.5px !important; line-height: 1.55 !important; margin-bottom: 12px !important; }
     [data-m~="fmchip"] { font-size: 9px !important; padding: 5px 8px !important; }
@@ -531,10 +566,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="ctstats"] > div { padding: 13px 7px 14px !important; text-align: center; }
     [data-m~="ctstats"] > div > div:first-child { font-size: 16px !important; letter-spacing: -0.03em !important; margin-bottom: 6px !important; }
     [data-m~="ctstats"] > div > div:last-child { font-size: 11px !important; letter-spacing: 0 !important; line-height: 1.35 !important; overflow-wrap: anywhere !important; word-break: break-word !important; }
-    [data-m~="wkcard"] { padding: 18px 18px 20px !important; }
-    [data-m~="wkcard"] > :nth-child(1) { margin-bottom: 10px !important; }
-    [data-m~="wkcard"] > h3 { font-size: 20px !important; margin-bottom: 6px !important; }
-    [data-m~="wkcard"] > p { font-size: 13.5px !important; line-height: 1.5 !important; margin-bottom: 12px !important; }
     [data-m~="radar"]  { width: 380px !important; height: 380px !important; right: -130px !important; top: -170px !important; }
     [data-m~="radar2"] { width: 132px !important; height: 132px !important; right: -16px !important; top: -34px !important; }
     [data-m~="radar3"] { width: 56px !important; height: 56px !important; right: 22px !important; top: 4px !important; }
@@ -554,31 +585,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="spcard"] > :nth-child(1) { width: 13px !important; height: 13px !important; }
     [data-m~="spcard"] div > div:first-child { font-size: 19px !important; }
     [data-m~="spcard"] div > div:last-child { display: none !important; }
-    /* Evidence tab reader on mobile: keep the file-tab metaphor — all three
-       tabs on one row with compact labels; the joined edge survives. */
-    [data-m~="evsec"] { margin-top: 56px !important; }
-    [data-m~="evh2"] { white-space: normal !important; font-size: 24px !important; }
-    [data-m~="evhead"] { grid-template-columns: 1fr !important; align-items: start !important; }
-    [data-m~="evtabs"] { gap: 5px !important; }
-    [data-m~="evtab"] { padding: 10px 11px 12px !important; gap: 4px !important; }
-    [data-m~="evtabname"] { display: none !important; }
-    [data-m~="evtabshort"] { display: block !important; }
-    [data-m~="evcard"] { padding: 22px 18px !important; }
-    [data-m~="evtitle"] { font-size: 20px !important; }
-    [data-m~="evresult"] { font-size: 16.5px !important; }
   }
   @media (max-width: 620px) {
+    [data-m~="wksec"] { margin: 44px -16px 0 !important; padding: 44px 16px 40px !important; }
     [data-m~="two"]   { grid-template-columns: minmax(0, 1fr) !important; }
-    /* "First eight weeks" panel: compact cards so the whole story fits in
-       roughly one phone screen instead of four. */
-    [data-m~="wkhead"] { font-size: 25px !important; margin-bottom: 20px !important; }
-    [data-m~="wkgrid"] { gap: 6px !important; }
-    [data-m~="wkcard"] { padding: 13px 15px 14px !important; }
-    [data-m~="wkcard"] > :nth-child(1) { margin-bottom: 9px !important; }
-    [data-m~="wkwhen"] { font-size: 9px !important; margin-bottom: 4px !important; }
-    [data-m~="wkh3"] { font-size: 16.5px !important; margin: 0 0 3px !important; }
-    [data-m~="wkp"] { font-size: 12.5px !important; line-height: 1.5 !important; margin: 0 !important; }
-    [data-m~="wkfine"] { margin-top: 18px !important; font-size: 8.5px !important; line-height: 1.6 !important; }
     /* Quiz intro: fit the whole screener (headline, button, engine card) in one
        phone viewport — keep the stats as a compact 2x2 and trim the spacing. */
     [data-m~="qzintrosec"] { padding-top: 24px !important; padding-bottom: 26px !important; }
@@ -1343,24 +1353,110 @@ image-slot:not([data-filled]) { color: transparent !important; }
         </div>
       </div>
 
-      <div data-m="inset" data-rv="1" style="position: relative; max-width: 1180px; margin: 88px auto 0; background: linear-gradient(168deg, #201C15 0%, #17140F 46%, #120F0B 100%); border-radius: 5px; padding: 72px 56px; overflow: hidden; box-shadow: 0 44px 90px -40px rgba(23,20,15,0.75), 0 1px 0 rgba(245,240,230,0.09) inset; opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);">
+      <div data-m="wksec" style="position: relative; margin: 92px -44px 0; padding: 62px 44px 58px; background: #17140F; color: #F5F0E6; border-top: 1px solid #DDD3C0; overflow: hidden;">
         <div aria-hidden="true" style="position: absolute; right: -180px; top: -220px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.10), transparent 70%); pointer-events: none;"></div>
-        <div style="position: relative; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 20px;">What to expect</div>
-        <h2 data-m="wkhead" style="position: relative; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; color: #F5F0E6; margin: 0 0 52px; max-width: 22em;">The first eight weeks, <span style="color: oklch(0.86 0.14 92);">honestly.</span></h2>
-        <div data-m="two gap wkgrid" style="position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px;">
-          <sc-for list="{{ weeksUI }}" as="wk" hint-placeholder-count="4">
-            <div data-m="wkcard" role="button" tabindex="0" sc-camel-on-click="{{ wk.onSelect }}" sc-camel-on-mouse-enter="{{ wk.onSelect }}" style="cursor: pointer; border-radius: 4px; padding: 26px 24px 30px; background: {{ wk.bg }}; box-shadow: {{ wk.shadow }}; transform: {{ wk.lift }}; transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.45s cubic-bezier(0.2,0.7,0.2,1);">
-              <div style="height: 2px; border-radius: 2px; margin-bottom: 22px; background: {{ wk.rule }}; transition: background 0.4s ease;"></div>
-              <div data-m="wkwhen" style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ wk.stampColor }}; margin-bottom: 14px; transition: color 0.4s ease;">{{ wk.when }}</div>
-              <h3 data-m="wkh3" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 23px; line-height: 1.15; color: #F5F0E6; margin: 0 0 10px;">{{ wk.title }}</h3>
-              <p data-m="wkp" style="font-size: 14.5px; line-height: 1.7; margin: 0; text-wrap: pretty; color: {{ wk.bodyColor }}; transition: color 0.4s ease;">{{ wk.body }}</p>
-            </div>
-          </sc-for>
+        <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.035) 1px, transparent 1px); background-size: 34px 34px; -webkit-mask-image: radial-gradient(120% 80% at 8% 0%, #000 0%, transparent 74%); mask-image: radial-gradient(120% 80% at 8% 0%, #000 0%, transparent 74%);"></div>
+
+        <div data-m="wkinner" style="position: relative; max-width: 1180px; margin: 0 auto;">
+
+        <div style="position: relative; display: flex; align-items: center; gap: 12px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 14px;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152);"></span>
+          <span>What to expect</span>
+          <span style="flex: 1; max-width: 120px; height: 1px; background: rgba(245,240,230,0.16);"></span>
         </div>
-        <p data-m="wkfine" style="position: relative; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 44px 0 0;">*Self-reported owner survey. Individual results vary. Not a treatment for disease.</p>
+        <h2 data-m="wkh2" style="position: relative; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(24px, 2.6vw, 38px); line-height: 1.05; color: #F5F0E6; margin: 0 0 26px;">The first eight weeks, <span style="color: oklch(0.86 0.14 92);">honestly.</span></h2>
+
+        <div data-m="wkframe" style="position: relative; border: 1px solid rgba(245,240,230,0.2); border-radius: 4px; background: linear-gradient(168deg, #241F17 0%, #1B1710 54%, #14110B 100%); box-shadow: 0 60px 90px -50px rgba(0,0,0,0.95), 0 26px 40px -30px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.075) inset, 0 -1px 0 rgba(0,0,0,0.55) inset, 0 0 0 1px rgba(0,0,0,0.35); animation: hbSlabFloat 9s ease-in-out infinite;">
+          <span aria-hidden="true" style="position: absolute; left: 14px; right: 14px; bottom: -26px; height: 26px; border-radius: 50%; background: radial-gradient(50% 100% at 50% 0%, rgba(0,0,0,0.6), transparent 72%); filter: blur(6px); pointer-events: none;"></span>
+          <span aria-hidden="true" style="position: absolute; inset: 0; border-radius: 4px; pointer-events: none; background: linear-gradient(180deg, rgba(245,240,230,0.05) 0%, transparent 22%, transparent 78%, rgba(0,0,0,0.28) 100%);"></span>
+
+          <div data-m="wkrail" style="display: grid; grid-template-columns: 290px repeat(3, minmax(0, 1fr));">
+            <sc-for list="{{ weeksUI }}" as="wk" hint-placeholder-count="4">
+              <button sc-camel-on-click="{{ wk.pick }}" data-m="wkseg" style="{{ wk.segStyle }}">
+                <span style="{{ wk.segTopStyle }}"></span>
+                <span data-m="wkwhenlong" style="{{ wk.segWhenStyle }}">{{ wk.when }}</span>
+                <span data-m="wkshort" style="{{ wk.segShortStyle }}">{{ wk.short }}</span>
+                <span data-m="wkmoodcell" style="{{ wk.segMoodStyle }}">{{ wk.mood }}</span>
+              </button>
+            </sc-for>
+          </div>
+
+          <div data-m="wkreadout" style="display: grid; grid-template-columns: minmax(0, 290px) minmax(0, 1fr); border-top: 1px solid rgba(245,240,230,0.16);">
+
+            <div data-m="wkdialcol" style="position: relative; z-index: 1; padding: 24px 26px 22px; background: linear-gradient(168deg, rgba(0,0,0,0.26) 0%, rgba(0,0,0,0.1) 100%); box-shadow: 1px 0 0 rgba(0,0,0,0.4) inset, 0 2px 5px -2px rgba(0,0,0,0.5) inset;">
+              <svg sc-camel-view-box="0 0 220 132" style="width: 100%; height: auto; display: block; overflow: visible;">
+                <path d="M20 118 A 90 90 0 0 1 200 118" fill="none" stroke="rgba(245,240,230,0.14)" stroke-width="2" stroke-linecap="round"></path>
+                <path d="M20 118 A 90 90 0 0 1 200 118" fill="none" stroke="oklch(0.86 0.14 92)" stroke-width="2" stroke-linecap="round" sc-camel-path-length="100" stroke-dasharray="100" stroke-dashoffset="{{ wkDialOffset }}" style="transition: stroke-dashoffset 0.55s cubic-bezier(0.2,0.7,0.2,1);"></path>
+                <sc-for list="{{ wkTicks }}" as="tk" hint-placeholder-count="4">
+                  <circle cx="{{ tk.cx }}" cy="{{ tk.cy }}" r="3.4" fill="{{ tk.fill }}" style="transition: fill 0.45s ease;"></circle>
+                </sc-for>
+                <g style="{{ wkNeedleStyle }}">
+                  <line x1="110" y1="118" x2="110" y2="46" stroke="oklch(0.86 0.14 92)" stroke-width="2.4" stroke-linecap="round"></line>
+                  <circle cx="110" cy="118" r="7" fill="#17140F" stroke="oklch(0.86 0.14 92)" stroke-width="2.2"></circle>
+                </g>
+              </svg>
+
+              <div data-m="wkreading" style="display: flex; align-items: center; gap: 14px; margin-top: 14px; padding-top: 16px; border-top: 1px solid rgba(245,240,230,0.12);">
+                <span data-m="wkbadge" style="{{ wkBadgeStyle }}">
+                  <svg width="36" height="36" sc-camel-view-box="0 0 34 34" fill="none" aria-hidden="true">
+                    <g style="{{ wkTiltStyle }}">
+                      <path d="{{ wkFace.earL }}" fill="oklch(0.66 0.13 62)" stroke="#17140F" stroke-width="1.3" stroke-linejoin="round"></path>
+                      <path d="{{ wkFace.earR }}" fill="oklch(0.66 0.13 62)" stroke="#17140F" stroke-width="1.3" stroke-linejoin="round"></path>
+                      <path d="M17 7.4 Q26.4 7.4 26.4 17.4 Q26.4 26.6 17 26.6 Q7.6 26.6 7.6 17.4 Q7.6 7.4 17 7.4 Z" fill="#F5F0E6" stroke="#17140F" stroke-width="1.4"></path>
+                      <path d="M17 7.4 Q26.4 7.4 26.4 17.4 Q26.4 22 24 24.4 Q20.6 20.6 20.4 15 Q20.2 9.6 17 7.4 Z" fill="oklch(0.66 0.13 62)"></path>
+                      <path d="M17 7.4 Q26.4 7.4 26.4 17.4 Q26.4 26.6 17 26.6 Q7.6 26.6 7.6 17.4 Q7.6 7.4 17 7.4 Z" fill="none" stroke="#17140F" stroke-width="1.4"></path>
+                      <circle cx="13.4" cy="{{ wkFace.eye }}" r="{{ wkFace.eyeR }}" fill="#17140F"></circle>
+                      <circle cx="21" cy="{{ wkFace.eye }}" r="{{ wkFace.eyeR }}" fill="#17140F"></circle>
+                      <ellipse cx="17" cy="19.2" rx="2.4" ry="1.8" fill="#17140F"></ellipse>
+                      <path d="M15.5 22.2 Q15.5 25.9 17 25.9 Q18.5 25.9 18.5 22.2 Z" fill="oklch(0.63 0.16 22)" stroke="#17140F" stroke-width="0.9" stroke-linejoin="round" opacity="{{ wkFace.tongue }}"></path>
+                      <path d="{{ wkFace.mouth }}" stroke="#17140F" stroke-width="1.4" stroke-linecap="round" fill="none"></path>
+                    </g>
+                  </svg>
+                </span>
+                <div style="min-width: 0;">
+                  <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 4px;">Reading</div>
+                  <div data-m="wkmood" style="{{ wkMoodStyle }}">{{ wkSel.mood }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div data-m="wkpanel" style="position: relative; z-index: 1; padding: 24px 28px 26px; border-left: 1px solid rgba(245,240,230,0.16); background: linear-gradient(168deg, rgba(245,240,230,0.065) 0%, rgba(245,240,230,0.015) 100%); box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset;">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 11px; margin-bottom: 10px;">
+                <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.86 0.14 92);">{{ wkSel.when }}</span>
+              </div>
+              <h3 data-m="wkh3" key="{{ wkSel.key }}" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.04em; font-size: 27px; line-height: 1.1; color: #F5F0E6; margin: 0 0 10px;">{{ wkSel.title }}</h3>
+              <p data-m="wkp" style="font-size: 15.5px; line-height: 1.58; color: #DED5C4; margin: 0; max-width: 33em; text-wrap: pretty;">{{ wkSel.body }}</p>
+
+              <div data-m="wkchips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px;">
+                <sc-for list="{{ wkChips }}" as="ch" hint-placeholder-count="3">
+                  <span style="{{ ch.style }}">{{ ch.label }}</span>
+                </sc-for>
+              </div>
+            </div>
+
+          </div>
+
+          <div data-m="wkbars" style="position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 22px 14px; border-top: 1px solid rgba(245,240,230,0.16); background: rgba(0,0,0,0.24); box-shadow: 0 2px 5px -2px rgba(0,0,0,0.55) inset;">
+            <div style="display: flex; align-items: center; gap: 13px;">
+              <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap;">Expected change</span>
+              <span style="display: flex; gap: 5px;">
+                <sc-for list="{{ wkBars }}" as="br" hint-placeholder-count="4">
+                  <span style="{{ br.style }}"></span>
+                </sc-for>
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button sc-camel-on-click="{{ wkPrev }}" aria-label="Previous stage" style="{{ wkPrevStyle }}">&#8592;</button>
+              <button sc-camel-on-click="{{ wkNext }}" aria-label="Next stage" style="{{ wkNextStyle }}">&#8594;</button>
+            </div>
+          </div>
+
+        </div>
+        <p style="position: relative; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 18px 0 0;">*Self-reported owner survey. Individual results vary. Not a treatment for disease.</p>
+        </div>
       </div>
 
-      <div data-m="evsec" style="position: relative; max-width: 980px; margin: 96px auto 0;">
+      <div data-m="evsec" style="position: relative; max-width: 980px; margin: 92px auto 0;">
         <div data-m="evhead" style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; margin-bottom: 26px;">
           <div>
             <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 16px;">The evidence</div>
@@ -1372,28 +1468,33 @@ image-slot:not([data-filled]) { color: transparent !important; }
           </div>
         </div>
 
-        <div data-m="evtabs" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 0;">
+        <div data-m="evtabs" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-bottom: 0;">
           <sc-for list="{{ evidence }}" as="ev" hint-placeholder-count="3">
-            <button sc-camel-on-click="{{ ev.pick }}" data-m="evtab" style="position: relative; z-index: {{ ev.tabZ }}; margin-bottom: -1px; display: grid; gap: 5px; text-align: left; cursor: pointer; padding: 15px 17px 16px; border-top: 1px solid {{ ev.tabBorder }}; border-left: 1px solid {{ ev.tabBorder }}; border-right: 1px solid {{ ev.tabBorder }}; border-bottom: 1px solid {{ ev.tabEdge }}; border-radius: 5px 5px 0 0; background: {{ ev.tabBg }}; transition: background 0.28s ease, border-color 0.28s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1); transform: {{ ev.tabLift }};">
-              <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: {{ ev.tabKicker }}; transition: color 0.28s ease;">Active {{ ev.n }}</span>
-              <span data-m="evtabname" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.028em; font-size: 15.5px; line-height: 1.2; color: {{ ev.tabColor }}; transition: color 0.28s ease;">{{ ev.active }}</span>
-              <span data-m="evtabshort" style="display: none; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 13.5px; line-height: 1.2; color: {{ ev.tabColor }}; transition: color 0.28s ease;">{{ ev.short }}</span>
+            <button sc-camel-on-click="{{ ev.pick }}" data-m="evtab" style="{{ ev.tabStyle }}">
+              <span style="{{ ev.kickerStyle }}">Active {{ ev.n }}</span>
+              <span data-m="evtabname" style="{{ ev.nameStyle }}">{{ ev.active }}</span>
+              <span data-m="evtabshort" style="{{ ev.shortStyle }}">{{ ev.short }}</span>
             </button>
           </sc-for>
         </div>
 
-        <div data-m="evcard" key="{{ evOne.key }}" style="position: relative; border: 1px solid #17140F; border-radius: 0 0 6px 6px; background: #FCFAF4; padding: 34px 36px 32px; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.3);">
-          <div data-m="evchips" style="display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 20px;">
+        <div data-m="evcard" key="{{ evOne.key }}" style="position: relative; border: 1px solid #17140F; border-radius: 0 0 5px 5px; background: #FCFAF4; padding: 34px 36px 32px; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.3);">
+          <div data-m="evchips" style="display: inline-flex; flex-wrap: nowrap; width: fit-content; max-width: 100%; gap: 6px; margin-bottom: 20px;">
             <sc-for list="{{ evOne.meta }}" as="mt" hint-placeholder-count="3">
-              <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #554C40; background: #F2EBDC; border: 1px solid #E0D6C2; border-radius: 3px; padding: 6px 10px;">{{ mt.k }} <span style="color: #8A7F6E;">/</span> {{ mt.v }}</span>
+              <span style="display: inline-flex; align-items: baseline; gap: 6px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; background: #F2EBDC; border: 1px solid #E0D6C2; border-radius: 2px; padding: 4px 8px; white-space: nowrap;"><span style="color: #9A8F7C;">{{ mt.k }}</span><span style="color: #554C40;">{{ mt.v }}</span></span>
             </sc-for>
           </div>
 
-          <h3 data-m="evtitle" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.032em; font-size: 25px; line-height: 1.2; color: #17140F; margin: 0 0 18px; max-width: 26em; text-wrap: pretty;">{{ evOne.title }}</h3>
+          <sc-if value="{{ evShowTitle }}" hint-placeholder-val="{{ true }}">
+            <h3 data-m="evtitle" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.032em; font-size: 25px; line-height: 1.2; color: #17140F; margin: 0; padding-bottom: 24px; border-bottom: 1px solid #DDD3C0; max-width: 26em; text-wrap: pretty;">{{ evOne.title }}</h3>
+          </sc-if>
 
-          <div data-m="evsplit">
-            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 11px;">What it found</div>
-            <p data-m="evresult" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 19px; line-height: 1.46; letter-spacing: -0.016em; color: #17140F; margin: 0; max-width: 34em; text-wrap: pretty;">{{ evOne.result }}</p>
+          <div data-m="evsplit" style="margin-top: 24px;">
+            <div data-m="evfoundlab" style="display: flex; align-items: center; gap: 11px; margin-bottom: 14px;">
+              <span style="width: 20px; height: 2px; background: oklch(0.44 0.07 152);"></span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">What it found</span>
+            </div>
+            <p data-m="evresult" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 19px; line-height: 1.46; letter-spacing: -0.016em; color: #17140F; margin: 0; padding-left: 20px; border-left: 2px solid oklch(0.44 0.07 152 / 0.32); max-width: 34em; text-wrap: pretty;">{{ evOne.result }}</p>
           </div>
 
           <div data-m="evfoot" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #E4DBC9;">
@@ -1405,7 +1506,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
           </div>
         </div>
 
-        <p data-m="evnote" style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.7; text-transform: uppercase; color: #8A7F6E; margin: 18px 0 0;">Opens at the publisher in a new tab. Published research on an ingredient is not a claim about this product.</p>
+        <p data-m="evnote" style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.7; text-transform: uppercase; color: #8A7F6E; margin: 18px 0 0;">Published research on an ingredient is not a claim about this product.</p>
       </div>
 
       <div style="max-width: 1180px; margin: 88px auto 0;">
@@ -2441,7 +2542,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;oklch(0.86 0.14 92)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;oklch(0.86 0.14 92)&quot;,&quot;oklch(0.72 0.08 152)&quot;,&quot;oklch(0.78 0.11 45)&quot;,&quot;oklch(0.8 0.06 250)&quot;],&quot;section&quot;:&quot;Brand&quot;},&quot;basePrice&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:68,&quot;min&quot;:30,&quot;max&quot;:180,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Commerce&quot;}}">
 class Component extends DCLogic {
-  state = { wkSel: 1, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
+  state = { wkSel: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
@@ -2688,6 +2789,8 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.heroVideo(0);
+    // What-to-expect gauge autoplay (stops for good on any interaction).
+    this.wkAuto();
     // Live small-batch counter — real availability from actual orders. Quietly
     // absent until it loads (or if the API is unreachable, e.g. local preview).
     fetch('/api/batch').then(r => r.json()).then(b => {
@@ -2819,6 +2922,7 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
+    if (this._wkTimer) { clearInterval(this._wkTimer); this._wkTimer = null; }
     this.stopField();
     this.stopPings();
     window.removeEventListener('scroll', this.onScroll);
@@ -2846,7 +2950,6 @@ class Component extends DCLogic {
     return (isDog ? [
         {
           active: 'Mushroom extract blend',
-          short: 'Mushroom',
           dose: '200mg per chew',
           source: 'IVC Journal',
           design: 'Randomised, dose-escalation',
@@ -2856,32 +2959,31 @@ class Component extends DCLogic {
           url: 'https://ivcjournal.com/single-agent-polysaccharopeptide-delays-metastases-and-improves-survival-in-naturally-occurring-hemangiosarcoma/'
         },
         {
+          active: 'Elk blend',
+          dose: '500mg per chew',
+          source: 'Research in Veterinary Science',
+          sourceShort: 'Res. Vet. Sci.',
+          design: 'Placebo-controlled trial',
+          title: 'Elk velvet antler supplementation in dogs with osteoarthritis',
+          result: 'Dogs on elk velvet antler put more weight on their affected limbs and moved better than dogs on placebo, with no adverse effects across the trial.',
+          cite: 'Research in Veterinary Science · 2014',
+          url: 'https://www.sciencedirect.com/science/article/abs/pii/S0034528814002483'
+        },
+        {
           active: 'Proprietary peptide blend',
-          short: 'Peptides',
           dose: '420mg per chew',
           source: 'PubMed Central',
           title: 'Collagen peptides and the repair signalling pathways behind joint and connective tissue',
           result: 'Collagen peptides taken by mouth survived digestion, reached connective tissue, and measurably shifted cells toward rebuilding it rather than breaking it down.',
           cite: 'PubMed Central · PMC6789547',
           url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6789547/'
-        },
-        {
-          active: 'Elk blend',
-          short: 'Elk',
-          dose: '500mg per chew',
-          source: 'Research in Veterinary Science',
-          design: 'Placebo-controlled trial',
-          title: 'Elk velvet antler supplementation in dogs with osteoarthritis',
-          result: 'Dogs on elk velvet antler put more weight on their affected limbs and moved better than dogs on placebo, with no adverse effects across the trial.',
-          cite: 'Research in Veterinary Science · 2014',
-          url: 'https://www.sciencedirect.com/science/article/abs/pii/S0034528814002483'
         }
       ] : [
         {
           active: 'Green-lipped mussel',
-          short: 'Mussel',
           dose: '300mg per chew',
           source: 'Journal of Veterinary Internal Medicine',
+          sourceShort: 'JVIM',
           design: 'Randomised, controlled, masked',
           title: 'Evaluation of a therapeutic diet for feline degenerative joint disease',
           result: 'Cats fed green-lipped mussel and omega-3s were measurably more active than cats on the control diet, tracked by device rather than owner opinion.',
@@ -2890,7 +2992,6 @@ class Component extends DCLogic {
         },
         {
           active: 'Taurine & salmon blend',
-          short: 'Taurine',
           dose: '250mg per chew',
           source: 'Science',
           design: 'Controlled feeding trial',
@@ -2901,7 +3002,6 @@ class Component extends DCLogic {
         },
         {
           active: 'Proprietary peptide blend',
-          short: 'Peptides',
           dose: '180mg per chew',
           design: 'Clinical trial',
           title: 'Undenatured type II collagen in cats with degenerative joint disease',
@@ -2914,20 +3014,90 @@ class Component extends DCLogic {
         n: '0' + (i + 1),
         key: (isDog ? 'd' : 'c') + i,
         pick: () => this.setState({ evSel: i }),
-        tabBg: i === evSel ? '#FCFAF4' : 'rgba(23,20,15,0.032)',
-        tabBorder: i === evSel ? '#17140F' : '#E0D6C2',
-        tabColor: i === evSel ? '#17140F' : '#554C40',
-        tabKicker: i === evSel ? 'oklch(0.44 0.07 152)' : '#8A7F6E',
-        tabLift: i === evSel ? 'translateY(0px)' : 'translateY(3px)',
-        tabZ: i === evSel ? 2 : 1,
-        tabEdge: i === evSel ? '#FCFAF4' : '#E0D6C2',
+        tabStyle: {
+          position: 'relative',
+          zIndex: i === evSel ? 2 : 1,
+          marginBottom: '-1px',
+          display: 'grid',
+          gap: '5px',
+          textAlign: 'left',
+          cursor: 'pointer',
+          padding: '15px 17px 16px',
+          borderTop: '1px solid ' + (i === evSel ? '#17140F' : '#E0D6C2'),
+          borderLeft: '1px solid ' + (i === evSel ? '#17140F' : '#E0D6C2'),
+          borderRight: '1px solid ' + (i === evSel ? '#17140F' : '#E0D6C2'),
+          borderBottom: '1px solid ' + (i === evSel ? '#FCFAF4' : '#E0D6C2'),
+          borderRadius: 0,
+          marginLeft: i === 0 ? 0 : '-1px',
+          background: i === evSel ? '#FCFAF4' : 'rgba(23,20,15,0.032)',
+          transition: 'background 0.28s ease, border-color 0.28s ease'
+        },
+        kickerStyle: {
+          fontFamily: "'DM Mono', monospace",
+          fontSize: '8.5px',
+          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          color: i === evSel ? 'oklch(0.44 0.07 152)' : '#8A7F6E',
+          transition: 'color 0.28s ease'
+        },
+        nameStyle: {
+          fontFamily: "'DM Sans', sans-serif",
+          fontWeight: 700,
+          letterSpacing: '-0.028em',
+          fontSize: '15.5px',
+          lineHeight: 1.2,
+          color: i === evSel ? '#17140F' : '#554C40',
+          transition: 'color 0.28s ease'
+        },
+        short: (isDog ? ['Mushroom', 'Elk', 'Peptide'] : ['Mussel', 'Taurine', 'Peptide'])[i],
+        shortStyle: {
+          display: 'none',
+          fontFamily: "'DM Sans', sans-serif",
+          fontWeight: 700,
+          letterSpacing: '-0.02em',
+          fontSize: '14px',
+          lineHeight: 1.2,
+          color: i === evSel ? '#17140F' : '#554C40',
+          transition: 'color 0.28s ease'
+        },
         meta: [
           { k: 'Species', v: isDog ? 'Dogs' : 'Cats' },
-          e.source ? { k: 'Source', v: e.source } : null,
-          e.design ? { k: 'Design', v: e.design } : null
+          e.source ? { k: 'Source', v: e.sourceShort || e.source } : null
         ].filter(Boolean).map((m, j) => ({ ...m, border: j === 0 ? '0' : '1px solid #E0D6C2', padLeft: j === 0 ? '0px' : '20px' }))
       }));
   }
+  wkFaces() {
+    const droopL = 'M7.4 12.6 Q3.2 14.4 4.6 22.4 Q8.2 20.2 8.8 14.2 Z';
+    const droopR = 'M26.6 12.6 Q30.8 14.4 29.4 22.4 Q25.8 20.2 25.2 14.2 Z';
+    const halfL = 'M7.4 12.4 Q2.6 12.2 3.4 18.6 Q7.4 17.4 8.8 13.8 Z';
+    const halfR = 'M26.6 12.4 Q31.4 12.2 30.6 18.6 Q26.6 17.4 25.2 13.8 Z';
+    const perkL = 'M7.6 12.8 Q4.2 7.6 6.4 3.4 Q9.6 7.4 9 13.4 Z';
+    const perkR = 'M26.4 12.8 Q29.8 7.6 27.6 3.4 Q24.4 7.4 25 13.4 Z';
+    return [
+      { mouth: 'M13.8 22.6 L20.2 22.6', eye: 15.2, eyeR: 1.5, tilt: 0, tongue: 0, earL: droopL, earR: droopR },
+      { mouth: 'M13.8 22.2 Q17 23.4 20.2 22.2', eye: 15.1, eyeR: 1.6, tilt: -3, tongue: 0, earL: halfL, earR: halfR },
+      { mouth: 'M13.6 21.8 Q17 24.4 20.4 21.8', eye: 14.9, eyeR: 1.7, tilt: 4, tongue: 0, earL: perkL, earR: perkR },
+      { mouth: 'M13.2 21.6 Q17 25.4 20.8 21.6', eye: 14.6, eyeR: 1.8, tilt: -5.5, tongue: 1, earL: perkL, earR: perkR }
+    ];
+  }
+
+  wkStop() {
+    this._wkHalt = true;
+    if (this._wkTimer) { clearInterval(this._wkTimer); this._wkTimer = null; }
+  }
+
+  wkAuto() {
+    if (this._wkTimer || this._wkHalt) return;
+    this._wkTimer = setInterval(() => {
+      if (this._wkHalt || document.hidden) return;
+      const sec = document.querySelector('[data-m~="wksec"]');
+      if (!sec) return;
+      const r = sec.getBoundingClientRect();
+      if (r.bottom < 120 || r.top > window.innerHeight - 120) return;
+      this.setState(s => ({ wkSel: ((s.wkSel || 0) + 1) % 4 }));
+    }, 3600);
+  }
+
   evRecs() {
     return [
         { year: '2022', title: 'One dog', body: 'Jon, our owner, began giving his goldendoodle Summer a wide range of vitamins that would eventually turn into our proprietary Happy Beanie formula.',
@@ -2959,23 +3129,45 @@ class Component extends DCLogic {
     const M = this.cartMath();
     const wkSel = this.state.wkSel;
     const wkBase = [
-      { when: 'Week 1–2', title: 'Nothing dramatic', body: 'A few owners notice appetite and drinking change first — most notice nothing at all yet.' },
-      { when: 'Week 3–4', title: 'Willingness returns', body: 'More interest in walks, faster to stand, and overall more mobility.' },
-      { when: 'Week 5–8', title: 'Visible change', body: 'Your bean should appear happier and more interactive. Keep at it!' },
-      { when: 'Ongoing', title: 'It compounds', body: 'Owners who stayed consistent report the greatest results at 12+ weeks.' }
+      { when: 'Week 1–2', title: 'Nothing dramatic', body: 'A few owners notice appetite and drinking change first — most notice nothing at all yet.', chips: ['Appetite', 'Drinking'] },
+      { when: 'Week 3–4', title: 'Willingness returns', body: 'More interest in walks, faster to stand, and overall more mobility.', chips: ['Walks', 'Standing', 'Mobility'] },
+      { when: 'Week 5–8', title: 'Visible change', body: 'Your bean should appear happier and more interactive. Keep at it!', chips: ['Mood', 'Interaction'] },
+      { when: 'Ongoing · 12+ weeks', title: 'It compounds', body: 'Owners who stayed consistent report the greatest results at 12+ weeks.', chips: ['Consistency', '12+ weeks'] }
     ];
-    const weeksUI = wkBase.map((w, i) => ({
-      ...w,
-      bg: i === wkSel ? 'linear-gradient(165deg, #2A251C, #1D190F)' : 'linear-gradient(165deg, rgba(245,240,230,0.055), rgba(245,240,230,0.015))',
-      shadow: i === wkSel
-        ? '0 26px 44px -22px rgba(0,0,0,0.75), 0 1px 0 rgba(245,240,230,0.14) inset'
-        : '0 10px 22px -18px rgba(0,0,0,0.6), 0 1px 0 rgba(245,240,230,0.06) inset',
-      lift: i === wkSel ? 'translateY(-6px)' : 'translateY(0)',
-      rule: i === wkSel ? accent : 'rgba(245,240,230,0.18)',
-      stampColor: i === wkSel ? accent : '#8A7F6E',
-      bodyColor: i === wkSel ? '#D8CFBD' : '#9C9280',
-      onSelect: () => this.setState({ wkSel: i })
-    }));
+    const wkSelIdx = Math.min(3, Math.max(0, this.state.wkSel || 0));
+    const wkGold = 'oklch(0.86 0.14 92)';
+    const wkMoods = ['Settling in', 'Perking up', 'Bouncing back', 'Thriving'];
+    const weeksUI = wkBase.map((w, i) => {
+      const on = i === wkSelIdx, seen = i <= wkSelIdx;
+      return {
+        when: w.when,
+        mood: wkMoods[i],
+        pick: () => { this.wkStop(); this.setState({ wkSel: i }); },
+        segStyle: {
+          position: 'relative', zIndex: 1, display: 'grid', gap: '6px', textAlign: 'left', cursor: 'pointer',
+          padding: '13px 16px 14px', border: 0,
+          borderLeft: i === 0 ? 0 : '1px solid rgba(245,240,230,0.14)',
+          background: on
+            ? 'linear-gradient(168deg, rgba(245,240,230,0.075) 0%, rgba(245,240,230,0.02) 100%)'
+            : 'rgba(0,0,0,0.34)',
+          boxShadow: on
+            ? '0 1px 0 rgba(255,255,255,0.07) inset'
+            : '0 -3px 6px -3px rgba(0,0,0,0.6) inset, 0 1px 0 rgba(0,0,0,0.35)',
+          transition: 'background 0.3s ease, box-shadow 0.3s ease'
+        },
+        segTopStyle: { display: 'block', height: '2px', background: seen ? wkGold : 'rgba(245,240,230,0.16)', transition: 'background 0.4s ease' },
+        short: ['1–2 wk', '3–4 wk', '5–8 wk', '12+ wk'][i],
+        segWhenStyle: { fontFamily: "'DM Mono', monospace", fontSize: '10px', letterSpacing: '0.16em', textTransform: 'uppercase', color: on ? wkGold : '#9A8F7C', transition: 'color 0.3s ease' },
+        segShortStyle: { display: 'none', fontFamily: "'DM Mono', monospace", fontSize: '9px', letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap', color: on ? wkGold : '#9A8F7C', transition: 'color 0.3s ease' },
+        segMoodStyle: { fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: '13.5px', color: on ? '#F5F0E6' : '#7E7365', transition: 'color 0.3s ease' }
+      };
+    });
+    const wkTicks = [0, 1, 2, 3].map(i => {
+      const a = Math.PI - (i / 3) * Math.PI;
+      return { cx: (110 + 90 * Math.cos(a)).toFixed(1), cy: (118 - 90 * Math.sin(a)).toFixed(1), fill: i <= wkSelIdx ? wkGold : 'rgba(245,240,230,0.22)' };
+    });
+    const wkF = this.wkFaces()[wkSelIdx];
+    const wkS = wkBase[wkSelIdx];
     const co = this.state.co;
     const coKeys = ['email', 'name', 'addr', 'city', 'state', 'zip'];
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(co.email || '').trim());
@@ -3508,7 +3700,53 @@ class Component extends DCLogic {
         { k: 'Made to order', v: 'Blended and shipped within 48 hours of your order, never warehoused.' },
         { k: 'Ask first', v: 'A licensed pharmacist reviews interactions with your animal\u2019s prescriptions, free.' }
       ],
-      weeksUI,
+      weeksUI: weeksUI,
+      wkTicks: wkTicks,
+      wkSel: { key: 'w' + wkSelIdx, when: wkS.when, title: wkS.title, body: wkS.body, mood: wkMoods[wkSelIdx], num: '0' + (wkSelIdx + 1) },
+      wkDialOffset: 100 - (wkSelIdx / 3) * 100,
+      wkNeedleStyle: { transformOrigin: '110px 118px', transform: 'rotate(' + (-78 + wkSelIdx * 52) + 'deg)', transition: 'transform 0.6s cubic-bezier(0.2,0.7,0.2,1)' },
+      wkFace: wkF,
+      wkTiltStyle: { transformOrigin: '17px 18px', transform: 'rotate(' + wkF.tilt + 'deg)', transition: 'transform 0.5s cubic-bezier(0.2,0.7,0.2,1)' },
+      wkBadgeStyle: {
+        display: 'grid', placeItems: 'center', width: '62px', height: '62px', flex: '0 0 auto', borderRadius: '50%',
+        background: wkSelIdx >= 2 ? 'oklch(0.86 0.14 92 / 0.14)' : '#201C15',
+        border: '2px solid ' + (wkSelIdx === 0 ? 'rgba(245,240,230,0.28)' : wkGold),
+        animation: wkSelIdx === 3 ? 'hbPulseRing 2.6s ease-in-out infinite' : 'none',
+        boxShadow: '0 8px 16px -8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.09) inset',
+        transition: 'background 0.45s ease, border-color 0.45s ease'
+      },
+      wkMoodStyle: { fontFamily: "'DM Sans', sans-serif", fontWeight: 700, letterSpacing: '-0.034em', fontSize: '24px', lineHeight: 1.1, color: wkSelIdx === 0 ? '#B9AF9C' : wkGold, transition: 'color 0.45s ease' },
+      wkChips: (wkBase[wkSelIdx].chips || []).map(c => ({
+        label: c,
+        style: {
+          fontFamily: "'DM Mono', monospace", fontSize: '8.5px', letterSpacing: '0.14em',
+          textTransform: 'uppercase', color: '#B9AF9C',
+          background: 'rgba(245,240,230,0.05)', border: '1px solid rgba(245,240,230,0.14)',
+          borderRadius: '2px', padding: '5px 9px', whiteSpace: 'nowrap'
+        }
+      })),
+      wkPrev: () => { this.wkStop(); this.setState(s => ({ wkSel: ((s.wkSel || 0) + 3) % 4 })); },
+      wkNext: () => { this.wkStop(); this.setState(s => ({ wkSel: ((s.wkSel || 0) + 1) % 4 })); },
+      wkPrevStyle: {
+        display: 'grid', placeItems: 'center', width: '30px', height: '30px', cursor: 'pointer',
+        border: '1px solid rgba(245,240,230,0.2)', background: 'transparent', color: '#B9AF9C',
+        fontFamily: "'DM Mono', monospace", fontSize: '13px', lineHeight: 1,
+        transition: 'border-color 0.25s ease, color 0.25s ease, background 0.25s ease'
+      },
+      wkNextStyle: {
+        display: 'grid', placeItems: 'center', width: '30px', height: '30px', cursor: 'pointer',
+        border: '1px solid oklch(0.86 0.14 92 / 0.55)', background: 'oklch(0.86 0.14 92 / 0.1)', color: wkGold,
+        fontFamily: "'DM Mono', monospace", fontSize: '13px', lineHeight: 1,
+        transition: 'border-color 0.25s ease, color 0.25s ease, background 0.25s ease'
+      },
+      wkBars: [0, 1, 2, 3].map(i => ({
+        style: {
+          display: 'block', width: '30px', height: '6px', borderRadius: '3px',
+          background: i <= wkSelIdx ? wkGold : 'rgba(245,240,230,0.14)',
+          transform: i <= wkSelIdx ? 'scaleY(1)' : 'scaleY(0.7)',
+          transition: 'background 0.4s ease ' + (i * 0.05) + 's, transform 0.4s ease ' + (i * 0.05) + 's'
+        }
+      })),
       weeks: [
         { when: 'Week 1–2', title: 'Nothing dramatic', body: 'A few owners notice appetite and drinking change first — most notice nothing at all yet.' },
         { when: 'Week 3–4', title: 'Willingness returns', body: 'More interest in walks, faster to stand, and overall more mobility.' },
@@ -3534,8 +3772,8 @@ class Component extends DCLogic {
         { code: 'A3', name: 'Green-lipped mussel', dose: '150mg per chew', role: 'Whole New Zealand green-lipped mussel — natural glucosamine, chondroitin and rare omega-3s for joints.' }
       ]),
       pdpInsideLabel: isDog ? 'For dogs' : 'For cats',
-      // Evidence tab reader — the study list is a pure function of isDog;
       // state.evSel picks the open record (0-2 valid for both species).
+      evShowTitle: false,
       ...(() => {
         const list = this.evList(isDog);
         return {
