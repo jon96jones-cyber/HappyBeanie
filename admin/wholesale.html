@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trade approvals — Happy Beanie</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="../favicon.png">
+<style>
+@font-face { font-family:'DM Mono'; font-weight:400; src:url('../assets/fonts/23b5af97.woff2') format('woff2'); }
+@font-face { font-family:'DM Mono'; font-weight:500; src:url('../assets/fonts/b847e313.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:400; src:url('../assets/fonts/d7200164.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:700; src:url('../assets/fonts/d7200164.woff2') format('woff2'); }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#F5F0E6; color:#17140F; font-family:'DM Sans',-apple-system,sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh; }
+.shell { max-width:880px; margin:0 auto; padding:0 24px; }
+.console { position:relative; overflow:hidden; background:#17140F; color:#F5F0E6; }
+.veil { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(245,240,230,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.045) 1px, transparent 1px); background-size:34px 34px; -webkit-mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); }
+.con-top { position:relative; display:flex; align-items:center; gap:22px; padding:16px 0; border-bottom:1px solid rgba(245,240,230,0.14); font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.live { display:flex; align-items:center; gap:9px; color:oklch(0.78 0.1 152); }
+.pulse { position:relative; width:7px; height:7px; border-radius:50%; background:oklch(0.72 0.16 152); }
+.pulse::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1px solid oklch(0.72 0.16 152); opacity:0; animation:ping 2.4s ease-out infinite; }
+@keyframes ping { 0% { transform:scale(0.7); opacity:0.9; } 70% { transform:scale(1.9); opacity:0; } 100% { opacity:0; } }
+.con-body { position:relative; padding:32px 0 30px; }
+h1 { font-weight:700; letter-spacing:-0.042em; font-size:clamp(28px,3.4vw,40px); line-height:1.05; }
+.sub { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-top:12px; }
+main { padding:28px 0 90px; }
+.lab { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.gate { max-width:420px; }
+.gate input { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:0.08em; color:#17140F; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:2px; padding:13px 14px; width:100%; margin-top:9px; }
+.gate input:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.btn { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; padding:12px 18px; border:none; border-radius:2px; background:#17140F; color:#F5F0E6; cursor:pointer; }
+.btn:hover { background:oklch(0.44 0.07 152); }
+.btn:disabled { opacity:0.6; cursor:default; }
+.btn.ghost { background:transparent; color:#3D372D; border:1px solid #DDD3C0; }
+.btn.ghost:hover { background:transparent; border-color:#17140F; }
+.bar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
+.count { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; }
+.count b { color:#17140F; font-size:15px; }
+.apps { display:grid; gap:16px; }
+.app { background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; overflow:hidden; }
+.app-h { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:16px 20px; border-bottom:1px solid #EDE6D8; }
+.co { font-weight:700; letter-spacing:-0.02em; font-size:17px; }
+.who { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; }
+.meta { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1px; background:#EDE6D8; border-bottom:1px solid #EDE6D8; }
+.meta > div { background:#FCFAF4; padding:11px 20px 12px; }
+.meta .k { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-bottom:3px; }
+.meta .v { font-size:13.5px; color:#17140F; word-break:break-word; }
+.note { padding:12px 20px; font-size:13px; color:#554C40; background:#F7F2E8; border-bottom:1px solid #EDE6D8; white-space:pre-line; max-height:150px; overflow:auto; }
+.approve { padding:14px 20px 16px; display:flex; gap:8px; align-items:end; flex-wrap:wrap; }
+.fld { display:grid; gap:4px; }
+.fld label { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; }
+.fld input { font-family:'DM Mono',monospace; font-size:13px; color:#17140F; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:2px; padding:10px 11px; width:100px; }
+.fld input.wide { width:130px; }
+.fld input:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.empty { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; padding:40px 22px; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; text-align:center; }
+.err { margin-top:18px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:13px 16px; font-size:14px; }
+.warn { border:1px solid rgba(196,88,60,0.4); background:rgba(242,206,89,0.15); color:#6a5a10; border-radius:3px; padding:11px 14px; font-size:13px; margin:0 20px 16px; }
+.okrow { padding:13px 20px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:oklch(0.44 0.07 152); }
+.fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
+</style>
+</head><body>
+
+<div class="console">
+  <span class="veil"></span>
+  <div class="shell">
+    <div class="con-top">
+      <span class="live"><span class="pulse"></span>Trade desk</span>
+      <span>Wholesale approvals</span>
+    </div>
+    <div class="con-body">
+      <h1>Trade approvals</h1>
+      <div class="sub">Pending applications · approving sends the branded pricing email automatically</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="shell">
+    <div id="gate" class="gate">
+      <label class="lab" for="key">Wholesale key</label>
+      <input id="key" type="password" autocomplete="off" placeholder="WHOLESALE_KEY">
+      <div style="margin-top:14px;"><button class="btn" id="unlock">Open the desk</button></div>
+      <div class="fine">The key is the WHOLESALE_KEY environment variable. It stays on this device only.</div>
+      <div id="gateErr"></div>
+    </div>
+
+    <div id="desk" style="display:none;">
+      <div class="bar">
+        <span class="count"><b id="n">0</b> &nbsp;pending applications</span>
+        <button class="btn ghost" id="refresh">Refresh</button>
+      </div>
+      <div id="banner"></div>
+      <div class="apps" id="apps"></div>
+      <div class="fine">Approving flips the Shopify tags to wholesale-approved and emails the account their pricing from hello@happybeanie.com · defaults are remembered on this device</div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var key = '';
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmt(iso) {
+    try { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch (e) { return ''; }
+  }
+  function prefs() {
+    try { return JSON.parse(localStorage.getItem('hb_ws_prefs') || '{}'); } catch (e) { return {}; }
+  }
+  function savePrefs(p) { try { localStorage.setItem('hb_ws_prefs', JSON.stringify(p)); } catch (e) {} }
+  function api(opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ 'x-wholesale-key': key }, opts.headers || {});
+    return fetch('/api/admin/wholesale', opts).then(function (r) {
+      return r.json().catch(function () { return { ok: false, error: 'bad_response' }; });
+    }).catch(function () { return { ok: false, error: 'unreachable' }; });
+  }
+
+  $('unlock').onclick = function () {
+    key = $('key').value.trim();
+    if (!key) return;
+    $('gateErr').innerHTML = '';
+    api({}).then(function (b) {
+      if (!b.ok && (b.error === 'bad_key' || b.error === 'not_configured' || b.error === 'unreachable' || b.error === 'bad_response')) {
+        $('gateErr').innerHTML = '<div class="err">' +
+          (b.error === 'bad_key' ? 'That key was not accepted.' :
+           b.error === 'not_configured' ? 'Set SHOPIFY_ADMIN_TOKEN and WHOLESALE_KEY on the deployment first.' :
+           'Could not reach the desk.') + '</div>';
+        return;
+      }
+      $('gate').style.display = 'none';
+      $('desk').style.display = 'block';
+      draw(b);
+    });
+  };
+  $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('unlock').click(); });
+  $('refresh').onclick = load;
+  function load() { api({}).then(draw); }
+
+  function draw(b) {
+    b = b || {};
+    var apps = b.apps || [];
+    $('n').textContent = apps.length;
+    $('banner').innerHTML = (b.ok && b.emailReady === false)
+      ? '<div class="warn">Email sending is not configured yet — add RESEND_API_KEY in Vercel. Applications are listed, but approvals will not go through until it is set.</div>' : '';
+    if (!b.ok && (b.error === 'read_failed' || b.error === 'token_rejected')) {
+      $('apps').innerHTML = '<div class="err">' + esc(b.message || 'Shopify would not return applications.') + '</div>';
+      return;
+    }
+    if (!apps.length) {
+      $('apps').innerHTML = '<div class="empty">No pending applications</div>';
+      return;
+    }
+    var p = prefs();
+    $('apps').innerHTML = apps.map(function (a, i) {
+      return '<div class="app" data-i="' + i + '">' +
+        '<div class="app-h"><span class="co">' + esc(a.company || '(no company)') + '</span>' +
+        '<span class="who">' + esc(a.firstName + ' ' + a.lastName) + ' · ' + esc(a.email) + ' · applied ' + fmt(a.appliedAt) + '</span></div>' +
+        '<div class="meta">' +
+          '<div><div class="k">Business type</div><div class="v">' + esc(a.businessType || '—') + '</div></div>' +
+          '<div><div class="k">Est. monthly volume</div><div class="v">' + esc(a.volume || '—') + '</div></div>' +
+          '<div><div class="k">Phone</div><div class="v">' + esc(a.phone || '—') + '</div></div>' +
+          '<div><div class="k">Website</div><div class="v">' + esc(a.website || '—') + '</div></div>' +
+        '</div>' +
+        (a.note ? '<div class="note">' + esc(a.note) + '</div>' : '') +
+        '<div class="approve">' +
+          '<span class="fld"><label>$ / dog box</label><input data-f="priceDog" value="' + esc(p.priceDog || '$62') + '"></span>' +
+          '<span class="fld"><label>$ / cat box</label><input data-f="priceCat" value="' + esc(p.priceCat || '$62') + '"></span>' +
+          '<span class="fld"><label>Min. opening order</label><input class="wide" data-f="minOrder" value="' + esc(p.minOrder || '12 boxes') + '"></span>' +
+          '<span class="fld"><label>Your name</label><input class="wide" data-f="senderName" value="' + esc(p.senderName || '') + '" placeholder="Jon"></span>' +
+          '<button class="btn" data-go>Approve &amp; send →</button>' +
+        '</div>' +
+        '<div data-slot></div>' +
+      '</div>';
+    }).join('');
+
+    Array.prototype.forEach.call(document.querySelectorAll('.app'), function (card, i) {
+      var a = apps[i];
+      card.querySelector('[data-go]').onclick = function () {
+        var btn = this;
+        var get = function (f) { return card.querySelector('[data-f="' + f + '"]').value.trim(); };
+        var payload = {
+          customerId: a.id, email: a.email, firstName: a.firstName || a.company, company: a.company || (a.firstName + ' ' + a.lastName),
+          priceDog: get('priceDog'), priceCat: get('priceCat'), minOrder: get('minOrder'), senderName: get('senderName')
+        };
+        var slot = card.querySelector('[data-slot]');
+        if (!payload.priceDog || !payload.priceCat || !payload.minOrder || !payload.senderName) {
+          slot.innerHTML = '<div class="warn">Fill in both prices, the minimum order, and your name.</div>';
+          return;
+        }
+        savePrefs({ priceDog: payload.priceDog, priceCat: payload.priceCat, minOrder: payload.minOrder, senderName: payload.senderName });
+        btn.disabled = true; btn.textContent = 'Sending…';
+        api({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(function (b) {
+          if (b.ok && !b.warning) {
+            slot.innerHTML = '<div class="okrow">✓ Approved — pricing email sent to ' + esc(a.email) + '</div>';
+            setTimeout(load, 1600);
+            return;
+          }
+          btn.disabled = false; btn.textContent = 'Approve & send →';
+          slot.innerHTML = '<div class="warn">' + esc(b.message || 'That did not go through — nothing was sent.') + '</div>';
+          if (b.warning) { btn.disabled = true; btn.textContent = 'Email sent'; }
+        });
+      };
+    });
+  }
+})();
+</script>
+</body></html>
