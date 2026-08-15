@@ -3635,12 +3635,14 @@ class Component extends DCLogic {
         this.setState(st => st.sp === 'cat'
           ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
           : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan });
+        this.nav('cart')();
       },
       barCtaGo: () => {
         if (this.state.added) { this.nav('cart')(); return; }
         this.setState(st => st.sp === 'cat'
           ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
           : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan });
+        this.nav('cart')();
       },
       joined: this.state.joined,
       joinOpen: !this.state.joined,
@@ -3816,14 +3818,20 @@ class Component extends DCLogic {
       bestBg: this.state.plan === 1 ? 'rgba(245,240,230,0.08)' : 'transparent',
       bestDot: this.state.plan === 1 ? 'oklch(0.86 0.14 92)' : 'transparent',
       pickBest: () => this.setState({ plan: 1 }),
-      addBest: () => this.setState(st => st.sp === 'cat'
-        ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
-        : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan }),
+      addBest: () => {
+        this.setState(st => st.sp === 'cat'
+          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
+          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan });
+        this.nav('cart')();
+      },
       barCta: this.state.added ? 'Added — checkout →'
         : 'Start the ' + (this.state.plan === 2 ? '120' : '30') + ' days · $' + planDefs[this.state.plan].price,
-      addToCart: () => this.setState(st => st.sp === 'cat'
-        ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
-        : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan }),
+      addToCart: () => {
+        this.setState(st => st.sp === 'cat'
+          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
+          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan });
+        this.nav('cart')();
+      },
       factsOpen: this.state.factsOpen,
       factsSign: this.state.factsOpen ? '\u2013' : '+',
       toggleFacts: () => this.setState(s => ({ factsOpen: !s.factsOpen })),
@@ -4335,6 +4343,8 @@ Object.assign(Component.prototype, {
         this.setState(st => a.species === 'cat'
           ? { qzAdded: true, cartCat: st.cartCat + 1, cartPlanCat: 1 }
           : { qzAdded: true, cartDog: st.cartDog + 1, cartPlanDog: 1 });
+        this.setState({ page: 'cart', menuOpen: false });
+        window.scrollTo({ top: 0 });
       },
       qzGoBuy: () => {
         this.setState({ page: 'product', sp: a.species === 'cat' ? 'cat' : 'dog', plan: 1, added: false, ordered: false, menuOpen: false });
