@@ -191,7 +191,6 @@ main { padding:28px 0 90px; }
           '<span class="fld"><label>$ / dog box</label><input data-f="priceDog" value="' + esc(p.priceDog || '') + '"></span>' +
           '<span class="fld"><label>$ / cat box</label><input data-f="priceCat" value="' + esc(p.priceCat || '') + '"></span>' +
           '<span class="fld"><label>Min. opening order</label><input class="wide" data-f="minOrder" value="' + esc(p.minOrder || '') + '"></span>' +
-          '<span class="fld"><label>Your name</label><input class="wide" data-f="senderName" value="' + esc(p.senderName || '') + '" placeholder="Jon"></span>' +
           '<button class="btn" data-go>Approve &amp; send →</button>' +
         '</div>' +
         '<div data-slot></div>' +
@@ -205,14 +204,14 @@ main { padding:28px 0 90px; }
         var get = function (f) { return card.querySelector('[data-f="' + f + '"]').value.trim(); };
         var payload = {
           customerId: a.id, email: a.email, firstName: a.firstName || a.company, company: a.company || (a.firstName + ' ' + a.lastName),
-          priceDog: get('priceDog'), priceCat: get('priceCat'), minOrder: get('minOrder'), senderName: get('senderName')
+          priceDog: get('priceDog'), priceCat: get('priceCat'), minOrder: get('minOrder')
         };
         var slot = card.querySelector('[data-slot]');
-        if (!payload.priceDog || !payload.priceCat || !payload.minOrder || !payload.senderName) {
-          slot.innerHTML = '<div class="warn">Fill in both prices, the minimum order, and your name.</div>';
+        if (!payload.priceDog || !payload.priceCat || !payload.minOrder) {
+          slot.innerHTML = '<div class="warn">Fill in both prices and the minimum order.</div>';
           return;
         }
-        savePrefs({ priceDog: payload.priceDog, priceCat: payload.priceCat, minOrder: payload.minOrder, senderName: payload.senderName });
+        savePrefs({ priceDog: payload.priceDog, priceCat: payload.priceCat, minOrder: payload.minOrder });
         btn.disabled = true; btn.textContent = 'Sending…';
         api({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(function (b) {
           if (b.ok && !b.warning) {

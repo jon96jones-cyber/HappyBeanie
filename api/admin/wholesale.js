@@ -1,7 +1,8 @@
 // /api/admin/wholesale — the trade-approval desk.
 //
 // GET  → { ok, apps: [...] }        pending applications (tag:wholesale-pending)
-// POST { customerId, priceDog, priceCat, minOrder, senderName }
+// POST { customerId, priceDog, priceCat, minOrder }
+//      (email sign-off name comes from WHOLESALE_SENDER, default 'Jon')
 //      → flips tags to approved, then fires the branded approval email via
 //        Resend with the account's pricing filled in. One click, done.
 //
@@ -153,8 +154,9 @@ module.exports = async function handler(req, res) {
     const priceDog = String(body.priceDog || '').slice(0, 20);
     const priceCat = String(body.priceCat || '').slice(0, 20);
     const minOrder = String(body.minOrder || '').slice(0, 60);
-    const senderName = String(body.senderName || '').slice(0, 100);
-    if (!customerId || !email || !firstName || !company || !priceDog || !priceCat || !minOrder || !senderName) {
+    // The email's sign-off name — server-supplied (the desk no longer asks).
+    const senderName = String(process.env.WHOLESALE_SENDER || 'Jon').slice(0, 100);
+    if (!customerId || !email || !firstName || !company || !priceDog || !priceCat || !minOrder) {
       return res.status(400).json({ ok: false, error: 'bad_request', message: 'All fields are required.' });
     }
 
