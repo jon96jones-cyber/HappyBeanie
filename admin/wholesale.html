@@ -188,9 +188,9 @@ main { padding:28px 0 90px; }
         '</div>' +
         (a.note ? '<div class="note">' + esc(a.note) + '</div>' : '') +
         '<div class="approve">' +
-          '<span class="fld"><label>$ / dog box</label><input data-f="priceDog" value="' + esc(p.priceDog || '$62') + '"></span>' +
-          '<span class="fld"><label>$ / cat box</label><input data-f="priceCat" value="' + esc(p.priceCat || '$62') + '"></span>' +
-          '<span class="fld"><label>Min. opening order</label><input class="wide" data-f="minOrder" value="' + esc(p.minOrder || '5 boxes') + '"></span>' +
+          '<span class="fld"><label>$ / dog box</label><input data-f="priceDog" value="' + esc(p.priceDog || '') + '"></span>' +
+          '<span class="fld"><label>$ / cat box</label><input data-f="priceCat" value="' + esc(p.priceCat || '') + '"></span>' +
+          '<span class="fld"><label>Min. opening order</label><input class="wide" data-f="minOrder" value="' + esc(p.minOrder || '') + '"></span>' +
           '<span class="fld"><label>Your name</label><input class="wide" data-f="senderName" value="' + esc(p.senderName || '') + '" placeholder="Jon"></span>' +
           '<button class="btn" data-go>Approve &amp; send →</button>' +
         '</div>' +
