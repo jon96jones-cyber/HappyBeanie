@@ -145,7 +145,7 @@ module.exports = async function handler(req, res) {
     });
 
     if (taken) {
-      const tagged = await tagExistingByEmail(token, email, note);
+      const tagged = await tagExistingByEmail(token, email, note, metafields);
       if (tagged) return res.status(200).json({ ok: true });
       // Existing customer but we couldn't retag — surface it instead of a fake success.
       console.error('[wholesale-apply] existing-email retag failed for', email);
@@ -164,7 +164,7 @@ module.exports = async function handler(req, res) {
 // Look up a customer by email and add the pending tag + append the application note.
 // Returns true only when the tag actually landed — a failed tag means the desk
 // would never show the application, so that must not read as success.
-async function tagExistingByEmail(token, email, note) {
+async function tagExistingByEmail(token, email, note, metafields) {
   const FIND = 'query findCustomer($q: String!) {' +
     ' customers(first: 1, query: $q) { edges { node { id note } } } }';
   const found = await shopifyAdmin(token, FIND, { q: 'email:' + email });
@@ -196,6 +196,23 @@ async function tagExistingByEmail(token, email, note) {
     .concat((((updated.json.data || {}).customerUpdate) || {}).userErrors || [])
     .concat(updated.json.errors || []);
   if (noteErrs.length) console.error('[wholesale-apply] note update failed for', email, JSON.stringify(noteErrs));
+
+  // Write the structured wholesale.* fields too, so the desk card renders the
+  // same for an existing customer as for a fresh one. metafieldsSet upserts by
+  // namespace/key. Nice-to-have: the desk can also parse the note as a fallback.
+  if (metafields && metafields.length) {
+    const SET = 'mutation setMf($metafields: [MetafieldsSetInput!]!) {' +
+      ' metafieldsSet(metafields: $metafields) { userErrors { field message } } }';
+    const setOut = await shopifyAdmin(token, SET, {
+      metafields: metafields.map(function (m) {
+        return { ownerId: id, namespace: m.namespace, key: m.key, type: m.type, value: m.value };
+      })
+    });
+    const mfErrs = []
+      .concat((((setOut.json.data || {}).metafieldsSet) || {}).userErrors || [])
+      .concat(setOut.json.errors || []);
+    if (mfErrs.length) console.error('[wholesale-apply] metafieldsSet failed for', email, JSON.stringify(mfErrs));
+  }
 
   return true;
 }

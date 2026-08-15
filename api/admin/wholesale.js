@@ -32,7 +32,7 @@ async function admin(token, query, variables) {
 const PENDING = `query Pending {
   customers(first: 50, query: "tag:wholesale-pending") {
     nodes {
-      id firstName lastName email note createdAt
+      id firstName lastName email note createdAt updatedAt
       company: metafield(namespace: "wholesale", key: "company") { value }
       businessType: metafield(namespace: "wholesale", key: "business_type") { value }
       volume: metafield(namespace: "wholesale", key: "monthly_volume") { value }
@@ -66,6 +66,26 @@ function readBody(req) {
 
 function mf(node) { return node && node.value ? node.value : ''; }
 
+// Applications from customers who already existed in Shopify live only in the
+// customer note (the apply endpoint appends a "WHOLESALE APPLICATION" block) —
+// their wholesale.* metafields may be empty. Parse the latest block out of the
+// note so the desk card renders the same either way.
+function parseNoteApp(note) {
+  const i = String(note || '').lastIndexOf('WHOLESALE APPLICATION');
+  const seg = i === -1 ? '' : String(note).slice(i);
+  function pick(re) { const m = seg.match(re); return m ? m[1].trim() : ''; }
+  return {
+    found: i !== -1,
+    company: pick(/^Company:\s*(.+)$/m),
+    businessType: pick(/^Business type:\s*(.+)$/m),
+    volume: pick(/^Est\. monthly volume:\s*(.+)$/m),
+    phone: pick(/^Phone:\s*(.+)$/m),
+    website: pick(/^Website:\s*(.+)$/m),
+    // Lines the meta grid does not surface stay visible in the note block.
+    extra: seg.split('\n').filter(function (l) { return /^(Address|Resale\/EIN|Notes):/.test(l); }).join('\n')
+  };
+}
+
 module.exports = async function handler(req, res) {
   const token = process.env.SHOPIFY_ADMIN_TOKEN;
   if (!token || !process.env.WHOLESALE_KEY) {
@@ -87,18 +107,22 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({ ok: false, error: 'read_failed', message: (gqlErrors[0] && gqlErrors[0].message) || 'Shopify read error' });
       }
       const apps = (out.json.data.customers.nodes || []).map(function (c) {
+        const p = parseNoteApp(c.note);
+        const fromNote = !mf(c.company) && p.found;
         return {
           id: c.id,
           firstName: c.firstName || '',
           lastName: c.lastName || '',
           email: c.email || '',
-          appliedAt: c.createdAt,
-          company: mf(c.company),
-          businessType: mf(c.businessType),
-          volume: mf(c.volume),
-          phone: mf(c.phone),
-          website: mf(c.website),
-          note: c.note || '',
+          // For a retagged existing customer, createdAt is when the account was
+          // first made — updatedAt (the retag/note write) is the application time.
+          appliedAt: fromNote ? (c.updatedAt || c.createdAt) : c.createdAt,
+          company: mf(c.company) || p.company,
+          businessType: mf(c.businessType) || p.businessType,
+          volume: mf(c.volume) || p.volume,
+          phone: mf(c.phone) || p.phone,
+          website: mf(c.website) || p.website,
+          note: p.found ? p.extra : (c.note || ''),
           emailReady: !!process.env.RESEND_API_KEY
         };
       });
@@ -178,3 +202,5 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ ok: false, error: 'upstream' });
   }
 };
+
+module.exports.parseNoteApp = parseNoteApp; // exposed for tests
