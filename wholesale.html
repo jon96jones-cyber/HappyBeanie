@@ -374,7 +374,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 
           <form id="wholesaleForm" novalidate>
             <!-- Honeypot: real people never see or fill this -->
-            <div class="hp" aria-hidden="true"><label>Do not fill this in<input type="text" name="company_url" tabindex="-1" autocomplete="off"></label></div>
+            <div class="hp" aria-hidden="true"><label>Do not fill this in<input type="text" name="hb_extra" tabindex="-1" autocomplete="off"></label></div>
 
             <div class="field">
               <label for="company">Business / company name <span class="req">&lowast;</span></label>
@@ -541,7 +541,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
       taxId: form.taxId.value.trim(),
       address: form.address.value.trim(),
       message: form.message.value.trim(),
-      company_url: form.company_url.value // honeypot
+      hb_extra: form.hb_extra.value // honeypot
     };
 
     if (!data.company || !data.firstName || !data.lastName || !data.email || !data.phone || !data.businessType || !data.volume) {

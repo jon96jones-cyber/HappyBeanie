@@ -48,7 +48,10 @@ module.exports = async function handler(req, res) {
   body = body || {};
 
   // Honeypot: bots fill hidden fields. Pretend success, create nothing.
-  if (clean(body.company_url, 200)) {
+  // (Field renamed from company_url — browser autofill was matching that name
+  // and filling it for real applicants; accept the old name during rollover.)
+  if (clean(body.hb_extra, 200) || clean(body.company_url, 200)) {
+    console.warn('[wholesale-apply] honeypot tripped — dropping submission for', clean(body.email, 200));
     return res.status(200).json({ ok: true });
   }
 
@@ -144,8 +147,9 @@ module.exports = async function handler(req, res) {
     if (taken) {
       const tagged = await tagExistingByEmail(token, email, note);
       if (tagged) return res.status(200).json({ ok: true });
-      // Existing customer but we couldn't retag — still acknowledge; the team will see them.
-      return res.status(200).json({ ok: true });
+      // Existing customer but we couldn't retag — surface it instead of a fake success.
+      console.error('[wholesale-apply] existing-email retag failed for', email);
+      return res.status(502).json({ ok: false, error: 'We couldn’t attach your application to your account. Please email hello@happybeanie.com and we’ll set you up.' });
     }
 
     console.error('[wholesale-apply] userErrors:', JSON.stringify(userErrors));
@@ -158,23 +162,40 @@ module.exports = async function handler(req, res) {
 };
 
 // Look up a customer by email and add the pending tag + append the application note.
+// Returns true only when the tag actually landed — a failed tag means the desk
+// would never show the application, so that must not read as success.
 async function tagExistingByEmail(token, email, note) {
   const FIND = 'query findCustomer($q: String!) {' +
     ' customers(first: 1, query: $q) { edges { node { id note } } } }';
   const found = await shopifyAdmin(token, FIND, { q: 'email:' + email });
   const edges = found.json && found.json.data && found.json.data.customers && found.json.data.customers.edges;
-  if (!edges || !edges.length) return false;
+  if (!edges || !edges.length) {
+    console.error('[wholesale-apply] email taken but lookup found no customer:', email, JSON.stringify(found.json.errors || null));
+    return false;
+  }
   const node = edges[0].node;
   const id = node.id;
 
   const TAG = 'mutation addTag($id: ID!, $tags: [String!]!) {' +
     ' tagsAdd(id: $id, tags: $tags) { userErrors { message } } }';
-  await shopifyAdmin(token, TAG, { id: id, tags: [PENDING_TAG] });
+  const tagged = await shopifyAdmin(token, TAG, { id: id, tags: [PENDING_TAG] });
+  const tagErrs = []
+    .concat((((tagged.json.data || {}).tagsAdd) || {}).userErrors || [])
+    .concat(tagged.json.errors || []);
+  if (tagErrs.length) {
+    console.error('[wholesale-apply] tagsAdd failed for', email, JSON.stringify(tagErrs));
+    return false;
+  }
 
+  // The note is nice-to-have — log a failure but don't fail the application over it.
   const combinedNote = (node.note ? node.note + '\n\n' : '') + note;
   const UPDATE = 'mutation updateNote($input: CustomerInput!) {' +
     ' customerUpdate(input: $input) { userErrors { message } } }';
-  await shopifyAdmin(token, UPDATE, { input: { id: id, note: combinedNote } });
+  const updated = await shopifyAdmin(token, UPDATE, { input: { id: id, note: combinedNote } });
+  const noteErrs = []
+    .concat((((updated.json.data || {}).customerUpdate) || {}).userErrors || [])
+    .concat(updated.json.errors || []);
+  if (noteErrs.length) console.error('[wholesale-apply] note update failed for', email, JSON.stringify(noteErrs));
 
   return true;
 }

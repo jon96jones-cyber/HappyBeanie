@@ -40,6 +40,9 @@ const PENDING = `query Pending {
       website: metafield(namespace: "wholesale", key: "website") { value }
     }
   }
+  recent: customers(first: 5, sortKey: UPDATED_AT, reverse: true) {
+    nodes { email tags updatedAt }
+  }
 }`;
 
 const APPROVE_TAGS = `mutation Approve($id: ID!, $add: [String!]!, $remove: [String!]!) {
@@ -99,7 +102,13 @@ module.exports = async function handler(req, res) {
           emailReady: !!process.env.RESEND_API_KEY
         };
       });
-      return res.status(200).json({ ok: true, apps: apps, emailReady: !!process.env.RESEND_API_KEY });
+      // Diagnostic feed: the last few touched customer records with their tags,
+      // shown by the desk when the queue is empty so "form submitted but nothing
+      // here" is debuggable at a glance (tag missing vs search-index lag).
+      const recent = ((out.json.data.recent || {}).nodes || []).map(function (c) {
+        return { email: c.email || '(no email)', tags: c.tags || [], updatedAt: c.updatedAt };
+      });
+      return res.status(200).json({ ok: true, apps: apps, recent: recent, emailReady: !!process.env.RESEND_API_KEY });
     }
 
     if (req.method !== 'POST') {
