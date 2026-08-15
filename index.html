@@ -2339,6 +2339,8 @@ image-slot:not([data-filled]) { color: transparent !important; }
                 <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 7px 10px; border-radius: 999px; white-space: nowrap;">{{ cartGiftTag }}</span>
                 <span style="font-size: 13.5px; line-height: 1.5; color: #17140F;">{{ cartGiftNote }}</span>
               </div>
+
+              <button sc-camel-on-click="{{ goShopping }}" data-m="tap" style="justify-self: start; font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 14px 24px; border: 1px solid #C9BEA8; border-radius: 999px; background: transparent; color: #554C40; cursor: pointer; transition: border-color 0.25s ease, color 0.25s ease;" style-hover="border-color: #17140F; color: #17140F;">← Still shopping</button>
             </div>
 
             <div data-m="cartsum" style="position: sticky; top: 96px; border: 1px solid rgba(245,240,230,0.16); border-radius: 8px; background: linear-gradient(#1D1913, #17140F); color: #F5F0E6; padding: 26px 26px 28px; overflow: hidden; box-shadow: 0 40px 70px -40px rgba(0,0,0,0.85);">
@@ -2365,7 +2367,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
                 </div>
               </div>
               <button sc-camel-on-click="{{ goCheckout }}" data-m="tap cbtn" style="position: relative; width: 100%; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 36px -20px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">Checkout →</button>
-              <button sc-camel-on-click="{{ goShopping }}" data-m="tap" style="position: relative; width: 100%; margin-top: 10px; font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 15px; border: 1px solid rgba(245,240,230,0.28); border-radius: 999px; background: transparent; color: #DED5C4; cursor: pointer; transition: border-color 0.25s ease, color 0.25s ease;" style-hover="border-color: oklch(0.86 0.14 92); color: oklch(0.86 0.14 92);">← Still shopping</button>
               <div data-m="ctrust" style="position: relative; display: grid; gap: 8px; margin-top: 18px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E;">
                 <span>30-day money-back guarantee</span>
                 <span>Ships within 24 hours · Scottsdale AZ</span>
