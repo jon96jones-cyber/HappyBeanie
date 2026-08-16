@@ -215,7 +215,8 @@ main { padding:28px 0 90px; }
         btn.disabled = true; btn.textContent = 'Sending…';
         api({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(function (b) {
           if (b.ok && !b.warning) {
-            slot.innerHTML = '<div class="okrow">✓ Approved — pricing email sent to ' + esc(a.email) + '</div>';
+            slot.innerHTML = '<div class="okrow">✓ Approved — pricing email sent to ' + esc(a.email) +
+              (b.emailId ? ' <span style="opacity:0.6;">· Resend id ' + esc(b.emailId) + '</span>' : '') + '</div>';
             setTimeout(load, 1600);
             return;
           }

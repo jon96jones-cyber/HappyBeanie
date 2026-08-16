@@ -180,6 +180,7 @@ module.exports = async function handler(req, res) {
       return res.status(502).json({ ok: false, error: 'email_failed',
         message: (sentJson && sentJson.message) || ('Email service returned ' + sent.status) });
     }
+    console.log('[admin/wholesale] resend accepted', sentJson.id, 'to', email);
 
     // 2. Flip the tags. If this half fails the email is already out — report
     //    it so the tag can be fixed by hand rather than double-sending.
@@ -194,11 +195,11 @@ module.exports = async function handler(req, res) {
       .concat(tagged.json.errors || []);
     if (tErrs.length) {
       console.error('[admin/wholesale] tag:', JSON.stringify(tErrs));
-      return res.status(200).json({ ok: true, warning: 'email_sent_tags_failed',
+      return res.status(200).json({ ok: true, warning: 'email_sent_tags_failed', emailId: sentJson.id,
         message: 'The email went out, but the Shopify tags did not update — flip wholesale-pending → wholesale-approved by hand for ' + email + '.' });
     }
 
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, emailId: sentJson.id });
   } catch (err) {
     console.error('[admin/wholesale]', err && err.message);
     return res.status(502).json({ ok: false, error: 'upstream' });
