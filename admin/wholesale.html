@@ -62,6 +62,7 @@ main { padding:28px 0 90px; }
 .err { margin-top:18px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:13px 16px; font-size:14px; }
 .warn { border:1px solid rgba(196,88,60,0.4); background:rgba(242,206,89,0.15); color:#6a5a10; border-radius:3px; padding:11px 14px; font-size:13px; margin:0 20px 16px; }
 .okrow { padding:13px 20px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:oklch(0.44 0.07 152); }
+.pipe { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#8A7F6E; padding:0 0 14px; }
 .fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
 </style>
 </head><body>
@@ -151,8 +152,26 @@ main { padding:28px 0 90px; }
     b = b || {};
     var apps = b.apps || [];
     $('n').textContent = apps.length;
-    $('banner').innerHTML = (b.ok && b.emailReady === false)
+    var bannerHtml = (b.ok && b.emailReady === false)
       ? '<div class="warn">Email sending is not configured yet — add RESEND_API_KEY in Vercel. Applications are listed, but approvals will not go through until it is set.</div>' : '';
+    // Email-pipe status, straight from the API key Vercel is using.
+    if (b.resend) {
+      if (!b.resend.reachable) {
+        bannerHtml += '<div class="warn">Email pipe check failed: ' + esc(b.resend.message || 'unknown') + '</div>';
+      } else if (!(b.resend.domains || []).length) {
+        bannerHtml += '<div class="warn">The RESEND_API_KEY in Vercel belongs to a Resend team with <b>no domains</b> — it is a different team than the one where happybeanie.com was verified. Create a key in that team (Resend → correct team → API Keys) and replace RESEND_API_KEY in Vercel.</div>';
+      } else {
+        bannerHtml += '<div class="pipe">Email pipe · ' + b.resend.domains.map(function (d) {
+          var ok = String(d.status).toLowerCase() === 'verified';
+          return '<b style="color:' + (ok ? '#325E3F' : '#B4552D') + ';">' + esc(d.name) + ' — ' + esc(d.status) + (ok ? ' ✓' : ' ✗') + '</b>';
+        }).join(' · ') + '</div>';
+        var unver = b.resend.domains.filter(function (d) { return String(d.status).toLowerCase() !== 'verified'; });
+        if (unver.length === b.resend.domains.length) {
+          bannerHtml += '<div class="warn">No verified domain in this key’s Resend team — sends from hello@happybeanie.com are being rejected. Finish DNS verification for the domain shown above, or point RESEND_API_KEY at the team where it is verified.</div>';
+        }
+      }
+    }
+    $('banner').innerHTML = bannerHtml;
     if (!b.ok && (b.error === 'read_failed' || b.error === 'token_rejected')) {
       $('apps').innerHTML = '<div class="err">' + esc(b.message || 'Shopify would not return applications.') + '</div>';
       return;

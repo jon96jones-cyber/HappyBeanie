@@ -127,13 +127,33 @@ module.exports = async function handler(req, res) {
           emailReady: !!process.env.RESEND_API_KEY
         };
       });
+      // Email-pipe probe: ask Resend (with the key Vercel actually holds) what
+      // domains its team can send from. A key pointing at the wrong team, or an
+      // unverified domain, shows up here instead of as a mystery failed send.
+      let resendInfo = null;
+      if (process.env.RESEND_API_KEY) {
+        try {
+          const rd = await fetch('https://api.resend.com/domains', {
+            headers: { 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY }
+          });
+          const rdJson = await rd.json().catch(function () { return {}; });
+          if (rd.ok) {
+            resendInfo = { reachable: true, domains: (rdJson.data || []).map(function (d) { return { name: d.name, status: d.status }; }) };
+          } else {
+            resendInfo = { reachable: false, message: rdJson.message || ('Resend returned ' + rd.status) };
+          }
+        } catch (e) {
+          resendInfo = { reachable: false, message: 'Could not reach Resend.' };
+        }
+      }
+
       // Diagnostic feed: the last few touched customer records with their tags,
       // shown by the desk when the queue is empty so "form submitted but nothing
       // here" is debuggable at a glance (tag missing vs search-index lag).
       const recent = ((out.json.data.recent || {}).nodes || []).map(function (c) {
         return { email: c.email || '(no email)', tags: c.tags || [], updatedAt: c.updatedAt };
       });
-      return res.status(200).json({ ok: true, apps: apps, recent: recent, emailReady: !!process.env.RESEND_API_KEY });
+      return res.status(200).json({ ok: true, apps: apps, recent: recent, resend: resendInfo, emailReady: !!process.env.RESEND_API_KEY });
     }
 
     if (req.method !== 'POST') {
