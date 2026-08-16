@@ -89,18 +89,35 @@ const DISCOUNTS = `query TradeDiscount {
   }
 }`;
 
-const UPDATE_PRICING = `mutation UpdatePricing($id: ID!, $d: DiscountAutomaticBasicInput!) {
-  discountAutomaticBasicUpdate(id: $id, automaticBasicDiscount: $d) {
-    userErrors { field message }
+const CODES_Q = `query CodeDiscounts {
+  codeDiscountNodes(first: 50) {
+    nodes {
+      id
+      codeDiscount {
+        __typename
+        ... on DiscountCodeBasic {
+          title status
+          minimumRequirement { ... on DiscountMinimumQuantity { greaterThanOrEqualToQuantity } }
+          customerGets { value { ... on DiscountPercentage { percentage } } }
+          codes(first: 1) { nodes { code } }
+        }
+      }
+    }
   }
+}`;
+const CODE_CREATE = `mutation CodeCreate($d: DiscountCodeBasicInput!) {
+  discountCodeBasicCreate(basicCodeDiscount: $d) { userErrors { field message } }
+}`;
+const CODE_UPDATE = `mutation CodeUpdate($id: ID!, $d: DiscountCodeBasicInput!) {
+  discountCodeBasicUpdate(id: $id, basicCodeDiscount: $d) { userErrors { field message } }
+}`;
+const AUTO_DEACTIVATE = `mutation AutoOff($id: ID!) {
+  discountAutomaticDeactivate(id: $id) { userErrors { field message } }
 }`;
 
 const SEGMENTS_Q = `query Segments { segments(first: 100) { edges { node { id name query } } } }`;
 const SEG_CREATE = `mutation SegCreate($name: String!, $q: String!) {
   segmentCreate(name: $name, query: $q) { segment { id } userErrors { field message } }
-}`;
-const TIER_CREATE = `mutation TierCreate($d: DiscountAutomaticBasicInput!) {
-  discountAutomaticBasicCreate(automaticBasicDiscount: $d) { userErrors { field message } }
 }`;
 const CUST_TAGS = `query CustTags($id: ID!) { customer(id: $id) { tags } }`;
 const TAGS_REMOVE = `mutation TagsRemove($id: ID!, $t: [String!]!) {
@@ -123,19 +140,40 @@ function usd(n) {
   return '$' + (r % 1 === 0 ? String(r) : r.toFixed(2));
 }
 
-// Find the STORE-WIDE wholesale automatic discount (per-account tier discounts
-// are titled "Wholesale tier — …" and excluded); returns { id, title, status,
-// summary, pct, minQty } or null.
+// Find the STORE-WIDE wholesale discount. Preferred: the WHOLESALE baseline
+// CODE discount (the site auto-applies it at checkout for wholesale accounts).
+// Legacy: the old automatic discount ("Wholesale — …", kind 'automatic') from
+// before the code migration — reported so the desk can migrate it.
 async function findTradeDiscount(token) {
+  const cOut = await admin(token, CODES_Q);
+  const cNodes = ((cOut.json.data || {}).codeDiscountNodes || {}).nodes || [];
+  const cHit = cNodes.filter(function (n) {
+    const d = n.codeDiscount || {};
+    const code = (((d.codes || {}).nodes || [])[0] || {}).code || '';
+    return code === 'WHOLESALE';
+  })[0];
+  if (cHit) {
+    const d = cHit.codeDiscount;
+    return {
+      kind: 'code',
+      id: cHit.id,
+      title: d.title,
+      status: d.status,
+      summary: '',
+      pct: ((d.customerGets || {}).value || {}).percentage || 0,
+      minQty: parseInt(((d.minimumRequirement || {}).greaterThanOrEqualToQuantity) || '0', 10) || 0
+    };
+  }
   const out = await admin(token, DISCOUNTS);
   const nodes = ((out.json.data || {}).automaticDiscountNodes || {}).nodes || [];
   const hit = nodes.filter(function (n) {
     const t = ((n.automaticDiscount || {}).title) || '';
-    return /wholesale|trade/i.test(t) && !/tier/i.test(t);
+    return /wholesale|trade/i.test(t) && !/tier/i.test(t) && String((n.automaticDiscount || {}).status).toUpperCase() === 'ACTIVE';
   })[0];
   if (!hit) return { error: (out.json.errors || [])[0] ? out.json.errors[0].message : null };
   const d = hit.automaticDiscount;
   return {
+    kind: 'automatic',
     id: hit.id,
     title: d.title,
     status: d.status,
@@ -143,6 +181,62 @@ async function findTradeDiscount(token) {
     pct: ((d.customerGets || {}).value || {}).percentage || 0,
     minQty: parseInt(((d.minimumRequirement || {}).greaterThanOrEqualToQuantity) || '0', 10) || 0
   };
+}
+
+// Find (or create) the segment whose query contains the given tag literal.
+async function ensureSegment(token, name, tag) {
+  const sOut = await admin(token, SEGMENTS_Q);
+  const segs = (((sOut.json.data || {}).segments || {}).edges || []).map(function (e) { return e.node; });
+  const seg = segs.filter(function (s) { return (s.query || '').indexOf("'" + tag + "'") !== -1; })[0];
+  if (seg) return { seg: seg };
+  const sc = await admin(token, SEG_CREATE, { name: name, q: "customer_tags CONTAINS '" + tag + "'" });
+  const scErrs = []
+    .concat((((sc.json.data || {}).segmentCreate) || {}).userErrors || [])
+    .concat(sc.json.errors || []);
+  const created = (((sc.json.data || {}).segmentCreate) || {}).segment;
+  if (!created || scErrs.length) return { error: (scErrs[0] && scErrs[0].message) || 'segment create failed' };
+  return { seg: created };
+}
+
+// Build the input for a wholesale code discount (baseline or tier).
+function codeDiscountInput(title, code, pct, minQty, segmentId) {
+  return {
+    title: title,
+    code: code,
+    startsAt: new Date().toISOString(),
+    customerSelection: { customerSegments: { add: [segmentId] } },
+    customerGets: {
+      value: { percentage: pct / 100 },
+      items: { all: true },
+      appliesOnOneTimePurchase: true,
+      appliesOnSubscription: false
+    },
+    minimumRequirement: { quantity: { greaterThanOrEqualToQuantity: String(minQty) } },
+    combinesWith: { productDiscounts: false, orderDiscounts: false, shippingDiscounts: true },
+    appliesOncePerCustomer: false
+  };
+}
+
+// Migrate the legacy automatic wholesale discount to the WHOLESALE baseline
+// code (same %, same minimum unless overridden), then deactivate the automatic
+// so it can never double-apply or leak to non-wholesale shoppers.
+async function migrateBaseline(token, legacy, pct, minQty) {
+  const segR = await ensureSegment(token, 'Wholesale accounts', 'wholesale');
+  if (segR.error) return { error: 'segment: ' + segR.error };
+  const title = 'Wholesale — trade pricing (' + minQty + '+ boxes)';
+  const cr = await admin(token, CODE_CREATE, { d: codeDiscountInput(title, 'WHOLESALE', pct, minQty, segR.seg.id) });
+  const crErrs = []
+    .concat((((cr.json.data || {}).discountCodeBasicCreate) || {}).userErrors || [])
+    .concat(cr.json.errors || []);
+  if (crErrs.length) return { error: 'code create: ' + (crErrs[0].message || 'failed') };
+  if (legacy && legacy.id) {
+    const off = await admin(token, AUTO_DEACTIVATE, { id: legacy.id });
+    const offErrs = []
+      .concat((((off.json.data || {}).discountAutomaticDeactivate) || {}).userErrors || [])
+      .concat(off.json.errors || []);
+    if (offErrs.length) return { warning: 'The code discount is live, but the old automatic discount could not be deactivated: ' + (offErrs[0].message || '') + ' — deactivate it by hand in Shopify admin → Discounts.' };
+  }
+  return {};
 }
 
 const APPROVE_TAGS = `mutation Approve($id: ID!, $add: [String!]!, $remove: [String!]!) {
@@ -253,7 +347,7 @@ module.exports = async function handler(req, res) {
       try {
         const d = await findTradeDiscount(token);
         discount = (d && d.id)
-          ? { found: true, title: d.title, status: d.status, summary: d.summary,
+          ? { found: true, kind: d.kind, title: d.title, status: d.status, summary: d.summary,
               pct: d.pct, minQty: d.minQty,
               boxPrice: Math.round(115 * (1 - d.pct) * 100) / 100 }
           : { found: false, error: d && d.error };
@@ -305,19 +399,28 @@ module.exports = async function handler(req, res) {
       }
       const d = await findTradeDiscount(token);
       if (!d || !d.id) {
-        return res.status(200).json({ ok: false, error: 'no_discount',
-          message: 'No wholesale automatic discount found in Shopify to update.' });
+        // Nothing exists yet — create the baseline code discount from scratch.
+        const mig = await migrateBaseline(token, null, pct, minQty);
+        if (mig.error) return res.status(200).json({ ok: false, error: 'update_failed', message: mig.error });
+        return res.status(200).json({ ok: true, migrated: true, warning: mig.warning });
       }
-      const upd = await admin(token, UPDATE_PRICING, {
+      if (d.kind === 'automatic') {
+        // Legacy automatic discount → migrate to the WHOLESALE baseline code
+        // at the requested terms, and deactivate the automatic.
+        const mig = await migrateBaseline(token, d, pct, minQty);
+        if (mig.error) return res.status(200).json({ ok: false, error: 'update_failed', message: mig.error });
+        return res.status(200).json({ ok: true, migrated: true, warning: mig.warning });
+      }
+      const upd = await admin(token, CODE_UPDATE, {
         id: d.id,
         d: {
           title: 'Wholesale — trade pricing (' + minQty + '+ boxes)',
-          customerGets: { value: { percentage: pct / 100 } },
+          customerGets: { value: { percentage: pct / 100 }, items: { all: true } },
           minimumRequirement: { quantity: { greaterThanOrEqualToQuantity: String(minQty) } }
         }
       });
       const uErrs = []
-        .concat((((upd.json.data || {}).discountAutomaticBasicUpdate) || {}).userErrors || [])
+        .concat((((upd.json.data || {}).discountCodeBasicUpdate) || {}).userErrors || [])
         .concat(upd.json.errors || []);
       if (uErrs.length) {
         console.error('[admin/wholesale] pricing update:', JSON.stringify(uErrs));
@@ -346,48 +449,38 @@ module.exports = async function handler(req, res) {
       if (!tCustomerId || !tEmail || !tFirst || !tCompany || !(tPct >= 5 && tPct <= 90)) {
         return res.status(400).json({ ok: false, error: 'bad_request', message: 'Tier must be a whole number between 5 and 90.' });
       }
-      const base = await findTradeDiscount(token);
+      let base = await findTradeDiscount(token);
       const tMinQty = (base && base.minQty) || 5;
+      // Tiers ride on code discounts; a legacy automatic baseline would clash
+      // with them at checkout (non-combinable), so migrate it first.
+      if (base && base.kind === 'automatic') {
+        const mig = await migrateBaseline(token, base, Math.round((base.pct || 0.3) * 100), tMinQty);
+        if (mig.error) return res.status(200).json({ ok: false, error: 'migrate_failed',
+          message: 'Could not migrate the baseline discount to the code system first: ' + mig.error });
+      }
       const tTag = 'wholesale-pct-' + tPct;
+      const tCode = 'TRADE' + tPct;
       const tTitlePrefix = 'Wholesale tier — ' + tPct + '%';
 
-      // 1. Ensure the tier discount exists in Shopify.
-      const dOut = await admin(token, DISCOUNTS);
-      const dNodes = ((dOut.json.data || {}).automaticDiscountNodes || {}).nodes || [];
-      const tierExists = dNodes.some(function (n) {
-        return (((n.automaticDiscount || {}).title) || '').indexOf(tTitlePrefix) === 0;
+      // 1. Ensure the tier code discount exists in Shopify.
+      const cOut = await admin(token, CODES_Q);
+      const cNodes = ((cOut.json.data || {}).codeDiscountNodes || {}).nodes || [];
+      const tierExists = cNodes.some(function (n) {
+        const cd = n.codeDiscount || {};
+        return ((((cd.codes || {}).nodes || [])[0] || {}).code) === tCode;
       });
       if (!tierExists) {
-        const sOut = await admin(token, SEGMENTS_Q);
-        const segs = (((sOut.json.data || {}).segments || {}).edges || []).map(function (e) { return e.node; });
-        let seg = segs.filter(function (s) { return (s.query || '').indexOf("'" + tTag + "'") !== -1; })[0];
-        if (!seg) {
-          const sc = await admin(token, SEG_CREATE, { name: 'Wholesale tier ' + tPct + '%', q: "customer_tags CONTAINS '" + tTag + "'" });
-          const scErrs = []
-            .concat((((sc.json.data || {}).segmentCreate) || {}).userErrors || [])
-            .concat(sc.json.errors || []);
-          seg = (((sc.json.data || {}).segmentCreate) || {}).segment;
-          if (!seg || scErrs.length) {
-            console.error('[admin/wholesale] segment:', JSON.stringify(scErrs));
-            return res.status(200).json({ ok: false, error: 'segment_failed',
-              message: 'Could not create the customer segment: ' + ((scErrs[0] && scErrs[0].message) || 'unknown error') });
-          }
+        const segR = await ensureSegment(token, 'Wholesale tier ' + tPct + '%', tTag);
+        if (segR.error) {
+          console.error('[admin/wholesale] segment:', segR.error);
+          return res.status(200).json({ ok: false, error: 'segment_failed',
+            message: 'Could not create the customer segment: ' + segR.error });
         }
-        const dc = await admin(token, TIER_CREATE, { d: {
-          title: tTitlePrefix + ' (' + tMinQty + '+ boxes)',
-          startsAt: new Date().toISOString(),
-          customerGets: {
-            value: { percentage: tPct / 100 },
-            items: { all: true },
-            appliesOnOneTimePurchase: true,
-            appliesOnSubscription: false
-          },
-          minimumRequirement: { quantity: { greaterThanOrEqualToQuantity: String(tMinQty) } },
-          customerSelection: { customerSegments: { add: [seg.id] } },
-          combinesWith: { productDiscounts: false, orderDiscounts: false, shippingDiscounts: true }
-        } });
+        const dc = await admin(token, CODE_CREATE, {
+          d: codeDiscountInput(tTitlePrefix + ' (' + tMinQty + '+ boxes)', tCode, tPct, tMinQty, segR.seg.id)
+        });
         const dcErrs = []
-          .concat((((dc.json.data || {}).discountAutomaticBasicCreate) || {}).userErrors || [])
+          .concat((((dc.json.data || {}).discountCodeBasicCreate) || {}).userErrors || [])
           .concat(dc.json.errors || []);
         if (dcErrs.length) {
           console.error('[admin/wholesale] tier discount:', JSON.stringify(dcErrs));

@@ -36,7 +36,7 @@ window.HB_SHOPIFY = {
   },
   sellingPlan: 'gid://shopify/SellingPlan/974946368'
 };
-window.hbShopifyCheckout = async function (rows, buyer) {
+window.hbShopifyCheckout = async function (rows, buyer, opts) {
   const cfg = window.HB_SHOPIFY;
   if (!cfg.token || cfg.token.indexOf('PLACEHOLDER') !== -1) {
     throw new Error('Shopify storefront token not configured yet');
@@ -55,6 +55,9 @@ window.hbShopifyCheckout = async function (rows, buyer) {
       query: 'mutation cartCreate($input: CartInput!) { cartCreate(input: $input) { cart { checkoutUrl } userErrors { field message } } }',
       variables: { input: (function () {
         const input = { lines: lines };
+        // Wholesale accounts: their trade code (restricted to their customer
+        // segment) is attached here so checkout prices without any typing.
+        if (opts && opts.discountCode) input.discountCodes = [opts.discountCode];
         if (buyer && (buyer.addr || buyer.email)) {
           const parts = String(buyer.name || '').trim().split(/\s+/);
           const firstName = parts.slice(0, -1).join(' ') || parts[0] || '';
@@ -3852,7 +3855,8 @@ class Component extends DCLogic {
         if (!coReady || tradeBlocked) return;
         window.hbShopifyCheckout(
           M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })),
-          { ...this.state.co, wantAccount: this.state.acctOptIn !== false }
+          { ...this.state.co, wantAccount: this.state.acctOptIn !== false },
+          { discountCode: (this.state.trade && this.state.trade.code) || null }
         ).catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
       },
       // Express checkout: hand off to Shopify's hosted checkout with just the
@@ -3863,7 +3867,8 @@ class Component extends DCLogic {
         if (!M.items.length || tradeBlocked) return;
         window.hbShopifyCheckout(
           M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })),
-          {}
+          {},
+          { discountCode: (this.state.trade && this.state.trade.code) || null }
         ).catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
       },
       wallHasPhoto: !!this.state.wallPhoto,

@@ -288,6 +288,9 @@ main { padding:28px 0 90px; }
           '<span class="pricehint">Writes to the Shopify discount — product page, cart and checkout follow instantly.</span>' +
           '<span id="dslot"></span></div>';
         if (!act) bannerHtml += '<div class="warn">The wholesale discount exists but is not active — approved accounts will pay retail at checkout. Activate it in Shopify admin → Discounts.</div>';
+        if (b.discount.kind === 'automatic') {
+          bannerHtml += '<div class="warn">This is the old automatic discount — it cannot be limited per account, and may be applying to ALL shoppers with ' + (b.discount.minQty || 5) + '+ boxes. Click <b>Update pricing</b> (same numbers are fine) to migrate to the code-based system: a WHOLESALE discount restricted to trade accounts, auto-applied by the site at checkout. The automatic discount is deactivated as part of the switch.</div>';
+        }
       } else if (b.discount.error) {
         bannerHtml += '<div class="warn">Could not read discounts from Shopify: ' + esc(b.discount.error) + '</div>';
       } else {

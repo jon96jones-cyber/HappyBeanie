@@ -18,7 +18,23 @@ const auth = require('../_lib/customer-auth.js');
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
 const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 
-const DISCOUNTS = `query TradeDiscount {
+const CODES_Q = `query TradeCodes {
+  codeDiscountNodes(first: 50) {
+    nodes {
+      codeDiscount {
+        __typename
+        ... on DiscountCodeBasic {
+          title status
+          minimumRequirement { ... on DiscountMinimumQuantity { greaterThanOrEqualToQuantity } }
+          customerGets { value { ... on DiscountPercentage { percentage } } }
+          codes(first: 1) { nodes { code } }
+        }
+      }
+    }
+  }
+}`;
+
+const AUTOS_Q = `query TradeDiscount {
   automaticDiscountNodes(first: 20) {
     nodes {
       automaticDiscount {
@@ -33,29 +49,52 @@ const DISCOUNTS = `query TradeDiscount {
   }
 }`;
 
-async function tradeTerms() {
+async function adminQuery(query) {
   const token = process.env.SHOPIFY_ADMIN_TOKEN;
   if (!token) return null;
   const res = await fetch('https://' + STORE_DOMAIN + '/admin/api/' + API_VERSION + '/graphql.json', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': token },
-    body: JSON.stringify({ query: DISCOUNTS })
+    body: JSON.stringify({ query: query })
   });
-  const json = await res.json().catch(function () { return {}; });
-  const nodes = (((json.data || {}).automaticDiscountNodes) || {}).nodes || [];
-  const hit = nodes
+  return res.json().catch(function () { return {}; });
+}
+
+function terms(d) {
+  const pct = ((d.customerGets || {}).value || {}).percentage;
+  if (typeof pct !== 'number' || pct <= 0) return null;
+  const minQty = parseInt(((d.minimumRequirement || {}).greaterThanOrEqualToQuantity) || '0', 10) || 0;
+  return { pct: pct, minQty: minQty, title: d.title };
+}
+
+// Baseline trade terms. Preferred: the WHOLESALE baseline code (the cart
+// attaches its code at checkout). Legacy fallback: the pre-migration automatic
+// discount, which self-applies at checkout, so code stays null.
+async function tradeTerms() {
+  const cJson = await adminQuery(CODES_Q);
+  const cNodes = (((cJson || {}).data || {}).codeDiscountNodes || {}).nodes || [];
+  const cHit = cNodes
+    .map(function (n) { return n.codeDiscount || {}; })
+    .filter(function (d) {
+      const code = ((((d.codes || {}).nodes || [])[0]) || {}).code || '';
+      return code === 'WHOLESALE' && String(d.status).toUpperCase() === 'ACTIVE';
+    })[0];
+  if (cHit) {
+    const t = terms(cHit);
+    if (t) { t.code = 'WHOLESALE'; return t; }
+  }
+  const aJson = await adminQuery(AUTOS_Q);
+  const aNodes = (((aJson || {}).data || {}).automaticDiscountNodes || {}).nodes || [];
+  const aHit = aNodes
     .map(function (n) { return n.automaticDiscount || {}; })
     .filter(function (d) {
-      // Per-account tier discounts ("Wholesale tier — …") are excluded — this
-      // finds the store-wide baseline only.
       return /wholesale|trade/i.test(d.title || '') && !/tier/i.test(d.title || '')
         && String(d.status).toUpperCase() === 'ACTIVE';
     })[0];
-  if (!hit) return null;
-  const pct = ((hit.customerGets || {}).value || {}).percentage;
-  if (typeof pct !== 'number' || pct <= 0) return null;
-  const minQty = parseInt(((hit.minimumRequirement || {}).greaterThanOrEqualToQuantity) || '0', 10) || 0;
-  return { pct: pct, minQty: minQty, title: hit.title };
+  if (!aHit) return null;
+  const t = terms(aHit);
+  if (t) t.code = null;
+  return t;
 }
 
 module.exports = async function handler(req, res) {
@@ -83,14 +122,15 @@ module.exports = async function handler(req, res) {
 
     let trade = null;
     try { trade = await tradeTerms(); } catch (e) {}
-    // A tier overrides the store-wide percentage for this account — checkout
-    // applies the largest eligible discount, so the tier's rate is what they
-    // actually pay. The minimum stays the store-wide one.
+    // A tier overrides the store-wide percentage for this account — the cart
+    // attaches the tier's TRADE<NN> code at checkout, which is restricted to
+    // this account's segment. The minimum stays the store-wide one.
     if (tierPct) {
       trade = {
         pct: tierPct / 100,
         minQty: (trade && trade.minQty) || 5,
-        title: 'Wholesale tier — ' + tierPct + '%'
+        title: 'Wholesale tier — ' + tierPct + '%',
+        code: 'TRADE' + tierPct
       };
     }
     return res.status(200).json({ in: true, wholesale: true, trade: trade });
