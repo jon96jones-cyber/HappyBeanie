@@ -2366,7 +2366,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
                   <span aria-hidden="true" style="flex: 1; height: 1px; background: rgba(245,240,230,0.14);"></span>
                 </div>
               </div>
-              <button sc-camel-on-click="{{ goCheckout }}" data-m="tap cbtn" style="position: relative; width: 100%; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 36px -20px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">Checkout →</button>
+              <button sc-camel-on-click="{{ goCheckout }}" data-m="tap cbtn" style="position: relative; width: 100%; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: {{ checkoutCtaBg }}; color: {{ checkoutCtaFg }}; cursor: {{ checkoutCtaCursor }}; box-shadow: 0 20px 36px -20px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: {{ checkoutCtaHoverBg }}; transform: translateY(-2px);">{{ checkoutCtaLabel }}</button>
               <div data-m="ctrust" style="position: relative; margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E; text-align: center; line-height: 2;">30-day guarantee · Ships in 24h · Cancel anytime</div>
             </div>
           </div>
@@ -3212,6 +3212,11 @@ class Component extends DCLogic {
     const accent = this.props.accent ?? 'oklch(0.86 0.14 92)';
     const page = this.state.page;
     const M = this.cartMath();
+    // Wholesale accounts cannot proceed to purchase below the trade minimum —
+    // the discount would not apply and they would be charged retail.
+    const tradeMin = this.state.trade && this.state.trade.minQty ? this.state.trade.minQty : 5;
+    const tradeBlocked = this.state.wholesale && M.items.length > 0 && M.oneTimeQty < tradeMin;
+    const tradeShort = tradeBlocked ? tradeMin - M.oneTimeQty : 0;
     const wkSel = this.state.wkSel;
     const wkBase = [
       { when: 'Week 1–2', title: 'Nothing dramatic', body: 'A few owners notice appetite and drinking change first — most notice nothing at all yet.', chips: ['Appetite', 'Drinking'] },
@@ -3703,7 +3708,14 @@ class Component extends DCLogic {
       isCart: page === 'cart',
       isCheckout: page === 'checkout',
       goCart: this.nav('cart'),
-      goCheckout: this.nav('checkout'),
+      goCheckout: () => { if (tradeBlocked) return; this.nav('checkout')(); },
+      checkoutCtaLabel: tradeBlocked
+        ? 'Trade minimum ' + tradeMin + ' boxes · add ' + tradeShort + ' more'
+        : 'Checkout →',
+      checkoutCtaBg: tradeBlocked ? 'rgba(245,240,230,0.14)' : 'oklch(0.86 0.14 92)',
+      checkoutCtaFg: tradeBlocked ? '#8A7F6E' : '#17140F',
+      checkoutCtaCursor: tradeBlocked ? 'not-allowed' : 'pointer',
+      checkoutCtaHoverBg: tradeBlocked ? 'rgba(245,240,230,0.14)' : '#F5F0E6',
       goShopping: () => { this.setState({ added: false }); this.nav('product')(); },
       cartEmpty: M.items.length === 0,
       cartHasItems: M.items.length > 0,
@@ -3795,18 +3807,20 @@ class Component extends DCLogic {
           flipSame: () => this.setState(st => ({ billSame: !st.billSame }))
         };
       }),
-      expressShow: M.items.length > 0 ? 'block' : 'none',
-      orderDisabled: !coReady,
-      orderBtnLabel: coReady ? 'Continue to payment · ' + this.money(M.total) : 'Complete the form',
-      orderBtnBg: coReady ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.14)',
-      orderBtnFg: coReady ? '#17140F' : '#8A7F6E',
-      orderBtnCursor: coReady ? 'pointer' : 'not-allowed',
-      orderHint: coReady ? 'Payment happens next on our secure checkout.'
+      expressShow: M.items.length > 0 && !tradeBlocked ? 'block' : 'none',
+      orderDisabled: !coReady || tradeBlocked,
+      orderBtnLabel: tradeBlocked ? 'Trade minimum ' + tradeMin + ' boxes'
+        : coReady ? 'Continue to payment · ' + this.money(M.total) : 'Complete the form',
+      orderBtnBg: coReady && !tradeBlocked ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.14)',
+      orderBtnFg: coReady && !tradeBlocked ? '#17140F' : '#8A7F6E',
+      orderBtnCursor: coReady && !tradeBlocked ? 'pointer' : 'not-allowed',
+      orderHint: tradeBlocked ? 'Trade accounts order ' + tradeMin + '+ one-time boxes — add ' + tradeShort + ' more in your cart to continue.'
+        : coReady ? 'Payment happens next on our secure checkout.'
         : (!allFilled ? 'Fill in every contact and shipping field to continue.'
           : (!emailOk ? 'That email doesn’t look right — check it to continue.'
             : (!zipOk ? 'Enter a valid 5-digit ZIP code to continue.'
               : 'Check the highlighted fields to continue.'))),
-      orderHintColor: coReady ? '#8A7F6E' : (allFilled ? 'oklch(0.72 0.17 25)' : '#8A7F6E'),
+      orderHintColor: tradeBlocked ? 'oklch(0.72 0.17 25)' : coReady ? '#8A7F6E' : (allFilled ? 'oklch(0.72 0.17 25)' : '#8A7F6E'),
       acctOn: this.state.acctOptIn !== false,
       acctState: this.state.acctOptIn !== false ? 'Creating my account' : 'No account, thanks',
       acctStateColor: this.state.acctOptIn !== false ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
@@ -3835,7 +3849,7 @@ class Component extends DCLogic {
         };
       }),
       placeOrder: () => {
-        if (!coReady) return;
+        if (!coReady || tradeBlocked) return;
         window.hbShopifyCheckout(
           M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })),
           { ...this.state.co, wantAccount: this.state.acctOptIn !== false }
@@ -3846,7 +3860,7 @@ class Component extends DCLogic {
       // one-tap wallets are offered. The chosen plan/quantity is preserved, so
       // returning wallet shoppers can pay without filling in our form.
       expressGo: () => {
-        if (!M.items.length) return;
+        if (!M.items.length || tradeBlocked) return;
         window.hbShopifyCheckout(
           M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })),
           {}
