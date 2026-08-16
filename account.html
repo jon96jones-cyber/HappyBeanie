@@ -1000,7 +1000,23 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     var tags = (c.tags || []).map(function (t) { return String(t).toLowerCase(); });
     var badges = '';
     if (tags.indexOf('wholesale') !== -1) {
-      badges = '<div class="trade-line"><span class="bdot"></span>Trade partner — up to 30% off</div>';
+      // Live rate: a tier tag names this account's own percentage; otherwise
+      // the store-wide baseline is fetched and filled in.
+      var tierPct = null;
+      for (var ti = 0; ti < tags.length; ti++) {
+        var tm = tags[ti].match(/^wholesale-pct-(\d+)$/);
+        if (tm) { tierPct = parseInt(tm[1], 10); break; }
+      }
+      badges = '<div class="trade-line" id="tradeLine"><span class="bdot"></span>Trade partner — ' +
+        (tierPct ? tierPct + '% off' : 'trade pricing') + '</div>';
+      if (!tierPct) {
+        fetch('/api/auth/me').then(function (r) { return r.json(); }).then(function (j) {
+          if (j && j.trade && j.trade.pct) {
+            var el = document.getElementById('tradeLine');
+            if (el) el.innerHTML = '<span class="bdot"></span>Trade partner — ' + Math.round(j.trade.pct * 100) + '% off';
+          }
+        }).catch(function () {});
+      }
     } else if (tags.indexOf('wholesale-pending') !== -1) {
       badges = '<div class="trade-line" style="color:#B9AF9C; border-color:rgba(245,240,230,0.24); background:rgba(245,240,230,0.05);"><span class="bdot" style="background:#8A7F6E;"></span>Wholesale application in review</div>';
     }
