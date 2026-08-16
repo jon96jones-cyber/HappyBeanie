@@ -375,6 +375,31 @@ module.exports = async function handler(req, res) {
               pct: d.pct, minQty: d.minQty,
               boxPrice: Math.round(115 * (1 - d.pct) * 100) / 100 }
           : { found: false, error: d && d.error };
+
+        // Leak check: if the code baseline exists but the OLD automatic
+        // wholesale discount is still active, it hands 30% to any shopper
+        // with 5+ boxes. Surface it with a one-click deactivate.
+        if (discount.found && discount.kind === 'code') {
+          const aOut = await admin(token, DISCOUNTS);
+          const aNodes = ((aOut.json.data || {}).automaticDiscountNodes || {}).nodes || [];
+          const leak = aNodes.filter(function (n) {
+            const ad = n.automaticDiscount || {};
+            return /wholesale|trade/i.test(ad.title || '') && !/tier/i.test(ad.title || '')
+              && String(ad.status).toUpperCase() === 'ACTIVE';
+          })[0];
+          if (leak) discount.legacy = { title: leak.automaticDiscount.title };
+        }
+
+        // Tier ladder: which TRADE<NN> code discounts exist and are active.
+        const lOut = await admin(token, CODES_Q);
+        const lNodes = ((lOut.json.data || {}).codeDiscountNodes || {}).nodes || [];
+        discount.tiers = lNodes.map(function (n) {
+          const cd = n.codeDiscount || {};
+          const code = ((((cd.codes || {}).nodes || [])[0]) || {}).code || '';
+          const m = code.match(/^TRADE(\d+)$/);
+          if (!m) return null;
+          return { pct: parseInt(m[1], 10), active: String(cd.status).toUpperCase() === 'ACTIVE' };
+        }).filter(Boolean).sort(function (a, b) { return a.pct - b.pct; });
       } catch (e) { /* probe only — never block the queue */ }
 
       // Approved accounts, for the desk's Approved tab (reprice emails).
@@ -457,6 +482,27 @@ module.exports = async function handler(req, res) {
     if (!process.env.RESEND_API_KEY) {
       return res.status(503).json({ ok: false, error: 'email_not_configured',
         message: 'Add RESEND_API_KEY in Vercel first — approvals must send the email.' });
+    }
+
+    // Kill the leftover automatic wholesale discount (post-migration leak).
+    if (body.action === 'deactivate_legacy') {
+      const aOut = await admin(token, DISCOUNTS);
+      const aNodes = ((aOut.json.data || {}).automaticDiscountNodes || {}).nodes || [];
+      const leak = aNodes.filter(function (n) {
+        const ad = n.automaticDiscount || {};
+        return /wholesale|trade/i.test(ad.title || '') && !/tier/i.test(ad.title || '')
+          && String(ad.status).toUpperCase() === 'ACTIVE';
+      })[0];
+      if (!leak) return res.status(200).json({ ok: true, already: true });
+      const off = await admin(token, AUTO_DEACTIVATE, { id: leak.id });
+      const offErrs = []
+        .concat((((off.json.data || {}).discountAutomaticDeactivate) || {}).userErrors || [])
+        .concat(off.json.errors || []);
+      if (offErrs.length) {
+        console.error('[admin/wholesale] legacy off:', JSON.stringify(offErrs));
+        return res.status(200).json({ ok: false, error: 'deactivate_failed', message: offErrs[0].message || 'Shopify refused.' });
+      }
+      return res.status(200).json({ ok: true });
     }
 
     // Pre-create one tier's discount + segment without touching any customer —

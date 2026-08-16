@@ -272,10 +272,13 @@ main { padding:28px 0 90px; }
     if (d.found && !act) warns += '<div class="warn">The wholesale discount is not active — approved accounts pay retail. Activate it in Shopify admin → Discounts.</div>';
     if (d.found && d.kind === 'automatic') warns += '<div class="warn">Old-style automatic discount detected — it may apply to ALL shoppers at ' + (d.minQty || 5) + '+ boxes. Open Settings and click Update pricing (same numbers are fine) to migrate it to account-restricted pricing.</div>';
     if (b.discount && !d.found) warns += '<div class="warn">' + (d.error ? 'Could not read discounts from Shopify: ' + esc(d.error) : 'No wholesale discount found — open Settings and click Update pricing to create it.') + '</div>';
+    if (d.legacy) warns += '<div class="warn"><b>Pricing leak:</b> the old automatic discount “' + esc(d.legacy.title) + '” is still active alongside the new system — ANY shopper with ' + (d.minQty || 5) + '+ boxes can get it. <button class="btn ghost" id="legoff" style="margin-left:10px;">Deactivate it now</button><span id="legslot"></span></div>';
 
+    var tierLadder = (d.tiers || []).filter(function (t) { return t.active; }).map(function (t) { return t.pct + '%'; });
     var status = '<div class="statusline">' +
       '<span class="' + (emailOk ? 'ok' : 'bad') + '">Email ' + (emailOk ? '✓' : '✗') + '</span>' +
       (d.found ? '<span class="' + (act ? 'ok' : 'bad') + '">Standard rate ' + Math.round((d.pct || 0) * 100) + '% · ' + usd(d.boxPrice || 0) + '/box · ' + (d.minQty || 5) + '+ boxes</span>' : '') +
+      (tierLadder.length ? '<span>Tiers live: ' + tierLadder.join(' · ') + '</span>' : '') +
       '<button class="linkbtn" id="setbtn">' + (settingsOpen ? 'Hide settings' : 'Settings') + '</button>' +
       '</div>';
 
@@ -299,6 +302,16 @@ main { padding:28px 0 90px; }
     $('banner').innerHTML = status + warns + settings;
     var setbtn = $('setbtn');
     if (setbtn) setbtn.onclick = function () { settingsOpen = !settingsOpen; draw(cur); };
+    var legoff = $('legoff');
+    if (legoff) legoff.onclick = function () {
+      legoff.disabled = true; legoff.textContent = 'Deactivating…';
+      api({ method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'deactivate_legacy' }) }).then(function (r) {
+        if (r.ok) { $('legslot').innerHTML = ' <span class="priceok">✓ Done</span>'; setTimeout(load, 900); return; }
+        legoff.disabled = false; legoff.textContent = 'Deactivate it now';
+        $('legslot').innerHTML = ' <span class="pricebad">' + esc(r.message || 'Failed.') + '</span>';
+      });
+    };
     var tprep = $('tprep');
     if (tprep) tprep.onclick = async function () {
       var from = parseInt($('tfrom').value, 10);
