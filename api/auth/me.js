@@ -46,7 +46,10 @@ async function tradeTerms() {
   const hit = nodes
     .map(function (n) { return n.automaticDiscount || {}; })
     .filter(function (d) {
-      return /wholesale|trade/i.test(d.title || '') && String(d.status).toUpperCase() === 'ACTIVE';
+      // Per-account tier discounts ("Wholesale tier — …") are excluded — this
+      // finds the store-wide baseline only.
+      return /wholesale|trade/i.test(d.title || '') && !/tier/i.test(d.title || '')
+        && String(d.status).toUpperCase() === 'ACTIVE';
     })[0];
   if (!hit) return null;
   const pct = ((hit.customerGets || {}).value || {}).percentage;
@@ -63,18 +66,33 @@ module.exports = async function handler(req, res) {
     if (!fresh) return res.status(200).json({ in: false });
     if (fresh.setCookie) res.setHeader('Set-Cookie', fresh.setCookie);
 
-    // Wholesale status from the customer's own record.
+    // Wholesale status + tier from the customer's own record.
     let wholesale = false;
+    let tierPct = null;
     try {
       const out = await auth.customerGraphql(fresh.session.at, 'query { customer { tags } }');
       const tags = ((out.json && out.json.data && out.json.data.customer) || {}).tags || [];
       wholesale = tags.some(function (t) { return String(t).toLowerCase() === 'wholesale'; });
+      for (let i = 0; i < tags.length; i++) {
+        const m = String(tags[i]).match(/^wholesale-pct-(\d+)$/);
+        if (m) { tierPct = parseInt(m[1], 10); break; }
+      }
     } catch (e) { /* probe only — signed-in still stands */ }
 
     if (!wholesale) return res.status(200).json({ in: true, wholesale: false });
 
     let trade = null;
     try { trade = await tradeTerms(); } catch (e) {}
+    // A tier overrides the store-wide percentage for this account — checkout
+    // applies the largest eligible discount, so the tier's rate is what they
+    // actually pay. The minimum stays the store-wide one.
+    if (tierPct) {
+      trade = {
+        pct: tierPct / 100,
+        minQty: (trade && trade.minQty) || 5,
+        title: 'Wholesale tier — ' + tierPct + '%'
+      };
+    }
     return res.status(200).json({ in: true, wholesale: true, trade: trade });
   } catch (e) {
     return res.status(200).json({ in: false });

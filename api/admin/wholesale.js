@@ -43,7 +43,7 @@ const PENDING = `query Pending {
   }
   approved: customers(first: 100, query: "tag:wholesale-approved", sortKey: UPDATED_AT, reverse: true) {
     nodes {
-      id firstName lastName email note updatedAt
+      id firstName lastName email note updatedAt tags
       company: metafield(namespace: "wholesale", key: "company") { value }
       businessType: metafield(namespace: "wholesale", key: "business_type") { value }
       priceDog: metafield(namespace: "wholesale", key: "price_dog") { value }
@@ -95,13 +95,43 @@ const UPDATE_PRICING = `mutation UpdatePricing($id: ID!, $d: DiscountAutomaticBa
   }
 }`;
 
-// Find the wholesale automatic discount; returns { id, title, status, summary,
-// pct, minQty } or null.
+const SEGMENTS_Q = `query Segments { segments(first: 100) { edges { node { id name query } } } }`;
+const SEG_CREATE = `mutation SegCreate($name: String!, $q: String!) {
+  segmentCreate(name: $name, query: $q) { segment { id } userErrors { field message } }
+}`;
+const TIER_CREATE = `mutation TierCreate($d: DiscountAutomaticBasicInput!) {
+  discountAutomaticBasicCreate(automaticBasicDiscount: $d) { userErrors { field message } }
+}`;
+const CUST_TAGS = `query CustTags($id: ID!) { customer(id: $id) { tags } }`;
+const TAGS_REMOVE = `mutation TagsRemove($id: ID!, $t: [String!]!) {
+  tagsRemove(id: $id, tags: $t) { userErrors { message } }
+}`;
+const TAGS_ADD = `mutation TagsAdd($id: ID!, $t: [String!]!) {
+  tagsAdd(id: $id, tags: $t) { userErrors { message } }
+}`;
+
+function tierPctFromTags(tags) {
+  for (var i = 0; i < (tags || []).length; i++) {
+    const m = String(tags[i]).match(/^wholesale-pct-(\d+)$/);
+    if (m) return parseInt(m[1], 10);
+  }
+  return null;
+}
+
+function usd(n) {
+  const r = Math.round(n * 100) / 100;
+  return '$' + (r % 1 === 0 ? String(r) : r.toFixed(2));
+}
+
+// Find the STORE-WIDE wholesale automatic discount (per-account tier discounts
+// are titled "Wholesale tier — …" and excluded); returns { id, title, status,
+// summary, pct, minQty } or null.
 async function findTradeDiscount(token) {
   const out = await admin(token, DISCOUNTS);
   const nodes = ((out.json.data || {}).automaticDiscountNodes || {}).nodes || [];
   const hit = nodes.filter(function (n) {
-    return /wholesale|trade/i.test(((n.automaticDiscount || {}).title) || '');
+    const t = ((n.automaticDiscount || {}).title) || '';
+    return /wholesale|trade/i.test(t) && !/tier/i.test(t);
   })[0];
   if (!hit) return { error: (out.json.errors || [])[0] ? out.json.errors[0].message : null };
   const d = hit.automaticDiscount;
@@ -242,7 +272,8 @@ module.exports = async function handler(req, res) {
           businessType: mf(c.businessType) || p.businessType,
           priceDog: mf(c.priceDog),
           priceCat: mf(c.priceCat),
-          minOrder: mf(c.minOrder)
+          minOrder: mf(c.minOrder),
+          tierPct: tierPctFromTags(c.tags)
         };
       });
 
@@ -299,6 +330,111 @@ module.exports = async function handler(req, res) {
     if (!process.env.RESEND_API_KEY) {
       return res.status(503).json({ ok: false, error: 'email_not_configured',
         message: 'Add RESEND_API_KEY in Vercel first — approvals must send the email.' });
+    }
+
+    // Per-account tier: bigger accounts, bigger discounts. Ensures a
+    // "Wholesale tier — NN%" automatic discount exists (scoped to a segment
+    // matching the wholesale-pct-NN tag), moves the account onto that tag, and
+    // emails them the new pricing. Checkout applies the largest eligible
+    // discount, so a tier above the store-wide rate wins for that account.
+    if (body.action === 'set_tier') {
+      const tCustomerId = String(body.customerId || '');
+      const tFirst = String(body.firstName || '').slice(0, 100);
+      const tCompany = String(body.company || '').slice(0, 200);
+      const tEmail = String(body.email || '').slice(0, 200);
+      const tPct = parseInt(body.pct, 10);
+      if (!tCustomerId || !tEmail || !tFirst || !tCompany || !(tPct >= 5 && tPct <= 90)) {
+        return res.status(400).json({ ok: false, error: 'bad_request', message: 'Tier must be a whole number between 5 and 90.' });
+      }
+      const base = await findTradeDiscount(token);
+      const tMinQty = (base && base.minQty) || 5;
+      const tTag = 'wholesale-pct-' + tPct;
+      const tTitlePrefix = 'Wholesale tier — ' + tPct + '%';
+
+      // 1. Ensure the tier discount exists in Shopify.
+      const dOut = await admin(token, DISCOUNTS);
+      const dNodes = ((dOut.json.data || {}).automaticDiscountNodes || {}).nodes || [];
+      const tierExists = dNodes.some(function (n) {
+        return (((n.automaticDiscount || {}).title) || '').indexOf(tTitlePrefix) === 0;
+      });
+      if (!tierExists) {
+        const sOut = await admin(token, SEGMENTS_Q);
+        const segs = (((sOut.json.data || {}).segments || {}).edges || []).map(function (e) { return e.node; });
+        let seg = segs.filter(function (s) { return (s.query || '').indexOf("'" + tTag + "'") !== -1; })[0];
+        if (!seg) {
+          const sc = await admin(token, SEG_CREATE, { name: 'Wholesale tier ' + tPct + '%', q: "customer_tags CONTAINS '" + tTag + "'" });
+          const scErrs = []
+            .concat((((sc.json.data || {}).segmentCreate) || {}).userErrors || [])
+            .concat(sc.json.errors || []);
+          seg = (((sc.json.data || {}).segmentCreate) || {}).segment;
+          if (!seg || scErrs.length) {
+            console.error('[admin/wholesale] segment:', JSON.stringify(scErrs));
+            return res.status(200).json({ ok: false, error: 'segment_failed',
+              message: 'Could not create the customer segment: ' + ((scErrs[0] && scErrs[0].message) || 'unknown error') });
+          }
+        }
+        const dc = await admin(token, TIER_CREATE, { d: {
+          title: tTitlePrefix + ' (' + tMinQty + '+ boxes)',
+          startsAt: new Date().toISOString(),
+          customerGets: {
+            value: { percentage: tPct / 100 },
+            items: { all: true },
+            appliesOnOneTimePurchase: true,
+            appliesOnSubscription: false
+          },
+          minimumRequirement: { quantity: { greaterThanOrEqualToQuantity: String(tMinQty) } },
+          customerSelection: { customerSegments: { add: [seg.id] } },
+          combinesWith: { productDiscounts: false, orderDiscounts: false, shippingDiscounts: true }
+        } });
+        const dcErrs = []
+          .concat((((dc.json.data || {}).discountAutomaticBasicCreate) || {}).userErrors || [])
+          .concat(dc.json.errors || []);
+        if (dcErrs.length) {
+          console.error('[admin/wholesale] tier discount:', JSON.stringify(dcErrs));
+          return res.status(200).json({ ok: false, error: 'discount_failed',
+            message: 'Could not create the tier discount: ' + (dcErrs[0].message || 'unknown error') });
+        }
+      }
+
+      // 2. Move the account onto the tier tag (off any previous tier).
+      const ct = await admin(token, CUST_TAGS, { id: tCustomerId });
+      const curTags = ((((ct.json.data || {}).customer) || {}).tags) || [];
+      const oldTiers = curTags.filter(function (t) { return /^wholesale-pct-\d+$/.test(t) && t !== tTag; });
+      if (oldTiers.length) await admin(token, TAGS_REMOVE, { id: tCustomerId, t: oldTiers });
+      if (curTags.indexOf(tTag) === -1) {
+        const ta = await admin(token, TAGS_ADD, { id: tCustomerId, t: [tTag] });
+        const taErrs = []
+          .concat((((ta.json.data || {}).tagsAdd) || {}).userErrors || [])
+          .concat(ta.json.errors || []);
+        if (taErrs.length) {
+          console.error('[admin/wholesale] tier tag:', JSON.stringify(taErrs));
+          return res.status(200).json({ ok: false, error: 'tag_failed',
+            message: 'The tier discount exists but the account could not be tagged: ' + (taErrs[0].message || '') });
+        }
+      }
+
+      // 3. Record the quote + email the new pricing.
+      const tPrice = usd(115 * (1 - tPct / 100));
+      const tMinOrder = tMinQty + ' boxes';
+      try { await storeQuotedPrices(token, tCustomerId, tPrice, tPrice, tMinOrder); } catch (e) {}
+      const tSender = String(process.env.WHOLESALE_SENDER || 'Jon').slice(0, 100);
+      const tHtml = buildEmail.reprice({ firstName: tFirst, company: tCompany, priceDog: tPrice, priceCat: tPrice, minOrder: tMinOrder, senderName: tSender });
+      const tSent = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY },
+        body: JSON.stringify({
+          from: FROM, to: [tEmail], reply_to: 'hello@happybeanie.com',
+          subject: 'Your new Happy Beanie trade pricing', html: tHtml
+        })
+      });
+      const tJson = await tSent.json().catch(function () { return {}; });
+      if (!tSent.ok || !tJson.id) {
+        console.error('[admin/wholesale] resend tier:', tSent.status, JSON.stringify(tJson));
+        return res.status(200).json({ ok: true, warning: 'tier_set_email_failed', pct: tPct, price: tPrice,
+          message: 'The ' + tPct + '% tier is live for this account, but the email did not send — use Email new pricing to retry.' });
+      }
+      console.log('[admin/wholesale] tier set', tPct + '%', 'for', tEmail, '· resend', tJson.id);
+      return res.status(200).json({ ok: true, emailId: tJson.id, pct: tPct, price: tPrice });
     }
 
     // Pricing-update email for an already-approved account. No tag changes —

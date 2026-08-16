@@ -72,6 +72,7 @@ main { padding:28px 0 90px; }
 .vtab { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; padding:10px 16px; border:1px solid #DDD3C0; background:#FCFAF4; border-radius:999px; cursor:pointer; color:#8A7F6E; transition:all .2s ease; }
 .vtab:hover { border-color:#17140F; color:#17140F; }
 .vtab.on { background:#17140F; color:#F5F0E6; border-color:#17140F; }
+.tierhint { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#554C40; align-self:center; padding-bottom:12px; }
 .fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
 </style>
 </head><body>
@@ -183,21 +184,22 @@ main { padding:28px 0 90px; }
       return;
     }
     var d = b.discount || {};
-    var bpDefault = d.boxPrice ? usd(d.boxPrice) : '';
-    var moDefault = d.minQty ? d.minQty + ' boxes' : '';
-    var head = '<div class="pipe">Checkout charges every trade account the store-wide discount' +
-      (d.boxPrice ? ' — currently ' + usd(d.boxPrice) + ' / box at ' + (d.minQty || 5) + '+' : '') +
-      '. Change it in the editor above, then email accounts their new rates here.</div>';
+    var basePct = d.pct ? Math.round(d.pct * 100) : 30;
+    var minQ = d.minQty || 5;
+    function boxAt(pct) { return usd(115 * (1 - pct / 100)); }
+    var head = '<div class="pipe">Accounts without a tier get the store-wide discount' +
+      (d.boxPrice ? ' — ' + basePct + '% · ' + usd(d.boxPrice) + ' / box at ' + minQ + '+' : '') +
+      '. Give bigger accounts a bigger tier: it creates the Shopify discount, moves the account onto it, and emails them the new rate. Checkout always applies their largest eligible discount.</div>';
     $('apps').innerHTML = head + list.map(function (a, i) {
+      var pctVal = a.tierPct || basePct;
       return '<div class="app" data-i="' + i + '">' +
         '<div class="app-h"><span class="co">' + esc(a.company || '(no company)') + '</span>' +
         '<span class="who">' + esc((a.firstName + ' ' + a.lastName).trim()) + ' · ' + esc(a.email) +
-        (a.businessType ? ' · ' + esc(a.businessType) : '') + '</span></div>' +
+        (a.tierPct ? ' · <b style="color:#325E3F;">tier ' + a.tierPct + '%</b>' : ' · standard rate') + '</span></div>' +
         '<div class="approve">' +
-          '<span class="fld"><label>$ / dog box</label><input data-f="priceDog" value="' + esc(a.priceDog || bpDefault) + '"></span>' +
-          '<span class="fld"><label>$ / cat box</label><input data-f="priceCat" value="' + esc(a.priceCat || bpDefault) + '"></span>' +
-          '<span class="fld"><label>Min. order</label><input class="wide" data-f="minOrder" value="' + esc(a.minOrder || moDefault) + '"></span>' +
-          '<button class="btn" data-go>Email new pricing →</button>' +
+          '<span class="fld"><label>% off tier</label><input data-f="pct" value="' + esc(pctVal) + '"></span>' +
+          '<span class="tierhint" data-hint>= ' + boxAt(pctVal) + ' / box at ' + minQ + '+ boxes</span>' +
+          '<button class="btn" data-go>Set tier &amp; email →</button>' +
         '</div>' +
         '<div data-slot></div>' +
       '</div>';
@@ -205,30 +207,42 @@ main { padding:28px 0 90px; }
 
     Array.prototype.forEach.call(document.querySelectorAll('.app'), function (card, i) {
       var a = list[i];
+      var pctInput = card.querySelector('[data-f="pct"]');
+      pctInput.addEventListener('input', function () {
+        var p = parseInt(pctInput.value, 10);
+        card.querySelector('[data-hint]').textContent =
+          (p >= 5 && p <= 90) ? '= ' + boxAt(p) + ' / box at ' + minQ + '+ boxes' : '5–90';
+      });
       card.querySelector('[data-go]').onclick = function () {
         var btn = this;
-        var get = function (f) { return card.querySelector('[data-f="' + f + '"]').value.trim(); };
-        var payload = {
-          action: 'reprice_email',
-          customerId: a.id, email: a.email,
-          firstName: a.firstName || a.company, company: a.company || (a.firstName + ' ' + a.lastName),
-          priceDog: get('priceDog'), priceCat: get('priceCat'), minOrder: get('minOrder')
-        };
+        var pct = parseInt(pctInput.value, 10);
         var slot = card.querySelector('[data-slot]');
-        if (!payload.priceDog || !payload.priceCat || !payload.minOrder) {
-          slot.innerHTML = '<div class="warn">Fill in both prices and the minimum order.</div>';
+        if (!(pct >= 5 && pct <= 90)) {
+          slot.innerHTML = '<div class="warn">Tier must be a whole number between 5 and 90.</div>';
           return;
         }
-        btn.disabled = true; btn.textContent = 'Sending…';
+        var payload = {
+          action: 'set_tier',
+          customerId: a.id, email: a.email,
+          firstName: a.firstName || a.company, company: a.company || (a.firstName + ' ' + a.lastName),
+          pct: pct
+        };
+        btn.disabled = true; btn.textContent = 'Setting…';
         api({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(function (r) {
-          if (r.ok) {
-            slot.innerHTML = '<div class="okrow">✓ New pricing emailed to ' + esc(a.email) +
+          if (r.ok && !r.warning) {
+            slot.innerHTML = '<div class="okrow">✓ Tier ' + pct + '% live — new pricing (' + esc(r.price || boxAt(pct)) + '/box) emailed to ' + esc(a.email) +
               (r.emailId ? ' <span style="opacity:0.6;">· Resend id ' + esc(r.emailId) + '</span>' : '') + '</div>';
-            btn.textContent = 'Sent';
+            btn.textContent = 'Set';
+            setTimeout(load, 1400);
             return;
           }
-          btn.disabled = false; btn.textContent = 'Email new pricing →';
-          slot.innerHTML = '<div class="warn">' + esc(r.message || 'That did not go through — nothing was sent.') + '</div>';
+          if (r.ok && r.warning) {
+            slot.innerHTML = '<div class="warn">' + esc(r.message) + '</div>';
+            btn.disabled = false; btn.textContent = 'Set tier & email →';
+            return;
+          }
+          btn.disabled = false; btn.textContent = 'Set tier & email →';
+          slot.innerHTML = '<div class="warn">' + esc(r.message || 'That did not go through — nothing was changed.') + '</div>';
         });
       };
     });
