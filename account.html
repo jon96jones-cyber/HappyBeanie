@@ -521,7 +521,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
           </ul>
           <div class="paw-note" style="margin-top:22px;">
             <span class="bdot" style="margin-top:7px;"></span>
-            <span>Prefer a human? The pharmacist desk reads every note — <a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></span>
+            <span>Prefer a human? The help desk reads every note — <a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></span>
           </div>
         </div>
       </div>
@@ -586,7 +586,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
             <div class="panel-body" id="subsBox"></div>
           </div>
           <div class="panel">
-            <div class="panel-head"><h2>Pharmacist desk</h2></div>
+            <div class="panel-head"><h2>Help desk</h2></div>
             <div class="panel-body">
               <p class="help">Questions about a delivery, a dose, or a lot number? The desk answers within a business day.<br><br><a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
             </div>
@@ -1367,12 +1367,12 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   function planFallback(slot, action) {
     slot.innerHTML = '<div class="plan-note">We could not reach the plan service just now. Email ' +
       '<a href="mailto:hello@happybeanie.com?subject=' + (action === 'cancel' ? 'Cancel my care plan' : 'Skip my next box') +
-      '">hello@happybeanie.com</a> and the pharmacist desk will handle it the same business day.</div>';
+      '">hello@happybeanie.com</a> and the help desk will handle it the same business day.</div>';
   }
 
   var DEMO = params.get('demo') === '1';
   var ERRORS = {
-    not_configured: 'The member area isn’t quite ready — we’re finishing the wiring. For anything order-related, the pharmacist desk has you: hello@happybeanie.com.',
+    not_configured: 'The member area isn’t quite ready — we’re finishing the wiring. For anything order-related, the help desk has you: hello@happybeanie.com.',
     state_mismatch: 'That sign-in link had gone stale. One more try should do it.',
     exchange_failed: 'Sign-in hit a snag on our side. Give it another go in a minute.',
     auth: 'Sign-in was cancelled or didn’t finish. Happy to try again whenever you are.'
