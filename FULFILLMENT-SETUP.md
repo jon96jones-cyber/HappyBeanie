@@ -1,6 +1,6 @@
 # Fulfillment desk — setup guide
 
-A live compounding-and-shipping queue for your supplier at **`/admin/fulfillment`**.
+A live formulation-and-shipping queue for your supplier at **`/admin/fulfillment`**.
 No Shopify login — they open one URL, enter a key, and see every paid order waiting
 to be made and shipped. Marking one shipped records the tracking in Shopify **and**
 fires the customer's branded shipping-confirmation email.
@@ -49,7 +49,7 @@ rotate access, change `FULFILLMENT_KEY` and redeploy — the old key stops worki
 ## The day-to-day flow
 
 1. Order comes in (new purchase **or** a subscription renewal) → it appears in the queue.
-2. Supplier compounds the box, ships it, enters the **tracking number + carrier**, hits
+2. Supplier formulates the box, ships it, enters the **tracking number + carrier**, hits
    **Mark shipped →**.
 3. Shopify records the fulfillment and emails the customer the branded **Shipping
    confirmation** with a working track link. The order drops off the queue.

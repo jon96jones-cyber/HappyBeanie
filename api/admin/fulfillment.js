@@ -1,4 +1,4 @@
-// /api/admin/fulfillment — the supplier's compounding + shipping desk.
+// /api/admin/fulfillment — the supplier's formulation + shipping desk.
 //
 // Auth: a shared secret in the `x-fulfillment-key` header, compared against
 // FULFILLMENT_KEY. One key, kept off the page — same model as the bandana desk.

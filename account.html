@@ -514,7 +514,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
         </div>
         <div>
           <ul class="sfeat">
-            <li><span class="bdot"></span>Every box tracked from the compounding bench to your door</li>
+            <li><span class="bdot"></span>Every box tracked from the formulation bench to your door</li>
             <li><span class="bdot"></span>Tracking links the moment a box ships</li>
             <li><span class="bdot"></span>Your care plan — what's coming, and when</li>
             <li><span class="bdot"></span>Trade pricing status for wholesale partners</li>
@@ -685,8 +685,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     return '<span><span class="dot grey"></span>' + esc(String(status).replace(/_/g, ' ').toLowerCase()) + '</span>';
   }
 
-  // ---- delivery stages: compounded -> sealed -> in transit -> delivered ----
-  var STAGES = ['Compounded', 'In transit', 'Delivered'];
+  // ---- delivery stages: formulated -> sealed -> in transit -> delivered ----
+  var STAGES = ['Formulated', 'In transit', 'Delivered'];
 
   function stageOf(order) {
     var fs = (order.fulfillments && order.fulfillments.nodes) || [];
@@ -700,7 +700,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   }
 
   function stageLabel(stage) {
-    return stage === 2 ? 'Delivered' : stage === 1 ? 'In transit' : 'Compounded';
+    return stage === 2 ? 'Delivered' : stage === 1 ? 'In transit' : 'Formulated';
   }
 
   function railHtml(stage) {
