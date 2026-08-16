@@ -68,7 +68,12 @@ main { padding:28px 0 90px; }
 .pricehint { font-family:'DM Sans',sans-serif; font-size:11.5px; line-height:1.5; color:#8A7F6E; max-width:22em; align-self:center; }
 .priceok { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#325E3F; align-self:center; }
 .pricebad { font-family:'DM Sans',sans-serif; font-size:12px; color:#8C4630; align-self:center; }
-.vtabs { display:flex; gap:8px; margin:0 0 16px; }
+.vtabs { display:flex; gap:8px; }
+.statusline { display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#8A7F6E; margin:0 0 16px; }
+.statusline .ok { color:#325E3F; }
+.statusline .bad { color:#B4552D; }
+.linkbtn { background:none; border:none; cursor:pointer; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#554C40; border-bottom:1px solid #C9BEA8; padding:0 0 2px; margin-left:auto; }
+.linkbtn:hover { color:#17140F; border-color:#17140F; }
 .vtab { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; padding:10px 16px; border:1px solid #DDD3C0; background:#FCFAF4; border-radius:999px; cursor:pointer; color:#8A7F6E; transition:all .2s ease; }
 .vtab:hover { border-color:#17140F; color:#17140F; }
 .vtab.on { background:#17140F; color:#F5F0E6; border-color:#17140F; }
@@ -103,13 +108,12 @@ main { padding:28px 0 90px; }
 
     <div id="desk" style="display:none;">
       <div class="bar">
-        <span class="count"><b id="n">0</b> &nbsp;pending applications</span>
+        <div class="vtabs" id="vtabs"></div>
         <button class="btn ghost" id="refresh">Refresh</button>
       </div>
-      <div class="vtabs" id="vtabs"></div>
       <div id="banner"></div>
       <div class="apps" id="apps"></div>
-      <div class="fine">Approving flips the Shopify tags to wholesale-approved and emails the account their pricing from hello@happybeanie.com · defaults are remembered on this device</div>
+      <div class="fine">Every approval and pricing change emails the account automatically from hello@happybeanie.com</div>
     </div>
   </div>
 </main>
@@ -165,6 +169,7 @@ main { padding:28px 0 90px; }
 
   var view = 'pending';
   var cur = null;
+  var settingsOpen = false;
 
   function drawTabs(b) {
     var nPending = (b.apps || []).length;
@@ -187,9 +192,7 @@ main { padding:28px 0 90px; }
     var basePct = d.pct ? Math.round(d.pct * 100) : 30;
     var minQ = d.minQty || 5;
     function boxAt(pct) { return usd(115 * (1 - pct / 100)); }
-    var head = '<div class="pipe">Accounts without a tier get the store-wide discount' +
-      (d.boxPrice ? ' — ' + basePct + '% · ' + usd(d.boxPrice) + ' / box at ' + minQ + '+' : '') +
-      '. Give bigger accounts a bigger tier: it creates the Shopify discount, moves the account onto it, and emails them the new rate. Checkout always applies their largest eligible discount.</div>';
+    var head = '<div class="pipe">Bigger accounts, bigger tier — setting one emails the account their new rate automatically.</div>';
     $('apps').innerHTML = head + list.map(function (a, i) {
       var pctVal = a.tierPct || basePct;
       return '<div class="app" data-i="' + i + '">' +
@@ -252,58 +255,50 @@ main { padding:28px 0 90px; }
     b = b || {};
     cur = b;
     var apps = b.apps || [];
-    $('n').textContent = apps.length;
     drawTabs(b);
-    var bannerHtml = (b.ok && b.emailReady === false)
-      ? '<div class="warn">Email sending is not configured yet — add RESEND_API_KEY in Vercel. Applications are listed, but approvals will not go through until it is set.</div>' : '';
-    // Email-pipe status, straight from the API key Vercel is using.
-    if (b.resend) {
-      if (!b.resend.reachable) {
-        bannerHtml += '<div class="warn">Email pipe check failed: ' + esc(b.resend.message || 'unknown') + '</div>';
-      } else if (!(b.resend.domains || []).length) {
-        bannerHtml += '<div class="warn">The RESEND_API_KEY in Vercel belongs to a Resend team with <b>no domains</b> — it is a different team than the one where happybeanie.com was verified. Create a key in that team (Resend → correct team → API Keys) and replace RESEND_API_KEY in Vercel.</div>';
-      } else {
-        bannerHtml += '<div class="pipe">Email pipe · ' + b.resend.domains.map(function (d) {
-          var ok = String(d.status).toLowerCase() === 'verified';
-          return '<b style="color:' + (ok ? '#325E3F' : '#B4552D') + ';">' + esc(d.name) + ' — ' + esc(d.status) + (ok ? ' ✓' : ' ✗') + '</b>';
-        }).join(' · ') + '</div>';
-        var unver = b.resend.domains.filter(function (d) { return String(d.status).toLowerCase() !== 'verified'; });
-        if (unver.length === b.resend.domains.length) {
-          bannerHtml += '<div class="warn">No verified domain in this key’s Resend team — sends from hello@happybeanie.com are being rejected. Finish DNS verification for the domain shown above, or point RESEND_API_KEY at the team where it is verified.</div>';
-        }
-      }
-    }
-    // Trade-pricing status + in-place editor, wired to the Shopify discount.
-    if (b.discount) {
-      if (b.discount.found) {
-        var act = String(b.discount.status).toUpperCase() === 'ACTIVE';
-        var pctShown = Math.round((b.discount.pct || 0) * 1000) / 10;
-        bannerHtml += '<div class="pipe">Trade pricing · <b style="color:' + (act ? '#325E3F' : '#B4552D') + ';">' +
-          esc(b.discount.title) + ' — ' + esc(b.discount.status) + (act ? ' ✓' : ' ✗') + '</b>' +
-          (b.discount.boxPrice ? ' <span style="text-transform:none; letter-spacing:0;">· wholesale pays ' + usd(b.discount.boxPrice) + ' on the $115 box</span>' : '') + '</div>';
-        bannerHtml += '<div class="pricebar">' +
-          '<span class="fld"><label>% off</label><input id="dpct" value="' + esc(pctShown) + '"></span>' +
-          '<span class="fld"><label>Min. boxes</label><input id="dmin" value="' + esc(b.discount.minQty || 5) + '"></span>' +
+
+    // ---- one quiet status line; warnings only when something is wrong ----
+    var d = b.discount || {};
+    var domains = (b.resend && b.resend.domains) || [];
+    var emailOk = !!(b.emailReady !== false && b.resend && b.resend.reachable &&
+      domains.some(function (x) { return String(x.status).toLowerCase() === 'verified'; }));
+    var act = d.found && String(d.status).toUpperCase() === 'ACTIVE';
+
+    var warns = '';
+    if (b.ok && b.emailReady === false) warns += '<div class="warn">Email sending is not configured — add RESEND_API_KEY in Vercel. Approvals will not go through until it is set.</div>';
+    if (b.resend && !b.resend.reachable) warns += '<div class="warn">Email pipe check failed: ' + esc(b.resend.message || 'unknown') + '</div>';
+    if (b.resend && b.resend.reachable && !domains.length) warns += '<div class="warn">The RESEND_API_KEY in Vercel belongs to a Resend team with no domains — create a key in the team where happybeanie.com is verified and replace it in Vercel.</div>';
+    if (b.resend && b.resend.reachable && domains.length && !emailOk) warns += '<div class="warn">happybeanie.com is not verified in this key’s Resend team — finish DNS verification, or point RESEND_API_KEY at the right team.</div>';
+    if (d.found && !act) warns += '<div class="warn">The wholesale discount is not active — approved accounts pay retail. Activate it in Shopify admin → Discounts.</div>';
+    if (d.found && d.kind === 'automatic') warns += '<div class="warn">Old-style automatic discount detected — it may apply to ALL shoppers at ' + (d.minQty || 5) + '+ boxes. Open Settings and click Update pricing (same numbers are fine) to migrate it to account-restricted pricing.</div>';
+    if (b.discount && !d.found) warns += '<div class="warn">' + (d.error ? 'Could not read discounts from Shopify: ' + esc(d.error) : 'No wholesale discount found — open Settings and click Update pricing to create it.') + '</div>';
+
+    var status = '<div class="statusline">' +
+      '<span class="' + (emailOk ? 'ok' : 'bad') + '">Email ' + (emailOk ? '✓' : '✗') + '</span>' +
+      (d.found ? '<span class="' + (act ? 'ok' : 'bad') + '">Standard rate ' + Math.round((d.pct || 0) * 100) + '% · ' + usd(d.boxPrice || 0) + '/box · ' + (d.minQty || 5) + '+ boxes</span>' : '') +
+      '<button class="linkbtn" id="setbtn">' + (settingsOpen ? 'Hide settings' : 'Settings') + '</button>' +
+      '</div>';
+
+    var settings = '';
+    if (d.found) {
+      settings = '<div id="settings" style="display:' + (settingsOpen ? 'block' : 'none') + ';">' +
+        '<div class="pricebar">' +
+          '<span class="fld"><label>% off</label><input id="dpct" value="' + esc(Math.round((d.pct || 0) * 1000) / 10) + '"></span>' +
+          '<span class="fld"><label>Min. boxes</label><input id="dmin" value="' + esc(d.minQty || 5) + '"></span>' +
           '<button class="btn ghost" id="dsave">Update pricing</button>' +
-          '<span class="pricehint">Writes to the Shopify discount — product page, cart and checkout follow instantly.</span>' +
-          '<span id="dslot"></span></div>';
-        bannerHtml += '<div class="pricebar">' +
+          '<span class="pricehint">The standard rate every trade account gets. Site and checkout follow instantly.</span>' +
+          '<span id="dslot"></span></div>' +
+        '<div class="pricebar">' +
           '<span class="fld"><label>Tiers from %</label><input id="tfrom" value="31"></span>' +
           '<span class="fld"><label>to %</label><input id="tto" value="44"></span>' +
           '<button class="btn ghost" id="tprep">Create tier discounts</button>' +
-          '<span class="pricehint">Pre-creates the tier discount + segment for every % in the range, so any tier can be assigned instantly.</span>' +
-          '<span id="tslot"></span></div>';
-        if (!act) bannerHtml += '<div class="warn">The wholesale discount exists but is not active — approved accounts will pay retail at checkout. Activate it in Shopify admin → Discounts.</div>';
-        if (b.discount.kind === 'automatic') {
-          bannerHtml += '<div class="warn">This is the old automatic discount — it cannot be limited per account, and may be applying to ALL shoppers with ' + (b.discount.minQty || 5) + '+ boxes. Click <b>Update pricing</b> (same numbers are fine) to migrate to the code-based system: a WHOLESALE discount restricted to trade accounts, auto-applied by the site at checkout. The automatic discount is deactivated as part of the switch.</div>';
-        }
-      } else if (b.discount.error) {
-        bannerHtml += '<div class="warn">Could not read discounts from Shopify: ' + esc(b.discount.error) + '</div>';
-      } else {
-        bannerHtml += '<div class="warn">No wholesale automatic discount found in Shopify — approved accounts will pay retail at checkout. Create one in Shopify admin → Discounts (amount off products, automatic, minimum 5 items, eligibility: Wholesale accounts segment).</div>';
-      }
+          '<span class="pricehint">Optional: pre-create every tier in a range.</span>' +
+          '<span id="tslot"></span></div>' +
+        '</div>';
     }
-    $('banner').innerHTML = bannerHtml;
+    $('banner').innerHTML = status + warns + settings;
+    var setbtn = $('setbtn');
+    if (setbtn) setbtn.onclick = function () { settingsOpen = !settingsOpen; draw(cur); };
     var tprep = $('tprep');
     if (tprep) tprep.onclick = async function () {
       var from = parseInt($('tfrom').value, 10);
