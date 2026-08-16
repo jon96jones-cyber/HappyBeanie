@@ -171,6 +171,20 @@ main { padding:28px 0 90px; }
         }
       }
     }
+    // Trade-pricing status, read live from Shopify's automatic discounts.
+    if (b.discount) {
+      if (b.discount.found) {
+        var act = String(b.discount.status).toUpperCase() === 'ACTIVE';
+        bannerHtml += '<div class="pipe">Trade pricing · <b style="color:' + (act ? '#325E3F' : '#B4552D') + ';">' +
+          esc(b.discount.title) + ' — ' + esc(b.discount.status) + (act ? ' ✓' : ' ✗') + '</b>' +
+          (b.discount.summary ? ' <span style="text-transform:none; letter-spacing:0;">· ' + esc(b.discount.summary) + '</span>' : '') + '</div>';
+        if (!act) bannerHtml += '<div class="warn">The wholesale discount exists but is not active — approved accounts will pay retail at checkout. Activate it in Shopify admin → Discounts.</div>';
+      } else if (b.discount.error) {
+        bannerHtml += '<div class="warn">Could not read discounts from Shopify: ' + esc(b.discount.error) + '</div>';
+      } else {
+        bannerHtml += '<div class="warn">No wholesale automatic discount found in Shopify — approved accounts will pay retail at checkout. Create one in Shopify admin → Discounts (amount off products, automatic, minimum 5 items, eligibility: Wholesale accounts segment).</div>';
+      }
+    }
     $('banner').innerHTML = bannerHtml;
     if (!b.ok && (b.error === 'read_failed' || b.error === 'token_rejected')) {
       $('apps').innerHTML = '<div class="err">' + esc(b.message || 'Shopify would not return applications.') + '</div>';

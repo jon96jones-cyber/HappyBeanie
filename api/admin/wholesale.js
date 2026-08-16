@@ -46,6 +46,17 @@ const PENDING = `query Pending {
   }
 }`;
 
+const DISCOUNTS = `query TradeDiscount {
+  automaticDiscountNodes(first: 20) {
+    nodes {
+      automaticDiscount {
+        __typename
+        ... on DiscountAutomaticBasic { title status summary }
+      }
+    }
+  }
+}`;
+
 const APPROVE_TAGS = `mutation Approve($id: ID!, $add: [String!]!, $remove: [String!]!) {
   tagsAdd(id: $id, tags: $add) { userErrors { message } }
   tagsRemove(id: $id, tags: $remove) { userErrors { message } }
@@ -147,13 +158,31 @@ module.exports = async function handler(req, res) {
         }
       }
 
+      // Trade-pricing probe: find the wholesale automatic discount and report
+      // its live status + summary (value, minimum, eligibility) so the desk
+      // shows whether the checkout side of an approval actually works.
+      let discount = null;
+      try {
+        const dOut = await admin(token, DISCOUNTS);
+        const dNodes = ((dOut.json.data || {}).automaticDiscountNodes || {}).nodes || [];
+        const hits = dNodes
+          .map(function (n) { return n.automaticDiscount || {}; })
+          .filter(function (d) { return /wholesale|trade/i.test(d.title || ''); });
+        discount = hits.length
+          ? { found: true, title: hits[0].title, status: hits[0].status, summary: hits[0].summary || '' }
+          : { found: false };
+        if (!dNodes.length && (dOut.json.errors || []).length) {
+          discount = { found: false, error: dOut.json.errors[0].message };
+        }
+      } catch (e) { /* probe only — never block the queue */ }
+
       // Diagnostic feed: the last few touched customer records with their tags,
       // shown by the desk when the queue is empty so "form submitted but nothing
       // here" is debuggable at a glance (tag missing vs search-index lag).
       const recent = ((out.json.data.recent || {}).nodes || []).map(function (c) {
         return { email: c.email || '(no email)', tags: c.tags || [], updatedAt: c.updatedAt };
       });
-      return res.status(200).json({ ok: true, apps: apps, recent: recent, resend: resendInfo, emailReady: !!process.env.RESEND_API_KEY });
+      return res.status(200).json({ ok: true, apps: apps, recent: recent, resend: resendInfo, discount: discount, emailReady: !!process.env.RESEND_API_KEY });
     }
 
     if (req.method !== 'POST') {
