@@ -217,6 +217,30 @@ function codeDiscountInput(title, code, pct, minQty, segmentId) {
   };
 }
 
+// Ensure the TRADE<pct> tier code discount (and its segment) exists.
+// Returns { created: true } | { existed: true } | { error }.
+async function ensureTierDiscount(token, pct, minQty) {
+  const tag = 'wholesale-pct-' + pct;
+  const code = 'TRADE' + pct;
+  const cOut = await admin(token, CODES_Q);
+  const cNodes = ((cOut.json.data || {}).codeDiscountNodes || {}).nodes || [];
+  const exists = cNodes.some(function (n) {
+    const cd = n.codeDiscount || {};
+    return ((((cd.codes || {}).nodes || [])[0] || {}).code) === code;
+  });
+  if (exists) return { existed: true };
+  const segR = await ensureSegment(token, 'Wholesale tier ' + pct + '%', tag);
+  if (segR.error) return { error: 'segment: ' + segR.error };
+  const dc = await admin(token, CODE_CREATE, {
+    d: codeDiscountInput('Wholesale tier — ' + pct + '% (' + minQty + '+ boxes)', code, pct, minQty, segR.seg.id)
+  });
+  const dcErrs = []
+    .concat((((dc.json.data || {}).discountCodeBasicCreate) || {}).userErrors || [])
+    .concat(dc.json.errors || []);
+  if (dcErrs.length) return { error: dcErrs[0].message || 'discount create failed' };
+  return { created: true };
+}
+
 // Migrate the legacy automatic wholesale discount to the WHOLESALE baseline
 // code (same %, same minimum unless overridden), then deactivate the automatic
 // so it can never double-apply or leak to non-wholesale shoppers.
@@ -435,6 +459,25 @@ module.exports = async function handler(req, res) {
         message: 'Add RESEND_API_KEY in Vercel first — approvals must send the email.' });
     }
 
+    // Pre-create one tier's discount + segment without touching any customer —
+    // the desk loops this over a range (e.g. 31–44%) to fill the tier ladder.
+    if (body.action === 'prepare_tier') {
+      const pPct = parseInt(body.pct, 10);
+      if (!(pPct >= 5 && pPct <= 90)) {
+        return res.status(400).json({ ok: false, error: 'bad_request', message: 'Tier must be 5–90.' });
+      }
+      let pBase = await findTradeDiscount(token);
+      if (pBase && pBase.kind === 'automatic') {
+        const mig = await migrateBaseline(token, pBase, Math.round((pBase.pct || 0.3) * 100), (pBase.minQty || 5));
+        if (mig.error) return res.status(200).json({ ok: false, error: 'migrate_failed', message: mig.error });
+        pBase = await findTradeDiscount(token);
+      }
+      const pMinQty = (pBase && pBase.minQty) || 5;
+      const r = await ensureTierDiscount(token, pPct, pMinQty);
+      if (r.error) return res.status(200).json({ ok: false, error: 'tier_failed', message: r.error });
+      return res.status(200).json({ ok: true, pct: pPct, created: !!r.created, existed: !!r.existed });
+    }
+
     // Per-account tier: bigger accounts, bigger discounts. Ensures a
     // "Wholesale tier — NN%" automatic discount exists (scoped to a segment
     // matching the wholesale-pct-NN tag), moves the account onto that tag, and
@@ -459,34 +502,13 @@ module.exports = async function handler(req, res) {
           message: 'Could not migrate the baseline discount to the code system first: ' + mig.error });
       }
       const tTag = 'wholesale-pct-' + tPct;
-      const tCode = 'TRADE' + tPct;
-      const tTitlePrefix = 'Wholesale tier — ' + tPct + '%';
 
       // 1. Ensure the tier code discount exists in Shopify.
-      const cOut = await admin(token, CODES_Q);
-      const cNodes = ((cOut.json.data || {}).codeDiscountNodes || {}).nodes || [];
-      const tierExists = cNodes.some(function (n) {
-        const cd = n.codeDiscount || {};
-        return ((((cd.codes || {}).nodes || [])[0] || {}).code) === tCode;
-      });
-      if (!tierExists) {
-        const segR = await ensureSegment(token, 'Wholesale tier ' + tPct + '%', tTag);
-        if (segR.error) {
-          console.error('[admin/wholesale] segment:', segR.error);
-          return res.status(200).json({ ok: false, error: 'segment_failed',
-            message: 'Could not create the customer segment: ' + segR.error });
-        }
-        const dc = await admin(token, CODE_CREATE, {
-          d: codeDiscountInput(tTitlePrefix + ' (' + tMinQty + '+ boxes)', tCode, tPct, tMinQty, segR.seg.id)
-        });
-        const dcErrs = []
-          .concat((((dc.json.data || {}).discountCodeBasicCreate) || {}).userErrors || [])
-          .concat(dc.json.errors || []);
-        if (dcErrs.length) {
-          console.error('[admin/wholesale] tier discount:', JSON.stringify(dcErrs));
-          return res.status(200).json({ ok: false, error: 'discount_failed',
-            message: 'Could not create the tier discount: ' + (dcErrs[0].message || 'unknown error') });
-        }
+      const tierR = await ensureTierDiscount(token, tPct, tMinQty);
+      if (tierR.error) {
+        console.error('[admin/wholesale] tier:', tierR.error);
+        return res.status(200).json({ ok: false, error: 'discount_failed',
+          message: 'Could not create the tier discount: ' + tierR.error });
       }
 
       // 2. Move the account onto the tier tag (off any previous tier).

@@ -287,6 +287,12 @@ main { padding:28px 0 90px; }
           '<button class="btn ghost" id="dsave">Update pricing</button>' +
           '<span class="pricehint">Writes to the Shopify discount — product page, cart and checkout follow instantly.</span>' +
           '<span id="dslot"></span></div>';
+        bannerHtml += '<div class="pricebar">' +
+          '<span class="fld"><label>Tiers from %</label><input id="tfrom" value="31"></span>' +
+          '<span class="fld"><label>to %</label><input id="tto" value="44"></span>' +
+          '<button class="btn ghost" id="tprep">Create tier discounts</button>' +
+          '<span class="pricehint">Pre-creates the tier discount + segment for every % in the range, so any tier can be assigned instantly.</span>' +
+          '<span id="tslot"></span></div>';
         if (!act) bannerHtml += '<div class="warn">The wholesale discount exists but is not active — approved accounts will pay retail at checkout. Activate it in Shopify admin → Discounts.</div>';
         if (b.discount.kind === 'automatic') {
           bannerHtml += '<div class="warn">This is the old automatic discount — it cannot be limited per account, and may be applying to ALL shoppers with ' + (b.discount.minQty || 5) + '+ boxes. Click <b>Update pricing</b> (same numbers are fine) to migrate to the code-based system: a WHOLESALE discount restricted to trade accounts, auto-applied by the site at checkout. The automatic discount is deactivated as part of the switch.</div>';
@@ -298,6 +304,30 @@ main { padding:28px 0 90px; }
       }
     }
     $('banner').innerHTML = bannerHtml;
+    var tprep = $('tprep');
+    if (tprep) tprep.onclick = async function () {
+      var from = parseInt($('tfrom').value, 10);
+      var to = parseInt($('tto').value, 10);
+      var slot = $('tslot');
+      if (!(from >= 5 && from <= 90 && to >= from && to <= 90 && to - from <= 30)) {
+        slot.innerHTML = '<span class="pricebad">Range must be 5–90, low to high, at most 30 wide.</span>';
+        return;
+      }
+      tprep.disabled = true;
+      var created = 0, existed = 0, failed = [];
+      for (var pct = from; pct <= to; pct++) {
+        tprep.textContent = 'Creating ' + pct + '%…';
+        var r = await api({ method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'prepare_tier', pct: pct }) });
+        if (r.ok && r.created) created++;
+        else if (r.ok && r.existed) existed++;
+        else failed.push(pct + '% (' + (r.message || 'failed') + ')');
+      }
+      tprep.disabled = false; tprep.textContent = 'Create tier discounts';
+      slot.innerHTML = failed.length
+        ? '<span class="pricebad">' + esc(created + ' created, ' + existed + ' already existed, failed: ' + failed.join(', ')) + '</span>'
+        : '<span class="priceok">✓ ' + created + ' created · ' + existed + ' already existed</span>';
+    };
     var dsave = $('dsave');
     if (dsave) dsave.onclick = function () {
       var pct = parseFloat($('dpct').value);
