@@ -259,7 +259,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
       <a href="/about">About</a>
       <a href="/contact">Contact</a>
       <a href="/wholesale" class="current">Wholesale</a>
-      <a href="/account">Account</a>
+      <a href="/account" id="navAcct">Account</a>
       <a href="/quiz">Eligibility</a>
       <a class="hdr-cta" href="#apply">Apply now</a>
     </nav>
@@ -706,5 +706,11 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
   });
   raf = requestAnimationFrame(draw);
 })();
+</script>
+<script>
+// Header signed-in probe — same session cookie the account portal sets.
+fetch('/api/auth/me').then(function (r) { return r.json(); }).then(function (j) {
+  if (j && j.in) { var a = document.getElementById('navAcct'); if (a) a.textContent = 'Your Account'; }
+}).catch(function () {});
 </script>
 </body></html>

@@ -488,7 +488,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       <a href="/about">About</a>
       <a href="/contact">Contact</a>
       <a href="/wholesale">Wholesale</a>
-      <a href="/account" class="current">Account</a>
+      <a href="/account" class="current" id="navAcct">Account</a>
       <a href="/quiz">Eligibility</a>
       <a class="hdr-cta" href="/product">Try Happy Beanie</a>
     </nav>
@@ -610,6 +610,9 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   var states = { out: $('stateOut'), loading: $('stateLoading'), dash: $('stateDash') };
   function show(name) {
     Object.keys(states).forEach(function (k) { states[k].classList.toggle('on', k === name); });
+    // Header reflects the session: "Your Account" once the dashboard is open.
+    var na = $('navAcct');
+    if (na) na.textContent = name === 'dash' ? 'Your Account' : 'Account';
   }
 
   var params = new URLSearchParams(location.search);
