@@ -63,6 +63,11 @@ main { padding:28px 0 90px; }
 .warn { border:1px solid rgba(196,88,60,0.4); background:rgba(242,206,89,0.15); color:#6a5a10; border-radius:3px; padding:11px 14px; font-size:13px; margin:0 20px 16px; }
 .okrow { padding:13px 20px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:oklch(0.44 0.07 152); }
 .pipe { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#8A7F6E; padding:0 0 14px; }
+.pricebar { display:flex; gap:8px; align-items:end; flex-wrap:wrap; padding:12px 14px 14px; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; margin-bottom:16px; }
+.pricebar .fld input { width:80px; }
+.pricehint { font-family:'DM Sans',sans-serif; font-size:11.5px; line-height:1.5; color:#8A7F6E; max-width:22em; align-self:center; }
+.priceok { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#325E3F; align-self:center; }
+.pricebad { font-family:'DM Sans',sans-serif; font-size:12px; color:#8C4630; align-self:center; }
 .fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
 </style>
 </head><body>
@@ -171,13 +176,20 @@ main { padding:28px 0 90px; }
         }
       }
     }
-    // Trade-pricing status, read live from Shopify's automatic discounts.
+    // Trade-pricing status + in-place editor, wired to the Shopify discount.
     if (b.discount) {
       if (b.discount.found) {
         var act = String(b.discount.status).toUpperCase() === 'ACTIVE';
+        var pctShown = Math.round((b.discount.pct || 0) * 1000) / 10;
         bannerHtml += '<div class="pipe">Trade pricing · <b style="color:' + (act ? '#325E3F' : '#B4552D') + ';">' +
           esc(b.discount.title) + ' — ' + esc(b.discount.status) + (act ? ' ✓' : ' ✗') + '</b>' +
-          (b.discount.summary ? ' <span style="text-transform:none; letter-spacing:0;">· ' + esc(b.discount.summary) + '</span>' : '') + '</div>';
+          (b.discount.boxPrice ? ' <span style="text-transform:none; letter-spacing:0;">· wholesale pays $' + b.discount.boxPrice + ' on the $115 box</span>' : '') + '</div>';
+        bannerHtml += '<div class="pricebar">' +
+          '<span class="fld"><label>% off</label><input id="dpct" value="' + esc(pctShown) + '"></span>' +
+          '<span class="fld"><label>Min. boxes</label><input id="dmin" value="' + esc(b.discount.minQty || 5) + '"></span>' +
+          '<button class="btn ghost" id="dsave">Update pricing</button>' +
+          '<span class="pricehint">Writes to the Shopify discount — product page, cart and checkout follow instantly.</span>' +
+          '<span id="dslot"></span></div>';
         if (!act) bannerHtml += '<div class="warn">The wholesale discount exists but is not active — approved accounts will pay retail at checkout. Activate it in Shopify admin → Discounts.</div>';
       } else if (b.discount.error) {
         bannerHtml += '<div class="warn">Could not read discounts from Shopify: ' + esc(b.discount.error) + '</div>';
@@ -186,6 +198,24 @@ main { padding:28px 0 90px; }
       }
     }
     $('banner').innerHTML = bannerHtml;
+    var dsave = $('dsave');
+    if (dsave) dsave.onclick = function () {
+      var pct = parseFloat($('dpct').value);
+      var minQty = parseInt($('dmin').value, 10);
+      var slot = $('dslot');
+      if (!(pct >= 1 && pct <= 90) || !(minQty >= 1 && minQty <= 999)) {
+        slot.innerHTML = '<span class="pricebad">1–90% and 1–999 boxes.</span>';
+        return;
+      }
+      dsave.disabled = true; dsave.textContent = 'Saving…';
+      api({ method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'update_pricing', pct: pct, minQty: minQty }) })
+        .then(function (r) {
+          if (r.ok) { slot.innerHTML = '<span class="priceok">✓ Saved</span>'; setTimeout(load, 900); return; }
+          dsave.disabled = false; dsave.textContent = 'Update pricing';
+          slot.innerHTML = '<span class="pricebad">' + esc(r.message || 'Update failed.') + '</span>';
+        });
+    };
     if (!b.ok && (b.error === 'read_failed' || b.error === 'token_rejected')) {
       $('apps').innerHTML = '<div class="err">' + esc(b.message || 'Shopify would not return applications.') + '</div>';
       return;

@@ -49,13 +49,44 @@ const PENDING = `query Pending {
 const DISCOUNTS = `query TradeDiscount {
   automaticDiscountNodes(first: 20) {
     nodes {
+      id
       automaticDiscount {
         __typename
-        ... on DiscountAutomaticBasic { title status summary }
+        ... on DiscountAutomaticBasic {
+          title status summary
+          minimumRequirement { ... on DiscountMinimumQuantity { greaterThanOrEqualToQuantity } }
+          customerGets { value { ... on DiscountPercentage { percentage } } }
+        }
       }
     }
   }
 }`;
+
+const UPDATE_PRICING = `mutation UpdatePricing($id: ID!, $d: DiscountAutomaticBasicInput!) {
+  discountAutomaticBasicUpdate(id: $id, automaticBasicDiscount: $d) {
+    userErrors { field message }
+  }
+}`;
+
+// Find the wholesale automatic discount; returns { id, title, status, summary,
+// pct, minQty } or null.
+async function findTradeDiscount(token) {
+  const out = await admin(token, DISCOUNTS);
+  const nodes = ((out.json.data || {}).automaticDiscountNodes || {}).nodes || [];
+  const hit = nodes.filter(function (n) {
+    return /wholesale|trade/i.test(((n.automaticDiscount || {}).title) || '');
+  })[0];
+  if (!hit) return { error: (out.json.errors || [])[0] ? out.json.errors[0].message : null };
+  const d = hit.automaticDiscount;
+  return {
+    id: hit.id,
+    title: d.title,
+    status: d.status,
+    summary: d.summary || '',
+    pct: ((d.customerGets || {}).value || {}).percentage || 0,
+    minQty: parseInt(((d.minimumRequirement || {}).greaterThanOrEqualToQuantity) || '0', 10) || 0
+  };
+}
 
 const APPROVE_TAGS = `mutation Approve($id: ID!, $add: [String!]!, $remove: [String!]!) {
   tagsAdd(id: $id, tags: $add) { userErrors { message } }
@@ -159,21 +190,16 @@ module.exports = async function handler(req, res) {
       }
 
       // Trade-pricing probe: find the wholesale automatic discount and report
-      // its live status + summary (value, minimum, eligibility) so the desk
-      // shows whether the checkout side of an approval actually works.
+      // its live status + terms so the desk shows whether the checkout side of
+      // an approval actually works — and can edit the terms in place.
       let discount = null;
       try {
-        const dOut = await admin(token, DISCOUNTS);
-        const dNodes = ((dOut.json.data || {}).automaticDiscountNodes || {}).nodes || [];
-        const hits = dNodes
-          .map(function (n) { return n.automaticDiscount || {}; })
-          .filter(function (d) { return /wholesale|trade/i.test(d.title || ''); });
-        discount = hits.length
-          ? { found: true, title: hits[0].title, status: hits[0].status, summary: hits[0].summary || '' }
-          : { found: false };
-        if (!dNodes.length && (dOut.json.errors || []).length) {
-          discount = { found: false, error: dOut.json.errors[0].message };
-        }
+        const d = await findTradeDiscount(token);
+        discount = (d && d.id)
+          ? { found: true, title: d.title, status: d.status, summary: d.summary,
+              pct: d.pct, minQty: d.minQty,
+              boxPrice: Math.round(115 * (1 - d.pct) * 100) / 100 }
+          : { found: false, error: d && d.error };
       } catch (e) { /* probe only — never block the queue */ }
 
       // Diagnostic feed: the last few touched customer records with their tags,
@@ -190,12 +216,46 @@ module.exports = async function handler(req, res) {
       return res.status(405).json({ ok: false, error: 'method_not_allowed' });
     }
 
+    const body = readBody(req);
+
+    // Trade-pricing editor: writes the percentage + minimum straight to the
+    // Shopify automatic discount. The site (product card, cart preview,
+    // checkout) all read that discount live, so one save updates everything.
+    if (body.action === 'update_pricing') {
+      const pct = Number(body.pct);
+      const minQty = parseInt(body.minQty, 10);
+      if (!(pct >= 1 && pct <= 90) || !(minQty >= 1 && minQty <= 999)) {
+        return res.status(400).json({ ok: false, error: 'bad_request',
+          message: 'Discount must be 1–90% and the minimum 1–999 boxes.' });
+      }
+      const d = await findTradeDiscount(token);
+      if (!d || !d.id) {
+        return res.status(200).json({ ok: false, error: 'no_discount',
+          message: 'No wholesale automatic discount found in Shopify to update.' });
+      }
+      const upd = await admin(token, UPDATE_PRICING, {
+        id: d.id,
+        d: {
+          title: 'Wholesale — trade pricing (' + minQty + '+ boxes)',
+          customerGets: { value: { percentage: pct / 100 } },
+          minimumRequirement: { quantity: { greaterThanOrEqualToQuantity: String(minQty) } }
+        }
+      });
+      const uErrs = []
+        .concat((((upd.json.data || {}).discountAutomaticBasicUpdate) || {}).userErrors || [])
+        .concat(upd.json.errors || []);
+      if (uErrs.length) {
+        console.error('[admin/wholesale] pricing update:', JSON.stringify(uErrs));
+        return res.status(200).json({ ok: false, error: 'update_failed',
+          message: uErrs[0].message || 'Shopify rejected the update.' });
+      }
+      return res.status(200).json({ ok: true });
+    }
+
     if (!process.env.RESEND_API_KEY) {
       return res.status(503).json({ ok: false, error: 'email_not_configured',
         message: 'Add RESEND_API_KEY in Vercel first — approvals must send the email.' });
     }
-
-    const body = readBody(req);
     const customerId = String(body.customerId || '');
     const firstName = String(body.firstName || '').slice(0, 100);
     const company = String(body.company || '').slice(0, 200);
