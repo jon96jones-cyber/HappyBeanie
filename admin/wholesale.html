@@ -68,6 +68,10 @@ main { padding:28px 0 90px; }
 .pricehint { font-family:'DM Sans',sans-serif; font-size:11.5px; line-height:1.5; color:#8A7F6E; max-width:22em; align-self:center; }
 .priceok { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#325E3F; align-self:center; }
 .pricebad { font-family:'DM Sans',sans-serif; font-size:12px; color:#8C4630; align-self:center; }
+.vtabs { display:flex; gap:8px; margin:0 0 16px; }
+.vtab { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; padding:10px 16px; border:1px solid #DDD3C0; background:#FCFAF4; border-radius:999px; cursor:pointer; color:#8A7F6E; transition:all .2s ease; }
+.vtab:hover { border-color:#17140F; color:#17140F; }
+.vtab.on { background:#17140F; color:#F5F0E6; border-color:#17140F; }
 .fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
 </style>
 </head><body>
@@ -101,6 +105,7 @@ main { padding:28px 0 90px; }
         <span class="count"><b id="n">0</b> &nbsp;pending applications</span>
         <button class="btn ghost" id="refresh">Refresh</button>
       </div>
+      <div class="vtabs" id="vtabs"></div>
       <div id="banner"></div>
       <div class="apps" id="apps"></div>
       <div class="fine">Approving flips the Shopify tags to wholesale-approved and emails the account their pricing from hello@happybeanie.com · defaults are remembered on this device</div>
@@ -119,6 +124,10 @@ main { padding:28px 0 90px; }
   }
   function fmt(iso) {
     try { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch (e) { return ''; }
+  }
+  function usd(n) {
+    var r = Math.round(Number(n) * 100) / 100;
+    return '$' + (r % 1 === 0 ? String(r) : r.toFixed(2));
   }
   function prefs() {
     try { return JSON.parse(localStorage.getItem('hb_ws_prefs') || '{}'); } catch (e) { return {}; }
@@ -153,10 +162,84 @@ main { padding:28px 0 90px; }
   $('refresh').onclick = load;
   function load() { api({}).then(draw); }
 
+  var view = 'pending';
+  var cur = null;
+
+  function drawTabs(b) {
+    var nPending = (b.apps || []).length;
+    var nApproved = (b.approved || []).length;
+    $('vtabs').innerHTML =
+      '<button class="vtab' + (view === 'pending' ? ' on' : '') + '" data-v="pending">Pending · ' + nPending + '</button>' +
+      '<button class="vtab' + (view === 'approved' ? ' on' : '') + '" data-v="approved">Approved · ' + nApproved + '</button>';
+    Array.prototype.forEach.call(document.querySelectorAll('.vtab'), function (t) {
+      t.onclick = function () { view = t.getAttribute('data-v'); if (cur) draw(cur); };
+    });
+  }
+
+  function renderApproved(b) {
+    var list = b.approved || [];
+    if (!list.length) {
+      $('apps').innerHTML = '<div class="empty">No approved accounts yet</div>';
+      return;
+    }
+    var d = b.discount || {};
+    var bpDefault = d.boxPrice ? usd(d.boxPrice) : '';
+    var moDefault = d.minQty ? d.minQty + ' boxes' : '';
+    var head = '<div class="pipe">Checkout charges every trade account the store-wide discount' +
+      (d.boxPrice ? ' — currently ' + usd(d.boxPrice) + ' / box at ' + (d.minQty || 5) + '+' : '') +
+      '. Change it in the editor above, then email accounts their new rates here.</div>';
+    $('apps').innerHTML = head + list.map(function (a, i) {
+      return '<div class="app" data-i="' + i + '">' +
+        '<div class="app-h"><span class="co">' + esc(a.company || '(no company)') + '</span>' +
+        '<span class="who">' + esc((a.firstName + ' ' + a.lastName).trim()) + ' · ' + esc(a.email) +
+        (a.businessType ? ' · ' + esc(a.businessType) : '') + '</span></div>' +
+        '<div class="approve">' +
+          '<span class="fld"><label>$ / dog box</label><input data-f="priceDog" value="' + esc(a.priceDog || bpDefault) + '"></span>' +
+          '<span class="fld"><label>$ / cat box</label><input data-f="priceCat" value="' + esc(a.priceCat || bpDefault) + '"></span>' +
+          '<span class="fld"><label>Min. order</label><input class="wide" data-f="minOrder" value="' + esc(a.minOrder || moDefault) + '"></span>' +
+          '<button class="btn" data-go>Email new pricing →</button>' +
+        '</div>' +
+        '<div data-slot></div>' +
+      '</div>';
+    }).join('');
+
+    Array.prototype.forEach.call(document.querySelectorAll('.app'), function (card, i) {
+      var a = list[i];
+      card.querySelector('[data-go]').onclick = function () {
+        var btn = this;
+        var get = function (f) { return card.querySelector('[data-f="' + f + '"]').value.trim(); };
+        var payload = {
+          action: 'reprice_email',
+          customerId: a.id, email: a.email,
+          firstName: a.firstName || a.company, company: a.company || (a.firstName + ' ' + a.lastName),
+          priceDog: get('priceDog'), priceCat: get('priceCat'), minOrder: get('minOrder')
+        };
+        var slot = card.querySelector('[data-slot]');
+        if (!payload.priceDog || !payload.priceCat || !payload.minOrder) {
+          slot.innerHTML = '<div class="warn">Fill in both prices and the minimum order.</div>';
+          return;
+        }
+        btn.disabled = true; btn.textContent = 'Sending…';
+        api({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(function (r) {
+          if (r.ok) {
+            slot.innerHTML = '<div class="okrow">✓ New pricing emailed to ' + esc(a.email) +
+              (r.emailId ? ' <span style="opacity:0.6;">· Resend id ' + esc(r.emailId) + '</span>' : '') + '</div>';
+            btn.textContent = 'Sent';
+            return;
+          }
+          btn.disabled = false; btn.textContent = 'Email new pricing →';
+          slot.innerHTML = '<div class="warn">' + esc(r.message || 'That did not go through — nothing was sent.') + '</div>';
+        });
+      };
+    });
+  }
+
   function draw(b) {
     b = b || {};
+    cur = b;
     var apps = b.apps || [];
     $('n').textContent = apps.length;
+    drawTabs(b);
     var bannerHtml = (b.ok && b.emailReady === false)
       ? '<div class="warn">Email sending is not configured yet — add RESEND_API_KEY in Vercel. Applications are listed, but approvals will not go through until it is set.</div>' : '';
     // Email-pipe status, straight from the API key Vercel is using.
@@ -183,7 +266,7 @@ main { padding:28px 0 90px; }
         var pctShown = Math.round((b.discount.pct || 0) * 1000) / 10;
         bannerHtml += '<div class="pipe">Trade pricing · <b style="color:' + (act ? '#325E3F' : '#B4552D') + ';">' +
           esc(b.discount.title) + ' — ' + esc(b.discount.status) + (act ? ' ✓' : ' ✗') + '</b>' +
-          (b.discount.boxPrice ? ' <span style="text-transform:none; letter-spacing:0;">· wholesale pays $' + b.discount.boxPrice + ' on the $115 box</span>' : '') + '</div>';
+          (b.discount.boxPrice ? ' <span style="text-transform:none; letter-spacing:0;">· wholesale pays ' + usd(b.discount.boxPrice) + ' on the $115 box</span>' : '') + '</div>';
         bannerHtml += '<div class="pricebar">' +
           '<span class="fld"><label>% off</label><input id="dpct" value="' + esc(pctShown) + '"></span>' +
           '<span class="fld"><label>Min. boxes</label><input id="dmin" value="' + esc(b.discount.minQty || 5) + '"></span>' +
@@ -220,6 +303,7 @@ main { padding:28px 0 90px; }
       $('apps').innerHTML = '<div class="err">' + esc(b.message || 'Shopify would not return applications.') + '</div>';
       return;
     }
+    if (view === 'approved') { renderApproved(b); return; }
     if (!apps.length) {
       // Empty queue: show what Shopify recorded most recently so a submitted-but-
       // missing application is debuggable (no wholesale-pending tag = the form

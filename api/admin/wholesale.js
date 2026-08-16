@@ -41,10 +41,37 @@ const PENDING = `query Pending {
       website: metafield(namespace: "wholesale", key: "website") { value }
     }
   }
+  approved: customers(first: 100, query: "tag:wholesale-approved", sortKey: UPDATED_AT, reverse: true) {
+    nodes {
+      id firstName lastName email note updatedAt
+      company: metafield(namespace: "wholesale", key: "company") { value }
+      businessType: metafield(namespace: "wholesale", key: "business_type") { value }
+      priceDog: metafield(namespace: "wholesale", key: "price_dog") { value }
+      priceCat: metafield(namespace: "wholesale", key: "price_cat") { value }
+      minOrder: metafield(namespace: "wholesale", key: "min_order") { value }
+    }
+  }
   recent: customers(first: 5, sortKey: UPDATED_AT, reverse: true) {
     nodes { email tags updatedAt }
   }
 }`;
+
+// Record the prices quoted to an account (approval or reprice) on the customer
+// so the desk pre-fills them next time. Best-effort — never blocks the send.
+async function storeQuotedPrices(token, customerId, priceDog, priceCat, minOrder) {
+  const SET = 'mutation setQuote($m: [MetafieldsSetInput!]!) {' +
+    ' metafieldsSet(metafields: $m) { userErrors { field message } } }';
+  const m = [
+    { ownerId: customerId, namespace: 'wholesale', key: 'price_dog', type: 'single_line_text_field', value: priceDog },
+    { ownerId: customerId, namespace: 'wholesale', key: 'price_cat', type: 'single_line_text_field', value: priceCat },
+    { ownerId: customerId, namespace: 'wholesale', key: 'min_order', type: 'single_line_text_field', value: minOrder }
+  ];
+  const out = await admin(token, SET, { m: m });
+  const errs = []
+    .concat((((out.json.data || {}).metafieldsSet) || {}).userErrors || [])
+    .concat(out.json.errors || []);
+  if (errs.length) console.error('[admin/wholesale] quote store:', JSON.stringify(errs));
+}
 
 const DISCOUNTS = `query TradeDiscount {
   automaticDiscountNodes(first: 20) {
@@ -202,13 +229,30 @@ module.exports = async function handler(req, res) {
           : { found: false, error: d && d.error };
       } catch (e) { /* probe only — never block the queue */ }
 
+      // Approved accounts, for the desk's Approved tab (reprice emails).
+      const approved = ((out.json.data.approved || {}).nodes || []).map(function (c) {
+        const p = parseNoteApp(c.note);
+        return {
+          id: c.id,
+          firstName: c.firstName || '',
+          lastName: c.lastName || '',
+          email: c.email || '',
+          updatedAt: c.updatedAt,
+          company: mf(c.company) || p.company,
+          businessType: mf(c.businessType) || p.businessType,
+          priceDog: mf(c.priceDog),
+          priceCat: mf(c.priceCat),
+          minOrder: mf(c.minOrder)
+        };
+      });
+
       // Diagnostic feed: the last few touched customer records with their tags,
       // shown by the desk when the queue is empty so "form submitted but nothing
       // here" is debuggable at a glance (tag missing vs search-index lag).
       const recent = ((out.json.data.recent || {}).nodes || []).map(function (c) {
         return { email: c.email || '(no email)', tags: c.tags || [], updatedAt: c.updatedAt };
       });
-      return res.status(200).json({ ok: true, apps: apps, recent: recent, resend: resendInfo, discount: discount, emailReady: !!process.env.RESEND_API_KEY });
+      return res.status(200).json({ ok: true, apps: apps, approved: approved, recent: recent, resend: resendInfo, discount: discount, emailReady: !!process.env.RESEND_API_KEY });
     }
 
     if (req.method !== 'POST') {
@@ -255,6 +299,43 @@ module.exports = async function handler(req, res) {
     if (!process.env.RESEND_API_KEY) {
       return res.status(503).json({ ok: false, error: 'email_not_configured',
         message: 'Add RESEND_API_KEY in Vercel first — approvals must send the email.' });
+    }
+
+    // Pricing-update email for an already-approved account. No tag changes —
+    // sends the reprice variant and records the quoted prices on the customer.
+    if (body.action === 'reprice_email') {
+      const rId = String(body.customerId || '');
+      const rFirst = String(body.firstName || '').slice(0, 100);
+      const rCompany = String(body.company || '').slice(0, 200);
+      const rEmail = String(body.email || '').slice(0, 200);
+      const rDog = String(body.priceDog || '').slice(0, 20);
+      const rCat = String(body.priceCat || '').slice(0, 20);
+      const rMin = String(body.minOrder || '').slice(0, 60);
+      const rSender = String(process.env.WHOLESALE_SENDER || 'Jon').slice(0, 100);
+      if (!rId || !rEmail || !rFirst || !rCompany || !rDog || !rCat || !rMin) {
+        return res.status(400).json({ ok: false, error: 'bad_request', message: 'All fields are required.' });
+      }
+      const rHtml = buildEmail.reprice({ firstName: rFirst, company: rCompany, priceDog: rDog, priceCat: rCat, minOrder: rMin, senderName: rSender });
+      const rSent = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY },
+        body: JSON.stringify({
+          from: FROM,
+          to: [rEmail],
+          reply_to: 'hello@happybeanie.com',
+          subject: 'Your new Happy Beanie trade pricing',
+          html: rHtml
+        })
+      });
+      const rJson = await rSent.json().catch(function () { return {}; });
+      if (!rSent.ok || !rJson.id) {
+        console.error('[admin/wholesale] resend reprice:', rSent.status, JSON.stringify(rJson));
+        return res.status(502).json({ ok: false, error: 'email_failed',
+          message: (rJson && rJson.message) || ('Email service returned ' + rSent.status) });
+      }
+      console.log('[admin/wholesale] reprice accepted', rJson.id, 'to', rEmail);
+      try { await storeQuotedPrices(token, rId, rDog, rCat, rMin); } catch (e) {}
+      return res.status(200).json({ ok: true, emailId: rJson.id });
     }
     const customerId = String(body.customerId || '');
     const firstName = String(body.firstName || '').slice(0, 100);
@@ -307,6 +388,9 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ ok: true, warning: 'email_sent_tags_failed', emailId: sentJson.id,
         message: 'The email went out, but the Shopify tags did not update — flip wholesale-pending → wholesale-approved by hand for ' + email + '.' });
     }
+
+    // Record what this account was quoted, so the Approved tab pre-fills it.
+    try { await storeQuotedPrices(token, customerId, priceDog, priceCat, minOrder); } catch (e) {}
 
     return res.status(200).json({ ok: true, emailId: sentJson.id });
   } catch (err) {
