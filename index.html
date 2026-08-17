@@ -1892,7 +1892,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
     </section>
     <section data-m="pad short" style="background: #FCFAF4; padding: 84px 44px 100px;">
 
-      <div id="contact-form" data-m="stack gap" style="position: relative; z-index: 1; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 64px; align-items: start; max-width: 1180px; margin: 0 auto;">
+      <div id="contact-form" data-m="stack gap" style="position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: 64px; align-items: start; max-width: 760px; margin: 0 auto;">
         <div>
           <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
             <div style="border: 1px solid oklch(0.44 0.07 152); border-radius: 0; padding: 40px 36px; background: #F5F0E6;">
@@ -1959,18 +1959,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
               </div>
             </div>
           </sc-if>
-        </div>
-        <div style="display: grid; gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 0; overflow: hidden;">
-          <sc-for list="{{ contactBlocks }}" as="cb" hint-placeholder-count="4">
-            <div sc-camel-on-click="{{ cb.copy }}" data-m="cblock" style="background: {{ cb.bg }}; padding: 26px 28px; cursor: {{ cb.cursor }}; transition: background 0.25s ease;">
-              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px;">
-                <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">{{ cb.k }}</span>
-                <span style="font-family: 'DM Sans', sans-serif; font-size: 12px; color: oklch(0.44 0.07 152); opacity: {{ cb.hintOpacity }}; transition: opacity 0.25s ease;">{{ cb.hint }}</span>
-              </div>
-              <div data-m="cbval" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 23px; line-height: 1.25; margin-bottom: 6px;">{{ cb.v }}</div>
-              <div data-m="cbnote" style="font-size: 14px; line-height: 1.6; color: #554C40;">{{ cb.note }}</div>
-            </div>
-          </sc-for>
         </div>
       </div>
     </section>
