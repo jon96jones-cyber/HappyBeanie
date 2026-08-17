@@ -376,7 +376,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
   [data-m~="roomrow"] { padding: 8px 12px 9px 15px !important; gap: 2px 9px !important; }
   [data-m~="roomrow"] > span:nth-child(2) { font-size: 8.5px !important; }
   [data-m~="roomrow"] > span:nth-child(3) { font-size: 13px !important; }
-  [data-m~="roomrow"] > span:last-child { font-size: 7.5px !important; }
     [data-m~="showf"] { display: flex !important; }
     [data-m~="first"] { order: -1 !important; }
     [data-m~="nostick"] { position: static !important; }
@@ -1800,7 +1799,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
                   <span aria-hidden="true" style="position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: oklch(0.86 0.14 92); transform: scaleY({{ rl.railScale }}); transition: transform 0.4s cubic-bezier(0.2,0.7,0.2,1);"></span>
                   <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; color: {{ rl.numColor }}; transition: color 0.3s ease;">{{ rl.no }}</span>
                   <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 15px; color: {{ rl.keyColor }}; transition: color 0.3s ease;">{{ rl.key }}</span>
-                  <span style="grid-column: 2; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: {{ rl.prevColor }}; transition: color 0.3s ease;">{{ rl.prevents }}</span>
                 </button>
               </sc-for>
             </div>
