@@ -36,3 +36,68 @@ module.exports.reprice = function buildRepriceEmail(t) {
     .replace(/<tr><td style="padding:0 0 6px;">[\s\S]*?Marketing kit included[\s\S]*?<\/td><\/tr>\n/, '');
   return fill(tpl, t);
 };
+
+// Plain-text alternative. Sending HTML with no text/plain part is itself a
+// spam signal at Gmail and friends, so every send carries both.
+function textApproval(t) {
+  return [
+    "You're approved, " + t.firstName + ".",
+    "",
+    "Welcome to the trade program - " + t.company + " now has a Happy Beanie",
+    "wholesale account. I reviewed your application myself, and everything",
+    "checked out. Here are your rates and how to place your first order.",
+    "",
+    "YOUR TRADE PRICING",
+    "  Happy Beans for Dogs (30-day box, MSRP $115): " + t.priceDog + " / box",
+    "  Happy Beans for Cats (30-day box, MSRP $115): " + t.priceCat + " / box",
+    "  Minimum opening order: " + t.minOrder,
+    "  Ships in 48h from Scottsdale",
+    "",
+    "PLACING ORDERS",
+    "  1. Sign in at https://www.happybeanie.com/account with this email",
+    "     address - your trade pricing is attached to it.",
+    "  2. Or reply to this email with quantities and I'll enter the order",
+    "     for you.",
+    "",
+    "Questions on pricing, terms or timing - reply directly to me. A person",
+    "reads this inbox, not a queue.",
+    "",
+    t.senderName,
+    "Trade team, Happy Beanie",
+    "hello@happybeanie.com",
+    "Formulated fresh in Scottsdale, AZ"
+  ].join("\n");
+}
+
+function textReprice(t) {
+  return [
+    "New pricing, " + t.firstName + ".",
+    "",
+    "A quick update from the trade program - the wholesale rates for",
+    t.company + " have changed. Your new pricing is below; it is already",
+    "live on your account and applies to every order from today.",
+    "",
+    "YOUR TRADE PRICING",
+    "  Happy Beans for Dogs (30-day box, MSRP $115): " + t.priceDog + " / box",
+    "  Happy Beans for Cats (30-day box, MSRP $115): " + t.priceCat + " / box",
+    "  Minimum order: " + t.minOrder,
+    "  Ships in 48h from Scottsdale",
+    "",
+    "PLACING ORDERS",
+    "  1. Sign in at https://www.happybeanie.com/account with this email",
+    "     address - your pricing is attached to it.",
+    "  2. Or reply to this email with quantities and I'll enter the order",
+    "     for you.",
+    "",
+    "Questions on pricing, terms or timing - reply directly to me. A person",
+    "reads this inbox, not a queue.",
+    "",
+    t.senderName,
+    "Trade team, Happy Beanie",
+    "hello@happybeanie.com",
+    "Formulated fresh in Scottsdale, AZ"
+  ].join("\n");
+}
+
+module.exports.text = textApproval;
+module.exports.repriceText = textReprice;

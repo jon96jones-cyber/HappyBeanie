@@ -585,7 +585,8 @@ module.exports = async function handler(req, res) {
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY },
         body: JSON.stringify({
           from: FROM, to: [tEmail], reply_to: 'hello@happybeanie.com',
-          subject: 'Your new Happy Beanie trade pricing', html: tHtml
+          subject: 'Your new Happy Beanie trade pricing', html: tHtml,
+          text: buildEmail.repriceText({ firstName: tFirst, company: tCompany, priceDog: tPrice, priceCat: tPrice, minOrder: tMinOrder, senderName: tSender })
         })
       });
       const tJson = await tSent.json().catch(function () { return {}; });
@@ -621,7 +622,8 @@ module.exports = async function handler(req, res) {
           to: [rEmail],
           reply_to: 'hello@happybeanie.com',
           subject: 'Your new Happy Beanie trade pricing',
-          html: rHtml
+          html: rHtml,
+          text: buildEmail.repriceText({ firstName: rFirst, company: rCompany, priceDog: rDog, priceCat: rCat, minOrder: rMin, senderName: rSender })
         })
       });
       const rJson = await rSent.json().catch(function () { return {}; });
@@ -658,7 +660,8 @@ module.exports = async function handler(req, res) {
         to: [email],
         reply_to: 'hello@happybeanie.com',
         subject: "You're approved — Happy Beanie trade pricing inside",
-        html: html
+        html: html,
+        text: buildEmail.text({ firstName: firstName, company: company, priceDog: priceDog, priceCat: priceCat, minOrder: minOrder, senderName: senderName })
       })
     });
     const sentJson = await sent.json().catch(function () { return {}; });
