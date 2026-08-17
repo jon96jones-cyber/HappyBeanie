@@ -373,6 +373,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="pad"]   { padding-left: 20px !important; padding-right: 20px !important; }
     [data-m~="short"] { padding-top: 56px !important; padding-bottom: 56px !important; }
     [data-m~="hide"]  { display: none !important; }
+  [data-m~="roomrow"] { padding: 8px 12px 9px 15px !important; gap: 2px 9px !important; }
+  [data-m~="roomrow"] > span:nth-child(2) { font-size: 8.5px !important; }
+  [data-m~="roomrow"] > span:nth-child(3) { font-size: 13px !important; }
+  [data-m~="roomrow"] > span:last-child { font-size: 7.5px !important; }
     [data-m~="showf"] { display: flex !important; }
     [data-m~="first"] { order: -1 !important; }
     [data-m~="nostick"] { position: static !important; }
@@ -1817,6 +1821,88 @@ image-slot:not([data-filled]) { color: transparent !important; }
       </div>
     </section>
 
+    <section data-m="pad short" style="position: relative; background: #17140F; color: #F5F0E6; padding: 82px 44px 78px; overflow: hidden;">
+      <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.05) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(110% 90% at 85% 0%, #000 12%, transparent 78%); -webkit-mask-image: radial-gradient(110% 90% at 85% 0%, #000 12%, transparent 78%);"></div>
+      <div aria-hidden="true" style="position: absolute; right: -140px; top: -180px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, oklch(0.72 0.08 152 / 0.16), transparent 70%); pointer-events: none;"></div>
+
+      <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
+        <h2 data-m="abh1" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(34px, 4.4vw, 62px); line-height: 1.0; margin: 0 0 30px;">View our <span style="color: oklch(0.86 0.14 92);">lab.</span></h2>
+
+        <div data-m="stack gap" style="display: grid; grid-template-columns: minmax(0, 1fr) clamp(240px, 26%, 360px); gap: clamp(20px, 3vw, 40px); align-items: start;">
+          <div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px;">
+              <div style="display: flex; align-items: center; gap: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #6F6659; white-space: nowrap;">
+                <span>Click a station to zoom in</span>
+                <span style="color: #DED5C4; letter-spacing: 0.14em; text-transform: none; font-size: 10px;"><span style="color: oklch(0.86 0.14 92);">{{ roomSel.count }}</span> / {{ roomSel.total }} stations</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <sc-if value="{{ roomZoomed }}" hint-placeholder-val="{{ false }}">
+                  <button sc-camel-on-click="{{ roomZoomOut }}" style="height: 32px; padding: 0 14px; border: 1px solid oklch(0.86 0.14 92 / 0.55); border-radius: 999px; background: transparent; color: oklch(0.86 0.14 92); font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: background 0.25s ease, color 0.25s ease;" style-hover="background: oklch(0.86 0.14 92); color: #17140F;">Zoom out</button>
+                </sc-if>
+                <button sc-camel-on-click="{{ roomReset }}" style="height: 32px; padding: 0 14px; border: 1px solid rgba(245,240,230,0.2); border-radius: 999px; background: transparent; color: #DED5C4; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: background 0.25s ease, border-color 0.25s ease;" style-hover="background: rgba(245,240,230,0.08); border-color: rgba(245,240,230,0.45);">Reset view</button>
+              </div>
+            </div>
+            <div ref="{{ roomStageRef }}" sc-camel-tab-index="0" sc-camel-on-key-down="{{ roomKeys }}" sc-camel-on-pointer-down="{{ roomDown }}" sc-camel-on-pointer-move="{{ roomMove }}" sc-camel-on-pointer-up="{{ roomUp }}" sc-camel-on-pointer-cancel="{{ roomUp }}" data-m="roomstage" style="position: relative; height: {{ roomStageH }}; overflow: hidden; display: grid; place-items: center; perspective: 1500px; perspective-origin: 50% 46%; cursor: {{ roomCursor }}; touch-action: none; user-select: none; outline: none;">
+              <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(120% 90% at 50% 45%, transparent 52%, rgba(23,20,15,0.55) 100%);"></div>
+              <div aria-hidden="true" style="position: absolute; inset: 8% 6%; border-radius: 50%; background: radial-gradient(circle at 50% 45%, rgba(245,240,230,0.5), transparent 66%); filter: blur(64px); opacity: 0.22; pointer-events: none;"></div>
+              <div style="position: absolute; left: 50%; top: 50%; width: 740px; height: 740px; transform-style: preserve-3d; transform: {{ roomCam }}; transition: {{ roomCamTrans }};">
+                <div style="position: absolute; inset: 0; transform-style: preserve-3d; transform: {{ roomWorld }}; transition: transform 0.18s linear;">
+                <div aria-hidden="true" style="position: absolute; inset: 0; border-radius: 3px; background-color: #E4E1D8; background-image: radial-gradient(120% 90% at 32% 18%, rgba(255,255,255,0.85), transparent 62%), linear-gradient(rgba(23,20,15,0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(23,20,15,0.055) 1px, transparent 1px); background-size: 100% 100%, 70px 70px, 70px 70px; box-shadow: 0 0 60px rgba(23,20,15,0.22) inset;"></div>
+                <div aria-hidden="true" style="position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(112deg, transparent 18%, rgba(255,255,255,0.55) 30%, transparent 40%, transparent 60%, rgba(255,255,255,0.3) 70%, transparent 80%); opacity: 0.5; transform: translateZ(0.3px); pointer-events: none;"></div>
+                <div aria-hidden="true" style="position: absolute; inset: 0; border-radius: 3px; background: radial-gradient(120% 90% at 78% 82%, rgba(23,20,15,0.3), transparent 62%); transform: translateZ(0.4px); pointer-events: none;"></div>
+                <div aria-hidden="true" style="position: absolute; left: 30%; top: 46%; width: 250px; height: 160px; transform: translate(-50%, -50%) translateZ(0.4px); border: 2px dashed rgba(180,140,40,0.45); border-radius: 2px;"></div>
+                <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 250px; transform-origin: top center; transform: rotateX(90deg); background-color: #EFEBE1; background-image: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.1) 46%, rgba(23,20,15,0.1) 100%), linear-gradient(90deg, rgba(23,20,15,0.07) 2px, transparent 2px); background-size: 100% 100%, 140px 100%; border-top: 3px solid #FBF9F4; box-shadow: 0 -18px 30px -18px rgba(23,20,15,0.45) inset, 0 8px 20px -12px rgba(23,20,15,0.35) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #CFCBC1, #B9B5AA);"></div><div style="position: absolute; right: 10%; top: 20%; width: 74px; height: 46px; background: repeating-linear-gradient(180deg, #C4C0B5 0 3px, #A9A599 3px 6px); box-shadow: 0 0 0 2px #DCD8CE;"></div><div style="position: absolute; left: 12%; top: 26%; width: 168px; height: 96px; background: linear-gradient(160deg, #FCFBF7, #EFECE4); box-shadow: 0 0 0 3px #C9C5BA, 0 6px 14px -8px rgba(23,20,15,0.5);"></div><div style="position: absolute; left: 40%; top: 30%; width: 62px; height: 82px; background: #F7F5EF; box-shadow: 0 0 0 2px #B7B3A8;"></div><div style="position: absolute; left: 47%; top: 30%; width: 62px; height: 82px; background: #F7F5EF; box-shadow: 0 0 0 2px #B7B3A8;"></div><div style="position: absolute; right: 26%; top: 24%; width: 40px; height: 40px; border-radius: 50%; background: #FAF8F2; box-shadow: 0 0 0 3px #A9A599;"></div></div>
+                <div aria-hidden="true" style="position: absolute; left: 0; top: 0; bottom: 0; width: 250px; transform-origin: left center; transform: rotateY(-90deg); background-color: #E4E0D6; background-image: linear-gradient(90deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.05) 44%, rgba(23,20,15,0.14) 100%), linear-gradient(rgba(23,20,15,0.07) 2px, transparent 2px); background-size: 100% 100%, 100% 140px; border-left: 3px solid #F6F3EC; box-shadow: 0 -18px 30px -18px rgba(23,20,15,0.4) inset, 8px 0 20px -12px rgba(23,20,15,0.3) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #C9C5BA, #B2AEA3);"></div><div style="position: absolute; left: 22%; top: 0; bottom: 12px; width: 8px; background: linear-gradient(90deg, #B7B3A8, #DCD8CE, #A9A599);"></div><div style="position: absolute; left: 26%; top: 0; bottom: 12px; width: 5px; background: linear-gradient(90deg, #A9A599, #CFCBC1, #9A968B);"></div><div style="position: absolute; left: 58%; top: 34%; width: 54px; height: 34px; background: oklch(0.52 0.09 152); box-shadow: 0 0 0 2px #E4E0D7;"></div><div style="position: absolute; left: 74%; top: 30%; width: 90px; height: 60px; background: linear-gradient(160deg, #F7F5EF, #E4E0D7); box-shadow: 0 0 0 2px #BDB9AE;"></div></div>
+
+                <div aria-hidden="true" style="position: absolute; left: 34%; top: 34%; width: 420px; height: 190px; transform: translate(-50%, -50%) translateZ(0.5px); background: radial-gradient(closest-side, rgba(255,252,242,0.75), rgba(255,252,242,0.2) 58%, transparent 100%); filter: blur(16px); opacity: 0.55; pointer-events: none;"></div>
+                <div aria-hidden="true" style="position: absolute; left: 62%; top: 66%; width: 420px; height: 190px; transform: translate(-50%, -50%) translateZ(0.5px); background: radial-gradient(closest-side, rgba(255,252,242,0.7), rgba(255,252,242,0.18) 58%, transparent 100%); filter: blur(16px); opacity: 0.5; pointer-events: none;"></div>
+                <sc-for list="{{ roomLightsList }}" as="rlt" hint-placeholder-count="2">
+                  <div aria-hidden="true" style="position: absolute; left: {{ rlt.left }}; top: {{ rlt.top }}; width: {{ rlt.width }}; height: {{ rlt.height }}; transform: {{ rlt.t }}; border-radius: 3px; background: linear-gradient(180deg, #FFFDF6, #EFEADC); box-shadow: 0 0 40px 12px rgba(255,250,235,0.35);"></div>
+                </sc-for>
+
+                <div aria-hidden="true" style="position: absolute; left: 0; bottom: 0; width: 74px; height: 250px; transform-origin: bottom center; transform: rotateX(-90deg); background-color: #E9E5DB; background-image: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.08) 46%, rgba(23,20,15,0.12) 100%); border-top: 3px solid #F6F3EC; box-shadow: -10px 0 22px -14px rgba(23,20,15,0.55) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #C9C5BA, #B2AEA3);"></div></div>
+                <div aria-hidden="true" style="position: absolute; right: 0; top: 0; width: 250px; height: 74px; transform-origin: right center; transform: rotateY(90deg); background-color: #E7E3D9; background-image: linear-gradient(90deg, rgba(23,20,15,0.12) 0%, rgba(255,255,255,0.1) 54%, rgba(255,255,255,0.72) 100%); border-right: 3px solid #F6F3EC; box-shadow: 0 -10px 22px -14px rgba(23,20,15,0.5) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #C9C5BA, #B2AEA3);"></div></div>
+                <sc-for list="{{ roomStations }}" as="rs" hint-placeholder-count="7">
+                  <div sc-camel-on-mouse-enter="{{ rs.enter }}" sc-camel-on-mouse-leave="{{ rs.leave }}" sc-camel-on-click="{{ rs.pick }}" style="position: absolute; left: {{ rs.left }}; top: {{ rs.top }}; width: {{ rs.width }}; height: {{ rs.height }}; transform-style: preserve-3d; transform: {{ rs.wrap }}; cursor: pointer; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1);">
+                    <div aria-hidden="true" style="position: absolute; inset: -4px; border-radius: 12px; background: radial-gradient(closest-side, rgba(23,20,15,0.62), rgba(23,20,15,0.28) 62%, transparent 100%); transform: {{ rs.shadowT }}; filter: {{ rs.shadowBlur }}; opacity: {{ rs.shadowO }};"></div>
+                    <div aria-hidden="true" style="position: absolute; left: 2px; right: 2px; top: 100%; height: {{ rs.reflH }}; background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12) 52%, transparent 88%); transform: {{ rs.reflT }}; filter: blur(5px); opacity: 0.4;"></div>
+                    <div style="position: absolute; inset: 0; border-radius: 2px; background: {{ rs.topBg }}; box-shadow: {{ rs.topRing }}, 0 1px 2px rgba(255,255,255,0.5) inset; transform: {{ rs.topT }}; transition: box-shadow 0.35s ease;">
+                      <div aria-hidden="true" style="position: absolute; inset: 0; border-radius: 2px; background: linear-gradient(118deg, transparent 26%, rgba(255,255,255,0.55) 42%, rgba(255,255,255,0.1) 52%, transparent 66%); opacity: 0.75;"></div>
+                      <div style="position: absolute; inset: 0; border-radius: 2px; background: oklch(0.86 0.14 92); opacity: {{ rs.warmO }}; transition: opacity 0.35s ease;"></div>
+                    </div>
+                    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: {{ rs.sideH }}; transform-origin: bottom center; transform: rotateX(-90deg); background: {{ rs.southBg }}; box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 -16px 20px -14px rgba(23,20,15,0.75) inset;">
+                      <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.16), transparent 40%, rgba(23,20,15,0.14));"></div>
+                      <div style="position: absolute; inset: 0; background: oklch(0.86 0.14 92); opacity: {{ rs.warmO }}; transition: opacity 0.35s ease;"></div>
+                    </div>
+                    <div style="position: absolute; top: 0; bottom: 0; right: 0; width: {{ rs.sideH }}; transform-origin: right center; transform: rotateY(90deg); background: {{ rs.eastBg }}; filter: brightness(0.82); box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 -16px 20px -14px rgba(23,20,15,0.8) inset;">
+                      <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.1), transparent 46%, rgba(23,20,15,0.2));"></div>
+                      <div style="position: absolute; inset: 0; background: oklch(0.86 0.14 92); opacity: {{ rs.warmO }}; transition: opacity 0.35s ease;"></div>
+                    </div>
+                    <div aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: 1px; height: 26px; transform-origin: bottom center; transform: {{ rs.stemT }}; background: linear-gradient(rgba(23,20,15,0.5), rgba(23,20,15,0.05));"></div>
+                    <div style="position: absolute; left: 50%; top: 50%; transform: {{ rs.pinT }}; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; border: 1px solid {{ rs.pinBorder }}; background: {{ rs.pinBg }}; color: {{ rs.pinFg }}; font-family: 'DM Mono', monospace; font-size: 9.5px; box-shadow: 0 6px 14px -6px rgba(0,0,0,0.6); transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;">{{ rs.no }}</div>
+                  </div>
+                </sc-for>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="display: grid; gap: 18px;">
+            <div style="display: grid; align-content: start; gap: 6px;">
+              <sc-for list="{{ roomList }}" as="rl" hint-placeholder-count="6">
+                <button sc-camel-on-click="{{ rl.pick }}" sc-camel-on-mouse-enter="{{ rl.enter }}" sc-camel-on-mouse-leave="{{ rl.leave }}" data-m="roomrow" style="position: relative; text-align: left; cursor: pointer; border: 1px solid {{ rl.border }}; border-radius: 6px; background: {{ rl.bg }}; padding: 10px 14px 11px 18px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 11px; align-items: center; transform: {{ rl.lift }}; transition: background 0.3s ease, border-color 0.3s ease, transform 0.4s cubic-bezier(0.2,0.7,0.2,1);">
+                  <span aria-hidden="true" style="position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: oklch(0.86 0.14 92); transform: scaleY({{ rl.railScale }}); transition: transform 0.4s cubic-bezier(0.2,0.7,0.2,1);"></span>
+                  <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; color: {{ rl.numColor }}; transition: color 0.3s ease;">{{ rl.no }}</span>
+                  <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 15px; color: {{ rl.keyColor }}; transition: color 0.3s ease;">{{ rl.key }}</span>
+                  <span style="grid-column: 2; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: {{ rl.prevColor }}; transition: color 0.3s ease;">{{ rl.prevents }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
     <section data-m="pad short" style="position: relative; background: #17140F; color: #F5F0E6; padding: 92px 44px; overflow: hidden;">
       <div aria-hidden="true" style="position: absolute; left: -120px; bottom: -180px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.12), transparent 70%); pointer-events: none;"></div>
       <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; max-width: 1180px; margin: 0 auto;">
@@ -2570,6 +2656,7 @@ class Component extends DCLogic {
   state = { wkSel: 0, igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null, signedIn: false, wholesale: false, trade: null,
+    roomSel: 0, roomHov: null, roomYaw: -42, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
@@ -2578,6 +2665,199 @@ class Component extends DCLogic {
     return e => {
       const v = e.target.value;
       this.setState(st => ({ co: { ...st.co, [k]: v } }));
+    };
+  }
+
+
+  roomDefs() {
+    const steel = 'linear-gradient(140deg,#F6F4EE 0%,#D4D0C6 54%,#E9E5DC 100%)';
+    const steelSide = 'linear-gradient(180deg,#EDEAE2,#CFCBC1)';
+    return [
+      { key: 'Gowning airlock', no: '01', x: 13, y: 30, w: 66, d: 96, h: 128,
+        top: 'linear-gradient(140deg,#F2EFE7,#D8D4CA)',
+        south: 'linear-gradient(rgba(150,196,206,0.34),rgba(120,168,184,0.16)) 50% 34%/62% 52% no-repeat, linear-gradient(#8E8879,#8E8879) 50% 60%/26% 1.6% no-repeat, linear-gradient(180deg,#EFECE4,#D3CFC5)',
+        east: 'linear-gradient(#C9C5BA,#C9C5BA) 50% 18%/70% 2% no-repeat, linear-gradient(180deg,#E4E0D8,#C6C2B8)',
+        prevents: 'The room bringing itself in',
+        body: 'Nobody walks in from the parking lot. Gowning, tacky mat, air shower, then the suite — because the fastest way to contaminate a batch is to wear the outside into it.',
+        meta: 'ISO 8 · gowned entry only' },
+      { key: 'Cold storage', no: '02', x: 36, y: 13, w: 88, d: 58, h: 138,
+        top: steel,
+        south: 'linear-gradient(#8E8879,#8E8879) 42% 26%/1.8% 40% no-repeat, linear-gradient(#8E8879,#8E8879) 58% 26%/1.8% 40% no-repeat, linear-gradient(90deg, transparent 0 49%, #B4AEA1 49% 50.6%, transparent 50.6% 100%), linear-gradient(#0E3B33,#0E3B33) 50% 8%/26% 7% no-repeat, ' + steelSide,
+        east: steelSide,
+        prevents: 'Actives dying before they are dosed',
+        body: 'Fish oils, probiotics and anything light- or heat-sensitive live at 2–8 °C from delivery to fill, on a logger that alarms a phone at night if the door is left ajar.',
+        meta: '2–8 °C · logged every 5 min' },
+      { key: 'Drying oven', no: '03', x: 55, y: 12, w: 78, d: 56, h: 104,
+        top: steel,
+        south: 'linear-gradient(#1E1B16,#0C0A08) 50% 38%/64% 42% no-repeat, linear-gradient(rgba(255,255,255,0.2),transparent) 50% 38%/64% 42% no-repeat, linear-gradient(#C6C1B5,#A9A497) 50% 84%/72% 9% no-repeat, ' + steelSide,
+        east: steelSide,
+        prevents: 'Moisture ruining a good powder',
+        body: 'Excipients and botanicals are dried to a target water activity before blending. Damp powder cakes, doses unevenly, and shortens the shelf life we just promised.',
+        meta: 'Loss on drying < 5%' },
+      { key: 'Stability chamber', no: '04', x: 77, y: 15, w: 92, d: 64, h: 124,
+        top: steel,
+        south: 'linear-gradient(#0E3B33,#08221D) 50% 12%/40% 11% no-repeat, linear-gradient(rgba(120,255,210,0.5),rgba(120,255,210,0.5)) 38% 12%/3% 3% no-repeat, linear-gradient(#8E8879,#8E8879) 78% 44%/2.4% 34% no-repeat, linear-gradient(90deg, transparent 0 5%, rgba(150,196,206,0.28) 5% 72%, transparent 72% 100%) 50% 46%/100% 40% no-repeat, ' + steelSide,
+        east: steelSide,
+        prevents: 'A jar that quietly fades',
+        body: 'Samples of every formulation sit here for the length of their claimed shelf life, accelerated and real-time. If potency falls before the date on the jar, the date changes.',
+        meta: '40 °C / 75% RH · 24 months' },
+      { key: 'HPLC bay', no: '05', x: 86, y: 52, w: 66, d: 132, h: 62,
+        top: steel,
+        south: 'linear-gradient(#2A2620,#2A2620) 50% 22%/76% 16% no-repeat, linear-gradient(#2A2620,#2A2620) 50% 50%/76% 16% no-repeat, linear-gradient(#0E3B33,#0E3B33) 50% 78%/76% 16% no-repeat, ' + steelSide,
+        east: 'linear-gradient(#C9C5BA,#C9C5BA) 50% 50%/86% 2% no-repeat, ' + steelSide,
+        prevents: "A supplier's word standing in for proof",
+        body: 'Every incoming lot is run against our own validated method, and every finished lot again before release. This is where we get to refuse a shipment and say exactly why.',
+        meta: '100% of lots, identity and potency' },
+      { key: 'Fill and seal island', no: '06', x: 46, y: 56, w: 156, d: 84, h: 36,
+        top: 'linear-gradient(140deg,#FBFAF6,#DAD6CC 60%,#EEEAE1), radial-gradient(circle at 30% 40%, rgba(0,0,0,0.05), transparent 40%)',
+        south: 'linear-gradient(90deg, rgba(0,0,0,0.08) 0 4%, transparent 4% 96%, rgba(0,0,0,0.08) 96% 100%), ' + steelSide,
+        east: steelSide,
+        prevents: 'An unsigned jar leaving the room',
+        body: 'Jars are filled, capped, dated and initialled by the person who made them, then a retain from the lot leaves the same day for an independent laboratory.',
+        meta: 'Signed by name · retain pulled per lot' },
+      { key: "Beanie's bed", no: '07', x: 17, y: 88, w: 74, d: 52, h: 16,
+        top: 'radial-gradient(circle at 50% 50%, #C6A98A, #A6825E)',
+        south: 'linear-gradient(180deg,#B08F6C,#8A6B4C)',
+        east: 'linear-gradient(180deg,#A98868,#856546)',
+        prevents: 'Us forgetting who this is for',
+        body: 'Beanie was fourteen when the first stack was built for her. Her bed stays in the corner of a cleanroom, which is a cheap way to remember all of this is for an animal on a floor somewhere.',
+        meta: 'Est. 2008 · still in the corner' }
+    ];
+  }
+
+  roomLights() {
+    return [
+      { left: '34%', top: '34%', width: '280px', height: '22px' },
+      { left: '62%', top: '66%', width: '280px', height: '22px' }
+    ].map((l, i) => ({ ...l, key: 'l' + i, t: 'translate(-50%, -50%) translateZ(250px)' }));
+  }
+
+  roomMeasure = () => {
+    const el = this._roomStage;
+    if (!el) return;
+    const w = el.getBoundingClientRect().width;
+    if (w && Math.abs((this.state.roomW || 0) - w) > 2) this.setState({ roomW: w });
+    // only allow the camera to animate once a real measurement has painted
+    if (w && !this.state.roomReady) {
+      requestAnimationFrame(() => { if (!this.state.roomReady) this.setState({ roomReady: true }); });
+    }
+  };
+
+  roomPointer(e, kind) {
+    if (kind === 'down') {
+      this._roomDrag = { x: e.clientX, y: e.clientY, yaw: this.state.roomYaw, tilt: this.state.roomTilt };
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+      this.setState({ roomGrab: true });
+      return;
+    }
+    if (kind === 'up') { this._roomDrag = null; this.setState({ roomGrab: false }); return; }
+    const d = this._roomDrag;
+    if (!d) return;
+    this.setState({
+      roomYaw: (d.yaw == null ? -42 : d.yaw) + (e.clientX - d.x) * 0.22,
+      roomTilt: Math.max(36, Math.min(76, (d.tilt == null ? 56 : d.tilt) + (e.clientY - d.y) * 0.12))
+    });
+  }
+
+  roomK() {
+    return Math.min(1.1, Math.max(0.3, (this.state.roomW || 900) / 1260));
+  }
+
+  roomVals() {
+    const defs = this.roomDefs();
+    const i = Math.min(defs.length - 1, this.state.roomSel || 0);
+    const hov = this.state.roomHov;
+    const yaw = this.state.roomYaw == null ? -42 : this.state.roomYaw;
+    const tilt = this.state.roomTilt == null ? 56 : this.state.roomTilt;
+    const bill = ' rotateZ(' + (-yaw).toFixed(1) + 'deg) rotateX(' + (-tilt).toFixed(1) + 'deg)';
+    const sel = defs[i];
+    return {
+      roomStageRef: (el) => {
+        this._roomStage = el;
+        if (el && !this._roomRO && typeof ResizeObserver !== 'undefined') {
+          this._roomRO = new ResizeObserver(this.roomMeasure);
+          this._roomRO.observe(el);
+        }
+        this.roomMeasure();
+      },
+      roomCam: (() => {
+        const k = this.roomK();
+        if (!this.state.roomZoom) return 'translate(-50%, -50%) scale(' + k.toFixed(3) + ')';
+        const W = 740, z = 1.42;
+        const ty = yaw * Math.PI / 180, tx = tilt * Math.PI / 180;
+        const u = ((sel.x - 50) / 100) * W, v = ((sel.y - 50) / 100) * W, w = sel.h / 2;
+        const rx = u * Math.cos(ty) - v * Math.sin(ty);
+        const ry = u * Math.sin(ty) + v * Math.cos(ty);
+        let sx = rx, sy = ry * Math.cos(tx) - w * Math.sin(tx);
+        // keep the pan inside the frame so the room never gets sliced by the stage edges
+        const stageW = this.state.roomW || 900, stageH = 760 * k + 84;
+        // clamp from the room's real projected size, not the stage box
+        const worldW = 1097, worldH = 849;
+        const maxX = Math.max(0, (worldW * k * z - stageW) * 0.5) / (k * z);
+        const maxY = Math.max(0, (worldH * k * z - stageH) * 0.5) / (k * z);
+        sx = Math.max(-maxX, Math.min(maxX, sx));
+        sy = Math.max(-maxY, Math.min(maxY, sy));
+        return 'translate(-50%, -50%) scale(' + (k * z).toFixed(3) + ') translate(' + (-sx).toFixed(1) + 'px, ' + (-sy).toFixed(1) + 'px)';
+      })(),
+      roomCamTrans: (!this.state.roomReady || this.reduced) ? 'none' : (this.state.roomGrab ? 'transform 0.1s linear' : 'transform 0.85s cubic-bezier(0.22,0.75,0.16,1)'),
+      roomZoomed: !!this.state.roomZoom,
+      roomZoomOut: () => this.setState({ roomZoom: false }),
+      roomStageH: Math.round(760 * this.roomK() + 84) + 'px',
+      roomWorld: 'rotateX(' + tilt.toFixed(1) + 'deg) rotateZ(' + yaw.toFixed(1) + 'deg)',
+      roomLightsList: this.roomLights(),
+      roomStations: defs.map((d, n) => {
+        const on = n === i;
+        const warm = on || hov === n;
+        const lift = on ? 14 : (hov === n ? 7 : 0);
+        return {
+          key: d.key, no: d.no,
+          left: d.x + '%', top: d.y + '%',
+          width: d.w + 'px', height: d.d + 'px',
+          wrap: 'translate(-50%, -50%) translateZ(' + lift + 'px)',
+          topT: 'translateZ(' + d.h + 'px)',
+          sideH: d.h + 'px',
+          topBg: d.top, southBg: d.south, eastBg: d.east,
+          shadowT: 'translateZ(' + (0.6 - lift) + 'px) translate(' + (14 + d.h * 0.16).toFixed(0) + 'px, ' + (12 + d.h * 0.14).toFixed(0) + 'px)',
+          shadowBlur: 'blur(' + (7 + lift * 0.7 + d.h * 0.05).toFixed(1) + 'px)',
+          shadowO: (0.5 - lift * 0.008).toFixed(2),
+          reflT: 'translateZ(' + (0.7 - lift) + 'px)',
+          reflH: Math.round(d.h * 0.62) + 'px',
+          warmO: warm ? 0.42 : 0,
+          topRing: warm ? '0 0 0 1.5px oklch(0.78 0.14 90), 0 0 34px oklch(0.86 0.14 92 / 0.5)' : '0 0 0 1px rgba(23,20,15,0.18)',
+          pinT: 'translate(-50%, -50%) translateZ(' + (d.h + lift + 32) + 'px)' + bill,
+          pinBg: warm ? 'oklch(0.86 0.14 92)' : 'rgba(23,20,15,0.88)',
+          pinFg: warm ? '#17140F' : '#EDE7DA',
+          pinBorder: warm ? 'oklch(0.86 0.14 92)' : 'rgba(23,20,15,0.6)',
+          stemT: 'translate(-50%, -100%) translateZ(' + (d.h + lift) + 'px)' + bill,
+          enter: () => this.setState({ roomHov: n }),
+          leave: () => this.setState({ roomHov: null }),
+          pick: () => this.setState({ roomSel: n, roomHov: n, roomZoom: !(this.state.roomSel === n && this.state.roomZoom) })
+        };
+      }),
+      roomSel: { ...sel, count: String(i + 1).padStart(2, '0'), total: String(defs.length).padStart(2, '0') },
+      roomList: defs.map((d, n) => {
+        const on = n === i;
+        return { key: d.key, no: d.no, prevents: d.prevents,
+          pick: () => this.setState({ roomSel: n, roomZoom: true }),
+          enter: () => this.setState({ roomHov: n }),
+          leave: () => this.setState({ roomHov: null }),
+          bg: on ? '#231F17' : 'transparent',
+          border: on ? 'oklch(0.86 0.14 92 / 0.5)' : 'rgba(245,240,230,0.13)',
+          lift: on ? 'translateX(6px)' : 'translateX(0)',
+          numColor: on ? 'oklch(0.86 0.14 92)' : '#6F6659',
+          keyColor: on ? '#F5F0E6' : '#DED5C4',
+          prevColor: on ? '#B9AF9C' : '#6F6659',
+          railScale: on ? 1 : 0 };
+      }),
+      roomCursor: this.state.roomGrab ? 'grabbing' : 'grab',
+      roomDown: (e) => this.roomPointer(e, 'down'),
+      roomMove: (e) => this.roomPointer(e, 'move'),
+      roomUp: (e) => this.roomPointer(e, 'up'),
+      roomReset: () => this.setState({ roomYaw: -42, roomTilt: 56, roomZoom: false }),
+      roomKeys: (e) => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); this.setState({ roomSel: (i + 1) % defs.length }); }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); this.setState({ roomSel: (i - 1 + defs.length) % defs.length }); }
+      }
     };
   }
 
@@ -2983,6 +3263,7 @@ class Component extends DCLogic {
 
   componentWillUnmount() {
     if (this._wkTimer) { clearInterval(this._wkTimer); this._wkTimer = null; }
+    if (this._roomRO) { this._roomRO.disconnect(); this._roomRO = null; }
     this.stopField();
     this.stopPings();
     window.removeEventListener('scroll', this.onScroll);
@@ -4432,6 +4713,7 @@ Object.assign(Component.prototype, {
       qzOrderSub: verdict === 'ok'
         ? this.qzDose() + ', given with a meal.'
         : '',
+      ...this.roomVals(),
       onQuizPage: (st.page || 'home') === 'quiz',
       goQuiz: this.nav('quiz'),
       qzNavColor: (st.page || 'home') === 'quiz' ? 'oklch(0.44 0.07 152)' : '#17140F',
