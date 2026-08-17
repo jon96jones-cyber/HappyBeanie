@@ -2610,7 +2610,7 @@ class Component extends DCLogic {
   state = { wkSel: 0, igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null, signedIn: false, wholesale: false, trade: null,
-    roomSel: 0, roomHov: null, roomYaw: -42, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
+    roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
@@ -2769,7 +2769,7 @@ class Component extends DCLogic {
     }
     d.moved = Math.max(d.moved, Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y));
     this.setState({
-      roomYaw: (d.yaw == null ? -42 : d.yaw) + (e.clientX - d.x) * 0.22,
+      roomYaw: (d.yaw == null ? 45 : d.yaw) + (e.clientX - d.x) * 0.22,
       roomTilt: Math.max(36, Math.min(76, (d.tilt == null ? 56 : d.tilt) + (e.clientY - d.y) * 0.12))
     });
   }
@@ -2782,7 +2782,7 @@ class Component extends DCLogic {
     const defs = this.roomDefs();
     const i = Math.min(defs.length - 1, this.state.roomSel || 0);
     const hov = this.state.roomHov;
-    const yaw = this.state.roomYaw == null ? -42 : this.state.roomYaw;
+    const yaw = this.state.roomYaw == null ? 45 : this.state.roomYaw;
     const tilt = this.state.roomTilt == null ? 56 : this.state.roomTilt;
     const bill = ' rotateZ(' + (-yaw).toFixed(1) + 'deg) rotateX(' + (-tilt).toFixed(1) + 'deg)';
     const sel = defs[i];
@@ -2869,7 +2869,7 @@ class Component extends DCLogic {
       roomDown: (e) => this.roomPointer(e, 'down'),
       roomMove: (e) => this.roomPointer(e, 'move'),
       roomUp: (e) => this.roomPointer(e, 'up'),
-      roomReset: () => this.setState({ roomYaw: -42, roomTilt: 56, roomZoom: false }),
+      roomReset: () => this.setState({ roomYaw: 45, roomTilt: 56, roomZoom: false }),
       roomKeys: (e) => {
         if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); this.setState({ roomSel: (i + 1) % defs.length }); }
         if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); this.setState({ roomSel: (i - 1 + defs.length) % defs.length }); }
