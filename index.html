@@ -1734,11 +1734,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
 
         <div data-m="stack gap" style="display: grid; grid-template-columns: minmax(0, 1fr) clamp(240px, 26%, 360px); gap: clamp(20px, 3vw, 40px); align-items: start;">
           <div>
-            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px;">
-              <div style="display: flex; align-items: center; gap: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #6F6659; white-space: nowrap;">
-                <span>Click a station to zoom in</span>
-                <span style="color: #DED5C4; letter-spacing: 0.14em; text-transform: none; font-size: 10px;"><span style="color: oklch(0.86 0.14 92);">{{ roomSel.count }}</span> / {{ roomSel.total }} stations</span>
-              </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 14px; margin-bottom: 14px;">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <sc-if value="{{ roomZoomed }}" hint-placeholder-val="{{ false }}">
                   <button sc-camel-on-click="{{ roomZoomOut }}" style="height: 32px; padding: 0 14px; border: 1px solid oklch(0.86 0.14 92 / 0.55); border-radius: 999px; background: transparent; color: oklch(0.86 0.14 92); font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: background 0.25s ease, color 0.25s ease;" style-hover="background: oklch(0.86 0.14 92); color: #17140F;">Zoom out</button>
