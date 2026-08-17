@@ -373,10 +373,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="pad"]   { padding-left: 20px !important; padding-right: 20px !important; }
     [data-m~="short"] { padding-top: 56px !important; padding-bottom: 56px !important; }
     [data-m~="hide"]  { display: none !important; }
-  [data-m~="roomrow"] { padding: 8px 12px 9px 15px !important; gap: 0 9px !important; }
-  [data-m~="isogrid"] { -webkit-mask-image: radial-gradient(46% 22% at 0% 0%, #000 0%, transparent 74%), radial-gradient(46% 22% at 100% 0%, #000 0%, transparent 74%) !important; mask-image: radial-gradient(46% 22% at 0% 0%, #000 0%, transparent 74%), radial-gradient(46% 22% at 100% 0%, #000 0%, transparent 74%) !important; }
+  [data-m~="roomrow"] { padding: 8px 12px 9px 15px !important; gap: 2px 9px !important; }
   [data-m~="roomrow"] > span:nth-child(2) { font-size: 8.5px !important; }
   [data-m~="roomrow"] > span:nth-child(3) { font-size: 13px !important; }
+  [data-m~="roomrow"] > span:last-child { font-size: 7.5px !important; }
     [data-m~="showf"] { display: flex !important; }
     [data-m~="first"] { order: -1 !important; }
     [data-m~="nostick"] { position: static !important; }
@@ -1727,7 +1727,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
   <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
   <div>
     <section data-m="pad short" style="position: relative; background: #17140F; color: #F5F0E6; padding: 82px 44px 78px; overflow: hidden;">
-      <div aria-hidden="true" data-m="isogrid" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.05) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(42% 48% at 0% 0%, #000 0%, transparent 72%), radial-gradient(42% 48% at 100% 0%, #000 0%, transparent 72%); -webkit-mask-image: radial-gradient(42% 48% at 0% 0%, #000 0%, transparent 72%), radial-gradient(42% 48% at 100% 0%, #000 0%, transparent 72%);"></div>
+      <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.05) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(110% 90% at 85% 0%, #000 12%, transparent 78%); -webkit-mask-image: radial-gradient(110% 90% at 85% 0%, #000 12%, transparent 78%);"></div>
       <div aria-hidden="true" style="position: absolute; right: -140px; top: -180px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, oklch(0.72 0.08 152 / 0.16), transparent 70%); pointer-events: none;"></div>
 
       <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
@@ -1796,10 +1796,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
           <div style="display: grid; gap: 18px;">
             <div style="display: grid; align-content: start; gap: 6px;">
               <sc-for list="{{ roomList }}" as="rl" hint-placeholder-count="6">
-                <button sc-camel-on-click="{{ rl.pick }}" sc-camel-on-mouse-enter="{{ rl.enter }}" sc-camel-on-mouse-leave="{{ rl.leave }}" data-m="roomrow" style="position: relative; text-align: left; cursor: pointer; border: 1px solid {{ rl.border }}; border-radius: 6px; background: {{ rl.bg }}; padding: 10px 14px 11px 18px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 11px; align-items: center; transform: {{ rl.lift }}; transition: background 0.3s ease, border-color 0.3s ease, transform 0.4s cubic-bezier(0.2,0.7,0.2,1);">
+                <button sc-camel-on-click="{{ rl.pick }}" sc-camel-on-mouse-enter="{{ rl.enter }}" sc-camel-on-mouse-leave="{{ rl.leave }}" data-m="roomrow" style="position: relative; text-align: left; cursor: pointer; border: 1px solid {{ rl.border }}; border-radius: 6px; background: {{ rl.bg }}; padding: 10px 14px 11px 18px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 11px; align-items: center; transform: {{ rl.lift }}; transition: background 0.3s ease, border-color 0.3s ease, transform 0.4s cubic-bezier(0.2,0.7,0.2,1);">
                   <span aria-hidden="true" style="position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: oklch(0.86 0.14 92); transform: scaleY({{ rl.railScale }}); transition: transform 0.4s cubic-bezier(0.2,0.7,0.2,1);"></span>
                   <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; color: {{ rl.numColor }}; transition: color 0.3s ease;">{{ rl.no }}</span>
                   <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 15px; color: {{ rl.keyColor }}; transition: color 0.3s ease;">{{ rl.key }}</span>
+                  <span style="grid-column: 2; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: {{ rl.prevColor }}; transition: color 0.3s ease;">{{ rl.prevents }}</span>
                 </button>
               </sc-for>
             </div>
