@@ -1768,7 +1768,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
                 <div aria-hidden="true" style="position: absolute; left: 0; bottom: 0; width: 74px; height: 250px; transform-origin: bottom center; transform: rotateX(-90deg); background-color: #E9E5DB; background-image: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.08) 46%, rgba(23,20,15,0.12) 100%); border-top: 3px solid #F6F3EC; box-shadow: -10px 0 22px -14px rgba(23,20,15,0.55) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #C9C5BA, #B2AEA3);"></div></div>
                 <div aria-hidden="true" style="position: absolute; right: 0; top: 0; width: 250px; height: 74px; transform-origin: right center; transform: rotateY(90deg); background-color: #E7E3D9; background-image: linear-gradient(90deg, rgba(23,20,15,0.12) 0%, rgba(255,255,255,0.1) 54%, rgba(255,255,255,0.72) 100%); border-right: 3px solid #F6F3EC; box-shadow: 0 -10px 22px -14px rgba(23,20,15,0.5) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #C9C5BA, #B2AEA3);"></div></div>
                 <sc-for list="{{ roomStations }}" as="rs" hint-placeholder-count="7">
-                  <div sc-camel-on-mouse-enter="{{ rs.enter }}" sc-camel-on-mouse-leave="{{ rs.leave }}" sc-camel-on-click="{{ rs.pick }}" style="position: absolute; left: {{ rs.left }}; top: {{ rs.top }}; width: {{ rs.width }}; height: {{ rs.height }}; transform-style: preserve-3d; transform: {{ rs.wrap }}; cursor: pointer; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1);">
+                  <div data-station="{{ rs.idx }}" sc-camel-on-mouse-enter="{{ rs.enter }}" sc-camel-on-mouse-leave="{{ rs.leave }}" style="position: absolute; left: {{ rs.left }}; top: {{ rs.top }}; width: {{ rs.width }}; height: {{ rs.height }}; transform-style: preserve-3d; transform: {{ rs.wrap }}; cursor: pointer; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1);">
                     <div aria-hidden="true" style="position: absolute; inset: -4px; border-radius: 12px; background: radial-gradient(closest-side, rgba(23,20,15,0.62), rgba(23,20,15,0.28) 62%, transparent 100%); transform: {{ rs.shadowT }}; filter: {{ rs.shadowBlur }}; opacity: {{ rs.shadowO }};"></div>
                     <div aria-hidden="true" style="position: absolute; left: 2px; right: 2px; top: 100%; height: {{ rs.reflH }}; background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12) 52%, transparent 88%); transform: {{ rs.reflT }}; filter: blur(5px); opacity: 0.4;"></div>
                     <div style="position: absolute; inset: 0; border-radius: 2px; background: {{ rs.topBg }}; box-shadow: {{ rs.topRing }}, 0 1px 2px rgba(255,255,255,0.5) inset; transform: {{ rs.topT }}; transition: box-shadow 0.35s ease;">
@@ -2703,16 +2703,77 @@ class Component extends DCLogic {
     }
   };
 
+  // Selecting a unit cannot ride on click: the stage captures the pointer on
+  // pointerdown (so a drag survives leaving the element), and pointer capture
+  // retargets the following click to the stage. So a press that ends without
+  // travelling is treated as a tap on whichever unit it started on — which is
+  // also what makes this work under touch.
+  roomPick(n) {
+    this.setState(st => ({ roomSel: n, roomHov: n, roomZoom: !(st.roomSel === n && st.roomZoom) }));
+  }
+
+  // Which unit is under a screen point. DOM hit testing can't answer this:
+  // inside a preserve-3d subtree the browser only hit-tests each unit's flat
+  // floor footprint, not the elevated box that is actually drawn, so a click
+  // on a visible unit lands on the camera plane instead. Resolve it from the
+  // projected silhouette — the union of the unit's own box with its drawn
+  // faces and pin (decorative children are aria-hidden and skipped).
+  roomHit(cx, cy) {
+    const stage = this._roomStage;
+    if (!stage) return null;
+    const hosts = stage.querySelectorAll('[data-station]');
+    let best = null, bestD = Infinity;
+    for (let i = 0; i < hosts.length; i++) {
+      const host = hosts[i];
+      const parts = [host].concat(Array.prototype.slice.call(host.children));
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (let j = 0; j < parts.length; j++) {
+        const el = parts[j];
+        if (el.getAttribute && el.getAttribute('aria-hidden') === 'true') continue;
+        const r = el.getBoundingClientRect();
+        if (!r.width && !r.height) continue;
+        if (r.left < x0) x0 = r.left;
+        if (r.top < y0) y0 = r.top;
+        if (r.right > x1) x1 = r.right;
+        if (r.bottom > y1) y1 = r.bottom;
+      }
+      if (x0 === Infinity) continue;
+      if (cx < x0 || cx > x1 || cy < y0 || cy > y1) continue;
+      // overlapping silhouettes: take the nearest centre, which reads as the
+      // unit in front
+      const d = Math.abs(cx - (x0 + x1) / 2) + Math.abs(cy - (y0 + y1) / 2);
+      if (d < bestD) { bestD = d; best = parseInt(host.getAttribute('data-station'), 10); }
+    }
+    return isNaN(best) ? null : best;
+  }
+
   roomPointer(e, kind) {
     if (kind === 'down') {
-      this._roomDrag = { x: e.clientX, y: e.clientY, yaw: this.state.roomYaw, tilt: this.state.roomTilt };
+      this._roomDrag = { x: e.clientX, y: e.clientY, yaw: this.state.roomYaw, tilt: this.state.roomTilt,
+        station: this.roomHit(e.clientX, e.clientY), moved: 0 };
       try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
       this.setState({ roomGrab: true });
       return;
     }
-    if (kind === 'up') { this._roomDrag = null; this.setState({ roomGrab: false }); return; }
+    if (kind === 'up') {
+      const d = this._roomDrag;
+      this._roomDrag = null;
+      this.setState({ roomGrab: false });
+      if (d && d.station != null && d.moved < 6) this.roomPick(d.station);
+      return;
+    }
     const d = this._roomDrag;
-    if (!d) return;
+    if (!d) {
+      // idle hover — cheap enough while nothing is animating, and guarded so
+      // it only recomputes after the pointer actually travels
+      const lx = this._roomHovAt;
+      if (lx && Math.abs(lx.x - e.clientX) + Math.abs(lx.y - e.clientY) < 5) return;
+      this._roomHovAt = { x: e.clientX, y: e.clientY };
+      const over = this.roomHit(e.clientX, e.clientY);
+      if (over !== this.state.roomHov) this.setState({ roomHov: over });
+      return;
+    }
+    d.moved = Math.max(d.moved, Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y));
     this.setState({
       roomYaw: (d.yaw == null ? -42 : d.yaw) + (e.clientX - d.x) * 0.22,
       roomTilt: Math.max(36, Math.min(76, (d.tilt == null ? 56 : d.tilt) + (e.clientY - d.y) * 0.12))
@@ -2791,7 +2852,8 @@ class Component extends DCLogic {
           stemT: 'translate(-50%, -100%) translateZ(' + (d.h + lift) + 'px)' + bill,
           enter: () => this.setState({ roomHov: n }),
           leave: () => this.setState({ roomHov: null }),
-          pick: () => this.setState({ roomSel: n, roomHov: n, roomZoom: !(this.state.roomSel === n && this.state.roomZoom) })
+          idx: n,
+          pick: () => this.roomPick(n)
         };
       }),
       roomSel: { ...sel, count: String(i + 1).padStart(2, '0'), total: String(defs.length).padStart(2, '0') },
