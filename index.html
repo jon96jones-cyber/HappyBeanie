@@ -1143,7 +1143,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <p style="font-size: 17px; line-height: 1.65; color: #B9AF9C; max-width: 34em; margin: 0 0 26px;">The world’s most powerful anti-aging pet supplement. A once a day supplement chew for dogs and cats.</p>
         <div style="position: relative; border-top: 1px solid rgba(245,240,230,0.16); border-bottom: 1px solid rgba(245,240,230,0.16); padding: 11px 0; margin-bottom: 42px; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 6%, #000 88%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 88%, transparent);">
           <div style="display: flex; width: max-content; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E; animation: shTicker 26s linear infinite;">
-            <span style="display: inline-flex;"><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>System online</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>2 formulations</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>23 ingredient inputs</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>Lot HB-0426 released</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>100% of lots assayed</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>cGMP · Scottsdale AZ</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>1,204 verified owners</span></span><span style="display: inline-flex;"><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>System online</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>2 formulations</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>23 ingredient inputs</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>Lot HB-0426 released</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>100% of lots assayed</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>cGMP · Scottsdale AZ</span><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>1,204 verified owners</span></span>
+            <span style="display: inline-flex;"><sc-for list="{{ tickerItems }}" as="tkr" hint-placeholder-count="9"><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>{{ tkr.label }}</span></sc-for></span><span style="display: inline-flex;"><sc-for list="{{ tickerItems }}" as="tkr2" hint-placeholder-count="9"><span style="display: inline-flex; align-items: center; gap: 10px; padding-right: 28px;"><span style="width: 4px; height: 4px; border-radius: 50%; background: oklch(0.86 0.14 92);"></span>{{ tkr2.label }}</span></sc-for></span>
           </div>
         </div>
         <div data-m="hide" style="display: flex; gap: 26px; flex-wrap: wrap; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E;">
@@ -3838,6 +3838,29 @@ class Component extends DCLogic {
       evGlow: this.evRecs()[this.state.evRec || 0].grade === 'Level I' ? 'oklch(0.86 0.14 92 / 0.16)' : 'oklch(0.72 0.08 152 / 0.14)',
       compare: compareRows,
       dosing: dosingRows,
+      // Hero ticker — facts a buyer can act on, not status filler. The two run
+      // counts come from /api/batch and only appear once it has loaded.
+      tickerItems: (() => {
+        const r = this.state.batch;
+        const live = [];
+        if (r && r.dog && typeof r.dog.remaining === 'number') {
+          live.push({ label: r.dog.remaining.toLocaleString('en-US') + ' of ' + r.dog.total.toLocaleString('en-US') + ' dog boxes left' });
+        }
+        if (r && r.cat && typeof r.cat.remaining === 'number') {
+          live.push({ label: r.cat.remaining.toLocaleString('en-US') + ' of ' + r.cat.total.toLocaleString('en-US') + ' cat boxes left' });
+        }
+        return [
+          { label: 'Lot HB-0426 released' }
+        ].concat(live, [
+          { label: 'Every lot third-party assayed' },
+          { label: 'cGMP · Scottsdale, AZ' },
+          { label: 'Human-grade · made in USA' },
+          { label: 'Ships in 24h · free over $60' },
+          { label: '30-day money-back guarantee' },
+          { label: 'Cancel anytime, one click' },
+          { label: '4.9/5 · 1,204 verified owners' }
+        ]);
+      })(),
       ...(() => {
         // Small-batch tracker — real numbers from /api/batch, hidden until
         // loaded. Each species has its own run; show the one being viewed.
