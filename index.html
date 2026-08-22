@@ -1279,8 +1279,9 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <div style="width: 100%; height: 100%; opacity: {{ pdpPhotoOpacity }}; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.045);"><image-slot id="{{ pdpSlotMain }}" placeholder="{{ pdpPhMain }}" style="width: 100%; height: 100%;"></image-slot></div>
             <!-- The stage is mounted imperatively into this node (see mountChew)
                  so a re-render never tears down the live WebGL context. -->
-            <div id="hbChewMount" style="position: absolute; inset: 0; display: {{ pdpStageDisplay }}; background: #EFE8D9;"></div>
-            <button sc-camel-on-click="{{ pdpReset }}" style="display: {{ pdpStageDisplay }}; position: absolute; right: 12px; bottom: 10px; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 14px; border: 1px solid #17140F; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer;">Reset</button>
+            <div id="hbChewMount" style="position: absolute; inset: 0; display: {{ pdpStageDisplay }}; opacity: {{ pdpStageOpacity }}; transition: opacity 0.4s ease; background: #EFE8D9;"></div>
+            <span style="display: {{ pdpLoadingDisplay }}; position: absolute; left: 12px; bottom: 10px; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 14px; border-radius: 3px; background: rgba(23,20,15,0.78); color: #F5F0E6; pointer-events: none;">Preparing 3D view…</span>
+            <button sc-camel-on-click="{{ pdpReset }}" style="display: {{ pdpResetDisplay }}; position: absolute; right: 12px; bottom: 10px; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 14px; border: 1px solid #17140F; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer;">Reset</button>
           </div>
           <sc-for list="{{ pdpCollage }}" as="cg" hint-placeholder-count="3">
             <div style="display: none; grid-column: {{ cg.col }}; grid-row: {{ cg.row }}; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.5);">
@@ -2667,7 +2668,7 @@ class Component extends DCLogic {
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null, signedIn: false, wholesale: false, trade: null,
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
-    pdpView: 'photo', pdpSel: 0, pdpCut: false,
+    pdpView: 'photo', pdpSel: 0, pdpCut: false, pdpReady: false,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
@@ -2807,6 +2808,10 @@ class Component extends DCLogic {
     });
     host.appendChild(el);
     this._chewEl = el;
+    el.ready.then(() => {
+      this._chewReady = true;
+      if (this._chewEl === el) this.setState({ pdpReady: true });
+    });
     this.chewSync();
   }
 
@@ -3407,7 +3412,8 @@ class Component extends DCLogic {
       // of the markup, so the cached handle would be stale on return. Reset to
       // the photo view and let the next opt-in rebuild the stage.
       this._chewEl = null;
-      this.setState({ page, menuOpen: false, added: false, pdpView: 'photo', pdpCut: false, pdpSel: 0 });
+      this._chewReady = false;
+      this.setState({ page, menuOpen: false, added: false, pdpView: 'photo', pdpCut: false, pdpSel: 0, pdpReady: false });
       if (typeof window !== 'undefined') {
         const path = page === 'home' ? '/' : '/' + page;
         if (window.location.pathname !== path) window.history.pushState({ page }, '', path);
@@ -3899,12 +3905,19 @@ class Component extends DCLogic {
         // choice; the fleck colours are index-matched to the palette baked
         // into the 3D model, so order here must track the model's order.
         const is3d = this.state.pdpView === '3d';
+        const ready = this.state.pdpReady;
         const igs = this.chewIngredients();
         const sel = Math.min(this.state.pdpSel, igs.length - 1);
         const cur = igs[sel] || { name: '', benefit: '' };
         return {
-          pdpPhotoOpacity: is3d ? '0' : '1',
+          // While three.js downloads the photo stays up and the stage fades in
+          // over it only once the chew is actually in the scene — never a blank
+          // tile, never the raw viewer shell.
+          pdpPhotoOpacity: (is3d && ready) ? '0' : '1',
           pdpStageDisplay: is3d ? 'block' : 'none',
+          pdpStageOpacity: (is3d && ready) ? '1' : '0',
+          pdpLoadingDisplay: (is3d && !ready) ? 'inline-block' : 'none',
+          pdpResetDisplay: (is3d && ready) ? 'block' : 'none',
           pdpPanelDisplay: is3d ? 'block' : 'none',
           pdpTabPhotoBg: is3d ? '#FCFAF4' : '#17140F',
           pdpTabPhotoFg: is3d ? '#554C40' : '#F5F0E6',
@@ -3922,8 +3935,15 @@ class Component extends DCLogic {
             pick: () => this.setState({ pdpSel: i, pdpCut: true }, () => this.chewSync())
           })),
           pdpShowPhoto: () => this.setState({ pdpView: 'photo' }),
-          pdpShow3d: () => this.setState({ pdpView: '3d' }, () => {
-            this.loadChew().then(() => this.mountChew(), () => {});
+          // Re-opening the tab on a still-mounted stage skips the loading
+          // state; a fresh visit shows the photo + "Preparing 3D view…" until
+          // the scene reports ready. If the modules fail to load the view
+          // falls back to the photos rather than an empty tile.
+          pdpShow3d: () => this.setState({ pdpView: '3d', pdpReady: !!(this._chewEl && this._chewEl.isConnected && this._chewReady) }, () => {
+            this.loadChew().then(() => this.mountChew(), () => {
+              this._chewLoad = null;
+              this.setState({ pdpView: 'photo', pdpReady: false });
+            });
           }),
           pdpReset: () => this.setState({ pdpCut: false, pdpSel: 0 }, () => {
             if (this._chewEl && this._chewEl.resetView) this._chewEl.resetView();

@@ -16,6 +16,10 @@
         this._selIdx = -1;
         if (this._stage && this._stage._controls) this._stage._controls.autoRotate = true;
       };
+      // Resolves once the chew model is actually in the scene — the host page
+      // holds its photo view until then, so the shopper never stares at an
+      // empty stage while three.js downloads.
+      this.ready = new Promise(res => { this._readyRes = res; });
       this._setup();
     }
     disconnectedCallback() { this._dead = true; }
@@ -27,6 +31,17 @@
       stage.setAttribute('background', this.getAttribute('background') || '#EDE6D5');
       stage.setAttribute('autorotate', 'autorotate');
       stage.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;';
+      // The stage builds its viewer chrome (orbit-help note, OBJ/GLB download
+      // toolbar) in its constructor, so it must be stripped before the element
+      // is ever attached — waiting for stage.ready leaves it on screen for the
+      // whole module download on a slow connection.
+      const hideChrome = () => {
+        if (!stage.shadowRoot) return;
+        const note = stage.shadowRoot.querySelector('.note');
+        if (note) note.style.display = 'none';
+        if (stage._toolbar) stage._toolbar.style.display = 'none';
+      };
+      hideChrome();
       this.appendChild(stage);
       this._stage = stage;
       const { THREE } = await stage.ready;
@@ -35,9 +50,7 @@
       stage._controls.enablePan = false;
       stage._controls.autoRotateSpeed = 1.1;
       stage._renderer.localClippingEnabled = true;
-      const note = stage.shadowRoot.querySelector('.note');
-      if (note) note.style.display = 'none';
-      if (stage._toolbar) stage._toolbar.style.display = 'none';
+      hideChrome();
 
       const { buildBean } = await import('/assets/js/chew/hb-box-model.js');
       if (this._dead) return;
@@ -198,6 +211,7 @@
         return g;
       });
       stage.setObject(model);
+      if (this._readyRes) this._readyRes();
 
       const self = this;
       let cutCur = 0;
