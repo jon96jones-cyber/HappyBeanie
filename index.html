@@ -106,19 +106,9 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
 image-slot:not([data-filled]) { color: transparent !important; }
 </style>
 
-<!-- Chew inspector (product page, 3D view). The map only names where the
-     modules live — nothing is fetched until the shopper opens the 3D tab and
-     /assets/js/chew/* is injected. three.js is vendored rather than pulled
-     from a CDN so the product page owns its own uptime. An import map must be
-     parsed before the first module loads, so it has to sit here in <head>. -->
-<script type="importmap">
-{
-  "imports": {
-    "three": "/assets/js/vendor/three-0.184.0/three.module.js",
-    "three/addons/controls/OrbitControls.js": "/assets/js/vendor/three-0.184.0/OrbitControls.js"
-  }
-}
-</script>
+<!-- Chew inspector (product page, 3D view). The scene modules import
+     three.js by plain URL from /assets/js/vendor — no import map, no CDN —
+     and nothing is fetched until the shopper opens the 3D tab. -->
 <style>hb-chew-stage:not(:defined), three-d-stage:not(:defined) { visibility: hidden; }</style>
 
 </head>
@@ -2734,6 +2724,15 @@ class Component extends DCLogic {
     el.ready.then(() => {
       this._chewReady = true;
       if (this._chewEl === el) this.setState({ pdpReady: true });
+    }, () => {
+      // Boot failed (module blocked, WebGL unavailable). Photos are the
+      // fallback — never leave the shopper on "Preparing 3D view".
+      if (this._chewEl === el) {
+        el.remove();
+        this._chewEl = null;
+        this._chewLoad = null;
+        this.setState({ pdpView: 'photo', pdpReady: false });
+      }
     });
     this.chewSync();
   }

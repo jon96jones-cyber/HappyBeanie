@@ -19,8 +19,14 @@
       // Resolves once the chew model is actually in the scene — the host page
       // holds its photo view until then, so the shopper never stares at an
       // empty stage while three.js downloads.
-      this.ready = new Promise(res => { this._readyRes = res; });
-      this._setup();
+      this.ready = new Promise((res, rej) => { this._readyRes = res; this._readyRej = rej; });
+      // A failed boot (module blocked, WebGL unavailable) must reject ready —
+      // the host page falls back to the photo view on rejection, so a hung
+      // "Preparing 3D view" can never be the end state.
+      this._setup().catch(err => {
+        console.error('[hb-chew-stage] 3D view failed to start:', err);
+        if (this._readyRej) this._readyRej(err);
+      });
     }
     disconnectedCallback() { this._dead = true; }
     async _setup() {
