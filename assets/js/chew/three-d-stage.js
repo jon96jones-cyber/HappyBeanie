@@ -209,8 +209,8 @@
       // Plain-URL imports: no reliance on <script type="importmap"> support
       // in the shopper's browser, and one less way for the load to fail.
       const [THREE, controlsMod] = await Promise.all([
-        import('/assets/js/vendor/three-0.184.0/three.module.js'),
-        import('/assets/js/vendor/three-0.184.0/OrbitControls.js'),
+        import('/assets/js/vendor/three-0.184.0-hb2/three.module.js'),
+        import('/assets/js/vendor/three-0.184.0-hb2/OrbitControls.js'),
       ]);
       this._THREE = THREE;
       // preserveDrawingBuffer keeps the last frame readable after

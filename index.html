@@ -2699,8 +2699,11 @@ class Component extends DCLogic {
     });
     // three-d-stage defines the shell element hb-chew-stage builds on, so it
     // has to finish first.
-    this._chewLoad = script('/assets/js/chew/three-d-stage.js')
-      .then(() => script('/assets/js/chew/hb-chew-stage.js'));
+    // The ?v= token is the cache-buster: /assets/js is served immutable for a
+    // year, so any change to these files MUST come with a bump here or every
+    // returning browser keeps running the old code.
+    this._chewLoad = script('/assets/js/chew/three-d-stage.js?v=2')
+      .then(() => script('/assets/js/chew/hb-chew-stage.js?v=2'));
     return this._chewLoad;
   }
 
