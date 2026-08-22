@@ -106,6 +106,21 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
 image-slot:not([data-filled]) { color: transparent !important; }
 </style>
 
+<!-- Chew inspector (product page, 3D view). The map only names where the
+     modules live — nothing is fetched until the shopper opens the 3D tab and
+     /assets/js/chew/* is injected. three.js is vendored rather than pulled
+     from a CDN so the product page owns its own uptime. An import map must be
+     parsed before the first module loads, so it has to sit here in <head>. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "/assets/js/vendor/three-0.184.0/three.module.js",
+    "three/addons/controls/OrbitControls.js": "/assets/js/vendor/three-0.184.0/OrbitControls.js"
+  }
+}
+</script>
+<style>hb-chew-stage:not(:defined), three-d-stage:not(:defined) { visibility: hidden; }</style>
+
 </head>
 <body>
 <x-dc>
@@ -1255,15 +1270,39 @@ image-slot:not([data-filled]) { color: transparent !important; }
       </div>
 
       <div data-m="stack gap" style="position: relative; z-index: 1; display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 54px; align-items: start; max-width: 1180px; margin: 0 auto;">
-        <div data-m="nostick collage" style="position: sticky; top: 96px; align-self: start; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto; gap: 12px;">
-          <div style="grid-column: 1 / -1; grid-row: 1; align-self: start; width: 100%; aspect-ratio: 1308 / 816; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.5);">
-            <div style="width: 100%; height: 100%; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.045);"><image-slot id="{{ pdpSlotMain }}" placeholder="{{ pdpPhMain }}" style="width: 100%; height: 100%;"></image-slot></div>
+        <!-- The photo collage keeps its own grid: its mobile rules position
+             children by nth-child, so the inspector's tabs and panel have to
+             sit outside it or they inherit thumbnail placement. -->
+        <div data-m="nostick" style="position: sticky; top: 96px; align-self: start; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px;">
+        <div data-m="collage" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto; gap: 12px;">
+          <div style="position: relative; grid-column: 1 / -1; grid-row: 1; align-self: start; width: 100%; aspect-ratio: 1308 / 816; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.5);">
+            <div style="width: 100%; height: 100%; opacity: {{ pdpPhotoOpacity }}; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.045);"><image-slot id="{{ pdpSlotMain }}" placeholder="{{ pdpPhMain }}" style="width: 100%; height: 100%;"></image-slot></div>
+            <!-- The stage is mounted imperatively into this node (see mountChew)
+                 so a re-render never tears down the live WebGL context. -->
+            <div id="hbChewMount" style="position: absolute; inset: 0; display: {{ pdpStageDisplay }}; background: #EFE8D9;"></div>
+            <button sc-camel-on-click="{{ pdpReset }}" style="display: {{ pdpStageDisplay }}; position: absolute; right: 12px; bottom: 10px; font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 14px; border: 1px solid #17140F; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer;">Reset</button>
           </div>
           <sc-for list="{{ pdpCollage }}" as="cg" hint-placeholder-count="3">
             <div style="display: none; grid-column: {{ cg.col }}; grid-row: {{ cg.row }}; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.5);">
               <div style="width: 100%; height: 100%; transition: transform 0.8s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.06);"><image-slot id="{{ cg.slot }}" placeholder="{{ cg.ph }}" style="width: 100%; height: 100%;"></image-slot></div>
             </div>
           </sc-for>
+        </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(23,20,15,0.12); border: 1px solid rgba(23,20,15,0.12); border-radius: 5px; overflow: hidden; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.4);">
+            <button sc-camel-on-click="{{ pdpShowPhoto }}" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 12px; border: none; cursor: pointer; background: {{ pdpTabPhotoBg }}; color: {{ pdpTabPhotoFg }};">Product photos</button>
+            <button sc-camel-on-click="{{ pdpShow3d }}" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 12px; border: none; cursor: pointer; background: {{ pdpTab3dBg }}; color: {{ pdpTab3dFg }};">See What's Inside</button>
+          </div>
+          <div style="display: {{ pdpPanelDisplay }}; border: 1px solid rgba(23,20,15,0.12); border-radius: 5px; background: #FCFAF4; overflow: hidden; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.4);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 1px; background: rgba(23,20,15,0.1); border-bottom: 1px solid rgba(23,20,15,0.1);">
+              <sc-for list="{{ pdpIngredients }}" as="ig" hint-placeholder-count="10">
+                <button sc-camel-on-click="{{ ig.pick }}" style="display: flex; align-items: center; gap: 9px; padding: 10px 14px; text-align: left; border: none; cursor: pointer; background: {{ ig.bg }};" style-hover="background: rgba(23,20,15,0.05);">
+                  <span style="flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; background: {{ ig.dot }}; box-shadow: inset 0 0 0 1px rgba(23,20,15,0.25);"></span>
+                  <span style="min-width: 0; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; color: {{ ig.fg }}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ ig.name }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="padding: 13px 16px 15px; font-size: 13px; line-height: 1.6; color: #554C40;"><strong style="color: #17140F;">{{ pdpIngName }}</strong> — {{ pdpIngBenefit }}</div>
+          </div>
         </div>
         <div>
           <div style="display: flex; flex-wrap: wrap; gap: 26px 30px; align-items: flex-start; margin-bottom: 22px;">
@@ -2593,11 +2632,42 @@ image-slot:not([data-filled]) { color: transparent !important; }
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;oklch(0.86 0.14 92)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;oklch(0.86 0.14 92)&quot;,&quot;oklch(0.72 0.08 152)&quot;,&quot;oklch(0.78 0.11 45)&quot;,&quot;oklch(0.8 0.06 250)&quot;],&quot;section&quot;:&quot;Brand&quot;},&quot;basePrice&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:68,&quot;min&quot;:30,&quot;max&quot;:180,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Commerce&quot;}}">
+// Fleck palette baked into the chew model, in model order — index i is the
+// colour of the Flecks_(i+1) group. Mirrors COLS in hb-chew-stage.js.
+const CHEW_COLS = ['#d9a441', '#d97e2f', '#b09877', '#e5d9c0', '#7a3b2e', '#6b4d8f', '#e3c34e', '#c96a2d', '#d8a29a', '#efe6d4'];
+const CHEW_IGS = {
+  dog: [
+    { name: 'Omega-3 EPA/DHA', benefit: 'Brain, heart, joints & inflammation' },
+    { name: 'Curcumin', benefit: 'Anti-inflammatory & antioxidant' },
+    { name: 'Turkey Tail', benefit: 'Immune regulation' },
+    { name: 'Elk Velvet Antler', benefit: 'Joint repair & mobility' },
+    { name: 'Elk Liver', benefit: 'Whole-food vitamin A, iron & palatability' },
+    { name: 'Blueberry Polyphenols', benefit: 'Cellular antioxidant defense' },
+    { name: 'B-Complex', benefit: 'Energy metabolism & nerve function' },
+    { name: 'CoQ10', benefit: 'Cardiac energy & mitochondrial support' },
+    { name: 'L-Carnitine', benefit: 'Fat metabolism & lean muscle maintenance' },
+    { name: 'Collagen Peptide Blend', benefit: 'Cartilage & connective tissue' }
+  ],
+  cat: [
+    { name: 'Omega-3 EPA/DHA', benefit: 'Brain, heart, joints & inflammation' },
+    { name: 'Taurine', benefit: 'Heart muscle function, eye health & nervous system' },
+    { name: 'Green-Lipped Mussel', benefit: 'Joint repair & mobility' },
+    { name: 'Collagen Peptide Blend', benefit: 'Cartilage & connective tissue' },
+    { name: 'Blueberry Polyphenols', benefit: 'Cellular antioxidant defense' },
+    { name: 'Organic Cranberry Extract', benefit: 'Urinary tract support & antioxidant protection' },
+    { name: 'B-Complex', benefit: 'Energy metabolism & nerve function' },
+    { name: 'CoQ10', benefit: 'Cardiac energy & mitochondrial support' },
+    { name: 'L-Carnitine', benefit: 'Fat metabolism & lean muscle maintenance' },
+    { name: 'Chamomile Extract', benefit: 'Calming & digestive comfort' }
+  ]
+};
+
 class Component extends DCLogic {
   state = { wkSel: 0, igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null, signedIn: false, wholesale: false, trade: null,
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
+    pdpView: 'photo', pdpSel: 0, pdpCut: false,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
@@ -2691,6 +2761,62 @@ class Component extends DCLogic {
   // also what makes this work under touch.
   roomPick(n) {
     this.setState(st => ({ roomSel: n, roomHov: n, roomZoom: !(st.roomSel === n && st.roomZoom) }));
+  }
+
+  // --- Chew inspector -------------------------------------------------------
+  // Index-matched to CHEW_COLS and to the fleck groups inside the 3D model:
+  // row i drives Flecks_(i+1). Reordering either list silently mismatches the
+  // colour dot against the flecks that rise, so keep them in step.
+  chewIngredients() {
+    return CHEW_IGS[this.state.sp === 'cat' ? 'cat' : 'dog'];
+  }
+
+  // three.js is ~2MB unminified, so none of it is fetched until the shopper
+  // actually opens the 3D tab. The product page is the conversion page; it
+  // should not pay for a view most visitors never open.
+  loadChew() {
+    if (this._chewLoad) return this._chewLoad;
+    const script = src => new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = res;
+      s.onerror = () => rej(new Error('failed to load ' + src));
+      document.head.appendChild(s);
+    });
+    // three-d-stage defines the shell element hb-chew-stage builds on, so it
+    // has to finish first.
+    this._chewLoad = script('/assets/js/chew/three-d-stage.js')
+      .then(() => script('/assets/js/chew/hb-chew-stage.js'));
+    return this._chewLoad;
+  }
+
+  // The stage is created once and kept alive. It deliberately lives outside the
+  // render pass: rebuilding a WebGL context on every setState would drop the
+  // camera angle and re-run all the procedural texture painting.
+  mountChew() {
+    const host = document.getElementById('hbChewMount');
+    // A handle to a node that is no longer in the document is worse than none:
+    // it silently swallows the mount and leaves an empty tile.
+    if (this._chewEl && !this._chewEl.isConnected) this._chewEl = null;
+    if (!host || this._chewEl) return;
+    const el = document.createElement('hb-chew-stage');
+    el.setAttribute('background', '#EFE8D9');
+    el.style.cssText = 'position:absolute;inset:0;';
+    el.addEventListener('hb-togglecut', () => {
+      this.setState(st => ({ pdpCut: !st.pdpCut }), () => this.chewSync());
+    });
+    host.appendChild(el);
+    this._chewEl = el;
+    this.chewSync();
+  }
+
+  // Single place that pushes state into the scene. Flecks only make sense on a
+  // cut face, so the selection is withheld until the chew is open.
+  chewSync() {
+    const el = this._chewEl;
+    if (!el || !el.setCut) return;
+    el.setCut(this.state.pdpCut);
+    el.setSel(this.state.pdpCut ? this.state.pdpSel : -1);
   }
 
   // Which unit is under a screen point. DOM hit testing can't answer this:
@@ -3277,7 +3403,11 @@ class Component extends DCLogic {
 
   nav(page) {
     return () => {
-      this.setState({ page, menuOpen: false, added: false });
+      // Leaving the product page drops the chew stage's DOM node with the rest
+      // of the markup, so the cached handle would be stale on return. Reset to
+      // the photo view and let the next opt-in rebuild the stage.
+      this._chewEl = null;
+      this.setState({ page, menuOpen: false, added: false, pdpView: 'photo', pdpCut: false, pdpSel: 0 });
       if (typeof window !== 'undefined') {
         const path = page === 'home' ? '/' : '/' + page;
         if (window.location.pathname !== path) window.history.pushState({ page }, '', path);
@@ -3764,6 +3894,42 @@ class Component extends DCLogic {
       pdpThumbs: [],
       pdpCollage: copy.thumbs.map(t => ({ ...t, col: 'auto', row: '2' })),
       pdpOther: copy.other,
+      ...(() => {
+        // Chew inspector. The ingredient list follows the page's species
+        // choice; the fleck colours are index-matched to the palette baked
+        // into the 3D model, so order here must track the model's order.
+        const is3d = this.state.pdpView === '3d';
+        const igs = this.chewIngredients();
+        const sel = Math.min(this.state.pdpSel, igs.length - 1);
+        const cur = igs[sel] || { name: '', benefit: '' };
+        return {
+          pdpPhotoOpacity: is3d ? '0' : '1',
+          pdpStageDisplay: is3d ? 'block' : 'none',
+          pdpPanelDisplay: is3d ? 'block' : 'none',
+          pdpTabPhotoBg: is3d ? '#FCFAF4' : '#17140F',
+          pdpTabPhotoFg: is3d ? '#554C40' : '#F5F0E6',
+          pdpTab3dBg: is3d ? '#17140F' : '#FCFAF4',
+          pdpTab3dFg: is3d ? '#F5F0E6' : '#554C40',
+          pdpIngName: cur.name,
+          pdpIngBenefit: cur.benefit,
+          pdpIngredients: igs.map((ig, i) => ({
+            name: ig.name,
+            dot: CHEW_COLS[i],
+            // The row highlight would be claiming "these flecks are showing"
+            // while the chew is still closed, so it only lights up once cut.
+            bg: (this.state.pdpCut && sel === i) ? 'rgba(23,20,15,0.07)' : '#FCFAF4',
+            fg: (this.state.pdpCut && sel === i) ? '#17140F' : '#554C40',
+            pick: () => this.setState({ pdpSel: i, pdpCut: true }, () => this.chewSync())
+          })),
+          pdpShowPhoto: () => this.setState({ pdpView: 'photo' }),
+          pdpShow3d: () => this.setState({ pdpView: '3d' }, () => {
+            this.loadChew().then(() => this.mountChew(), () => {});
+          }),
+          pdpReset: () => this.setState({ pdpCut: false, pdpSel: 0 }, () => {
+            if (this._chewEl && this._chewEl.resetView) this._chewEl.resetView();
+          })
+        };
+      })(),
       qzChrome: page === 'quiz' ? 'qzhidebar' : '',
       qzHdr: page === 'quiz' ? 'qzstatic' : '',
       menuOpen: this.state.menuOpen,
