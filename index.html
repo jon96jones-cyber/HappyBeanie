@@ -321,6 +321,8 @@ image-slot:not([data-filled]) { color: transparent !important; }
   }
   @keyframes hbSlabFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
   @keyframes hbGlowPulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.95; } }
+  @keyframes hbEvUp { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
+  @keyframes hbEvMark { 0% { background-size: 0% 0.45em; } 100% { background-size: 100% 0.45em; } }
   [data-m~="evtab"]:focus { outline: none; }
   [data-m~="evtab"]:focus-visible { outline: 2px solid #17140F; outline-offset: -3px; }
   @media (max-width: 900px) {
@@ -348,15 +350,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="evtabs"] { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0 !important; }
     [data-m~="evtab"] { padding: 10px 8px 12px !important; gap: 4px !important; justify-items: center !important; text-align: center !important; }
     [data-m~="evtabname"] { display: none !important; }
-    [data-m~="evtabshort"] { display: block !important; }
     [data-m~="evcard"] { padding: 20px 16px 22px !important; margin-top: 0 !important; }
-    [data-m~="evtitle"] { font-size: 20px !important; padding-bottom: 18px !important; }
-    [data-m~="evchips"] { gap: 5px !important; margin-bottom: 16px !important; }
-    [data-m~="evchips"] > span { font-size: 8.5px !important; padding: 4px 7px !important; gap: 5px !important; }
-    [data-m~="evsplit"] { margin-top: 18px !important; }
     [data-m~="evfoundlab"] { margin-bottom: 11px !important; }
     [data-m~="evfoundlab"] span:last-child { font-size: 10px !important; }
-    [data-m~="evresult"] { font-size: 16.5px !important; padding-left: 14px !important; }
+    [data-m~="evresult"] { font-size: 18px !important; }
+    [data-m~="evstats"] { grid-template-columns: minmax(0, 1fr) !important; }
     [data-m~="evfoot"] { gap: 12px !important; margin-top: 20px !important; }
     [data-m~="evcite"] { font-size: 9px !important; }
     [data-m~="evnote"] { font-size: 9px !important; }
@@ -1455,31 +1453,27 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <button sc-camel-on-click="{{ ev.pick }}" data-m="evtab" style="{{ ev.tabStyle }}">
               <span style="{{ ev.kickerStyle }}">Active {{ ev.n }}</span>
               <span data-m="evtabname" style="{{ ev.nameStyle }}">{{ ev.active }}</span>
-              <span data-m="evtabshort" style="{{ ev.shortStyle }}">{{ ev.short }}</span>
             </button>
           </sc-for>
         </div>
 
         <div data-m="evcard" key="{{ evOne.key }}" style="position: relative; border: 1px solid #17140F; border-radius: 0 0 5px 5px; background: #FCFAF4; padding: 34px 36px 32px; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.3);">
-          <div data-m="evchips" style="display: inline-flex; flex-wrap: nowrap; width: fit-content; max-width: 100%; gap: 6px; margin-bottom: 20px;">
-            <sc-for list="{{ evOne.meta }}" as="mt" hint-placeholder-count="3">
-              <span style="display: inline-flex; align-items: baseline; gap: 6px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; background: #F2EBDC; border: 1px solid #E0D6C2; border-radius: 2px; padding: 4px 8px; white-space: nowrap;"><span style="color: #9A8F7C;">{{ mt.k }}</span><span style="color: #554C40;">{{ mt.v }}</span></span>
+          <div data-m="evfoundlab" style="display: flex; align-items: center; gap: 11px; margin-bottom: 16px; animation: hbEvUp 0.45s 0.05s cubic-bezier(0.2,0.7,0.2,1) both;">
+            <span style="width: 20px; height: 2px; background: oklch(0.44 0.07 152);"></span>
+            <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">What it found</span>
+          </div>
+          <p data-m="evresult" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 24px; line-height: 1.42; letter-spacing: -0.024em; color: #17140F; margin: 0; max-width: 28em; text-wrap: pretty; animation: hbEvUp 0.5s 0.12s cubic-bezier(0.2,0.7,0.2,1) both;">{{ evOne.pre }}<mark style="background: none; color: inherit; background-image: linear-gradient(oklch(0.86 0.14 92 / 0.55), oklch(0.86 0.14 92 / 0.55)); background-repeat: no-repeat; background-size: 0% 0.45em; background-position: 0 86%; animation: hbEvMark 0.7s 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards;">{{ evOne.hl }}</mark>{{ evOne.post }}</p>
+
+          <div data-m="evstats" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #E4DBC9; border: 1px solid #E4DBC9; border-radius: 4px; overflow: hidden; margin-top: 28px; animation: hbEvUp 0.5s 0.22s cubic-bezier(0.2,0.7,0.2,1) both;">
+            <sc-for list="{{ evOne.stats }}" as="st3" hint-placeholder-count="3">
+              <div style="background: #F7F2E5; padding: 13px 16px 14px;">
+                <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">{{ st3.k }}</div>
+                <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 14.5px; color: #17140F;">{{ st3.v }}</div>
+              </div>
             </sc-for>
           </div>
 
-          <sc-if value="{{ evShowTitle }}" hint-placeholder-val="{{ true }}">
-            <h3 data-m="evtitle" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.032em; font-size: 25px; line-height: 1.2; color: #17140F; margin: 0; padding-bottom: 24px; border-bottom: 1px solid #DDD3C0; max-width: 26em; text-wrap: pretty;">{{ evOne.title }}</h3>
-          </sc-if>
-
-          <div data-m="evsplit" style="margin-top: 24px;">
-            <div data-m="evfoundlab" style="display: flex; align-items: center; gap: 11px; margin-bottom: 14px;">
-              <span style="width: 20px; height: 2px; background: oklch(0.44 0.07 152);"></span>
-              <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">What it found</span>
-            </div>
-            <p data-m="evresult" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 19px; line-height: 1.46; letter-spacing: -0.016em; color: #17140F; margin: 0; padding-left: 20px; border-left: 2px solid oklch(0.44 0.07 152 / 0.32); max-width: 34em; text-wrap: pretty;">{{ evOne.result }}</p>
-          </div>
-
-          <div data-m="evfoot" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #E4DBC9;">
+          <div data-m="evfoot" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #E4DBC9; animation: hbEvUp 0.5s 0.3s cubic-bezier(0.2,0.7,0.2,1) both;">
             <a href="{{ evOne.url }}" target="_blank" rel="noopener noreferrer" data-m="evlink" style="display: inline-flex; align-items: center; gap: 11px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #F5F0E6; background: #17140F; border: 1px solid #17140F; border-radius: 3px; padding: 12px 18px; text-decoration: none; transition: background 0.25s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: oklch(0.44 0.07 152); border-color: oklch(0.44 0.07 152); transform: translateY(-2px);">
               <span>Read the study</span>
               <span aria-hidden="true">&#8599;</span>
@@ -3358,6 +3352,7 @@ class Component extends DCLogic {
           design: 'Randomised, dose-escalation',
           title: 'A mushroom extract, used alone, slowed cancer spread in dogs',
           result: 'Dogs given the mushroom extract alone — no chemotherapy — survived longer and their cancer spread more slowly, with the highest dose performing best.',
+          hl: 'survived longer and their cancer spread more slowly',
           cite: 'Brown & Reetz · IVC Journal · “Single-agent polysaccharopeptide delays metastases and improves survival in naturally occurring canine hemangiosarcoma”',
           url: 'https://ivcjournal.com/single-agent-polysaccharopeptide-delays-metastases-and-improves-survival-in-naturally-occurring-hemangiosarcoma/'
         },
@@ -3369,6 +3364,7 @@ class Component extends DCLogic {
           design: 'Placebo-controlled trial',
           title: 'Elk velvet antler supplementation in dogs with osteoarthritis',
           result: 'Dogs on elk velvet antler put more weight on their affected limbs and moved better than dogs on placebo, with no adverse effects across the trial.',
+          hl: 'put more weight on their affected limbs and moved better',
           cite: 'Research in Veterinary Science · 2014',
           url: 'https://www.sciencedirect.com/science/article/abs/pii/S0034528814002483'
         },
@@ -3378,6 +3374,7 @@ class Component extends DCLogic {
           source: 'PubMed Central',
           title: 'Collagen peptides and the repair signalling pathways behind joint and connective tissue',
           result: 'Collagen peptides taken by mouth survived digestion, reached connective tissue, and measurably shifted cells toward rebuilding it rather than breaking it down.',
+          hl: 'rebuilding it rather than breaking it down',
           cite: 'PubMed Central · PMC6789547',
           url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6789547/'
         }
@@ -3390,6 +3387,7 @@ class Component extends DCLogic {
           design: 'Randomised, controlled, masked',
           title: 'Evaluation of a therapeutic diet for feline degenerative joint disease',
           result: 'Cats fed green-lipped mussel and omega-3s were measurably more active than cats on the control diet, tracked by device rather than owner opinion.',
+          hl: 'measurably more active',
           cite: 'Lascelles et al. · 2010',
           url: 'https://www.researchgate.net/publication/42588045_Evaluation_of_a_Therapeutic_Diet_for_Feline_Degenerative_Joint_Disease'
         },
@@ -3400,20 +3398,36 @@ class Component extends DCLogic {
           design: 'Controlled feeding trial',
           title: 'Myocardial failure in cats associated with low plasma taurine: a reversible cardiomyopathy',
           result: 'Cats in heart failure from low taurine recovered normal heart function once taurine was restored — the damage reversed, and taurine became mandatory in cat food.',
+          hl: 'recovered normal heart function',
           cite: 'Pion et al. · Science · 1987',
           url: 'https://www.science.org/doi/10.1126/science.3616607'
         },
         {
           active: 'Proprietary peptide blend',
           dose: '180mg per chew',
+          source: 'Peer-reviewed',
           design: 'Clinical trial',
           title: 'Undenatured type II collagen in cats with degenerative joint disease',
           result: 'Cats with degenerative joint disease improved in mobility and daily activity on undenatured type II collagen, confirming the mechanism works in cats and not only dogs.',
+          hl: 'improved in mobility and daily activity',
           cite: 'ResearchGate · 381552574',
           url: 'https://www.researchgate.net/publication/381552574_UNDENATURED_TYPE_II_COLLAGEN_IN_CATS_WITH_DEGENERATIVE_JOINT_DISEASE'
         }
-      ]).map((e, i) => ({
+      ]).map((e, i) => {
+        // The marker highlight is a text split, not innerHTML: interpolation
+        // escapes markup, so pre/hl/post render as three sibling text nodes
+        // with the <mark> living in the template.
+        const at = e.hl ? e.result.indexOf(e.hl) : -1;
+        return {
         ...e,
+        pre: at === -1 ? e.result : e.result.slice(0, at),
+        hl: at === -1 ? '' : e.hl,
+        post: at === -1 ? '' : e.result.slice(at + e.hl.length),
+        stats: [
+          { k: 'In Happy Beans', v: e.dose },
+          { k: 'Study design', v: e.design },
+          { k: 'Published in', v: e.sourceShort || e.source }
+        ],
         n: '0' + (i + 1),
         key: (isDog ? 'd' : 'c') + i,
         pick: () => this.setState({ evSel: i }),
@@ -3452,22 +3466,9 @@ class Component extends DCLogic {
           color: i === evSel ? '#17140F' : '#554C40',
           transition: 'color 0.28s ease'
         },
-        short: (isDog ? ['Mushroom', 'Elk', 'Peptide'] : ['Mussel', 'Taurine', 'Peptide'])[i],
-        shortStyle: {
-          display: 'none',
-          fontFamily: "'DM Sans', sans-serif",
-          fontWeight: 700,
-          letterSpacing: '-0.02em',
-          fontSize: '14px',
-          lineHeight: 1.2,
-          color: i === evSel ? '#17140F' : '#554C40',
-          transition: 'color 0.28s ease'
-        },
-        meta: [
-          { k: 'Species', v: isDog ? 'Dogs' : 'Cats' },
-          e.source ? { k: 'Source', v: e.sourceShort || e.source } : null
-        ].filter(Boolean).map((m, j) => ({ ...m, border: j === 0 ? '0' : '1px solid #E0D6C2', padLeft: j === 0 ? '0px' : '20px' }))
-      }));
+        nameShown: true
+      };
+      });
   }
   evRecs() {
     return [
@@ -4265,7 +4266,6 @@ class Component extends DCLogic {
       ]),
       pdpInsideLabel: isDog ? 'For dogs' : 'For cats',
       // state.evSel picks the open record (0-2 valid for both species).
-      evShowTitle: false,
       ...(() => {
         const list = this.evList(isDog);
         return {
