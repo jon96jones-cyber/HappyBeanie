@@ -72,18 +72,55 @@
         t.anisotropy = 8;
         return t;
       };
-      const speckle = canvasTex(512, 512, (x, w, h) => {
-        x.fillStyle = '#6f513a'; x.fillRect(0, 0, w, h);
-        let sd = 7;
-        const rnd = () => (sd = (sd * 1103515245 + 12345) % 2147483648) / 2147483648;
-        for (let i = 0; i < 900; i++) {
-          const r = rnd();
-          x.fillStyle = r < 0.5 ? 'rgba(32,22,13,0.7)' : (r < 0.82 ? 'rgba(182,130,53,0.5)' : 'rgba(239,236,227,0.35)');
-          x.beginPath(); x.arc(rnd() * w, rnd() * h, 1.2 + rnd() * 3.4, 0, 6.3); x.fill();
+      let sdo = 7;
+      const rndo = () => (sdo = (sdo * 1103515245 + 12345) % 2147483648) / 2147483648;
+      const oSpecks = [], oPores = [];
+      for (let i = 0; i < 1700; i++) oSpecks.push({ x: rndo(), y: rndo(), r: 0.5 + rndo() * 1.0, o: 0.6 + rndo() * 0.38, warm: rndo() < 0.12 });
+      for (let i = 0; i < 64; i++) oPores.push({ x: rndo(), y: rndo(), r: 1.2 + rndo() * 1.8, o: 0.5 + rndo() * 0.3 });
+      const speckle = canvasTex(1024, 1024, (x, w, h) => {
+        x.fillStyle = '#94714e'; x.fillRect(0, 0, w, h);
+        for (let i = 0; i < 24; i++) {
+          const bx = rndo() * w, by = rndo() * h, br = 90 + rndo() * 220;
+          const g2 = x.createRadialGradient(bx, by, 0, bx, by, br);
+          const warm2 = rndo() < 0.5;
+          g2.addColorStop(0, warm2 ? 'rgba(150,113,79,0.18)' : 'rgba(96,68,45,0.16)');
+          g2.addColorStop(1, 'rgba(0,0,0,0)');
+          x.fillStyle = g2; x.fillRect(bx - br, by - br, br * 2, br * 2);
         }
+        for (let i = 0; i < 8000; i++) {
+          x.fillStyle = rndo() < 0.5 ? 'rgba(52,35,20,0.04)' : 'rgba(220,198,168,0.035)';
+          x.fillRect(rndo() * w, rndo() * h, 1.4, 1.4);
+        }
+        oSpecks.forEach(s2 => {
+          x.fillStyle = s2.warm ? 'rgba(226,190,132,' + s2.o.toFixed(2) + ')' : 'rgba(246,240,228,' + s2.o.toFixed(2) + ')';
+          x.beginPath(); x.arc(s2.x * w, s2.y * h, s2.r * 2.1, 0, 6.3); x.fill();
+        });
+        oPores.forEach(p => {
+          x.fillStyle = 'rgba(40,26,14,' + p.o.toFixed(2) + ')';
+          x.beginPath(); x.ellipse(p.x * w, p.y * h, p.r * 1.6, p.r * 1.25, 0.6, 0, 6.3); x.fill();
+          x.fillStyle = 'rgba(178,143,105,' + (p.o * 0.55).toFixed(2) + ')';
+          x.beginPath(); x.ellipse(p.x * w, p.y * h + p.r * 1.5, p.r * 1.3, p.r * 0.4, 0, 0, 6.3); x.fill();
+        });
       });
       speckle.wrapS = speckle.wrapT = THREE.RepeatWrapping;
       speckle.repeat.set(1.2, 1.2);
+      const outerBump = canvasTex(1024, 1024, (x, w, h) => {
+        x.fillStyle = '#808080'; x.fillRect(0, 0, w, h);
+        for (let i = 0; i < 6000; i++) {
+          x.fillStyle = rndo() < 0.5 ? 'rgba(70,70,70,0.1)' : 'rgba(150,150,150,0.09)';
+          x.fillRect(rndo() * w, rndo() * h, 1.8, 1.8);
+        }
+        oSpecks.forEach(s2 => {
+          x.fillStyle = 'rgba(175,175,175,0.6)';
+          x.beginPath(); x.arc(s2.x * w, s2.y * h, s2.r * 2.1, 0, 6.3); x.fill();
+        });
+        oPores.forEach(p => {
+          x.fillStyle = 'rgba(22,22,22,0.9)';
+          x.beginPath(); x.ellipse(p.x * w, p.y * h, p.r * 1.6, p.r * 1.25, 0.6, 0, 6.3); x.fill();
+        });
+      });
+      outerBump.wrapS = outerBump.wrapT = THREE.RepeatWrapping;
+      outerBump.repeat.set(1.2, 1.2);
 
       const cols = COLS;
       let sd9 = 99;
@@ -161,7 +198,8 @@
       cutBump.offset.copy(cutTex.offset);
 
       const plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0.02);
-      const mExt = new THREE.MeshStandardMaterial({ name: 'ChewOuter', map: speckle, roughness: 0.6, metalness: 0, clippingPlanes: [plane], clipShadows: true, side: THREE.DoubleSide });
+      const mExt = new THREE.MeshStandardMaterial({ name: 'ChewOuter', map: speckle, bumpMap: outerBump, bumpScale: 0.0011, roughness: 0.5, metalness: 0, clippingPlanes: [plane], clipShadows: true, side: THREE.DoubleSide });
+      mExt.envMapIntensity = 1.35;
       const mCut = new THREE.MeshStandardMaterial({ name: 'ChewCut', map: cutTex, bumpMap: cutBump, bumpScale: 0.0012, roughness: 0.92, metalness: 0 });
 
       const model = new THREE.Group();
@@ -216,6 +254,7 @@
         model.add(g);
         return g;
       });
+      model.rotation.y = Math.PI * 1.38;
       stage.setObject(model);
       if (this._readyRes) this._readyRes();
 
