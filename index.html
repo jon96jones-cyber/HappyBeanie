@@ -2696,10 +2696,12 @@ class Component extends DCLogic {
     // three-d-stage defines the shell element hb-chew-stage builds on, so it
     // has to finish first.
     // The ?v= token is the cache-buster: /assets/js is served immutable for a
-    // year, so any change to these files MUST come with a bump here or every
-    // returning browser keeps running the old code.
-    this._chewLoad = script('/assets/js/chew/three-d-stage.js?v=3')
-      .then(() => script('/assets/js/chew/hb-chew-stage.js?v=3'));
+    // year, so EVERY edit to any file under /assets/js/chew MUST come with a
+    // bump here — returning browsers will not refetch the old URL, and the
+    // narrower must-revalidate header rule for chew/ cannot be relied on to
+    // out-rank the immutable rule.
+    this._chewLoad = script('/assets/js/chew/three-d-stage.js?v=4')
+      .then(() => script('/assets/js/chew/hb-chew-stage.js?v=4'));
     return this._chewLoad;
   }
 
