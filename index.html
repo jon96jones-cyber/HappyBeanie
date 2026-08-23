@@ -433,6 +433,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="ctstat"] > :first-child { font-size: 8.5px !important; padding: 5px 8px !important; }
     [data-m~="ctlot"] { grid-column: 1 !important; font-size: 11px !important; }
     [data-m~="ctdate"] { display: none !important; }
+    [data-m~="ctintro"] { grid-template-columns: minmax(0, 1fr) !important; gap: 10px !important; margin-bottom: 30px !important; }
     [data-m~="askcol"] { display: contents !important; }
     [data-m~="faqwrap"] { grid-column: 1 / -1 !important; grid-row: auto !important; }
     [data-m~="faqhead"] > :first-child { grid-column: 1 !important; grid-row: 1 !important; }
@@ -1985,6 +1986,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
     </section>
     <section data-m="pad short" style="position: relative; background: radial-gradient(120% 80% at 50% 0%, #FDFCF7 0%, #FCFAF4 44%, #F1EADB 100%); padding: 62px 44px 100px;">
       <div style="position: relative; max-width: 1180px; margin: 0 auto;">
+        <div data-m="ctintro" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: end; margin-bottom: 44px; padding-bottom: 22px; border-bottom: 1px solid #DDD3C0;">
+          <p style="font-size: 16px; line-height: 1.7; color: #554C40; max-width: 36em; margin: 0; text-wrap: pretty;">Every batch we blend is sent to an independent lab before it ships. The certificate comes back, we publish it, and it stays here — whether we liked the result or not.</p>
+          <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap; padding-bottom: 4px;">4 lots · est. 2026</span>
+        </div>
         <div data-m="ctstats hide" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid rgba(23,20,15,0.1); border-radius: 8px; overflow: hidden; margin-bottom: 26px; box-shadow: 0 26px 48px -30px rgba(23,20,15,0.34), 0 6px 14px -10px rgba(23,20,15,0.14), 0 1px 0 rgba(255,255,255,0.9) inset;">
           <div style="background: #FCFAF4; padding: 20px 22px;">
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1; margin-bottom: 8px; color: #17140F;">4</div>
@@ -1995,8 +2000,8 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.5; color: #8A7F6E;">Panels within spec</div>
           </div>
           <div style="background: #FCFAF4; padding: 20px 22px;">
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1; margin-bottom: 8px; color: oklch(0.52 0.16 32);">1</div>
-            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.5; color: #8A7F6E;">Lot destroyed, published</div>
+            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1; margin-bottom: 8px; color: #8A7F6E;">1</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.5; color: #8A7F6E;">Lot expired, published</div>
           </div>
           <div style="background: #FCFAF4; padding: 20px 22px;">
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1; margin-bottom: 8px; color: #17140F;">13 Jul 2026</div>
@@ -2018,7 +2023,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <div aria-hidden="true" style="position: absolute; left: 7px; right: 7px; bottom: -4px; height: 16px; border-radius: 0 0 8px 8px; background: #F2EBDC; border: 1px solid rgba(23,20,15,0.08); border-top: none;"></div>
         <div style="position: relative; border: 1px solid rgba(23,20,15,0.12); border-radius: 8px; background: #F5F0E6; overflow: hidden; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.38), 0 8px 18px -12px rgba(23,20,15,0.16), 0 1px 0 rgba(255,255,255,0.9) inset;">
           <div data-m="hide" style="display: grid; grid-template-columns: 1.1fr 1fr 0.9fr 0.9fr 0.7fr; gap: 20px; padding: 18px 28px; background: linear-gradient(#E7DECC, #E1D7C3); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #17140F; box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset;">
-            <span>Product</span><span>Lot</span><span>Blended</span><span>Assayed</span><span>Status</span>
+            <span>Product</span><span>Lot</span><span>Blended</span><span>{{ certDateCol }}</span><span>Status</span>
           </div>
           <sc-for list="{{ certs }}" as="ct" hint-placeholder-count="4">
             <div sc-camel-on-click="{{ ct.open }}" data-m="ctrow" style="position: relative; display: grid; grid-template-columns: 1.1fr 1fr 0.9fr 0.9fr 0.7fr; gap: 20px; align-items: center; padding: 22px 28px; border-top: 1px solid #E4DBC9; cursor: pointer; transition: background 0.25s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease;" style-hover="background: #FCFAF4; transform: translateX(4px); box-shadow: 0 18px 34px -28px rgba(23,20,15,0.5);">
@@ -2049,8 +2054,8 @@ image-slot:not([data-filled]) { color: transparent !important; }
           <div data-m="two" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; margin-bottom: 28px;">
             <div style="background: #F5F0E6; padding: 16px 18px;"><div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Blended</div><div style="font-size: 14px;">{{ coa.made }}</div></div>
             <div style="background: #F5F0E6; padding: 16px 18px;"><div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Assayed</div><div style="font-size: 14px;">{{ coa.tested }}</div></div>
-            <div style="background: #F5F0E6; padding: 16px 18px;"><div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Status</div><div style="font-size: 14px;">{{ coa.status }}</div></div>
-            <div style="background: #F5F0E6; padding: 16px 18px;"><div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Lab</div><div style="font-size: 13px; line-height: 1.4;">{{ coa.lab }}</div></div>
+            <div style="background: #F5F0E6; padding: 16px 18px;"><div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Laboratory</div><div style="font-size: 13px; line-height: 1.4;">{{ coa.lab }}</div></div>
+            <div style="background: #F5F0E6; padding: 16px 18px;"><div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Status</div><div style="font-size: 14px; font-weight: 700; letter-spacing: -0.02em; color: {{ coaStatusColor }};">{{ coa.status }}</div></div>
           </div>
           <div data-m="coahead" style="display: grid; grid-template-columns: 1.5fr 1fr 1fr auto; gap: 16px; padding: 12px 0; border-bottom: 1px solid #17140F; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;">
             <span>Test</span><span>Specification</span><span>Result</span><span>&nbsp;</span>
@@ -3621,7 +3626,7 @@ class Component extends DCLogic {
           { k: 'Total aerobic count', spec: '< 1,000 cfu/g', result: '< 10 cfu/g', pass: true },
           { k: 'Yeast & mould', spec: '< 100 cfu/g', result: '< 10 cfu/g', pass: true }
         ] },
-      { key: 'cat', product: 'Happy Beans for Cats', lot: 'LB-2604-B', made: '11 Apr 2026', tested: '18 Apr 2026', lab: 'Desert Peak Labs, Phoenix AZ', status: 'Destroyed', size: '1,200 boxes',
+      { key: 'cat', product: 'Happy Beans for Cats', lot: 'LB-2604-B', made: '11 Apr 2026', tested: '18 Apr 2026', lab: 'Desert Peak Labs, Phoenix AZ', status: 'Expired', size: '1,200 boxes',
         panels: [
           { k: 'Feline peptide complex, identity', spec: 'Conforms', result: 'Conforms', pass: true },
           { k: 'Feline peptide complex, assay', spec: '180mg ± 10%', result: '149mg', pass: false },
@@ -4411,16 +4416,17 @@ class Component extends DCLogic {
         { n: '02 Direct', title: 'Hand it over', body: 'No mixing, no measuring, no pill pocket. Most beans take it as a treat on the first try.', slot: 'hbv2-step2', ph: 'Hand offering chew to dog' },
         { n: '03 Consistent', title: 'Never miss a morning', body: 'Repair builds. Owners who stay consistent report the clearest change between two and six weeks.', slot: 'hbv2-step3', ph: 'Dog mid-run in field' }
       ],
-      certTitle: this.state.certFilter === 'dog' ? 'Happy Beans for Dogs'
-        : this.state.certFilter === 'cat' ? 'Happy Beans for Cats' : 'All lots',
-      certCount: (() => {
-        const n = certDefs.filter(c => this.state.certFilter === 'all' || c.key === this.state.certFilter).length;
-        return n + (n === 1 ? ' lot' : ' lots');
-      })(),
+      // Certificates: the pills toggle test-type sections, not species. Each
+      // section derives its own status chip and (for shelf life) date column
+      // from the same lot data; the modal always opens the lot's real COA, so
+      // rows spread the original cert and only override display fields.
+      certTitle: ({ all: 'All reports', potency: 'Potency testing', ingredient: 'Ingredient testing', shelf: 'Shelf-life testing' })[this.state.certFilter] || 'All reports',
+      certDateCol: this.state.certFilter === 'shelf' ? 'Re-assayed' : 'Assayed',
       certFilters: [
-        { key: 'all', label: 'All lots' },
-        { key: 'dog', label: 'For dogs' },
-        { key: 'cat', label: 'For cats' }
+        { key: 'all', label: 'All reports' },
+        { key: 'potency', label: 'Potency' },
+        { key: 'ingredient', label: 'Ingredients' },
+        { key: 'shelf', label: 'Shelf life' }
       ].map(cf => ({
         label: cf.label,
         pick: () => this.setState({ certFilter: cf.key }),
@@ -4428,13 +4434,27 @@ class Component extends DCLogic {
         fg: this.state.certFilter === cf.key ? '#F5F0E6' : '#554C40',
         border: this.state.certFilter === cf.key ? '#17140F' : '#E0D6C2'
       })),
-      certs: certDefs
-        .filter(c => this.state.certFilter === 'all' || c.key === this.state.certFilter)
-        .map(c => ({ ...c, open: () => this.setState({ coa: c }) })),
+      ...(() => {
+        const GREEN = 'oklch(0.44 0.07 152)', GRAY = '#8A7F6E';
+        const f = this.state.certFilter;
+        const base = certDefs.map(c => ({ ...c, open: () => this.setState({ coa: c }) }));
+        let rows;
+        if (f === 'potency') rows = base.map(c => ({ ...c, status: c.status === 'Released' ? 'Within spec' : 'Under claim' }));
+        else if (f === 'ingredient') rows = base.map(c => ({ ...c, statusBg: GREEN, status: 'Verified' }));
+        else if (f === 'shelf') rows = base.filter(c => c.status === 'Released').slice(0, 2).map((c, i) => ({
+          ...c,
+          tested: i === 0 ? '13 Jul 2026' : '21 Aug 2026',
+          statusBg: i === 0 ? GRAY : GREEN,
+          status: i === 0 ? 'Month 1 of 12' : 'Month 3 · on track'
+        }));
+        else rows = base;
+        return { certs: rows, certCount: rows.length + (rows.length === 1 ? ' report' : ' reports') };
+      })(),
       coaOpen: !!this.state.coa,
       coaClose: () => this.setState({ coa: null }),
       stop: e => e.stopPropagation(),
       coa: this.state.coa || {},
+      coaStatusColor: (this.state.coa && this.state.coa.status === 'Released') ? 'oklch(0.44 0.07 152)' : '#8A7F6E',
       coaPanels: this.state.coa ? this.state.coa.panels : [],
       layers: [
         { n: '01', title: 'The nutritional layer', accent: '| Whole-food carriers', tag: 'Organic-certified inputs', slot: 'hbv2-layer2', ph: 'Raw whole-food inputs, overhead', body: 'Good signals need good fuel. Every chew carries the nutrients a body draws on to repair itself — B12, iron, zinc, taurine and vitamin A — and they come from real whole-food sources, never synthetic shortcuts.', chips: ['Wide Vitamin Scale', 'Complex B Vitamins'] },
