@@ -1436,55 +1436,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
         </div>
       </div>
 
-      <div data-m="evsec" style="position: relative; max-width: 980px; margin: 92px auto 0;">
-        <div data-m="evhead" style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; margin-bottom: 26px;">
-          <div>
-            <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 16px;">The evidence</div>
-            <h2 data-m="evh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(20px, 2.35vw, 33px); line-height: 1.06; margin: 0; max-width: none; white-space: nowrap;">Three active ingredients. <span style="color: oklch(0.44 0.07 152);">Three published studies.</span></h2>
-          </div>
-          <div data-m="evtag" style="display: flex; align-items: center; gap: 9px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055; white-space: nowrap; padding-bottom: 5px;">
-            <span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152);"></span>
-            <span>{{ evScope }}</span>
-          </div>
-        </div>
-
-        <div data-m="evtabs" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-bottom: 0;">
-          <sc-for list="{{ evidence }}" as="ev" hint-placeholder-count="3">
-            <button sc-camel-on-click="{{ ev.pick }}" data-m="evtab" style="{{ ev.tabStyle }}">
-              <span style="{{ ev.kickerStyle }}">Active {{ ev.n }}</span>
-              <span data-m="evtabname" style="{{ ev.nameStyle }}">{{ ev.active }}</span>
-            </button>
-          </sc-for>
-        </div>
-
-        <div data-m="evcard" key="{{ evOne.key }}" style="position: relative; border: 1px solid #17140F; border-radius: 0 0 5px 5px; background: #FCFAF4; padding: 34px 36px 32px; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.3);">
-          <div data-m="evfoundlab" style="display: flex; align-items: center; gap: 11px; margin-bottom: 16px; animation: hbEvUp 0.45s 0.05s cubic-bezier(0.2,0.7,0.2,1) both;">
-            <span style="width: 20px; height: 2px; background: oklch(0.44 0.07 152);"></span>
-            <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">What it found</span>
-          </div>
-          <p data-m="evresult" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 24px; line-height: 1.42; letter-spacing: -0.024em; color: #17140F; margin: 0; max-width: 28em; text-wrap: pretty; animation: hbEvUp 0.5s 0.12s cubic-bezier(0.2,0.7,0.2,1) both;">{{ evOne.pre }}<mark style="background: none; color: inherit; background-image: linear-gradient(oklch(0.86 0.14 92 / 0.55), oklch(0.86 0.14 92 / 0.55)); background-repeat: no-repeat; background-size: 0% 0.45em; background-position: 0 86%; animation: hbEvMark 0.7s 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards;">{{ evOne.hl }}</mark>{{ evOne.post }}</p>
-
-          <div data-m="evstats" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #E4DBC9; border: 1px solid #E4DBC9; border-radius: 4px; overflow: hidden; margin-top: 28px; animation: hbEvUp 0.5s 0.22s cubic-bezier(0.2,0.7,0.2,1) both;">
-            <sc-for list="{{ evOne.stats }}" as="st3" hint-placeholder-count="3">
-              <div style="background: #F7F2E5; padding: 13px 16px 14px;">
-                <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">{{ st3.k }}</div>
-                <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 14.5px; color: #17140F;">{{ st3.v }}</div>
-              </div>
-            </sc-for>
-          </div>
-
-          <div data-m="evfoot" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #E4DBC9; animation: hbEvUp 0.5s 0.3s cubic-bezier(0.2,0.7,0.2,1) both;">
-            <a href="{{ evOne.url }}" target="_blank" rel="noopener noreferrer" data-m="evlink" style="display: inline-flex; align-items: center; gap: 11px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #F5F0E6; background: #17140F; border: 1px solid #17140F; border-radius: 3px; padding: 12px 18px; text-decoration: none; transition: background 0.25s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: oklch(0.44 0.07 152); border-color: oklch(0.44 0.07 152); transform: translateY(-2px);">
-              <span>Read the study</span>
-              <span aria-hidden="true">&#8599;</span>
-            </a>
-            <span data-m="evcite" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E;">{{ evOne.cite }}</span>
-          </div>
-        </div>
-
-        <p data-m="evnote" style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.7; text-transform: uppercase; color: #8A7F6E; margin: 18px 0 0;">Published research on an ingredient is not a claim about this product.</p>
-      </div>
-
       <div style="max-width: 1180px; margin: 88px auto 0;">
         <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-bottom: 12px;">
           <div>
@@ -1570,6 +1521,55 @@ image-slot:not([data-filled]) { color: transparent !important; }
         </div>
       </div>
       <div style="max-width: 1180px; margin: 14px auto 0; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; color: #8A7F6E;">Bandanas ship free with every first order. One discount per household.</div>
+
+      <div data-m="evsec" style="position: relative; max-width: 980px; margin: 92px auto 0;">
+        <div data-m="evhead" style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; margin-bottom: 26px;">
+          <div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 16px;">The evidence</div>
+            <h2 data-m="evh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(20px, 2.35vw, 33px); line-height: 1.06; margin: 0; max-width: none; white-space: nowrap;">Three active ingredients. <span style="color: oklch(0.44 0.07 152);">Three published studies.</span></h2>
+          </div>
+          <div data-m="evtag" style="display: flex; align-items: center; gap: 9px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055; white-space: nowrap; padding-bottom: 5px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152);"></span>
+            <span>{{ evScope }}</span>
+          </div>
+        </div>
+
+        <div data-m="evtabs" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-bottom: 0;">
+          <sc-for list="{{ evidence }}" as="ev" hint-placeholder-count="3">
+            <button sc-camel-on-click="{{ ev.pick }}" data-m="evtab" style="{{ ev.tabStyle }}">
+              <span style="{{ ev.kickerStyle }}">Active {{ ev.n }}</span>
+              <span data-m="evtabname" style="{{ ev.nameStyle }}">{{ ev.active }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div data-m="evcard" key="{{ evOne.key }}" style="position: relative; border: 1px solid #17140F; border-radius: 0 0 5px 5px; background: #FCFAF4; padding: 34px 36px 32px; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.3);">
+          <div data-m="evfoundlab" style="display: flex; align-items: center; gap: 11px; margin-bottom: 16px; animation: hbEvUp 0.45s 0.05s cubic-bezier(0.2,0.7,0.2,1) both;">
+            <span style="width: 20px; height: 2px; background: oklch(0.44 0.07 152);"></span>
+            <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">What it found</span>
+          </div>
+          <p data-m="evresult" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 24px; line-height: 1.42; letter-spacing: -0.024em; color: #17140F; margin: 0; max-width: 28em; text-wrap: pretty; animation: hbEvUp 0.5s 0.12s cubic-bezier(0.2,0.7,0.2,1) both;">{{ evOne.pre }}<mark style="background: none; color: inherit; background-image: linear-gradient(oklch(0.86 0.14 92 / 0.55), oklch(0.86 0.14 92 / 0.55)); background-repeat: no-repeat; background-size: 0% 0.45em; background-position: 0 86%; animation: hbEvMark 0.7s 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards;">{{ evOne.hl }}</mark>{{ evOne.post }}</p>
+
+          <div data-m="evstats" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #E4DBC9; border: 1px solid #E4DBC9; border-radius: 4px; overflow: hidden; margin-top: 28px; animation: hbEvUp 0.5s 0.22s cubic-bezier(0.2,0.7,0.2,1) both;">
+            <sc-for list="{{ evOne.stats }}" as="st3" hint-placeholder-count="3">
+              <div style="background: #F7F2E5; padding: 13px 16px 14px;">
+                <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">{{ st3.k }}</div>
+                <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 14.5px; color: #17140F;">{{ st3.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div data-m="evfoot" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #E4DBC9; animation: hbEvUp 0.5s 0.3s cubic-bezier(0.2,0.7,0.2,1) both;">
+            <a href="{{ evOne.url }}" target="_blank" rel="noopener noreferrer" data-m="evlink" style="display: inline-flex; align-items: center; gap: 11px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #F5F0E6; background: #17140F; border: 1px solid #17140F; border-radius: 3px; padding: 12px 18px; text-decoration: none; transition: background 0.25s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: oklch(0.44 0.07 152); border-color: oklch(0.44 0.07 152); transform: translateY(-2px);">
+              <span>Read the study</span>
+              <span aria-hidden="true">&#8599;</span>
+            </a>
+            <span data-m="evcite" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E;">{{ evOne.cite }}</span>
+          </div>
+        </div>
+
+        <p data-m="evnote" style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.7; text-transform: uppercase; color: #8A7F6E; margin: 18px 0 0;">Published research on an ingredient is not a claim about this product.</p>
+      </div>
 
       <div data-m="stack gap" style="display: none; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; max-width: 1180px; margin: 88px auto 0;">
         <div data-m="auto" style="height: 520px; border-radius: 5px; overflow: hidden; box-shadow: 0 34px 60px -38px rgba(23,20,15,0.5);"><image-slot id="hbv2-pdp-story" placeholder="Beanie, the dog this began with" style="width: 100%; height: 100%;"></image-slot></div>
