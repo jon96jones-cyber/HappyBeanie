@@ -254,7 +254,7 @@
         model.add(g);
         return g;
       });
-      model.rotation.y = Math.PI * 1.38;
+      model.rotation.y = 0.35;
       stage.setObject(model);
       if (this._readyRes) this._readyRes();
 
