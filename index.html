@@ -433,7 +433,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="ctstat"] > :first-child { font-size: 8.5px !important; padding: 5px 8px !important; }
     [data-m~="ctlot"] { grid-column: 1 !important; font-size: 11px !important; }
     [data-m~="ctdate"] { display: none !important; }
-    [data-m~="ctintro"] { grid-template-columns: minmax(0, 1fr) !important; gap: 10px !important; margin-bottom: 30px !important; }
     [data-m~="askcol"] { display: contents !important; }
     [data-m~="faqwrap"] { grid-column: 1 / -1 !important; grid-row: auto !important; }
     [data-m~="faqhead"] > :first-child { grid-column: 1 !important; grid-row: 1 !important; }
@@ -1981,15 +1980,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
       <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
         <div style="display: flex; align-items: center; gap: 10px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 22px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.08 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Certificate library · <span id="ctCount" style="color: #8A7F6E;">live assay feed</span></div>
         <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(38px, 5vw, 72px); line-height: 1.0; margin: 0 0 20px; max-width: 18em;">Every lot, <span style="color: oklch(0.86 0.14 92);">including the bad one.</span></h1>
-        <p style="font-size: 17px; line-height: 1.65; color: #B9AF9C; max-width: 34em; margin: 0;">Published by lot number and kept online for the life of the product. Open any report — the expired lot stays here too.</p>
+        <p style="font-size: 17px; line-height: 1.65; color: #B9AF9C; max-width: 34em; margin: 0;">Published by lot number and kept online for the life of the product. Open any report — the expired report stays here too.</p>
       </div>
     </section>
     <section data-m="pad short" style="position: relative; background: radial-gradient(120% 80% at 50% 0%, #FDFCF7 0%, #FCFAF4 44%, #F1EADB 100%); padding: 62px 44px 100px;">
       <div style="position: relative; max-width: 1180px; margin: 0 auto;">
-        <div data-m="ctintro" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: end; margin-bottom: 44px; padding-bottom: 22px; border-bottom: 1px solid #DDD3C0;">
-          <p style="font-size: 16px; line-height: 1.7; color: #554C40; max-width: 36em; margin: 0; text-wrap: pretty;">Every batch we blend is sent to an independent lab before it ships. The certificate comes back, we publish it, and it stays here — whether we liked the result or not.</p>
-          <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap; padding-bottom: 4px;">4 lots · est. 2026</span>
-        </div>
         <div data-m="ctstats hide" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid rgba(23,20,15,0.1); border-radius: 8px; overflow: hidden; margin-bottom: 26px; box-shadow: 0 26px 48px -30px rgba(23,20,15,0.34), 0 6px 14px -10px rgba(23,20,15,0.14), 0 1px 0 rgba(255,255,255,0.9) inset;">
           <div style="background: #FCFAF4; padding: 20px 22px;">
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1; margin-bottom: 8px; color: #17140F;">4</div>
@@ -2001,11 +1996,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
           </div>
           <div style="background: #FCFAF4; padding: 20px 22px;">
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1; margin-bottom: 8px; color: #8A7F6E;">1</div>
-            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.5; color: #8A7F6E;">Lot expired, published</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.5; color: #8A7F6E;">Lot expired</div>
           </div>
           <div style="background: #FCFAF4; padding: 20px 22px;">
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1; margin-bottom: 8px; color: #17140F;">13 Jul 2026</div>
-            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.5; color: #8A7F6E;">Most recent assay released</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.5; color: #8A7F6E;">Most recent test released</div>
           </div>
         </div>
         <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;">
@@ -2023,7 +2018,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <div aria-hidden="true" style="position: absolute; left: 7px; right: 7px; bottom: -4px; height: 16px; border-radius: 0 0 8px 8px; background: #F2EBDC; border: 1px solid rgba(23,20,15,0.08); border-top: none;"></div>
         <div style="position: relative; border: 1px solid rgba(23,20,15,0.12); border-radius: 8px; background: #F5F0E6; overflow: hidden; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.38), 0 8px 18px -12px rgba(23,20,15,0.16), 0 1px 0 rgba(255,255,255,0.9) inset;">
           <div data-m="hide" style="display: grid; grid-template-columns: 1.1fr 1fr 0.9fr 0.9fr 0.7fr; gap: 20px; padding: 18px 28px; background: linear-gradient(#E7DECC, #E1D7C3); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #17140F; box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset;">
-            <span>Product</span><span>Lot</span><span>Blended</span><span>{{ certDateCol }}</span><span>Status</span>
+            <span>Product</span><span>Lot</span><span>Formulated</span><span>{{ certDateCol }}</span><span>Status</span>
           </div>
           <sc-for list="{{ certs }}" as="ct" hint-placeholder-count="4">
             <div sc-camel-on-click="{{ ct.open }}" data-m="ctrow" style="position: relative; display: grid; grid-template-columns: 1.1fr 1fr 0.9fr 0.9fr 0.7fr; gap: 20px; align-items: center; padding: 22px 28px; border-top: 1px solid #E4DBC9; cursor: pointer; transition: background 0.25s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease;" style-hover="background: #FCFAF4; transform: translateX(4px); box-shadow: 0 18px 34px -28px rgba(23,20,15,0.5);">
@@ -4421,7 +4416,7 @@ class Component extends DCLogic {
       // from the same lot data; the modal always opens the lot's real COA, so
       // rows spread the original cert and only override display fields.
       certTitle: ({ all: 'All reports', potency: 'Potency testing', ingredient: 'Ingredient testing', shelf: 'Shelf-life testing' })[this.state.certFilter] || 'All reports',
-      certDateCol: this.state.certFilter === 'shelf' ? 'Re-assayed' : 'Assayed',
+      certDateCol: this.state.certFilter === 'shelf' ? 'Re-tested' : 'Tested',
       certFilters: [
         { key: 'all', label: 'All reports' },
         { key: 'potency', label: 'Potency' },
