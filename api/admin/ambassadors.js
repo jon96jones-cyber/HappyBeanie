@@ -61,6 +61,7 @@ const APPROVED_Q = `query AmbApproved {
       tiktok: metafield(namespace: "ambassador", key: "tiktok") { value }
       audience: metafield(namespace: "ambassador", key: "audience") { value }
       paid: metafield(namespace: "ambassador", key: "paid_total") { value }
+      payout: metafield(namespace: "ambassador", key: "payout_method") { value }
     }
   }
 }`;
@@ -197,6 +198,7 @@ module.exports = async function handler(req, res) {
           id: c.id, firstName: c.firstName || '', lastName: c.lastName || '', email: c.email || '',
           instagram: mf(c.instagram), tiktok: mf(c.tiktok), audience: mf(c.audience),
           paidTotal: parseFloat(mf(c.paid) || '0') || 0,
+          payoutMethod: (function (v) { return v === '—' ? '' : v; })(mf(c.payout)),
           code: info.code, pct: info.pct,
           link: info.code ? SITE + '/?ref=' + encodeURIComponent(info.code) : null,
           stats: stats

@@ -1,4 +1,11 @@
-// GET /api/ambassador/portal — the signed-in ambassador's own dashboard data.
+// /api/ambassador/portal — the signed-in ambassador's own dashboard.
+//
+// POST { payoutMethod } — saves how they want to be paid (a PayPal email or
+// Venmo handle, max 200 chars). Deliberately NOT bank account details: raw
+// ACH numbers never touch this stack. Stored in the ambassador.payout_method
+// metafield and shown on the admin desk beside their balance.
+//
+// GET — dashboard data:
 //
 // Auth is the customer's session cookie (same as the account portal). The
 // customer's tags prove ambassador status and carry their code + rate; the
@@ -41,8 +48,16 @@ const ORDERS_Q = `query AmbOrders($q: String!) {
 
 const PAID_Q = `query AmbPaid($q: String!) {
   customers(first: 1, query: $q) {
-    nodes { paid: metafield(namespace: "ambassador", key: "paid_total") { value } }
+    nodes {
+      id
+      paid: metafield(namespace: "ambassador", key: "paid_total") { value }
+      payout: metafield(namespace: "ambassador", key: "payout_method") { value }
+    }
   }
+}`;
+
+const MF_SET = `mutation SetMf($metafields: [MetafieldsSetInput!]!) {
+  metafieldsSet(metafields: $metafields) { userErrors { field message } }
 }`;
 
 module.exports = async function handler(req, res) {
@@ -71,6 +86,29 @@ module.exports = async function handler(req, res) {
     });
     if (!isAmb || !code) return res.status(200).json({ ok: false, error: 'not_ambassador' });
 
+    if (req.method === 'POST') {
+      let body = req.body;
+      if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = {}; } }
+      body = body || {};
+      const method = String(body.payoutMethod || '')
+        .replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
+      // Refuse anything that looks like bank details — this field is for a
+      // PayPal email or Venmo handle only.
+      if (/\d{9,}/.test(method.replace(/\D/g, ''))) {
+        return res.status(200).json({ ok: false, error: 'no_bank_details',
+          message: 'That looks like a bank account number — please enter a PayPal email or Venmo handle instead. We never store bank details.' });
+      }
+      const pj = await admin(PAID_Q, { q: 'email:' + email });
+      const node = (((((pj || {}).data || {}).customers) || {}).nodes || [])[0];
+      if (!node || !node.id) return res.status(200).json({ ok: false, error: 'not_found' });
+      const setOut = await admin(MF_SET, { metafields: [
+        { ownerId: node.id, namespace: 'ambassador', key: 'payout_method', type: 'single_line_text_field', value: method || '—' }
+      ] });
+      const errs = [].concat(((((setOut || {}).data || {}).metafieldsSet) || {}).userErrors || []).concat((setOut || {}).errors || []);
+      if (errs.length) return res.status(200).json({ ok: false, error: 'save_failed' });
+      return res.status(200).json({ ok: true, payoutMethod: method });
+    }
+
     // Their orders, by their code.
     let orders = 0, sales = 0, orders30 = 0, sales30 = 0;
     const recent = [];
@@ -96,11 +134,13 @@ module.exports = async function handler(req, res) {
     } catch (e) { /* stats stay zero — the portal still renders */ }
 
     // Paid-to-date, recorded by the desk.
-    let paidTotal = 0;
+    let paidTotal = 0, payoutMethod = '';
     try {
       const pj = await admin(PAID_Q, { q: 'email:' + email });
       const node = (((((pj || {}).data || {}).customers) || {}).nodes || [])[0];
       paidTotal = parseFloat(((node || {}).paid || {}).value || '0') || 0;
+      payoutMethod = ((node || {}).payout || {}).value || '';
+      if (payoutMethod === '—') payoutMethod = '';
     } catch (e) {}
 
     const earned = pct ? Math.round(sales * pct) / 100 : 0;
@@ -110,6 +150,7 @@ module.exports = async function handler(req, res) {
       ok: true,
       code: code,
       pct: pct,
+      payoutMethod: payoutMethod,
       link: SITE + '/?ref=' + encodeURIComponent(code),
       stats: {
         orders: orders, sales: Math.round(sales * 100) / 100, earned: earned,

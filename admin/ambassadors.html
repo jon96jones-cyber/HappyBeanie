@@ -267,7 +267,7 @@ main { padding:28px 0 90px; }
           '<div><div class="k">Orders · 30d</div><div class="big">' + (st.orders30 != null ? st.orders30 : '—') + '</div><div class="sm">' + (st.orders != null ? st.orders + ' all-time' : '') + '</div></div>' +
           '<div><div class="k">Net sales · 30d</div><div class="big">' + (st.sales30 != null ? usd(st.sales30) : '—') + '</div><div class="sm">' + (st.sales != null ? usd(st.sales) + ' all-time' : '') + '</div></div>' +
           '<div><div class="k">Earned · 30d</div><div class="big">' + usd(owed30) + '</div><div class="sm">' + usd(owed) + ' all-time</div></div>' +
-          '<div><div class="k">Balance owed</div><div class="big">' + usd(balance) + '</div><div class="sm">' + usd(paid) + ' paid to date</div></div>' +
+          '<div><div class="k">Balance owed</div><div class="big">' + usd(balance) + '</div><div class="sm">' + usd(paid) + ' paid · ' + (a.payoutMethod ? 'pay via ' + esc(a.payoutMethod) : 'no payout method yet') + '</div></div>' +
         '</div>' +
         (a.link ? '<div class="linkrow"><span class="url">' + esc(a.link) + '</span><button class="copy" data-act="copylink">Copy link</button><button class="copy" data-act="copycode">Copy code</button></div>' : '') +
         '<div class="ctls">' +
