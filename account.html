@@ -1016,9 +1016,9 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     ];
     box.innerHTML =
       (pct ? '<div style="font-size:12.5px; line-height:1.6; color:#B9AF9C; margin-bottom:10px;">You earn <b style="color:#F5F0E6;">' + pct + '%</b> of net sales, paid monthly ($25 minimum) to the payout method saved in your ambassador panel.</div>' : '') +
-      rules.map(function (r) {
-        return '<div style="display:flex; gap:9px; padding:5px 0; font-size:12.5px; line-height:1.55;">' +
-          '<span style="flex:0 0 auto; color:oklch(0.9 0.1 92);">✓</span>' +
+      rules.map(function (r, i) {
+        return '<div style="display:flex; gap:10px; padding:5px 0; font-size:12.5px; line-height:1.55;">' +
+          '<span style="flex:0 0 auto; font-family:\'DM Mono\',monospace; font-size:11px; line-height:1.75; color:oklch(0.9 0.1 92);">0' + (i + 1) + '</span>' +
           '<span style="color:#B9AF9C;"><b style="color:#DED5C4; font-weight:700;">' + r[0] + '.</b> ' + r[1] + '</span>' +
         '</div>';
       }).join('');
