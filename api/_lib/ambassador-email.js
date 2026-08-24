@@ -14,8 +14,21 @@ function fill(tpl, t) {
     .replace(/\[\[YOUR_NAME\]\]/g, t.senderName);
 }
 
+// Approval: the desk approves terms only — the ambassador picks their own
+// code in the portal, so the card invites them in rather than showing a code.
 module.exports = function buildApprovalEmail(t) {
-  return fill(TEMPLATE, t);
+  const tpl = TEMPLATE
+    .replace('Welcome to the Happy Beanie ambassador program</title>', 'Pick your Happy Beanie ambassador code</title>')
+    .replace("You're in — your code [[CODE]] and your link are inside.",
+             "You're in — open your portal and pick your personal code.")
+    .replace("Welcome to the Happy Beanie ambassador program. Your personal code and link are below — they're live right now.",
+             "Welcome to the Happy Beanie ambassador program. One thing left to do: sign in to your portal and pick your personal code — it goes live the moment you claim it.")
+    .replace('Your code · [[BUYER_PCT]]% off for your people', 'First move · claim your code')
+    .replace("font-size:30px; letter-spacing:4px; font-weight:700; color:#f2ce59;\">[[CODE]]</p>",
+             "font-size:21px; letter-spacing:2px; font-weight:700; color:#f2ce59;\">You pick it — in your portal</p>")
+    .replace('<b style="color:#17140f;">Share your link or code</b> — anyone who uses it gets [[BUYER_PCT]]% off their order, and the sale is credited to you automatically.',
+             '<b style="color:#17140f;">Pick your code</b> — sign in and claim any code, 3–20 letters or numbers (your name, your pet\'s name, your call). Your audience gets [[BUYER_PCT]]% off with it, and every sale it drives is credited to you automatically.');
+  return fill(tpl, t);
 };
 
 // Tier-change variant: same design, copy announces the new commission rate.
@@ -37,16 +50,17 @@ function textApproval(t) {
   return [
     "You're in, " + t.firstName + ".",
     "",
-    "Welcome to the Happy Beanie ambassador program. Your personal code and",
-    "link are below - they're live right now.",
+    "Welcome to the Happy Beanie ambassador program. One thing left to do:",
+    "sign in to your portal and pick your personal code - it goes live the",
+    "moment you claim it.",
     "",
-    "YOUR CODE (" + t.buyerPct + "% off for your people): " + t.code,
-    "YOUR LINK: " + t.link,
-    "YOU EARN: " + t.commissionPct + "% of every sale it drives",
+    "YOU EARN: " + t.commissionPct + "% of every sale your code drives",
+    "YOUR AUDIENCE GETS: " + t.buyerPct + "% off with it",
     "",
     "HOW IT WORKS",
-    "  1. Share your link or code - anyone who uses it gets " + t.buyerPct + "% off,",
-    "     and the sale is credited to you automatically.",
+    "  1. Pick your code - sign in and claim any code, 3-20 letters or",
+    "     numbers (your name, your pet's name, your call). Every sale it",
+    "     drives is credited to you automatically.",
     "  2. Get paid monthly - " + t.commissionPct + "% of net product sales, paid at",
     "     month end once you've earned $25 or more.",
     "  3. Play it straight - always disclose the partnership (#ad), never",

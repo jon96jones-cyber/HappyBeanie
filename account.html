@@ -605,6 +605,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
               <p class="help">Questions about a delivery, a dose, or a lot number? The desk answers within a business day.<br><br><a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
             </div>
           </div>
+          <div class="panel" id="ambRulesPanel" data-view="ambassador" style="display:none;">
+            <div class="panel-head"><h2>The rules</h2></div>
+            <div class="panel-body" id="ambRulesBox"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -744,7 +748,9 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     // and still needs managing.
     if (!isWholesale || (subs && subs.length)) roles.push('personal');
     if (isWholesale) roles.push('wholesale');
-    if (tags.indexOf('ambassador') !== -1 && tags.some(function (t) { return /^amb-code-/i.test(t); })) roles.push('ambassador');
+    // Approved ambassadors get the workspace even before they claim a code —
+    // claiming it happens IN the portal.
+    if (tags.indexOf('ambassador') !== -1) roles.push('ambassador');
     var host = document.getElementById('acctViews');
     if (!host) return;
     if (roles.length < 2) { host.style.display = 'none'; applyView(roles[0] || 'personal', roles); return; }
@@ -778,7 +784,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       var views = String(el.getAttribute('data-view')).split(/\s+/);
       var show = views.indexOf(v) !== -1;
       // A panel for a role the account lacks stays hidden in every view.
-      if (show && el.id === 'ambPanel' && roles.indexOf('ambassador') === -1) show = false;
+      if (show && (el.id === 'ambPanel' || el.id === 'ambRulesPanel') && roles.indexOf('ambassador') === -1) show = false;
       if (show && el.id === 'wsPanel' && roles.indexOf('wholesale') === -1) show = false;
       el.style.display = show ? '' : 'none';
     });
@@ -827,11 +833,19 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       m = String(t).match(/^amb-pct-(\d+)$/i);
       if (m) pct = parseInt(m[1], 10);
     });
-    if (tags.indexOf('ambassador') === -1 || !code) { panel.style.display = 'none'; return; }
+    if (tags.indexOf('ambassador') === -1) {
+      panel.style.display = 'none';
+      var rp = document.getElementById('ambRulesPanel');
+      if (rp) rp.style.display = 'none';
+      return;
+    }
     panel.style.display = '';
     var rate = document.getElementById('ambRate');
     if (rate) rate.textContent = pct ? pct + '% commission' : '';
-    ambDraw({ code: code, pct: pct, link: 'https://www.happybeanie.com/?ref=' + encodeURIComponent(code), stats: null, recent: [] });
+    // No code yet means they haven't claimed one — the portal is where that
+    // happens, so draw the claim state until the API says otherwise.
+    if (code) ambDraw({ code: code, pct: pct, link: 'https://www.happybeanie.com/?ref=' + encodeURIComponent(code), stats: null, recent: [] });
+    else ambDraw({ needsCode: true, pct: pct });
     fetch('/api/ambassador/portal').then(function (r) { return r.json(); }).then(function (j) {
       if (j && j.ok) ambDraw(j);
     }).catch(function () {});
@@ -848,6 +862,53 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     var mono = "font-family:'DM Mono',monospace;";
     var lab = mono + 'font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E;';
     var html = '';
+    ambRulesFill(d.pct);
+
+    // First visit after approval: they claim their own code here. It becomes
+    // the public discount the moment it's claimed, and it's permanent.
+    if (d.needsCode) {
+      box.innerHTML =
+        '<div style="' + lab + ' margin-bottom:6px;">One step left — claim your code</div>' +
+        '<div style="font-size:13px; line-height:1.65; color:#B9AF9C; margin-bottom:12px;">This is the code your audience types at checkout' + (d.buyerPct ? ' for ' + d.buyerPct + '% off' : '') + ', and every order that uses it is credited to you. 3–20 letters or numbers — your name, your pet’s name, your call. Once claimed it’s permanent.</div>' +
+        '<div style="display:flex; align-items:stretch; gap:8px; flex-wrap:wrap; margin-bottom:6px;">' +
+          '<input id="ambCodeInput" type="text" maxlength="20" placeholder="e.g. BEANIE" autocapitalize="characters" autocomplete="off" spellcheck="false" style="flex:1 1 180px; min-width:0; ' + mono + ' font-size:16px; letter-spacing:0.14em; text-transform:uppercase; color:oklch(0.9 0.1 92); background:rgba(23,20,15,0.6); border:1px solid rgba(245,240,230,0.24); border-radius:2px; padding:10px 12px;">' +
+          '<button type="button" id="ambCodeClaim" style="' + mono + ' font-size:9px; letter-spacing:0.12em; text-transform:uppercase; background:#F0C64B; border:1px solid #F0C64B; border-radius:2px; color:#17140F; font-weight:700; padding:7px 16px; cursor:pointer;">Claim code</button>' +
+        '</div>' +
+        '<div id="ambCodeMsg" style="font-size:11.5px; line-height:1.5; color:#8A7F6E;">Checks availability the moment you claim it.</div>';
+      var claim = document.getElementById('ambCodeClaim');
+      var inp = document.getElementById('ambCodeInput');
+      var say = function (t, bad) {
+        var m = document.getElementById('ambCodeMsg');
+        if (m) { m.textContent = t; m.style.color = bad ? '#E0A48F' : '#8A7F6E'; }
+      };
+      if (claim) claim.onclick = function () {
+        var val = String(inp ? inp.value : '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (val.length < 3) { say('At least 3 letters or numbers.', true); return; }
+        claim.disabled = true; claim.textContent = 'Claiming…';
+        fetch('/api/ambassador/portal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ setCode: val })
+        }).then(function (r) { return r.json(); }).then(function (j) {
+          if (j && j.ok) {
+            // Re-pull the dashboard now that the code is live.
+            fetch('/api/ambassador/portal').then(function (r) { return r.json(); }).then(function (j2) {
+              ambDraw(j2 && j2.ok ? j2 : { code: j.code, pct: d.pct, link: j.link, stats: null, recent: [] });
+            }).catch(function () {
+              ambDraw({ code: j.code, pct: d.pct, link: j.link, stats: null, recent: [] });
+            });
+          } else {
+            claim.disabled = false; claim.textContent = 'Claim code';
+            say((j && j.message) || 'Could not claim that code — try another.', true);
+          }
+        }).catch(function () {
+          claim.disabled = false; claim.textContent = 'Claim code';
+          say('Network hiccup — try again.', true);
+        });
+      };
+      if (inp) inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && claim) claim.click(); });
+      return;
+    }
 
     // Stats tiles
     if (st) {
@@ -908,26 +969,6 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       html += '<div style="font-size:12.5px; color:#8A7F6E; margin-bottom:16px;">No referred orders yet — your first one shows up here the moment it lands.</div>';
     }
 
-    // The rules — the full set lives here, where every ambassador signs in.
-    var rules = [
-      ['Always disclose', 'Every post using your code or link carries a clear disclosure — #ad, #happybeaniepartner, or the platform\u2019s paid-partnership tool.'],
-      ['No health claims we don\u2019t make', 'Share your own pet\u2019s story, but never claim Happy Beanie treats, cures or prevents any disease.'],
-      ['Keep your code off coupon sites', 'Your code is for your audience. Posting it to deal aggregators ends the partnership.'],
-      ['No brand-term ads', 'No paid ads on \u201cHappy Beanie\u201d or our misspellings, and no impersonating the brand in handles or domains.'],
-      ['No self-commission', 'Your code works for your audience, not on your own orders.'],
-      ['Either side can end it', 'Anytime, no hard feelings — earned commissions are always paid on the next cycle.']
-    ];
-    html += '<div style="border-top:1px solid rgba(245,240,230,0.14); padding-top:12px;">' +
-      '<div style="' + lab + ' margin-bottom:8px;">The rules</div>' +
-      (d.pct ? '<div style="font-size:12.5px; line-height:1.6; color:#B9AF9C; margin-bottom:10px;">You earn <b style="color:#F5F0E6;">' + d.pct + '%</b> of net sales, paid monthly ($25 minimum) to the method you saved above.</div>' : '') +
-      rules.map(function (r) {
-        return '<div style="display:flex; gap:9px; padding:5px 0; font-size:12.5px; line-height:1.55;">' +
-          '<span style="flex:0 0 auto; color:oklch(0.9 0.1 92);">\u2713</span>' +
-          '<span style="color:#B9AF9C;"><b style="color:#DED5C4; font-weight:700;">' + r[0] + '.</b> ' + r[1] + '</span>' +
-        '</div>';
-      }).join('') +
-    '</div>';
-
     box.innerHTML = html;
 
     var linkFor = function () {
@@ -960,6 +1001,29 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     var cl = document.getElementById('ambCopyLink');
     if (cl) cl.onclick = function () { navigator.clipboard.writeText(linkFor()).then(function () { cl.textContent = 'Copied ✓'; setTimeout(function () { cl.textContent = 'Copy link'; }, 1400); }); };
   }
+  // The rules live in their own panel below the Help desk — filled whenever
+  // the ambassador panel draws, so the rate line stays live.
+  function ambRulesFill(pct) {
+    var box = document.getElementById('ambRulesBox');
+    if (!box) return;
+    var rules = [
+      ['Always disclose', 'Every post using your code or link carries a clear disclosure — #ad, #happybeaniepartner, or the platform’s paid-partnership tool.'],
+      ['No health claims we don’t make', 'Share your own pet’s story, but never claim Happy Beanie treats, cures or prevents any disease.'],
+      ['Keep your code off coupon sites', 'Your code is for your audience. Posting it to deal aggregators ends the partnership.'],
+      ['No brand-term ads', 'No paid ads on “Happy Beanie” or our misspellings, and no impersonating the brand in handles or domains.'],
+      ['No self-commission', 'Your code works for your audience, not on your own orders.'],
+      ['Either side can end it', 'Anytime, no hard feelings — earned commissions are always paid on the next cycle.']
+    ];
+    box.innerHTML =
+      (pct ? '<div style="font-size:12.5px; line-height:1.6; color:#B9AF9C; margin-bottom:10px;">You earn <b style="color:#F5F0E6;">' + pct + '%</b> of net sales, paid monthly ($25 minimum) to the payout method saved in your ambassador panel.</div>' : '') +
+      rules.map(function (r) {
+        return '<div style="display:flex; gap:9px; padding:5px 0; font-size:12.5px; line-height:1.55;">' +
+          '<span style="flex:0 0 auto; color:oklch(0.9 0.1 92);">✓</span>' +
+          '<span style="color:#B9AF9C;"><b style="color:#DED5C4; font-weight:700;">' + r[0] + '.</b> ' + r[1] + '</span>' +
+        '</div>';
+      }).join('');
+  }
+
   window.__hbRenderAmb = renderAmbassador;
 
   function renderReadouts(orders, subs) {

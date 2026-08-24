@@ -1,11 +1,19 @@
 // /api/ambassador/portal — the signed-in ambassador's own dashboard.
 //
+// POST { setCode } — one-time code claim. The desk approves rates only; the
+// ambassador picks their own code here on first sign-in. Normalized to
+// A-Z0-9, 3–20 chars, checked against every existing discount code, then
+// created as the public discount (buyer % from the amb-off-NN tag the desk
+// set at approval) and locked in with the amb-code tag. Permanent once set.
+//
 // POST { payoutMethod } — saves how they want to be paid (a PayPal email or
 // Venmo handle, max 200 chars). Deliberately NOT bank account details: raw
 // ACH numbers never touch this stack. Stored in the ambassador.payout_method
 // metafield and shown on the admin desk beside their balance.
 //
-// GET — dashboard data:
+// GET — dashboard data. Before a code is claimed it returns
+// { ok: true, needsCode: true, pct, buyerPct } and the portal shows the
+// claim form instead of stats:
 //
 // Auth is the customer's session cookie (same as the account portal). The
 // customer's tags prove ambassador status and carry their code + rate; the
@@ -60,6 +68,37 @@ const MF_SET = `mutation SetMf($metafields: [MetafieldsSetInput!]!) {
   metafieldsSet(metafields: $metafields) { userErrors { field message } }
 }`;
 
+const CODE_CHECK = `query CodeCheck($code: String!) {
+  codeDiscountNodeByCode(code: $code) { id }
+}`;
+
+const CODE_CREATE = `mutation CodeCreate($d: DiscountCodeBasicInput!) {
+  discountCodeBasicCreate(basicCodeDiscount: $d) { userErrors { field message } }
+}`;
+
+const TAGS_ADD = `mutation TagsAdd($id: ID!, $t: [String!]!) {
+  tagsAdd(id: $id, tags: $t) { userErrors { message } }
+}`;
+
+// Public one-per-customer code — same shape the desk used to create: buyer %
+// off everything, one-time and subscription first orders, open to everyone.
+function ambCodeInput(code, buyerPct) {
+  return {
+    title: 'Ambassador — ' + code + ' (' + buyerPct + '% off)',
+    code: code,
+    startsAt: new Date().toISOString(),
+    customerSelection: { all: true },
+    customerGets: {
+      value: { percentage: buyerPct / 100 },
+      items: { all: true },
+      appliesOnOneTimePurchase: true,
+      appliesOnSubscription: true
+    },
+    combinesWith: { productDiscounts: false, orderDiscounts: false, shippingDiscounts: true },
+    appliesOncePerCustomer: true
+  };
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'private, no-store');
   try {
@@ -77,19 +116,65 @@ module.exports = async function handler(req, res) {
     const email = ((cust.emailAddress || {}).emailAddress || '').toLowerCase();
 
     const isAmb = tags.some(function (t) { return String(t).toLowerCase() === 'ambassador'; });
-    let code = null, pct = null;
+    let code = null, pct = null, buyerPct = 10;
     tags.forEach(function (t) {
       let m = String(t).match(/^amb-code-(.+)$/);
       if (m) code = m[1].toUpperCase();
       m = String(t).match(/^amb-pct-(\d+)$/);
       if (m) pct = parseInt(m[1], 10);
+      m = String(t).match(/^amb-off-(\d+)$/);
+      if (m) buyerPct = parseInt(m[1], 10);
     });
-    if (!isAmb || !code) return res.status(200).json({ ok: false, error: 'not_ambassador' });
+    if (!isAmb) return res.status(200).json({ ok: false, error: 'not_ambassador' });
 
     if (req.method === 'POST') {
       let body = req.body;
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = {}; } }
       body = body || {};
+
+      // One-time code claim — the ambassador names their own code.
+      if (body.setCode !== undefined) {
+        if (code) {
+          return res.status(200).json({ ok: false, error: 'code_locked',
+            message: 'Your code is already set — it’s permanent. Email hello@happybeanie.com if it truly needs to change.' });
+        }
+        const wanted = String(body.setCode || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20);
+        if (wanted.length < 3) {
+          return res.status(200).json({ ok: false, error: 'bad_code', message: 'At least 3 letters or numbers.' });
+        }
+        // Brand and trade names stay ours.
+        if (/^(TRADE|WHOLESALE|HAPPYBEANIE|HAPPYBEAN)/.test(wanted)) {
+          return res.status(200).json({ ok: false, error: 'code_taken', message: '“' + wanted + '” is reserved — try another.' });
+        }
+        const chk = await admin(CODE_CHECK, { code: wanted });
+        if ((((chk || {}).data || {}).codeDiscountNodeByCode || {}).id) {
+          return res.status(200).json({ ok: false, error: 'code_taken', message: '“' + wanted + '” is taken — try another.' });
+        }
+        const dc = await admin(CODE_CREATE, { d: ambCodeInput(wanted, buyerPct) });
+        const dcErrs = [].concat(((((dc || {}).data || {}).discountCodeBasicCreate) || {}).userErrors || []).concat((dc || {}).errors || []);
+        if (dcErrs.length) {
+          console.error('[ambassador/portal] code create:', JSON.stringify(dcErrs));
+          return res.status(200).json({ ok: false, error: 'discount_failed', message: 'Could not create that code — try another.' });
+        }
+        const pj = await admin(PAID_Q, { q: 'email:' + email });
+        const node = (((((pj || {}).data || {}).customers) || {}).nodes || [])[0];
+        if (!node || !node.id) return res.status(200).json({ ok: false, error: 'not_found' });
+        const ta = await admin(TAGS_ADD, { id: node.id, t: ['amb-code-' + wanted] });
+        const taErrs = [].concat(((((ta || {}).data || {}).tagsAdd) || {}).userErrors || []).concat((ta || {}).errors || []);
+        if (taErrs.length) {
+          console.error('[ambassador/portal] code tag:', JSON.stringify(taErrs));
+          return res.status(200).json({ ok: false, error: 'tag_failed',
+            message: 'The code was created but could not be attached to your account — email hello@happybeanie.com and we’ll fix it.' });
+        }
+        try {
+          await admin(MF_SET, { metafields: [
+            { ownerId: node.id, namespace: 'ambassador', key: 'code', type: 'single_line_text_field', value: wanted }
+          ] });
+        } catch (e) {}
+        console.log('[ambassador/portal] code claimed', email, wanted);
+        return res.status(200).json({ ok: true, code: wanted, link: SITE + '/?ref=' + encodeURIComponent(wanted) });
+      }
+
       const method = String(body.payoutMethod || '')
         .replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
       // Refuse anything that looks like bank details — this field is for a
@@ -107,6 +192,11 @@ module.exports = async function handler(req, res) {
       const errs = [].concat(((((setOut || {}).data || {}).metafieldsSet) || {}).userErrors || []).concat((setOut || {}).errors || []);
       if (errs.length) return res.status(200).json({ ok: false, error: 'save_failed' });
       return res.status(200).json({ ok: true, payoutMethod: method });
+    }
+
+    // Approved but no code claimed yet — the portal shows the claim form.
+    if (!code) {
+      return res.status(200).json({ ok: true, needsCode: true, pct: pct, buyerPct: buyerPct });
     }
 
     // Their orders, by their code.

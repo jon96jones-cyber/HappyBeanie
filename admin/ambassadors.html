@@ -166,12 +166,6 @@ main { padding:28px 0 90px; }
   $('refresh').onclick = load;
   function load() { api({}).then(function (b) { if (b.ok) { state.data = b; draw(); } }); }
 
-  // Suggested code: FIRSTNAME + buyer discount, e.g. JAMIE10.
-  function suggestCode(a) {
-    var base = String(a.firstName || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 12) || 'BEAN';
-    return base + '10';
-  }
-
   function channelLine(a) {
     var bits = [];
     if (a.instagram) bits.push('IG @' + a.instagram);
@@ -209,28 +203,27 @@ main { padding:28px 0 90px; }
         '</div>' +
         (a.why ? '<div class="note">' + esc(a.why) + '</div>' : '') +
         '<div class="approve">' +
-          '<span class="fld"><label>Their code</label><input class="wide" data-f="code" value="' + esc(suggestCode(a)) + '"></span>' +
           '<span class="fld"><label>Buyer % off</label><input data-f="buyer" value="10" inputmode="numeric"></span>' +
           '<span class="fld"><label>Commission %</label><input data-f="comm" value="10" inputmode="numeric"></span>' +
-          '<button class="btn" data-act="approve">Approve &amp; email code</button>' +
+          '<button class="btn" data-act="approve">Approve &amp; email invite</button>' +
           '<button class="btn ghost" data-act="decline">Decline</button>' +
-          '<span class="hint">Approving creates the public code in Shopify (one use per customer) and emails it with their link.</span>' +
+          '<span class="hint">Approving sets their terms and emails the invite — they pick their own code in their portal, which is when the public discount goes live.</span>' +
         '</div>';
       var get = function (f) { return card.querySelector('[data-f="' + f + '"]').value.trim(); };
       card.querySelector('[data-act="approve"]').onclick = function () {
         var btn = this; btn.disabled = true; btn.textContent = 'Approving…';
         api({ method: 'POST', body: JSON.stringify({
           customerId: a.id, firstName: a.firstName, email: a.email,
-          code: get('code'), buyerPct: parseInt(get('buyer'), 10), commissionPct: parseInt(get('comm'), 10)
+          buyerPct: parseInt(get('buyer'), 10), commissionPct: parseInt(get('comm'), 10)
         }) }).then(function (b) {
           if (b.ok && !b.warning) {
-            card.innerHTML = '<div class="okrow">✓ Approved — ' + esc(b.code) + ' is live, email sent</div>';
+            card.innerHTML = '<div class="okrow">✓ Approved — invite sent, they pick their code in their portal</div>';
             setTimeout(load, 1200);
           } else if (b.ok) {
             card.insertAdjacentHTML('afterbegin', '<div class="warn">' + esc(b.message || 'Approved, but the email did not send.') + '</div>');
-            btn.disabled = false; btn.textContent = 'Approve & email code';
+            btn.disabled = false; btn.textContent = 'Approve & email invite';
           } else {
-            btn.disabled = false; btn.textContent = 'Approve & email code';
+            btn.disabled = false; btn.textContent = 'Approve & email invite';
             card.insertAdjacentHTML('afterbegin', '<div class="warn">' + esc(b.message || b.error || 'Approval failed.') + '</div>');
           }
         });
@@ -261,7 +254,7 @@ main { padding:28px 0 90px; }
       card.innerHTML =
         '<div class="app-h">' +
           '<span style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><span class="co">' + esc(a.firstName + ' ' + a.lastName) + '</span><span class="who">' + esc(a.email) + (a.instagram ? ' · @' + esc(a.instagram) : '') + '</span></span>' +
-          '<span class="chips">' + (a.code ? '<span class="chip">' + esc(a.code) + '</span>' : '<span class="chip dim">no code</span>') + (a.pct != null ? '<span class="chip dim">' + a.pct + '% rate<button class="editpen" data-act="editrate" title="Change this rate" aria-label="Change this rate">✎</button></span>' : '') + '</span>' +
+          '<span class="chips">' + (a.code ? '<span class="chip">' + esc(a.code) + '</span>' : '<span class="chip dim">picks code in portal</span>') + (a.pct != null ? '<span class="chip dim">' + a.pct + '% rate<button class="editpen" data-act="editrate" title="Change this rate" aria-label="Change this rate">✎</button></span>' : '') + '</span>' +
         '</div>' +
         '<div class="stats4">' +
           '<div><div class="k">Orders · 30d</div><div class="big">' + (st.orders30 != null ? st.orders30 : '—') + '</div><div class="sm">' + (st.orders != null ? st.orders + ' all-time' : '') + '</div></div>' +

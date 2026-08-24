@@ -117,8 +117,8 @@ module.exports = async function handler(req, res) {
         const m = String(tags[i]).match(/^wholesale-pct-(\d+)$/);
         if (m) { tierPct = parseInt(m[1], 10); break; }
       }
-      // Ambassador terms ride on tags too: amb-pct-NN (commission) and
-      // amb-code-CODE (their public discount code) — set by the desk.
+      // Ambassador terms ride on tags too: amb-pct-NN (commission, set by
+      // the desk) and amb-code-CODE (the code they claimed in their portal).
       if (tags.some(function (t) { return String(t).toLowerCase() === 'ambassador'; })) {
         let ambPct = null, ambCode = null;
         tags.forEach(function (t) {

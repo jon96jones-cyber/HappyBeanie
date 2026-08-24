@@ -6,12 +6,15 @@
 //        and sales pulled live from orders that used their code (order count,
 //        net sales, commission owed — all-time and last 30 days).
 //
-// POST { action: 'approve', customerId, firstName, email, code, buyerPct, commissionPct }
-//        Creates the public discount code (buyerPct% off, once per customer),
-//        moves tags pending → ambassador + amb-pct-NN + amb-code-CODE, and
-//        sends the approval email with code + link.
+// POST { action: 'approve', customerId, firstName, email, buyerPct, commissionPct }
+//        Approves the terms only — moves tags pending → ambassador +
+//        amb-pct-NN (commission) + amb-off-NN (their audience's discount) and
+//        emails the invite. The ambassador claims their own code in the
+//        portal, which is where the public discount gets created.
 // POST { action: 'set_tier', customerId, firstName, email, code, commissionPct }
-//        Swaps the amb-pct tag and emails the new rate. The code is untouched.
+//        Swaps the amb-pct tag and emails the new rate. The code is untouched;
+//        if no code has been claimed yet the email is skipped (the new rate
+//        shows in their portal).
 // POST { action: 'decline', customerId }
 //        Removes the pending tag. No email — decline how you like, by hand.
 //
@@ -75,22 +78,6 @@ const ORDERS_Q = `query AmbOrders($q: String!) {
   }
 }`;
 
-const CODES_Q = `query AmbCodes {
-  codeDiscountNodes(first: 100) {
-    nodes {
-      id
-      codeDiscount {
-        __typename
-        ... on DiscountCodeBasic { title status codes(first: 1) { nodes { code } } }
-      }
-    }
-  }
-}`;
-
-const CODE_CREATE = `mutation CodeCreate($d: DiscountCodeBasicInput!) {
-  discountCodeBasicCreate(basicCodeDiscount: $d) { userErrors { field message } }
-}`;
-
 const CUST_TAGS = `query CustTags($id: ID!) { customer(id: $id) { tags } }`;
 const TAGS_REMOVE = `mutation TagsRemove($id: ID!, $t: [String!]!) {
   tagsRemove(id: $id, tags: $t) { userErrors { message } }
@@ -120,25 +107,6 @@ function ambInfoFromTags(tags) {
     if (m) code = m[1];
   });
   return { pct: pct, code: code };
-}
-
-// Public one-per-customer code: buyerPct% off everything, no minimum, works on
-// one-time and subscription first orders, open to all customers.
-function ambCodeInput(code, buyerPct) {
-  return {
-    title: 'Ambassador — ' + code + ' (' + buyerPct + '% off)',
-    code: code,
-    startsAt: new Date().toISOString(),
-    customerSelection: { all: true },
-    customerGets: {
-      value: { percentage: buyerPct / 100 },
-      items: { all: true },
-      appliesOnOneTimePurchase: true,
-      appliesOnSubscription: true
-    },
-    combinesWith: { productDiscounts: false, orderDiscounts: false, shippingDiscounts: true },
-    appliesOncePerCustomer: true
-  };
 }
 
 // Sales for one code: sum of non-cancelled order subtotals, all-time and
@@ -250,7 +218,7 @@ module.exports = async function handler(req, res) {
       const email = String(body.email || '').slice(0, 200);
       const code = String(body.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 30);
       const pct = parseInt(body.commissionPct, 10);
-      if (!id || !email || !firstName || !code || !(pct >= 5 && pct <= 50)) {
+      if (!id || !email || !firstName || !(pct >= 5 && pct <= 50)) {
         return res.status(400).json({ ok: false, error: 'bad_request', message: 'Commission must be a whole number between 5 and 50.' });
       }
       const tag = 'amb-pct-' + pct;
@@ -263,6 +231,9 @@ module.exports = async function handler(req, res) {
         const taErrs = [].concat((((ta.json.data || {}).tagsAdd) || {}).userErrors || []).concat(ta.json.errors || []);
         if (taErrs.length) return res.status(200).json({ ok: false, error: 'tag_failed', message: taErrs[0].message || 'Could not set the tier tag.' });
       }
+      // No code claimed yet → nothing to reference in a rate email; the new
+      // rate shows in their portal the next time they sign in.
+      if (!code) return res.status(200).json({ ok: true, pct: pct, emailSkipped: true });
       const sender = String(process.env.AMBASSADOR_SENDER || 'Jon').slice(0, 100);
       const t = { firstName: firstName, code: code, link: SITE + '/?ref=' + encodeURIComponent(code), buyerPct: 10, commissionPct: pct, senderName: sender };
       const sent = await fetch('https://api.resend.com/emails', {
@@ -282,81 +253,64 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ ok: true, emailId: sj.id, pct: pct });
     }
 
-    // Default action: approve.
+    // Default action: approve. Terms only — the ambassador claims their own
+    // code in the portal, so no discount is created here.
     const id = String(body.customerId || '');
     const firstName = String(body.firstName || '').slice(0, 100);
     const email = String(body.email || '').slice(0, 200);
-    const code = String(body.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 30);
     const buyerPct = parseInt(body.buyerPct, 10) || 10;
     const commissionPct = parseInt(body.commissionPct, 10);
-    if (!id || !email || !firstName || !code || code.length < 3) {
-      return res.status(400).json({ ok: false, error: 'bad_request', message: 'Code must be at least 3 letters/numbers.' });
+    if (!id || !email || !firstName) {
+      return res.status(400).json({ ok: false, error: 'bad_request', message: 'Missing the applicant.' });
     }
     if (!(buyerPct >= 5 && buyerPct <= 50) || !(commissionPct >= 5 && commissionPct <= 50)) {
       return res.status(400).json({ ok: false, error: 'bad_request', message: 'Both percentages must be whole numbers between 5 and 50.' });
     }
 
-    // 1. Create the public code unless it already exists.
-    const cOut = await admin(token, CODES_Q);
-    const cNodes = ((((cOut.json || {}).data || {}).codeDiscountNodes) || {}).nodes || [];
-    const codeExists = cNodes.some(function (n) {
-      const cd = n.codeDiscount || {};
-      return ((((cd.codes || {}).nodes || [])[0] || {}).code) === code;
-    });
-    if (!codeExists) {
-      const dc = await admin(token, CODE_CREATE, { d: ambCodeInput(code, buyerPct) });
-      const dcErrs = [].concat((((dc.json.data || {}).discountCodeBasicCreate) || {}).userErrors || []).concat(dc.json.errors || []);
-      if (dcErrs.length) {
-        console.error('[admin/ambassadors] code create:', JSON.stringify(dcErrs));
-        return res.status(200).json({ ok: false, error: 'discount_failed', message: 'Could not create the code: ' + (dcErrs[0].message || '') });
-      }
-    }
-
-    // 2. Tags: pending off; ambassador + tier + code on.
+    // 1. Tags: pending off; ambassador + commission tier + buyer discount on.
     const ct = await admin(token, CUST_TAGS, { id: id });
     const curTags = ((((ct.json.data || {}).customer) || {}).tags) || [];
     const drop = curTags.filter(function (t) {
-      return t === 'ambassador-pending' || (/^amb-pct-\d+$/.test(t) && t !== 'amb-pct-' + commissionPct) || (/^amb-code-/.test(t) && t !== 'amb-code-' + code);
+      return t === 'ambassador-pending' || (/^amb-pct-\d+$/.test(t) && t !== 'amb-pct-' + commissionPct) || (/^amb-off-\d+$/.test(t) && t !== 'amb-off-' + buyerPct);
     });
     if (drop.length) await admin(token, TAGS_REMOVE, { id: id, t: drop });
-    const add = ['ambassador', 'amb-pct-' + commissionPct, 'amb-code-' + code].filter(function (t) { return curTags.indexOf(t) === -1; });
+    const add = ['ambassador', 'amb-pct-' + commissionPct, 'amb-off-' + buyerPct].filter(function (t) { return curTags.indexOf(t) === -1; });
     if (add.length) {
       const ta = await admin(token, TAGS_ADD, { id: id, t: add });
       const taErrs = [].concat((((ta.json.data || {}).tagsAdd) || {}).userErrors || []).concat(ta.json.errors || []);
       if (taErrs.length) {
         console.error('[admin/ambassadors] tags:', JSON.stringify(taErrs));
-        return res.status(200).json({ ok: false, error: 'tag_failed', message: 'The code exists but the account could not be tagged: ' + (taErrs[0].message || '') });
+        return res.status(200).json({ ok: false, error: 'tag_failed', message: 'The account could not be tagged: ' + (taErrs[0].message || '') });
       }
     }
 
-    // 3. Record status + code on the customer record.
+    // 2. Record status on the customer record.
     try {
       await admin(token, MF_SET, { metafields: [
-        { ownerId: id, namespace: 'ambassador', key: 'status', type: 'single_line_text_field', value: 'approved' },
-        { ownerId: id, namespace: 'ambassador', key: 'code', type: 'single_line_text_field', value: code }
+        { ownerId: id, namespace: 'ambassador', key: 'status', type: 'single_line_text_field', value: 'approved' }
       ] });
     } catch (e) {}
 
-    // 4. Approval email with code + link.
+    // 3. Approval email — invite to the portal, where they pick their code.
     const sender = String(process.env.AMBASSADOR_SENDER || 'Jon').slice(0, 100);
-    const t = { firstName: firstName, code: code, link: SITE + '/?ref=' + encodeURIComponent(code), buyerPct: buyerPct, commissionPct: commissionPct, senderName: sender };
+    const t = { firstName: firstName, code: '', link: SITE + '/account', buyerPct: buyerPct, commissionPct: commissionPct, senderName: sender };
     const sent = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY },
       body: JSON.stringify({
         from: FROM, to: [email], reply_to: 'hello@happybeanie.com',
-        subject: 'You’re in — your Happy Beanie ambassador code',
+        subject: 'You’re in — pick your Happy Beanie ambassador code',
         html: buildEmail(t), text: buildEmail.text(t)
       })
     });
     const sj = await sent.json().catch(function () { return {}; });
     if (!sent.ok || !sj.id) {
       console.error('[admin/ambassadors] resend:', sent.status, JSON.stringify(sj));
-      return res.status(200).json({ ok: true, warning: 'approved_email_failed', code: code,
-        message: 'The account is approved and the code is live, but the email did not send.' });
+      return res.status(200).json({ ok: true, warning: 'approved_email_failed',
+        message: 'The account is approved, but the email did not send.' });
     }
-    console.log('[admin/ambassadors] approved', email, 'code', code, commissionPct + '%', '· resend', sj.id);
-    return res.status(200).json({ ok: true, emailId: sj.id, code: code, link: t.link });
+    console.log('[admin/ambassadors] approved', email, commissionPct + '% /', buyerPct + '% off', '· resend', sj.id);
+    return res.status(200).json({ ok: true, emailId: sj.id });
   } catch (err) {
     console.error('[admin/ambassadors] error:', err && err.message);
     return res.status(500).json({ ok: false, error: 'internal', message: String(err && err.message || err) });
