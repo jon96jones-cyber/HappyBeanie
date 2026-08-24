@@ -78,6 +78,8 @@ main { padding:28px 0 90px; }
 .grp + .grp { padding-left:26px; border-left:1px solid #EDE6D8; }
 @media (max-width:640px){ .grp + .grp { padding-left:0; border-left:none; } }
 .ctlnote { font-family:'DM Sans',sans-serif; font-size:11.5px; line-height:1.5; color:#8A7F6E; padding:0 20px 16px; }
+.editpen { background:none; border:none; cursor:pointer; font-size:12px; line-height:1; color:#8A7F6E; padding:2px 0 2px 8px; }
+.editpen:hover { color:#17140F; }
 </style>
 </head><body>
 
@@ -259,7 +261,7 @@ main { padding:28px 0 90px; }
       card.innerHTML =
         '<div class="app-h">' +
           '<span style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><span class="co">' + esc(a.firstName + ' ' + a.lastName) + '</span><span class="who">' + esc(a.email) + (a.instagram ? ' · @' + esc(a.instagram) : '') + '</span></span>' +
-          '<span class="chips">' + (a.code ? '<span class="chip">' + esc(a.code) + '</span>' : '<span class="chip dim">no code</span>') + (a.pct != null ? '<span class="chip dim">' + a.pct + '% rate</span>' : '') + '</span>' +
+          '<span class="chips">' + (a.code ? '<span class="chip">' + esc(a.code) + '</span>' : '<span class="chip dim">no code</span>') + (a.pct != null ? '<span class="chip dim">' + a.pct + '% rate<button class="editpen" data-act="editrate" title="Change this rate" aria-label="Change this rate">✎</button></span>' : '') + '</span>' +
         '</div>' +
         '<div class="stats4">' +
           '<div><div class="k">Orders · 30d</div><div class="big">' + (st.orders30 != null ? st.orders30 : '—') + '</div><div class="sm">' + (st.orders != null ? st.orders + ' all-time' : '') + '</div></div>' +
@@ -269,12 +271,20 @@ main { padding:28px 0 90px; }
         '</div>' +
         (a.link ? '<div class="linkrow"><span class="url">' + esc(a.link) + '</span><button class="copy" data-act="copylink">Copy link</button><button class="copy" data-act="copycode">Copy code</button></div>' : '') +
         '<div class="ctls">' +
-          '<span class="grp"><span class="fld"><label>Commission %</label><input data-f="comm" value="' + (a.pct != null ? a.pct : 10) + '" inputmode="numeric"></span>' +
+          '<span class="grp" data-role="rate-edit" style="display:none;"><span class="fld"><label>New commission %</label><input data-f="comm" value="' + (a.pct != null ? a.pct : 10) + '" inputmode="numeric"></span>' +
           '<button class="btn" data-act="tier">Set rate &amp; email</button></span>' +
-          '<span class="grp"><span class="fld"><label>Payout $</label><input data-f="payout" placeholder="0.00" inputmode="decimal"></span>' +
+          '<span class="grp" style="border-left:none; padding-left:0;"><span class="fld"><label>Payout $</label><input data-f="payout" placeholder="0.00" inputmode="decimal"></span>' +
           '<button class="btn ghost" data-act="payout">Record payout</button></span>' +
         '</div>' +
-        '<div class="ctlnote">Set rate re-emails their terms · Record payout logs what you actually paid — their portal shows paid-to-date and balance.</div>';
+        '<div class="ctlnote">Their rate is set — the ✎ beside it opens the change control (changing re-emails their terms) · Record payout logs what you actually paid.</div>';
+      var pen = card.querySelector('[data-act="editrate"]');
+      if (pen) pen.onclick = function () {
+        var grp = card.querySelector('[data-role="rate-edit"]');
+        var open = grp.style.display !== 'none';
+        grp.style.display = open ? 'none' : '';
+        pen.style.color = open ? '' : '#17140F';
+        if (!open) grp.querySelector('[data-f="comm"]').focus();
+      };
       var copyBtn = card.querySelector('[data-act="copylink"]');
       if (copyBtn) copyBtn.onclick = function () {
         navigator.clipboard.writeText(a.link).then(function () { copyBtn.textContent = 'Copied ✓'; setTimeout(function () { copyBtn.textContent = 'Copy link'; }, 1400); });
