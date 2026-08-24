@@ -6,10 +6,11 @@
 // created as the public discount (buyer % from the amb-off-NN tag the desk
 // set at approval) and locked in with the amb-code tag. Permanent once set.
 //
-// POST { payoutMethod } — saves how they want to be paid (a PayPal email or
-// Venmo handle, max 200 chars). Deliberately NOT bank account details: raw
-// ACH numbers never touch this stack. Stored in the ambassador.payout_method
-// metafield and shown on the admin desk beside their balance.
+// POST { payoutMethod } — saves how they want to be paid (a Zelle phone
+// number or email, or a Venmo handle, max 200 chars). Deliberately NOT bank
+// account details: raw ACH numbers never touch this stack. Stored in the
+// ambassador.payout_method metafield and shown on the admin desk beside
+// their balance.
 //
 // GET — dashboard data. Before a code is claimed it returns
 // { ok: true, needsCode: true, pct, buyerPct } and the portal shows the
@@ -178,10 +179,13 @@ module.exports = async function handler(req, res) {
       const method = String(body.payoutMethod || '')
         .replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
       // Refuse anything that looks like bank details — this field is for a
-      // PayPal email or Venmo handle only.
-      if (/\d{9,}/.test(method.replace(/\D/g, ''))) {
+      // Zelle phone number, Zelle email, or Venmo handle only. A US phone
+      // (10 digits, optional leading 1) is the one long digit run allowed.
+      const digits = method.replace(/\D/g, '');
+      const looksPhone = /^1?\d{10}$/.test(digits);
+      if (!looksPhone && /\d{9,}/.test(digits)) {
         return res.status(200).json({ ok: false, error: 'no_bank_details',
-          message: 'That looks like a bank account number — please enter a PayPal email or Venmo handle instead. We never store bank details.' });
+          message: 'That looks like a bank account number — please enter a Zelle phone number, Zelle email, or Venmo handle instead. We never store bank details.' });
       }
       const pj = await admin(PAID_Q, { q: 'email:' + email });
       const node = (((((pj || {}).data || {}).customers) || {}).nodes || [])[0];

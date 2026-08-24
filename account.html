@@ -945,13 +945,14 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       '</div>' +
       '<div id="ambLinkOut" style="' + mono + ' font-size:11.5px; color:#DED5C4; word-break:break-all; margin-bottom:16px;"></div>';
 
-    // How they get paid — a PayPal email or Venmo handle, never bank details.
+    // How they get paid — Zelle (phone or email) or a Venmo handle, never
+    // bank details.
     html += '<div style="' + lab + ' margin-bottom:6px;">How you get paid</div>' +
       '<div style="display:flex; align-items:stretch; gap:8px; flex-wrap:wrap; margin-bottom:6px;">' +
-        '<input id="ambPayout" type="text" maxlength="200" placeholder="PayPal email or @venmo handle" value="' + String(d.payoutMethod || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;') + '" style="flex:1 1 220px; min-width:0; ' + mono + ' font-size:12px; color:#F5F0E6; background:rgba(23,20,15,0.6); border:1px solid rgba(245,240,230,0.24); border-radius:2px; padding:9px 10px;">' +
+        '<input id="ambPayout" type="text" maxlength="200" placeholder="Zelle phone or email, or @venmo handle" value="' + String(d.payoutMethod || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;') + '" style="flex:1 1 220px; min-width:0; ' + mono + ' font-size:12px; color:#F5F0E6; background:rgba(23,20,15,0.6); border:1px solid rgba(245,240,230,0.24); border-radius:2px; padding:9px 10px;">' +
         '<button type="button" id="ambPayoutSave" style="' + mono + ' font-size:9px; letter-spacing:0.12em; text-transform:uppercase; background:none; border:1px solid rgba(245,240,230,0.28); border-radius:2px; color:#DED5C4; padding:7px 12px; cursor:pointer;">Save</button>' +
       '</div>' +
-      '<div id="ambPayoutMsg" style="font-size:11.5px; line-height:1.5; color:#8A7F6E; margin-bottom:16px;">Payouts go here monthly ($25 minimum). PayPal or Venmo only — we never collect bank details.</div>';
+      '<div id="ambPayoutMsg" style="font-size:11.5px; line-height:1.5; color:#8A7F6E; margin-bottom:16px;">Payouts go here monthly ($25 minimum). Zelle or Venmo only — we never collect bank details.</div>';
 
     // Recent referred orders
     if (d.recent && d.recent.length) {
