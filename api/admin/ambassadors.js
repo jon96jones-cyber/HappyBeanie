@@ -60,6 +60,7 @@ const APPROVED_Q = `query AmbApproved {
       instagram: metafield(namespace: "ambassador", key: "instagram") { value }
       tiktok: metafield(namespace: "ambassador", key: "tiktok") { value }
       audience: metafield(namespace: "ambassador", key: "audience") { value }
+      paid: metafield(namespace: "ambassador", key: "paid_total") { value }
     }
   }
 }`;
@@ -195,6 +196,7 @@ module.exports = async function handler(req, res) {
         approved.push({
           id: c.id, firstName: c.firstName || '', lastName: c.lastName || '', email: c.email || '',
           instagram: mf(c.instagram), tiktok: mf(c.tiktok), audience: mf(c.audience),
+          paidTotal: parseFloat(mf(c.paid) || '0') || 0,
           code: info.code, pct: info.pct,
           link: info.code ? SITE + '/?ref=' + encodeURIComponent(info.code) : null,
           stats: stats
@@ -220,6 +222,24 @@ module.exports = async function handler(req, res) {
       const errs = [].concat((((out.json.data || {}).tagsRemove) || {}).userErrors || []).concat(out.json.errors || []);
       if (errs.length) return res.status(200).json({ ok: false, error: 'tag_failed', message: errs[0].message || 'Could not remove the pending tag.' });
       return res.status(200).json({ ok: true });
+    }
+
+    if (body.action === 'record_payout') {
+      const id = String(body.customerId || '');
+      const amount = Math.round(parseFloat(body.amount) * 100) / 100;
+      if (!id || !(amount > 0 && amount < 100000)) {
+        return res.status(400).json({ ok: false, error: 'bad_request', message: 'Enter the amount you paid, in dollars.' });
+      }
+      const CUR = `query Paid($id: ID!) { customer(id: $id) { paid: metafield(namespace: "ambassador", key: "paid_total") { value } } }`;
+      const cur = await admin(token, CUR, { id: id });
+      const prev = parseFloat((((((cur.json || {}).data || {}).customer) || {}).paid || {}).value || '0') || 0;
+      const next = Math.round((prev + amount) * 100) / 100;
+      const setOut = await admin(token, MF_SET, { metafields: [
+        { ownerId: id, namespace: 'ambassador', key: 'paid_total', type: 'number_decimal', value: String(next) }
+      ] });
+      const errs = [].concat((((setOut.json.data || {}).metafieldsSet) || {}).userErrors || []).concat(setOut.json.errors || []);
+      if (errs.length) return res.status(200).json({ ok: false, error: 'metafield_failed', message: errs[0].message || 'Could not record the payout.' });
+      return res.status(200).json({ ok: true, paidTotal: next });
     }
 
     if (body.action === 'set_tier') {

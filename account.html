@@ -719,8 +719,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   }
 
 
-  // Ambassador card: their code, share link and the rules digest. Terms ride
-  // on tags (amb-pct-NN, amb-code-CODE) so no extra API call is needed.
+  // Ambassador dashboard: commissions, referred orders, payouts and a link
+  // builder, from /api/ambassador/portal (their own session, their own
+  // numbers). Tags gate visibility; if the stats call fails the card still
+  // shows their code and link.
   function renderAmbassador(tags) {
     var panel = document.getElementById('ambPanel');
     if (!panel) return;
@@ -732,31 +734,102 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       if (m) pct = parseInt(m[1], 10);
     });
     if (tags.indexOf('ambassador') === -1 || !code) { panel.style.display = 'none'; return; }
-    var link = 'https://www.happybeanie.com/?ref=' + encodeURIComponent(code);
     panel.style.display = '';
     var rate = document.getElementById('ambRate');
     if (rate) rate.textContent = pct ? pct + '% commission' : '';
-    var box = document.getElementById('ambBox');
-    box.innerHTML =
-      '<div style="font-family:\'DM Mono\',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-bottom:6px;">Your code · 10% off for your people</div>' +
-      '<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">' +
-        '<span style="font-family:\'DM Mono\',monospace; font-size:22px; letter-spacing:0.18em; color:oklch(0.9 0.1 92);">' + code + '</span>' +
-        '<button type="button" id="ambCopyCode" style="font-family:\'DM Mono\',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; background:none; border:1px solid rgba(245,240,230,0.28); border-radius:2px; color:#DED5C4; padding:7px 12px; cursor:pointer;">Copy code</button>' +
-      '</div>' +
-      '<div style="font-family:\'DM Mono\',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-bottom:6px;">Your link</div>' +
-      '<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px;">' +
-        '<span style="font-family:\'DM Mono\',monospace; font-size:11.5px; color:#DED5C4; word-break:break-all;">' + link + '</span>' +
-        '<button type="button" id="ambCopyLink" style="font-family:\'DM Mono\',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; background:none; border:1px solid rgba(245,240,230,0.28); border-radius:2px; color:#DED5C4; padding:7px 12px; cursor:pointer;">Copy link</button>' +
-      '</div>' +
-      '<div style="font-size:12.5px; line-height:1.65; color:#B9AF9C; border-top:1px solid rgba(245,240,230,0.14); padding-top:12px;">' +
-        (pct ? 'You earn <b style="color:#F5F0E6;">' + pct + '%</b> of net sales your code drives, paid monthly ($25 minimum). ' : '') +
-        'Always disclose the partnership (#ad), no health claims, and keep the code off coupon sites — <a href="/ambassador#apply" style="color:oklch(0.9 0.1 92);">full rules</a>.' +
-      '</div>';
-    var cc = document.getElementById('ambCopyCode');
-    cc.onclick = function () { navigator.clipboard.writeText(code).then(function () { cc.textContent = 'Copied ✓'; setTimeout(function () { cc.textContent = 'Copy code'; }, 1400); }); };
-    var cl = document.getElementById('ambCopyLink');
-    cl.onclick = function () { navigator.clipboard.writeText(link).then(function () { cl.textContent = 'Copied ✓'; setTimeout(function () { cl.textContent = 'Copy link'; }, 1400); }); };
+    ambDraw({ code: code, pct: pct, link: 'https://www.happybeanie.com/?ref=' + encodeURIComponent(code), stats: null, recent: [] });
+    fetch('/api/ambassador/portal').then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.ok) ambDraw(j);
+    }).catch(function () {});
   }
+
+  function ambUsd(n) {
+    return '$' + (Math.round((n || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function ambDraw(d) {
+    var box = document.getElementById('ambBox');
+    if (!box) return;
+    var st = d.stats;
+    var mono = "font-family:'DM Mono',monospace;";
+    var lab = mono + 'font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E;';
+    var html = '';
+
+    // Stats tiles
+    if (st) {
+      var tiles = [
+        ['Referred orders · 30d / all', st.orders30 + ' / ' + st.orders],
+        ['Net sales · 30d / all', ambUsd(st.sales30) + ' / ' + ambUsd(st.sales)],
+        ['Earned · 30d / all', ambUsd(st.earned30) + ' / ' + ambUsd(st.earned)],
+        ['Paid to date / balance', ambUsd(st.paidTotal) + ' / ' + ambUsd(Math.max(0, st.balance))]
+      ];
+      html += '<div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; background:rgba(245,240,230,0.14); border:1px solid rgba(245,240,230,0.14); border-radius:4px; overflow:hidden; margin-bottom:16px;">' +
+        tiles.map(function (t) {
+          return '<div style="background:rgba(23,20,15,0.5); padding:12px 14px;"><div style="' + lab + ' margin-bottom:5px;">' + t[0] + '</div><div style="font-size:15px; font-weight:700; letter-spacing:-0.02em; color:#F5F0E6;">' + t[1] + '</div></div>';
+        }).join('') + '</div>';
+    }
+
+    // Code + link
+    html += '<div style="' + lab + ' margin-bottom:6px;">Your code · 10% off for your people</div>' +
+      '<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">' +
+        '<span style="' + mono + ' font-size:22px; letter-spacing:0.18em; color:oklch(0.9 0.1 92);">' + d.code + '</span>' +
+        '<button type="button" id="ambCopyCode" style="' + mono + ' font-size:9px; letter-spacing:0.12em; text-transform:uppercase; background:none; border:1px solid rgba(245,240,230,0.28); border-radius:2px; color:#DED5C4; padding:7px 12px; cursor:pointer;">Copy code</button>' +
+      '</div>';
+
+    // Link builder
+    html += '<div style="' + lab + ' margin-bottom:6px;">Link builder — pick where your link lands</div>' +
+      '<div style="display:flex; align-items:stretch; gap:8px; flex-wrap:wrap; margin-bottom:8px;">' +
+        '<select id="ambDest" style="' + mono + ' font-size:12px; color:#F5F0E6; background:rgba(23,20,15,0.6); border:1px solid rgba(245,240,230,0.24); border-radius:2px; padding:9px 10px;">' +
+          '<option value="/">Home page</option>' +
+          '<option value="/product">Product page</option>' +
+          '<option value="/shop">Shop — compare formulas</option>' +
+          '<option value="/about">About — the lab</option>' +
+          '<option value="/quiz">Eligibility screener</option>' +
+        '</select>' +
+        '<button type="button" id="ambCopyLink" style="' + mono + ' font-size:9px; letter-spacing:0.12em; text-transform:uppercase; background:none; border:1px solid rgba(245,240,230,0.28); border-radius:2px; color:#DED5C4; padding:7px 12px; cursor:pointer;">Copy link</button>' +
+      '</div>' +
+      '<div id="ambLinkOut" style="' + mono + ' font-size:11.5px; color:#DED5C4; word-break:break-all; margin-bottom:16px;"></div>';
+
+    // Recent referred orders
+    if (d.recent && d.recent.length) {
+      html += '<div style="' + lab + ' margin-bottom:8px;">Recent referred orders</div>' +
+        '<div style="border-top:1px solid rgba(245,240,230,0.14); margin-bottom:16px;">' +
+        d.recent.map(function (o) {
+          var dt = '';
+          try { dt = new Date(o.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch (e) {}
+          return '<div style="display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid rgba(245,240,230,0.1); font-size:13px;">' +
+            '<span style="' + mono + ' font-size:11.5px; color:#B9AF9C;">' + o.name + ' · ' + dt + '</span>' +
+            '<span style="color:#DED5C4;">' + ambUsd(o.subtotal) + (o.commission != null ? ' <span style="color:oklch(0.9 0.1 92);">→ ' + ambUsd(o.commission) + '</span>' : '') + '</span>' +
+          '</div>';
+        }).join('') + '</div>';
+    } else if (d.stats) {
+      html += '<div style="font-size:12.5px; color:#8A7F6E; margin-bottom:16px;">No referred orders yet — your first one shows up here the moment it lands.</div>';
+    }
+
+    // Rules digest
+    html += '<div style="font-size:12.5px; line-height:1.65; color:#B9AF9C; border-top:1px solid rgba(245,240,230,0.14); padding-top:12px;">' +
+      (d.pct ? 'You earn <b style="color:#F5F0E6;">' + d.pct + '%</b> of net sales, paid monthly ($25 minimum). ' : '') +
+      'Always disclose the partnership (#ad), no health claims, keep the code off coupon sites — <a href="/ambassador" style="color:oklch(0.9 0.1 92);">full rules</a>.' +
+    '</div>';
+
+    box.innerHTML = html;
+
+    var linkFor = function () {
+      var sel = document.getElementById('ambDest');
+      var path = sel ? sel.value : '/';
+      return 'https://www.happybeanie.com' + path + '?ref=' + encodeURIComponent(d.code);
+    };
+    var outEl = document.getElementById('ambLinkOut');
+    var syncOut = function () { if (outEl) outEl.textContent = linkFor(); };
+    syncOut();
+    var sel = document.getElementById('ambDest');
+    if (sel) sel.onchange = syncOut;
+    var cc = document.getElementById('ambCopyCode');
+    if (cc) cc.onclick = function () { navigator.clipboard.writeText(d.code).then(function () { cc.textContent = 'Copied ✓'; setTimeout(function () { cc.textContent = 'Copy code'; }, 1400); }); };
+    var cl = document.getElementById('ambCopyLink');
+    if (cl) cl.onclick = function () { navigator.clipboard.writeText(linkFor()).then(function () { cl.textContent = 'Copied ✓'; setTimeout(function () { cl.textContent = 'Copy link'; }, 1400); }); };
+  }
+  window.__hbRenderAmb = renderAmbassador;
 
   function renderReadouts(orders, subs) {
     var sub = subs[0];
