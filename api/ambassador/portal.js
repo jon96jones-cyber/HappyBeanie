@@ -203,29 +203,30 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ ok: true, needsCode: true, pct: pct, buyerPct: buyerPct });
     }
 
-    // Their orders, by their code.
-    let orders = 0, sales = 0, orders30 = 0, sales30 = 0;
-    const recent = [];
+    // Their orders, by their code — the full list (last 100) goes back so the
+    // portal's table can filter by any time window client-side.
+    let orders = 0, sales = 0, orders30 = 0, sales30 = 0, capped = false;
+    const list = [];
     const cutoff = Date.now() - 30 * 24 * 3600 * 1000;
     try {
       const oj = await admin(ORDERS_Q, { q: 'discount_code:' + code });
       const nodes = ((((oj || {}).data || {}).orders) || {}).nodes || [];
+      capped = nodes.length === 100;
       nodes.forEach(function (o) {
         if (o.cancelledAt) return;
         if (String(o.displayFinancialStatus).toUpperCase() === 'REFUNDED') return;
         const amt = parseFloat((((o.currentSubtotalPriceSet || {}).shopMoney) || {}).amount || '0') || 0;
         orders += 1; sales += amt;
         if (new Date(o.createdAt).getTime() >= cutoff) { orders30 += 1; sales30 += amt; }
-        if (recent.length < 12) {
-          recent.push({
-            name: o.name,
-            date: o.createdAt,
-            subtotal: Math.round(amt * 100) / 100,
-            commission: pct ? Math.round(amt * pct) / 100 : null
-          });
-        }
+        list.push({
+          name: o.name,
+          date: o.createdAt,
+          subtotal: Math.round(amt * 100) / 100,
+          commission: pct ? Math.round(amt * pct) / 100 : null
+        });
       });
     } catch (e) { /* stats stay zero — the portal still renders */ }
+    const recent = list.slice(0, 12);
 
     // Paid-to-date, recorded by the desk.
     let paidTotal = 0, payoutMethod = '';
@@ -252,7 +253,9 @@ module.exports = async function handler(req, res) {
         paidTotal: Math.round(paidTotal * 100) / 100,
         balance: Math.round((earned - paidTotal) * 100) / 100
       },
-      recent: recent
+      recent: recent,
+      orders: list,
+      capped: capped
     });
   } catch (e) {
     return res.status(200).json({ ok: false, error: 'internal' });

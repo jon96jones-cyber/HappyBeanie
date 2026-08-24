@@ -855,6 +855,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     return '$' + (Math.round((n || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
+  // Time window for the tracking table + tiles — sticky across visits.
+  var ambRange = '30';
+  try { ambRange = localStorage.getItem('hb_amb_range') || '30'; } catch (e) {}
+
   function ambDraw(d) {
     var box = document.getElementById('ambBox');
     if (!box) return;
@@ -910,18 +914,57 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       return;
     }
 
-    // Stats tiles
+    // Tracking: window pills, tiles that follow the window, and the orders
+    // table. Balance stays all-time — payouts don't belong to a window.
     if (st) {
-      var tiles = [
-        ['Referred orders · 30d / all', st.orders30 + ' / ' + st.orders],
-        ['Net sales · 30d / all', ambUsd(st.sales30) + ' / ' + ambUsd(st.sales)],
-        ['Earned · 30d / all', ambUsd(st.earned30) + ' / ' + ambUsd(st.earned)],
-        ['Paid to date / balance', ambUsd(st.paidTotal) + ' / ' + ambUsd(Math.max(0, st.balance))]
-      ];
-      html += '<div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; background:rgba(245,240,230,0.14); border:1px solid rgba(245,240,230,0.14); border-radius:4px; overflow:hidden; margin-bottom:16px;">' +
-        tiles.map(function (t) {
-          return '<div style="background:rgba(23,20,15,0.5); padding:12px 14px;"><div style="' + lab + ' margin-bottom:5px;">' + t[0] + '</div><div style="font-size:15px; font-weight:700; letter-spacing:-0.02em; color:#F5F0E6;">' + t[1] + '</div></div>';
+      var allOrders = d.orders || d.recent || [];
+      var cut = ambRange === 'all' ? null : Date.now() - parseInt(ambRange, 10) * 24 * 3600 * 1000;
+      var sel = allOrders.filter(function (o) {
+        try { return !cut || new Date(o.date).getTime() >= cut; } catch (e) { return true; }
+      });
+      var wSales = 0;
+      sel.forEach(function (o) { wSales += o.subtotal || 0; });
+      wSales = Math.round(wSales * 100) / 100;
+      var wEarned = d.pct ? Math.round(wSales * d.pct) / 100 : 0;
+      var wLabel = ambRange === 'all' ? 'all time' : 'last ' + ambRange + ' days';
+
+      html += '<div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">' +
+        [['7', '7 days'], ['30', '30 days'], ['90', '90 days'], ['all', 'All time']].map(function (r) {
+          var on = r[0] === ambRange;
+          return '<button type="button" data-amb-range="' + r[0] + '" style="' + mono + ' font-size:9px; letter-spacing:0.12em; text-transform:uppercase; padding:6px 12px; border-radius:999px; cursor:pointer; border:1px solid ' + (on ? '#F0C64B' : 'rgba(245,240,230,0.24)') + '; background:' + (on ? '#F0C64B' : 'none') + '; color:' + (on ? '#17140F' : '#B9AF9C') + '; font-weight:' + (on ? '700' : '400') + ';">' + r[1] + '</button>';
         }).join('') + '</div>';
+
+      var tiles = [
+        ['Referred orders', String(sel.length), wLabel],
+        ['Net sales', ambUsd(wSales), wLabel],
+        ['You earned', ambUsd(wEarned), wLabel],
+        ['Balance owed', ambUsd(Math.max(0, st.balance)), ambUsd(st.paidTotal) + ' paid to date']
+      ];
+      html += '<div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; background:rgba(245,240,230,0.14); border:1px solid rgba(245,240,230,0.14); border-radius:4px; overflow:hidden; margin-bottom:10px;">' +
+        tiles.map(function (t) {
+          return '<div style="background:rgba(23,20,15,0.5); padding:12px 14px;"><div style="' + lab + ' margin-bottom:5px;">' + t[0] + '</div><div style="font-size:15px; font-weight:700; letter-spacing:-0.02em; color:#F5F0E6;">' + t[1] + '</div><div style="font-size:10.5px; color:#8A7F6E; margin-top:3px;">' + t[2] + '</div></div>';
+        }).join('') + '</div>';
+
+      var cols = 'display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr; gap:0 10px; align-items:center;';
+      if (sel.length) {
+        html += '<div style="border:1px solid rgba(245,240,230,0.14); border-radius:4px; overflow:hidden; margin-bottom:16px;"><div style="max-height:280px; overflow-y:auto;">' +
+          '<div style="' + cols + ' padding:9px 12px; background:rgba(23,20,15,0.75); position:sticky; top:0; ' + lab + '"><span>Order</span><span>Date</span><span style="text-align:right;">Net sale</span><span style="text-align:right;">You earned</span></div>' +
+          sel.map(function (o) {
+            var dt = '';
+            try { dt = new Date(o.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }); } catch (e) {}
+            return '<div style="' + cols + ' padding:8px 12px; border-top:1px solid rgba(245,240,230,0.1); font-size:12.5px;">' +
+              '<span style="' + mono + ' font-size:11.5px; color:#B9AF9C;">' + o.name + '</span>' +
+              '<span style="color:#B9AF9C;">' + dt + '</span>' +
+              '<span style="text-align:right; color:#DED5C4;">' + ambUsd(o.subtotal) + '</span>' +
+              '<span style="text-align:right; color:oklch(0.9 0.1 92);">' + (o.commission != null ? ambUsd(o.commission) : '—') + '</span>' +
+            '</div>';
+          }).join('') + '</div></div>';
+        if (d.capped) html += '<div style="font-size:10.5px; color:#8A7F6E; margin:-10px 0 16px;">Showing your latest 100 orders.</div>';
+      } else {
+        html += '<div style="font-size:12.5px; color:#8A7F6E; margin-bottom:16px;">' +
+          (allOrders.length ? 'No referred orders in this window — widen the range above.' : 'No referred orders yet — your first one shows up here the moment it lands.') +
+        '</div>';
+      }
     }
 
     // Code + link
@@ -954,23 +997,15 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       '</div>' +
       '<div id="ambPayoutMsg" style="font-size:11.5px; line-height:1.5; color:#8A7F6E; margin-bottom:16px;">Payouts go here monthly ($25 minimum). Zelle or Venmo only — we never collect bank details.</div>';
 
-    // Recent referred orders
-    if (d.recent && d.recent.length) {
-      html += '<div style="' + lab + ' margin-bottom:8px;">Recent referred orders</div>' +
-        '<div style="border-top:1px solid rgba(245,240,230,0.14); margin-bottom:16px;">' +
-        d.recent.map(function (o) {
-          var dt = '';
-          try { dt = new Date(o.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch (e) {}
-          return '<div style="display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid rgba(245,240,230,0.1); font-size:13px;">' +
-            '<span style="' + mono + ' font-size:11.5px; color:#B9AF9C;">' + o.name + ' · ' + dt + '</span>' +
-            '<span style="color:#DED5C4;">' + ambUsd(o.subtotal) + (o.commission != null ? ' <span style="color:oklch(0.9 0.1 92);">→ ' + ambUsd(o.commission) + '</span>' : '') + '</span>' +
-          '</div>';
-        }).join('') + '</div>';
-    } else if (d.stats) {
-      html += '<div style="font-size:12.5px; color:#8A7F6E; margin-bottom:16px;">No referred orders yet — your first one shows up here the moment it lands.</div>';
-    }
-
     box.innerHTML = html;
+
+    Array.prototype.forEach.call(box.querySelectorAll('[data-amb-range]'), function (b) {
+      b.onclick = function () {
+        ambRange = b.getAttribute('data-amb-range');
+        try { localStorage.setItem('hb_amb_range', ambRange); } catch (e) {}
+        ambDraw(d);
+      };
+    });
 
     var linkFor = function () {
       var sel = document.getElementById('ambDest');
