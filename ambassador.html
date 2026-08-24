@@ -105,24 +105,6 @@ h1 em { font-style:normal; color:#F0C64B; }
   .step p { font-size:11.5px; line-height:1.45; }
 }
 
-/* cream band: tiers */
-.band { background:#F5F0E6; color:#17140F; padding:92px 0 96px; }
-.band .kicker { color:oklch(0.44 0.07 152); }
-.band .kicker::before { background:oklch(0.44 0.07 152); }
-.band h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(30px,3.9vw,50px); line-height:1.05; max-width:17em; }
-.band h2 em { font-style:normal; color:oklch(0.44 0.07 152); }
-.band .sub { color:#6A6055; font-size:16px; max-width:36em; margin:16px 0 44px; }
-.tiers { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-@media (max-width:860px){ .tiers { grid-template-columns:1fr; } }
-.tier { position:relative; background:#FCFAF4; border:1px solid #E4DBC9; border-radius:4px; padding:28px 26px 30px; box-shadow:0 18px 34px -26px rgba(23,20,15,0.35); transition:transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease; }
-.tier:hover { transform:translateY(-5px); box-shadow:0 30px 44px -26px rgba(23,20,15,0.42); }
-.tier .tt { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:oklch(0.44 0.07 152); margin-bottom:12px; }
-.tier .pct { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.05em; font-size:52px; line-height:1; margin-bottom:4px; }
-.tier .pl { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-bottom:16px; }
-.tier p { font-size:14px; color:#4A4438; line-height:1.6; }
-.tier.mid { border-color:oklch(0.44 0.07 152 / 0.55); }
-.band .fine { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#8A7F6E; margin-top:28px; line-height:1.8; }
-
 /* rules */
 .rules-sec { padding:92px 0 96px; position:relative; }
 .rules-sec h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(28px,3.4vw,44px); line-height:1.05; }
@@ -234,7 +216,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 <section class="hero">
   <div class="shell">
     <div class="kicker rv">Ambassador Program</div>
-    <h1 class="rv d1">Love your bean out loud — <em>and get paid for it.</em></h1>
+    <h1 class="rv d1">Love your bean — <em>and get paid for it.</em></h1>
     <p class="lede rv d2">If your audience trusts you with their pets, we'd like to earn a place in that trust. Ambassadors get a personal code that gives their people money off every order — and a commission on every sale it drives, paid monthly.</p>
     <div class="hero-ctas rv d3">
       <a class="btn-gold" href="#apply">Apply for access</a>
@@ -243,8 +225,8 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
   </div>
   <div class="stats">
     <div class="shell">
-      <div class="stat"><div class="n">10<i>%</i></div><div class="l">Off for your audience, every order</div></div>
-      <div class="stat"><div class="n">Up to 20<i>%</i></div><div class="l">Commission on net sales</div></div>
+      <div class="stat"><div class="n">Custom</div><div class="l">Your rate &amp; audience discount — set with your approval</div></div>
+      <div class="stat"><div class="n">Every sale</div><div class="l">Credited to your code automatically</div></div>
       <div class="stat"><div class="n">Monthly</div><div class="l">Payouts · $25 minimum</div></div>
       <div class="stat"><div class="n">Zero</div><div class="l">Cost to join · no purchase required</div></div>
     </div>
@@ -263,19 +245,6 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
   </div>
 </section>
 
-<section class="band">
-  <div class="shell">
-    <div class="kicker rv">Tiers</div>
-    <h2 class="rv d1">Grow with us — <em>bigger reach, bigger cut.</em></h2>
-    <p class="sub rv d2">Everyone starts as a Scout. Rates move up with the sales your code drives — reviewed monthly, and we'll email you when your tier changes.</p>
-    <div class="tiers">
-      <div class="tier rv"><div class="tt">Tier 01 · Scout</div><div class="pct">10%</div><div class="pl">Commission on net sales</div><p>Where everyone starts. Your code is live from day one, and every sale counts toward the next tier.</p></div>
-      <div class="tier mid rv d1"><div class="tt">Tier 02 · Advocate</div><div class="pct">15%</div><div class="pl">Commission on net sales</div><p>For ambassadors whose codes drive consistent monthly sales. Most active creators land here.</p></div>
-      <div class="tier rv d2"><div class="tt">Tier 03 · Partner</div><div class="pct">20%</div><div class="pl">Commission on net sales</div><p>Our top tier — for creators whose audiences have made Happy Beanie part of their routine. Early access and collabs live here too.</p></div>
-    </div>
-    <p class="fine rv">Net sales = product subtotal after discounts and refunds, before shipping and tax. Tier reviews are monthly; rates never drop mid-month.</p>
-  </div>
-</section>
 
 <section class="rules-sec">
   <div class="shell">
@@ -341,8 +310,8 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
         <div class="abox">
           <div class="at">What you get</div>
           <ul>
-            <li><span class="tick">✓</span>A personal code — 10% off for your audience, every order</li>
-            <li><span class="tick">✓</span>10–20% commission on every sale it drives</li>
+            <li><span class="tick">✓</span>A personal code your audience can use on any order</li>
+            <li><span class="tick">✓</span>A commission on every sale it drives — your rate comes with your approval</li>
             <li><span class="tick">✓</span>Monthly payouts, $25 minimum, no fees</li>
             <li><span class="tick">✓</span>An affiliate dashboard — commissions, orders, payouts, link builder</li>
             <li><span class="tick">✓</span>A real person answering your questions</li>

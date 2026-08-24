@@ -864,7 +864,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     }
 
     // Code + link
-    html += '<div style="' + lab + ' margin-bottom:6px;">Your code · 10% off for your people</div>' +
+    html += '<div style="' + lab + ' margin-bottom:6px;">Your code — your audience\u2019s discount applies automatically</div>' +
       '<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">' +
         '<span style="' + mono + ' font-size:22px; letter-spacing:0.18em; color:oklch(0.9 0.1 92);">' + d.code + '</span>' +
         '<button type="button" id="ambCopyCode" style="' + mono + ' font-size:9px; letter-spacing:0.12em; text-transform:uppercase; background:none; border:1px solid rgba(245,240,230,0.28); border-radius:2px; color:#DED5C4; padding:7px 12px; cursor:pointer;">Copy code</button>' +
@@ -908,10 +908,24 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       html += '<div style="font-size:12.5px; color:#8A7F6E; margin-bottom:16px;">No referred orders yet — your first one shows up here the moment it lands.</div>';
     }
 
-    // Rules digest
-    html += '<div style="font-size:12.5px; line-height:1.65; color:#B9AF9C; border-top:1px solid rgba(245,240,230,0.14); padding-top:12px;">' +
-      (d.pct ? 'You earn <b style="color:#F5F0E6;">' + d.pct + '%</b> of net sales, paid monthly ($25 minimum). ' : '') +
-      'Always disclose the partnership (#ad), no health claims, keep the code off coupon sites — <a href="/ambassador" style="color:oklch(0.9 0.1 92);">full rules</a>.' +
+    // The rules — the full set lives here, where every ambassador signs in.
+    var rules = [
+      ['Always disclose', 'Every post using your code or link carries a clear disclosure — #ad, #happybeaniepartner, or the platform\u2019s paid-partnership tool.'],
+      ['No health claims we don\u2019t make', 'Share your own pet\u2019s story, but never claim Happy Beanie treats, cures or prevents any disease.'],
+      ['Keep your code off coupon sites', 'Your code is for your audience. Posting it to deal aggregators ends the partnership.'],
+      ['No brand-term ads', 'No paid ads on \u201cHappy Beanie\u201d or our misspellings, and no impersonating the brand in handles or domains.'],
+      ['No self-commission', 'Your code works for your audience, not on your own orders.'],
+      ['Either side can end it', 'Anytime, no hard feelings — earned commissions are always paid on the next cycle.']
+    ];
+    html += '<div style="border-top:1px solid rgba(245,240,230,0.14); padding-top:12px;">' +
+      '<div style="' + lab + ' margin-bottom:8px;">The rules</div>' +
+      (d.pct ? '<div style="font-size:12.5px; line-height:1.6; color:#B9AF9C; margin-bottom:10px;">You earn <b style="color:#F5F0E6;">' + d.pct + '%</b> of net sales, paid monthly ($25 minimum) to the method you saved above.</div>' : '') +
+      rules.map(function (r) {
+        return '<div style="display:flex; gap:9px; padding:5px 0; font-size:12.5px; line-height:1.55;">' +
+          '<span style="flex:0 0 auto; color:oklch(0.9 0.1 92);">\u2713</span>' +
+          '<span style="color:#B9AF9C;"><b style="color:#DED5C4; font-weight:700;">' + r[0] + '.</b> ' + r[1] + '</span>' +
+        '</div>';
+      }).join('') +
     '</div>';
 
     box.innerHTML = html;
