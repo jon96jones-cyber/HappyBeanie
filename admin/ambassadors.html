@@ -62,6 +62,22 @@ main { padding:28px 0 90px; }
 .fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
 .copy { background:none; border:none; cursor:pointer; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#554C40; border-bottom:1px solid #C9BEA8; padding:0 0 2px; }
 .copy:hover { color:#17140F; border-color:#17140F; }
+.chips { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.chip { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; padding:6px 12px; border-radius:999px; background:#17140F; color:#F2CE59; white-space:nowrap; }
+.chip.dim { background:transparent; border:1px solid #DDD3C0; color:#554C40; }
+.stats4 { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:1px; background:#EDE6D8; border-bottom:1px solid #EDE6D8; }
+.stats4 > div { background:#FCFAF4; padding:13px 20px 14px; }
+.stats4 .k { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-bottom:5px; }
+.stats4 .big { font-weight:700; letter-spacing:-0.02em; font-size:19px; line-height:1.1; }
+.stats4 .sm { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.04em; color:#8A7F6E; margin-top:3px; }
+@media (max-width:640px){ .stats4 { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+.linkrow { display:flex; gap:14px; align-items:center; flex-wrap:wrap; padding:13px 20px; background:#F7F2E8; border-bottom:1px solid #EDE6D8; }
+.linkrow .url { font-family:'DM Mono',monospace; font-size:11.5px; color:#554C40; word-break:break-all; }
+.ctls { display:flex; gap:26px; flex-wrap:wrap; padding:16px 20px 18px; }
+.grp { display:flex; gap:8px; align-items:end; }
+.grp + .grp { padding-left:26px; border-left:1px solid #EDE6D8; }
+@media (max-width:640px){ .grp + .grp { padding-left:0; border-left:none; } }
+.ctlnote { font-family:'DM Sans',sans-serif; font-size:11.5px; line-height:1.5; color:#8A7F6E; padding:0 20px 16px; }
 </style>
 </head><body>
 
@@ -236,27 +252,29 @@ main { padding:28px 0 90px; }
       var st = a.stats || {};
       var owed = a.pct ? Math.round((st.sales || 0) * a.pct) / 100 : 0;
       var owed30 = a.pct ? Math.round((st.sales30 || 0) * a.pct) / 100 : 0;
+      var paid = a.paidTotal || 0;
+      var balance = Math.max(0, Math.round((owed - paid) * 100) / 100);
       var card = document.createElement('div');
       card.className = 'app';
       card.innerHTML =
-        '<div class="app-h"><span class="co">' + esc(a.firstName + ' ' + a.lastName) + '</span>' +
-        '<span class="who">' + esc(a.email) + (a.instagram ? ' · @' + esc(a.instagram) : '') + '</span></div>' +
-        '<div class="meta">' +
-          '<div><div class="k">Code</div><div class="v gold">' + (esc(a.code) || '<span style="color:#8C4630">missing</span>') + '</div></div>' +
-          '<div><div class="k">Commission</div><div class="v">' + (a.pct != null ? a.pct + '%' : '—') + '</div></div>' +
-          '<div><div class="k">Orders · 30d / all</div><div class="v">' + (st.orders30 != null ? st.orders30 + ' / ' + st.orders : '—') + '</div></div>' +
-          '<div><div class="k">Net sales · 30d / all</div><div class="v">' + (st.sales != null ? usd(st.sales30) + ' / ' + usd(st.sales) : '—') + '</div></div>' +
-          '<div><div class="k">Earned · 30d / all-time</div><div class="v"><b>' + usd(owed30) + '</b> / ' + usd(owed) + '</div></div>' +
-          '<div><div class="k">Paid / balance owed</div><div class="v">' + usd(a.paidTotal || 0) + ' / <b>' + usd(Math.max(0, owed - (a.paidTotal || 0))) + '</b></div></div>' +
+        '<div class="app-h">' +
+          '<span style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;"><span class="co">' + esc(a.firstName + ' ' + a.lastName) + '</span><span class="who">' + esc(a.email) + (a.instagram ? ' · @' + esc(a.instagram) : '') + '</span></span>' +
+          '<span class="chips">' + (a.code ? '<span class="chip">' + esc(a.code) + '</span>' : '<span class="chip dim">no code</span>') + (a.pct != null ? '<span class="chip dim">' + a.pct + '% rate</span>' : '') + '</span>' +
         '</div>' +
-        (a.link ? '<div class="note" style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;"><span style="font-family:\'DM Mono\',monospace; font-size:11.5px;">' + esc(a.link) + '</span><button class="copy" data-act="copylink">Copy link</button><button class="copy" data-act="copycode">Copy code</button></div>' : '') +
-        '<div class="approve">' +
-          '<span class="fld"><label>New commission %</label><input data-f="comm" value="' + (a.pct != null ? a.pct : 10) + '" inputmode="numeric"></span>' +
-          '<button class="btn" data-act="tier">Set rate &amp; email</button>' +
-          '<span class="fld"><label>Payout amount $</label><input data-f="payout" placeholder="0.00" inputmode="decimal"></span>' +
-          '<button class="btn ghost" data-act="payout">Record payout</button>' +
-          '<span class="hint">Record what you actually paid them — their portal shows paid-to-date and balance.</span>' +
-        '</div>';
+        '<div class="stats4">' +
+          '<div><div class="k">Orders · 30d</div><div class="big">' + (st.orders30 != null ? st.orders30 : '—') + '</div><div class="sm">' + (st.orders != null ? st.orders + ' all-time' : '') + '</div></div>' +
+          '<div><div class="k">Net sales · 30d</div><div class="big">' + (st.sales30 != null ? usd(st.sales30) : '—') + '</div><div class="sm">' + (st.sales != null ? usd(st.sales) + ' all-time' : '') + '</div></div>' +
+          '<div><div class="k">Earned · 30d</div><div class="big">' + usd(owed30) + '</div><div class="sm">' + usd(owed) + ' all-time</div></div>' +
+          '<div><div class="k">Balance owed</div><div class="big">' + usd(balance) + '</div><div class="sm">' + usd(paid) + ' paid to date</div></div>' +
+        '</div>' +
+        (a.link ? '<div class="linkrow"><span class="url">' + esc(a.link) + '</span><button class="copy" data-act="copylink">Copy link</button><button class="copy" data-act="copycode">Copy code</button></div>' : '') +
+        '<div class="ctls">' +
+          '<span class="grp"><span class="fld"><label>Commission %</label><input data-f="comm" value="' + (a.pct != null ? a.pct : 10) + '" inputmode="numeric"></span>' +
+          '<button class="btn" data-act="tier">Set rate &amp; email</button></span>' +
+          '<span class="grp"><span class="fld"><label>Payout $</label><input data-f="payout" placeholder="0.00" inputmode="decimal"></span>' +
+          '<button class="btn ghost" data-act="payout">Record payout</button></span>' +
+        '</div>' +
+        '<div class="ctlnote">Set rate re-emails their terms · Record payout logs what you actually paid — their portal shows paid-to-date and balance.</div>';
       var copyBtn = card.querySelector('[data-act="copylink"]');
       if (copyBtn) copyBtn.onclick = function () {
         navigator.clipboard.writeText(a.link).then(function () { copyBtn.textContent = 'Copied ✓'; setTimeout(function () { copyBtn.textContent = 'Copy link'; }, 1400); });
