@@ -15,10 +15,10 @@
 // POST { action: 'decline', customerId }
 //        Removes the pending tag. No email — decline how you like, by hand.
 //
-// Auth: shared secret in `x-ambassador-key` vs AMBASSADOR_KEY, falling back to
-// WHOLESALE_KEY so the existing desk key works day one.
+// Auth: shared secret in `x-ambassador-key` vs AMBASSADOR_KEY — its own key,
+// deliberately not shared with any other desk.
 //
-// Env: SHOPIFY_ADMIN_TOKEN, AMBASSADOR_KEY (or WHOLESALE_KEY), RESEND_API_KEY.
+// Env: SHOPIFY_ADMIN_TOKEN, AMBASSADOR_KEY, RESEND_API_KEY.
 // Optional: AMBASSADOR_FROM (default 'Happy Beanie <hello@happybeanie.com>'),
 //           AMBASSADOR_SENDER (default 'Jon').
 
@@ -101,7 +101,7 @@ const MF_SET = `mutation SetMf($metafields: [MetafieldsSetInput!]!) {
 }`;
 
 function keyOk(req) {
-  const expected = String(process.env.AMBASSADOR_KEY || process.env.WHOLESALE_KEY || '');
+  const expected = String(process.env.AMBASSADOR_KEY || '');
   if (!expected) return false;
   const given = String((req.headers && req.headers['x-ambassador-key']) || '');
   const a = crypto.createHash('sha256').update(given).digest();
@@ -241,7 +241,7 @@ module.exports = async function handler(req, res) {
         const taErrs = [].concat((((ta.json.data || {}).tagsAdd) || {}).userErrors || []).concat(ta.json.errors || []);
         if (taErrs.length) return res.status(200).json({ ok: false, error: 'tag_failed', message: taErrs[0].message || 'Could not set the tier tag.' });
       }
-      const sender = String(process.env.AMBASSADOR_SENDER || process.env.WHOLESALE_SENDER || 'Jon').slice(0, 100);
+      const sender = String(process.env.AMBASSADOR_SENDER || 'Jon').slice(0, 100);
       const t = { firstName: firstName, code: code, link: SITE + '/?ref=' + encodeURIComponent(code), buyerPct: 10, commissionPct: pct, senderName: sender };
       const sent = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -316,7 +316,7 @@ module.exports = async function handler(req, res) {
     } catch (e) {}
 
     // 4. Approval email with code + link.
-    const sender = String(process.env.AMBASSADOR_SENDER || process.env.WHOLESALE_SENDER || 'Jon').slice(0, 100);
+    const sender = String(process.env.AMBASSADOR_SENDER || 'Jon').slice(0, 100);
     const t = { firstName: firstName, code: code, link: SITE + '/?ref=' + encodeURIComponent(code), buyerPct: buyerPct, commissionPct: commissionPct, senderName: sender };
     const sent = await fetch('https://api.resend.com/emails', {
       method: 'POST',

@@ -5,9 +5,6 @@
 // creator details on the record so the desk at /admin/ambassadors can review
 // and approve them.
 //
-// Same shape as /api/wholesale-apply — one intake, one pending tag, structured
-// metafields plus a readable note.
-//
 // Env: SHOPIFY_ADMIN_TOKEN. Optional: SHOPIFY_STORE_DOMAIN,
 // SHOPIFY_ADMIN_API_VERSION.
 
@@ -145,8 +142,8 @@ module.exports = async function handler(req, res) {
   }
 };
 
-// Same contract as the wholesale intake: success only when the pending tag
-// actually landed, because an untagged application never reaches the desk.
+// Success only when the pending tag actually landed — an untagged
+// application never reaches the desk, so that must not read as success.
 async function tagExistingByEmail(token, email, note, metafields) {
   const FIND = 'query findCustomer($q: String!) {' +
     ' customers(first: 1, query: $q) { edges { node { id note } } } }';
