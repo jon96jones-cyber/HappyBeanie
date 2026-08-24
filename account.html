@@ -126,6 +126,10 @@ h1 em { font-style:normal; color:oklch(0.86 0.14 92); }
 .ro-sub.green { color:oklch(0.78 0.1 152); }
 
 /* ---------- layout ---------- */
+.acctabs { display:flex; gap:8px; flex-wrap:wrap; margin-top:22px; }
+.acctabs button { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; padding:11px 20px; border-radius:999px; cursor:pointer; border:1px solid rgba(245,240,230,0.24); background:transparent; color:#B9AF9C; transition:all .2s ease; }
+.acctabs button:hover { border-color:rgba(245,240,230,0.5); color:#F5F0E6; }
+.acctabs button.on { background:#F0C64B; border-color:#F0C64B; color:#17140F; }
 .grid { display:grid; grid-template-columns:1.55fr 1fr; gap:22px; align-items:start; margin-top:22px; }
 @media (max-width:980px){ .grid { grid-template-columns:1fr; } }
 .aside { display:grid; gap:22px; }
@@ -555,41 +559,47 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
             <div id="nameMsg" style="font-size:12px; line-height:1.5; color:#8A7F6E; margin-top:9px; display:none;"></div>
           </form>
         </div>
-        <div class="readouts" id="readouts"></div>
+        <div class="readouts" id="readouts" data-view="personal"></div>
       </div>
+
+      <div id="acctViews" class="acctabs" style="display:none;" role="tablist" aria-label="Account workspace"></div>
 
       <div class="grid">
         <div class="aside">
-          <div class="panel" id="ambPanel" style="display:none;">
+          <div class="panel" id="ambPanel" data-view="ambassador" style="display:none;">
             <div class="panel-head"><h2><span class="gdot"></span>Ambassador</h2><span class="count" id="ambRate"></span></div>
             <div class="panel-body" id="ambBox"></div>
           </div>
-          <div class="panel">
+          <div class="panel" id="wsPanel" data-view="wholesale" style="display:none;">
+            <div class="panel-head"><h2><span class="gdot"></span>Wholesale account</h2><span class="count" id="wsRate"></span></div>
+            <div class="panel-body" id="wsBox"></div>
+          </div>
+          <div class="panel" data-view="personal wholesale">
             <div class="panel-head">
               <h2><span class="gdot"></span>Delivery log<span id="deliveriesFor"></span></h2>
               <span class="count" id="orderCount"></span>
             </div>
             <div class="orders" id="ordersList"></div>
           </div>
-          <div class="panel">
+          <div class="panel" data-view="personal">
             <div class="panel-head"><h2>Bandana reward</h2><span class="count" id="bandanaState"></span></div>
             <div class="panel-body" id="bandanaBox"></div>
           </div>
         </div>
         <div class="aside">
-          <div class="panel" id="petsPanel">
+          <div class="panel" id="petsPanel" data-view="personal">
             <div class="panel-head"><h2>Registered pets</h2><span class="count" id="petCount"></span></div>
             <div class="panel-body" id="petBox"></div>
           </div>
-          <div class="panel">
+          <div class="panel" data-view="personal wholesale">
             <div class="panel-head"><h2>Ship to</h2></div>
             <div class="panel-body" id="addrBox"></div>
           </div>
-          <div class="panel">
+          <div class="panel" data-view="personal">
             <div class="panel-head"><h2>Care plan</h2></div>
             <div class="panel-body" id="subsBox"></div>
           </div>
-          <div class="panel">
+          <div class="panel" data-view="personal wholesale ambassador">
             <div class="panel-head"><h2>Help desk</h2></div>
             <div class="panel-body">
               <p class="help">Questions about a delivery, a dose, or a lot number? The desk answers within a business day.<br><br><a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
@@ -718,6 +728,83 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       '<span class="rail-fill" style="width:' + fill + '%"></span>' + nodes + '</div>';
   }
 
+
+
+  // Account workspaces: one signed-in page, but a personal / wholesale /
+  // ambassador account each gets its own view. Panels declare where they
+  // belong via data-view; the switcher only appears when the account holds
+  // more than one role, so single-role users never see extra chrome.
+  var acctView = 'personal';
+  function setupViews(tags) {
+    var roles = ['personal'];
+    if (tags.indexOf('wholesale') !== -1) roles.push('wholesale');
+    if (tags.indexOf('ambassador') !== -1 && tags.some(function (t) { return /^amb-code-/i.test(t); })) roles.push('ambassador');
+    var host = document.getElementById('acctViews');
+    if (!host) return;
+    if (roles.length < 2) { host.style.display = 'none'; applyView('personal', roles); return; }
+    var saved = '';
+    try { saved = localStorage.getItem('hb_acct_view') || ''; } catch (e) {}
+    acctView = roles.indexOf(saved) !== -1 ? saved : 'personal';
+    host.style.display = '';
+    host.innerHTML = '';
+    var labels = { personal: 'Personal', wholesale: 'Wholesale', ambassador: 'Ambassador' };
+    roles.forEach(function (r) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = labels[r];
+      b.setAttribute('role', 'tab');
+      b.className = r === acctView ? 'on' : '';
+      b.onclick = function () {
+        acctView = r;
+        try { localStorage.setItem('hb_acct_view', r); } catch (e) {}
+        Array.prototype.forEach.call(host.children, function (x) { x.className = x === b ? 'on' : ''; });
+        applyView(r, roles);
+      };
+      host.appendChild(b);
+    });
+    applyView(acctView, roles);
+    if (roles.indexOf('wholesale') !== -1) renderWholesale(tags);
+  }
+
+  function applyView(v, roles) {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-view]'), function (el) {
+      var views = String(el.getAttribute('data-view')).split(/\s+/);
+      var show = views.indexOf(v) !== -1;
+      // A panel for a role the account lacks stays hidden in every view.
+      if (show && el.id === 'ambPanel' && roles.indexOf('ambassador') === -1) show = false;
+      if (show && el.id === 'wsPanel' && roles.indexOf('wholesale') === -1) show = false;
+      el.style.display = show ? '' : 'none';
+    });
+  }
+
+  // Wholesale view: live trade terms, how ordering works, and the shortcut in.
+  function renderWholesale(tags) {
+    var box = document.getElementById('wsBox');
+    if (!box || box.childNodes.length) return;
+    var pct = null;
+    (tags || []).forEach(function (t) {
+      var m = String(t).match(/^wholesale-pct-(\d+)$/i);
+      if (m) pct = parseInt(m[1], 10);
+    });
+    var mono = "font-family:'DM Mono',monospace;";
+    var draw = function (p, minQty, code) {
+      var lab = mono + 'font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E;';
+      box.innerHTML =
+        '<div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; background:rgba(245,240,230,0.14); border:1px solid rgba(245,240,230,0.14); border-radius:4px; overflow:hidden; margin-bottom:16px;">' +
+          '<div style="background:rgba(23,20,15,0.5); padding:12px 14px;"><div style="' + lab + ' margin-bottom:5px;">Your trade rate</div><div style="font-size:15px; font-weight:700; color:#F5F0E6;">' + (p ? p + '% off retail' : 'On file') + '</div></div>' +
+          '<div style="background:rgba(23,20,15,0.5); padding:12px 14px;"><div style="' + lab + ' margin-bottom:5px;">Minimum order</div><div style="font-size:15px; font-weight:700; color:#F5F0E6;">' + (minQty || 5) + ' boxes</div></div>' +
+        '</div>' +
+        '<div style="font-size:13px; line-height:1.65; color:#B9AF9C; margin-bottom:16px;">Your pricing applies automatically at checkout while you\u2019re signed in with this email' + (code ? ' \u2014 the ' + code + ' code attaches itself, nothing to type' : '') + '. Orders below the minimum can\u2019t check out.</div>' +
+        '<a href="/product" style="display:inline-block; ' + mono + ' font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; padding:12px 20px; border-radius:2px; background:#F0C64B; color:#17140F; text-decoration:none;">Order at trade pricing</a>';
+      var rate = document.getElementById('wsRate');
+      if (rate && p) rate.textContent = p + '% off';
+    };
+    draw(pct, null, pct ? 'TRADE' + pct : null);
+    fetch('/api/auth/me').then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.trade) draw(Math.round((j.trade.pct || 0) * 100), j.trade.minQty, j.trade.code);
+    }).catch(function () {});
+  }
+  window.__hbSetupViews = setupViews;
 
   // Ambassador dashboard: commissions, referred orders, payouts and a link
   // builder, from /api/ambassador/portal (their own session, their own
@@ -1144,6 +1231,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     }
     $('badgeRow').innerHTML = badges;
     renderAmbassador(tags);
+    setupViews(tags);
 
     var orders = (c.orders && c.orders.nodes) || [];
     var subs = (c.subscriptionContracts && c.subscriptionContracts.nodes) || [];
