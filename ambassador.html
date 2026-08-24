@@ -90,7 +90,6 @@ h1 em { font-style:normal; color:#F0C64B; }
 @media (max-width:860px){ .steps { grid-template-columns:1fr; } }
 .step { position:relative; border:1px solid rgba(245,240,230,0.14); border-radius:4px; background:rgba(245,240,230,0.035); padding:30px 26px 32px; overflow:hidden; transition:border-color 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1); }
 .step:hover { border-color:rgba(240,198,75,0.45); background:rgba(245,240,230,0.055); transform:translateY(-4px); }
-.step .ghost { position:absolute; right:14px; top:-24px; font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:130px; line-height:1; color:rgba(245,240,230,0.05); pointer-events:none; }
 .step .tag { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#F0C64B; margin-bottom:14px; }
 .step h3 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:25px; margin-bottom:10px; }
 .step p { font-size:14px; color:#B9AF9C; line-height:1.65; }
@@ -99,7 +98,6 @@ h1 em { font-style:normal; color:#F0C64B; }
   .steps-sec { padding:52px 0 56px; }
   .steps { gap:6px; margin-top:22px; }
   .step { padding:11px 14px 12px; border-radius:3px; }
-  .step .ghost { display:none; }
   .step .tag { font-size:8px; letter-spacing:0.12em; margin-bottom:5px; }
   .step h3 { font-size:16px; margin-bottom:4px; }
   .step p { font-size:11.5px; line-height:1.45; }
@@ -238,9 +236,9 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
     <div class="kicker rv">How it works</div>
     <h2 class="rv d1">One code. <em>Three steps.</em></h2>
     <div class="steps">
-      <div class="step rv"><span class="ghost">1</span><div class="tag">Step 01</div><h3>Apply</h3><p>Tell us where you post and who follows you. <b>A person reads every application</b> — usually within two business days.</p></div>
-      <div class="step rv d1"><span class="ghost">2</span><div class="tag">Step 02</div><h3>Pick your code</h3><p>Approved ambassadors sign in and <b>claim their own code</b> — your name, your pet's name, your call — plus an affiliate dashboard: commissions, referred orders, payouts and a link builder.</p></div>
-      <div class="step rv d2"><span class="ghost">3</span><div class="tag">Step 03</div><h3>Get paid</h3><p>A commission on every sale your code drives, <b>paid monthly once you've earned $25</b>. Track every order and payout in your dashboard.</p></div>
+      <div class="step rv"><div class="tag">Step 01</div><h3>Apply</h3><p>Tell us where you post and who follows you. <b>A person reads every application</b> — usually within two business days.</p></div>
+      <div class="step rv d1"><div class="tag">Step 02</div><h3>Pick your code</h3><p>Approved ambassadors sign in and <b>claim their own code</b> — your name, your pet's name, your call — plus an affiliate dashboard: commissions, referred orders, payouts and a link builder.</p></div>
+      <div class="step rv d2"><div class="tag">Step 03</div><h3>Get paid</h3><p>A commission on every sale your code drives, <b>paid monthly once you've earned $25</b>. Track every order and payout in your dashboard.</p></div>
     </div>
   </div>
 </section>
