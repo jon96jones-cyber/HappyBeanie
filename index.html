@@ -2673,6 +2673,15 @@ class Component extends DCLogic {
     this.setState(st => ({ roomSel: n, roomHov: n, roomZoom: !(st.roomSel === n && st.roomZoom) }));
   }
 
+  // Stored ambassador referral code, if it is still inside its 30-day window.
+  refCode() {
+    try {
+      const r = JSON.parse(localStorage.getItem('hbRef') || 'null');
+      if (r && r.code && Date.now() - (r.ts || 0) < 30 * 24 * 3600 * 1000) return r.code;
+    } catch (e) {}
+    return null;
+  }
+
   // --- Chew inspector -------------------------------------------------------
   // Index-matched to CHEW_COLS and to the fleck groups inside the 3D model:
   // row i drives Flecks_(i+1). Reordering either list silently mismatches the
@@ -3173,6 +3182,16 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.heroVideo(0);
+    // Ambassador referral: /?ref=CODE stores the code for 30 days, and
+    // checkout attaches it as a discount code (unless a trade code applies —
+    // trade terms always win for wholesale accounts). The discount code on
+    // the order is the attribution: no pixels, nothing else to maintain.
+    try {
+      const ref = new URLSearchParams(window.location.search).get('ref');
+      if (ref && /^[A-Za-z0-9]{3,30}$/.test(ref)) {
+        localStorage.setItem('hbRef', JSON.stringify({ code: ref.toUpperCase(), ts: Date.now() }));
+      }
+    } catch (e) {}
     // What-to-expect gauge autoplay (stops for good on any interaction).
     // Live small-batch counter — real availability from actual orders. Quietly
     // absent until it loads (or if the API is unreachable, e.g. local preview).
@@ -4179,7 +4198,7 @@ class Component extends DCLogic {
         window.hbShopifyCheckout(
           M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })),
           { ...this.state.co, wantAccount: this.state.acctOptIn !== false },
-          { discountCode: (this.state.trade && this.state.trade.code) || null }
+          { discountCode: (this.state.trade && this.state.trade.code) || this.refCode() }
         ).catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
       },
       // Express checkout: hand off to Shopify's hosted checkout with just the
@@ -4191,7 +4210,7 @@ class Component extends DCLogic {
         window.hbShopifyCheckout(
           M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan })),
           {},
-          { discountCode: (this.state.trade && this.state.trade.code) || null }
+          { discountCode: (this.state.trade && this.state.trade.code) || this.refCode() }
         ).catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
       },
       wallHasPhoto: !!this.state.wallPhoto,

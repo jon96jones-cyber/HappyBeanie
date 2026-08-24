@@ -54,7 +54,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/|policies|api/|admin|wholesale|account|favicon).*)",
+      "source": "/((?!assets/|policies|api/|admin|wholesale|ambassador|account|favicon).*)",
       "destination": "/"
     }
   ]

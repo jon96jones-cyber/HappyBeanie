@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ambassador desk — Happy Beanie</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="../favicon.png">
+<style>
+@font-face { font-family:'DM Mono'; font-weight:400; src:url('../assets/fonts/23b5af97.woff2') format('woff2'); }
+@font-face { font-family:'DM Mono'; font-weight:500; src:url('../assets/fonts/b847e313.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:400; src:url('../assets/fonts/d7200164.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:700; src:url('../assets/fonts/d7200164.woff2') format('woff2'); }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#F5F0E6; color:#17140F; font-family:'DM Sans',-apple-system,sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh; }
+.shell { max-width:880px; margin:0 auto; padding:0 24px; }
+.console { position:relative; overflow:hidden; background:#17140F; color:#F5F0E6; }
+.veil { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(245,240,230,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.045) 1px, transparent 1px); background-size:34px 34px; -webkit-mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); mask-image:radial-gradient(80% 70% at 20% 0%, #000 0%, transparent 100%); }
+.con-top { position:relative; display:flex; align-items:center; gap:22px; padding:16px 0; border-bottom:1px solid rgba(245,240,230,0.14); font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.live { display:flex; align-items:center; gap:9px; color:oklch(0.78 0.1 152); }
+.pulse { position:relative; width:7px; height:7px; border-radius:50%; background:oklch(0.72 0.16 152); }
+.pulse::after { content:''; position:absolute; inset:-5px; border-radius:50%; border:1px solid oklch(0.72 0.16 152); opacity:0; animation:ping 2.4s ease-out infinite; }
+@keyframes ping { 0% { transform:scale(0.7); opacity:0.9; } 70% { transform:scale(1.9); opacity:0; } 100% { opacity:0; } }
+.con-body { position:relative; padding:32px 0 30px; }
+h1 { font-weight:700; letter-spacing:-0.042em; font-size:clamp(28px,3.4vw,40px); line-height:1.05; }
+.sub { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-top:12px; }
+main { padding:28px 0 90px; }
+.lab { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.gate { max-width:420px; }
+.gate input { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:0.08em; color:#17140F; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:2px; padding:13px 14px; width:100%; margin-top:9px; }
+.gate input:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.btn { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; padding:12px 18px; border:none; border-radius:2px; background:#17140F; color:#F5F0E6; cursor:pointer; }
+.btn:hover { background:oklch(0.44 0.07 152); }
+.btn:disabled { opacity:0.6; cursor:default; }
+.btn.ghost { background:transparent; color:#3D372D; border:1px solid #DDD3C0; }
+.btn.ghost:hover { background:transparent; border-color:#17140F; }
+.bar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
+.vtabs { display:flex; gap:8px; }
+.vtab { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; padding:10px 16px; border:1px solid #DDD3C0; background:#FCFAF4; border-radius:999px; cursor:pointer; color:#8A7F6E; transition:all .2s ease; }
+.vtab:hover { border-color:#17140F; color:#17140F; }
+.vtab.on { background:#17140F; color:#F5F0E6; border-color:#17140F; }
+.apps { display:grid; gap:16px; }
+.app { background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; overflow:hidden; }
+.app-h { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:16px 20px; border-bottom:1px solid #EDE6D8; }
+.co { font-weight:700; letter-spacing:-0.02em; font-size:17px; }
+.who { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; }
+.meta { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1px; background:#EDE6D8; border-bottom:1px solid #EDE6D8; }
+.meta > div { background:#FCFAF4; padding:11px 20px 12px; }
+.meta .k { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-bottom:3px; }
+.meta .v { font-size:13.5px; color:#17140F; word-break:break-word; }
+.meta .v.gold { color:#7a6410; font-family:'DM Mono',monospace; letter-spacing:0.06em; }
+.note { padding:12px 20px; font-size:13px; color:#554C40; background:#F7F2E8; border-bottom:1px solid #EDE6D8; white-space:pre-line; max-height:150px; overflow:auto; }
+.approve { padding:14px 20px 16px; display:flex; gap:8px; align-items:end; flex-wrap:wrap; }
+.fld { display:grid; gap:4px; }
+.fld label { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; }
+.fld input { font-family:'DM Mono',monospace; font-size:13px; color:#17140F; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:2px; padding:10px 11px; width:100px; }
+.fld input.wide { width:150px; }
+.fld input:focus { outline:none; border-color:oklch(0.44 0.07 152); }
+.empty { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; padding:40px 22px; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; text-align:center; }
+.err { margin-top:18px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:13px 16px; font-size:14px; }
+.warn { border:1px solid rgba(196,88,60,0.4); background:rgba(242,206,89,0.15); color:#6a5a10; border-radius:3px; padding:11px 14px; font-size:13px; margin:0 20px 16px; }
+.okrow { padding:13px 20px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:oklch(0.44 0.07 152); }
+.hint { font-family:'DM Sans',sans-serif; font-size:11.5px; line-height:1.5; color:#8A7F6E; max-width:22em; align-self:center; }
+.fine { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#A79C8A; margin-top:22px; line-height:1.9; }
+.copy { background:none; border:none; cursor:pointer; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#554C40; border-bottom:1px solid #C9BEA8; padding:0 0 2px; }
+.copy:hover { color:#17140F; border-color:#17140F; }
+</style>
+</head><body>
+
+<div class="console">
+  <span class="veil"></span>
+  <div class="shell">
+    <div class="con-top">
+      <span class="live"><span class="pulse"></span>Ambassador desk</span>
+      <span>Creator approvals &amp; payouts</span>
+    </div>
+    <div class="con-body">
+      <h1>Ambassador approvals</h1>
+      <div class="sub">Approving creates their public code and emails it automatically</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="shell">
+    <div id="gate" class="gate">
+      <label class="lab" for="key">Ambassador key</label>
+      <input id="key" type="password" autocomplete="off" placeholder="AMBASSADOR_KEY (or your wholesale key)">
+      <div style="margin-top:14px;"><button class="btn" id="unlock">Open the desk</button></div>
+      <div class="fine">The key is the AMBASSADOR_KEY environment variable (the WHOLESALE_KEY also works). It stays on this device only.</div>
+      <div id="gateErr"></div>
+    </div>
+
+    <div id="desk" style="display:none;">
+      <div class="bar">
+        <div class="vtabs" id="vtabs"></div>
+        <button class="btn ghost" id="refresh">Refresh</button>
+      </div>
+      <div id="banner"></div>
+      <div class="apps" id="apps"></div>
+      <div class="fine">Approvals email the creator their code and link from hello@happybeanie.com · commission owed = net sales × their rate · payouts are manual, monthly, $25 minimum</div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { view: 'pending', data: null };
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmt(iso) {
+    try { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch (e) { return ''; }
+  }
+  function usd(n) {
+    return '$' + (Math.round((n || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function prefs() {
+    try { return JSON.parse(localStorage.getItem('hb_amb_prefs') || '{}'); } catch (e) { return {}; }
+  }
+  function savePrefs(p) { try { localStorage.setItem('hb_amb_prefs', JSON.stringify(p)); } catch (e) {} }
+  function api(opts) {
+    var key = prefs().key || '';
+    opts = opts || {};
+    opts.headers = Object.assign({ 'x-ambassador-key': key, 'Content-Type': 'application/json' }, opts.headers || {});
+    return fetch('/api/admin/ambassadors', opts).then(function (r) {
+      return r.json().catch(function () { return { ok: false, error: 'bad_response' }; });
+    }).catch(function () { return { ok: false, error: 'unreachable' }; });
+  }
+
+  $('unlock').onclick = function () {
+    var p = prefs(); p.key = $('key').value.trim(); savePrefs(p);
+    $('gateErr').innerHTML = '';
+    api({}).then(function (b) {
+      if (!b.ok) {
+        $('gateErr').innerHTML = '<div class="err">' + (b.error === 'unauthorized' ? 'That key was not accepted.' : esc(b.message || b.error || 'Could not reach the desk.')) + '</div>';
+        return;
+      }
+      state.data = b;
+      $('gate').style.display = 'none';
+      $('desk').style.display = '';
+      draw();
+    });
+  };
+  $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('unlock').click(); });
+  $('refresh').onclick = load;
+  function load() { api({}).then(function (b) { if (b.ok) { state.data = b; draw(); } }); }
+
+  // Suggested code: FIRSTNAME + buyer discount, e.g. JAMIE10.
+  function suggestCode(a) {
+    var base = String(a.firstName || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 12) || 'BEAN';
+    return base + '10';
+  }
+
+  function channelLine(a) {
+    var bits = [];
+    if (a.instagram) bits.push('IG @' + a.instagram);
+    if (a.tiktok) bits.push('TT @' + a.tiktok);
+    if (a.otherChannel) bits.push(a.otherChannel);
+    return bits.join(' · ');
+  }
+
+  function draw() {
+    var d = state.data || { pending: [], approved: [] };
+    $('vtabs').innerHTML =
+      '<button class="vtab' + (state.view === 'pending' ? ' on' : '') + '" data-v="pending">Pending · ' + d.pending.length + '</button>' +
+      '<button class="vtab' + (state.view === 'approved' ? ' on' : '') + '" data-v="approved">Ambassadors · ' + d.approved.length + '</button>';
+    Array.prototype.forEach.call($('vtabs').querySelectorAll('.vtab'), function (b) {
+      b.onclick = function () { state.view = b.getAttribute('data-v'); draw(); };
+    });
+    $('banner').innerHTML = '';
+    if (state.view === 'pending') drawPending(d.pending);
+    else drawApproved(d.approved);
+  }
+
+  function drawPending(list) {
+    var host = $('apps');
+    if (!list.length) { host.innerHTML = '<div class="empty">No pending applications</div>'; return; }
+    host.innerHTML = '';
+    list.forEach(function (a) {
+      var card = document.createElement('div');
+      card.className = 'app';
+      card.innerHTML =
+        '<div class="app-h"><span class="co">' + esc(a.firstName + ' ' + a.lastName) + '</span>' +
+        '<span class="who">' + esc(a.email) + ' · applied ' + esc(fmt(a.createdAt)) + '</span></div>' +
+        '<div class="meta">' +
+          '<div><div class="k">Channels</div><div class="v">' + (esc(channelLine(a)) || '—') + '</div></div>' +
+          '<div><div class="k">Audience</div><div class="v">' + (esc(a.audience) || '—') + '</div></div>' +
+        '</div>' +
+        (a.why ? '<div class="note">' + esc(a.why) + '</div>' : '') +
+        '<div class="approve">' +
+          '<span class="fld"><label>Their code</label><input class="wide" data-f="code" value="' + esc(suggestCode(a)) + '"></span>' +
+          '<span class="fld"><label>Buyer % off</label><input data-f="buyer" value="10" inputmode="numeric"></span>' +
+          '<span class="fld"><label>Commission %</label><input data-f="comm" value="10" inputmode="numeric"></span>' +
+          '<button class="btn" data-act="approve">Approve &amp; email code</button>' +
+          '<button class="btn ghost" data-act="decline">Decline</button>' +
+          '<span class="hint">Approving creates the public code in Shopify (one use per customer) and emails it with their link.</span>' +
+        '</div>';
+      var get = function (f) { return card.querySelector('[data-f="' + f + '"]').value.trim(); };
+      card.querySelector('[data-act="approve"]').onclick = function () {
+        var btn = this; btn.disabled = true; btn.textContent = 'Approving…';
+        api({ method: 'POST', body: JSON.stringify({
+          customerId: a.id, firstName: a.firstName, email: a.email,
+          code: get('code'), buyerPct: parseInt(get('buyer'), 10), commissionPct: parseInt(get('comm'), 10)
+        }) }).then(function (b) {
+          if (b.ok && !b.warning) {
+            card.innerHTML = '<div class="okrow">✓ Approved — ' + esc(b.code) + ' is live, email sent</div>';
+            setTimeout(load, 1200);
+          } else if (b.ok) {
+            card.insertAdjacentHTML('afterbegin', '<div class="warn">' + esc(b.message || 'Approved, but the email did not send.') + '</div>');
+            btn.disabled = false; btn.textContent = 'Approve & email code';
+          } else {
+            btn.disabled = false; btn.textContent = 'Approve & email code';
+            card.insertAdjacentHTML('afterbegin', '<div class="warn">' + esc(b.message || b.error || 'Approval failed.') + '</div>');
+          }
+        });
+      };
+      card.querySelector('[data-act="decline"]').onclick = function () {
+        if (!confirm('Decline ' + a.firstName + ' ' + a.lastName + '? This just removes them from the queue — no email is sent.')) return;
+        api({ method: 'POST', body: JSON.stringify({ action: 'decline', customerId: a.id }) }).then(function (b) {
+          if (b.ok) { card.remove(); load(); }
+          else card.insertAdjacentHTML('afterbegin', '<div class="warn">' + esc(b.message || 'Could not decline.') + '</div>');
+        });
+      };
+      host.appendChild(card);
+    });
+  }
+
+  function drawApproved(list) {
+    var host = $('apps');
+    if (!list.length) { host.innerHTML = '<div class="empty">No ambassadors yet — approve someone from the Pending tab</div>'; return; }
+    host.innerHTML = '';
+    list.forEach(function (a) {
+      var st = a.stats || {};
+      var owed = a.pct ? (st.sales || 0) * a.pct / 100 : 0;
+      var owed30 = a.pct ? (st.sales30 || 0) * a.pct / 100 : 0;
+      var card = document.createElement('div');
+      card.className = 'app';
+      card.innerHTML =
+        '<div class="app-h"><span class="co">' + esc(a.firstName + ' ' + a.lastName) + '</span>' +
+        '<span class="who">' + esc(a.email) + (a.instagram ? ' · @' + esc(a.instagram) : '') + '</span></div>' +
+        '<div class="meta">' +
+          '<div><div class="k">Code</div><div class="v gold">' + (esc(a.code) || '<span style="color:#8C4630">missing</span>') + '</div></div>' +
+          '<div><div class="k">Commission</div><div class="v">' + (a.pct != null ? a.pct + '%' : '—') + '</div></div>' +
+          '<div><div class="k">Orders · 30d / all</div><div class="v">' + (st.orders30 != null ? st.orders30 + ' / ' + st.orders : '—') + '</div></div>' +
+          '<div><div class="k">Net sales · 30d / all</div><div class="v">' + (st.sales != null ? usd(st.sales30) + ' / ' + usd(st.sales) : '—') + '</div></div>' +
+          '<div><div class="k">Owed · 30d / all-time</div><div class="v"><b>' + usd(owed30) + '</b> / ' + usd(owed) + '</div></div>' +
+        '</div>' +
+        (a.link ? '<div class="note" style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;"><span style="font-family:\'DM Mono\',monospace; font-size:11.5px;">' + esc(a.link) + '</span><button class="copy" data-act="copylink">Copy link</button><button class="copy" data-act="copycode">Copy code</button></div>' : '') +
+        '<div class="approve">' +
+          '<span class="fld"><label>New commission %</label><input data-f="comm" value="' + (a.pct != null ? a.pct : 10) + '" inputmode="numeric"></span>' +
+          '<button class="btn" data-act="tier">Set rate &amp; email</button>' +
+          '<span class="hint">Changes the commission tier only — their code and link stay the same.</span>' +
+        '</div>';
+      var copyBtn = card.querySelector('[data-act="copylink"]');
+      if (copyBtn) copyBtn.onclick = function () {
+        navigator.clipboard.writeText(a.link).then(function () { copyBtn.textContent = 'Copied ✓'; setTimeout(function () { copyBtn.textContent = 'Copy link'; }, 1400); });
+      };
+      var copyCode = card.querySelector('[data-act="copycode"]');
+      if (copyCode) copyCode.onclick = function () {
+        navigator.clipboard.writeText(a.code || '').then(function () { copyCode.textContent = 'Copied ✓'; setTimeout(function () { copyCode.textContent = 'Copy code'; }, 1400); });
+      };
+      card.querySelector('[data-act="tier"]').onclick = function () {
+        var btn = this; btn.disabled = true; btn.textContent = 'Saving…';
+        api({ method: 'POST', body: JSON.stringify({
+          action: 'set_tier', customerId: a.id, firstName: a.firstName, email: a.email, code: a.code,
+          commissionPct: parseInt(card.querySelector('[data-f="comm"]').value.trim(), 10)
+        }) }).then(function (b) {
+          btn.disabled = false; btn.textContent = 'Set rate & email';
+          if (b.ok && !b.warning) { btn.textContent = '✓ Rate set'; setTimeout(load, 1200); }
+          else card.insertAdjacentHTML('afterbegin', '<div class="warn">' + esc(b.message || b.error || 'Could not set the rate.') + '</div>');
+        });
+      };
+      host.appendChild(card);
+    });
+  }
+
+  if (prefs().key) {
+    api({}).then(function (b) {
+      if (b.ok) { state.data = b; $('gate').style.display = 'none'; $('desk').style.display = ''; draw(); }
+    });
+  }
+})();
+</script>
+</body></html>

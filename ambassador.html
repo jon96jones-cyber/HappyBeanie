@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ambassador Program — Happy Beanie</title>
+<meta name="description" content="Share Happy Beanie with your audience. Your people get a discount, you earn a commission on every sale — apply for the Happy Beanie ambassador program.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+@font-face { font-family:'DM Mono'; font-weight:400; src:url('/assets/fonts/23b5af97.woff2') format('woff2'); }
+@font-face { font-family:'DM Mono'; font-weight:500; src:url('/assets/fonts/b847e313.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:400; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:500; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:700; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:#17140F; color:#F5F0E6; font-family:'DM Sans',-apple-system,sans-serif; font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+a { color:#F0C64B; text-decoration:none; }
+a:hover { border-bottom:1px solid #F0C64B; }
+.shell { max-width:1180px; margin:0 auto; padding:0 24px; }
+.rv { opacity:0; transform:translateY(22px); transition:opacity 0.7s cubic-bezier(0.2,0.7,0.2,1), transform 0.7s cubic-bezier(0.2,0.7,0.2,1); }
+.rv.in { opacity:1; transform:none; }
+.rv.d1 { transition-delay:0.08s; } .rv.d2 { transition-delay:0.16s; } .rv.d3 { transition-delay:0.24s; }
+@media (prefers-reduced-motion: reduce) { .rv { opacity:1; transform:none; transition:none; } }
+
+header.site { position:sticky; top:0; z-index:50; background:rgba(23,20,15,0.88); backdrop-filter:blur(10px); border-bottom:1px solid rgba(245,240,230,0.12); }
+header.site .bar { max-width:1180px; margin:0 auto; padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.mark { display:flex; align-items:baseline; gap:10px; color:#F5F0E6; }
+.mark:hover { border-bottom:none; }
+.mark b { font-family:'DM Sans',sans-serif; font-weight:700; font-size:23px; letter-spacing:-0.045em; white-space:nowrap; }
+.mark b .bean { position:relative; }
+.mark b .bean::before { content:''; position:absolute; left:50%; top:0.26em; width:0.19em; height:0.135em; margin-left:-0.095em; border-radius:46% 54% 50% 50% / 58% 42% 58% 42%; background:oklch(0.8 0.13 92); transform:rotate(-18deg); }
+.mark b .bean span { position:relative; z-index:1; }
+.mark > span { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; }
+.site-nav { display:flex; flex:1 1 auto; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:9px clamp(12px,1.7vw,20px); font-family:'DM Sans',sans-serif; font-size:14px; min-width:0; }
+.site-nav a { color:#F5F0E6; white-space:nowrap; padding-bottom:3px; border-bottom:1px solid transparent; }
+.site-nav a:hover { color:oklch(0.86 0.14 92); border-bottom:none; }
+.site-nav a.current { border-bottom-color:oklch(0.86 0.14 92); color:oklch(0.86 0.14 92); }
+.hdr-cta { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; padding:11px 18px; border-radius:2px; background:#F0C64B; color:#17140F; transition:background 0.2s ease, transform 0.2s ease; }
+.hdr-cta:hover { background:#f4d268; border-bottom:none; transform:translateY(-1px); }
+.nav-toggle { display:none; }
+.nav-burger { display:none; }
+@media (max-width:900px){
+  header.site .bar { position:relative; flex-wrap:nowrap; }
+  .nav-burger { display:inline-flex; flex-direction:column; justify-content:center; align-items:center; gap:5px; width:44px; height:44px; margin:-10px -8px -10px 0; cursor:pointer; flex:0 0 auto; }
+  .nav-burger span { display:block; width:22px; height:2px; border-radius:2px; background:#F5F0E6; transition:transform .3s ease, opacity .2s ease; }
+  .nav-toggle:checked ~ .nav-burger span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+  .nav-toggle:checked ~ .nav-burger span:nth-child(2){ opacity:0; }
+  .nav-toggle:checked ~ .nav-burger span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+  .site-nav { position:absolute; top:100%; left:0; right:0; flex-direction:column; align-items:stretch; justify-content:flex-start; flex-wrap:nowrap; gap:0; font-size:16px; background:#17140F; border-bottom:1px solid rgba(245,240,230,0.12); padding:0 24px; overflow:hidden; max-height:0; transition:max-height .35s cubic-bezier(0.2,0.7,0.2,1); }
+  .nav-toggle:checked ~ .site-nav { max-height:calc(100vh - 70px); padding:4px 24px 16px; }
+  .site-nav a { width:100%; padding:14px 2px; border-bottom:1px solid rgba(245,240,230,0.08); white-space:normal; }
+  .site-nav a.current { border-bottom:1px solid rgba(245,240,230,0.08); color:oklch(0.86 0.14 92); }
+  .site-nav a.hdr-cta{ display:block; margin-top:14px; text-align:center; border-bottom:none; }
+}
+@media (max-width:640px){ .hdr-cta { display:none; } }
+
+.hero { position:relative; overflow:hidden; padding:96px 0 0; }
+.hero::before { content:''; position:absolute; inset:0; background:
+  radial-gradient(46% 42% at 78% 18%, rgba(240,198,75,0.13), transparent 70%),
+  radial-gradient(40% 46% at 12% 82%, oklch(0.44 0.07 152 / 0.18), transparent 72%); pointer-events:none; }
+.hero::after { content:''; position:absolute; inset:0; pointer-events:none; opacity:0.5;
+  background-image:radial-gradient(rgba(245,240,230,0.09) 1px, transparent 1px); background-size:26px 26px;
+  -webkit-mask-image:radial-gradient(70% 60% at 50% 30%, #000 0%, transparent 100%); mask-image:radial-gradient(70% 60% at 50% 30%, #000 0%, transparent 100%); }
+.hero .shell { position:relative; z-index:1; }
+.kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:#F0C64B; display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+.kicker::before { content:''; width:30px; height:1px; background:#F0C64B; }
+h1 { font-family:'DM Sans',sans-serif; font-weight:700; font-size:clamp(40px,6.2vw,78px); line-height:1.0; letter-spacing:-0.042em; max-width:13em; }
+h1 em { font-style:normal; color:#F0C64B; }
+.lede { font-size:clamp(16px,1.6vw,19px); color:#DED5C4; max-width:33em; margin:26px 0 38px; }
+.hero-ctas { display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-bottom:74px; }
+.btn-gold { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; padding:17px 32px; border-radius:2px; background:#F0C64B; color:#17140F; transition:background 0.2s ease, transform 0.2s ease; display:inline-block; }
+.btn-gold:hover { background:#f4d268; transform:translateY(-2px); border-bottom:none; }
+.btn-ghost { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; padding:16px 28px; border-radius:2px; border:1px solid rgba(245,240,230,0.3); color:#F5F0E6; transition:border-color 0.2s ease, background 0.2s ease; display:inline-block; }
+.btn-ghost:hover { border-color:#F0C64B; color:#F0C64B; background:rgba(240,198,75,0.06); border-bottom-style:solid; }
+.stats { position:relative; z-index:1; border-top:1px solid rgba(245,240,230,0.14); background:rgba(245,240,230,0.03); }
+.stats .shell { display:grid; grid-template-columns:repeat(4,1fr); }
+.stat { padding:26px 22px 28px; border-left:1px solid rgba(245,240,230,0.12); }
+.stat:first-child { border-left:none; padding-left:0; }
+.stat .n { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(26px,3vw,38px); line-height:1; color:#F5F0E6; margin-bottom:8px; }
+.stat .n i { font-style:normal; color:#F0C64B; }
+.stat .l { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.15em; text-transform:uppercase; color:#8A7F6E; line-height:1.55; }
+@media (max-width:760px){ .stats .shell { grid-template-columns:1fr 1fr; } .stat { padding-left:18px; } .stat:nth-child(odd){ border-left:none; padding-left:0; } .stat:nth-child(n+3){ border-top:1px solid rgba(245,240,230,0.12); } }
+
+.steps-sec { padding:96px 0 100px; position:relative; overflow:hidden; }
+.steps-sec::before { content:''; position:absolute; inset:0; background:radial-gradient(50% 40% at 90% 100%, oklch(0.44 0.07 152 / 0.12), transparent 70%); pointer-events:none; }
+.steps-sec .shell { position:relative; z-index:1; }
+.steps-sec h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(30px,3.9vw,50px); line-height:1.05; max-width:17em; }
+.steps-sec h2 em { font-style:normal; color:#F0C64B; }
+.steps { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:48px; }
+@media (max-width:860px){ .steps { grid-template-columns:1fr; } }
+.step { position:relative; border:1px solid rgba(245,240,230,0.14); border-radius:4px; background:rgba(245,240,230,0.035); padding:30px 26px 32px; overflow:hidden; transition:border-color 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1); }
+.step:hover { border-color:rgba(240,198,75,0.45); background:rgba(245,240,230,0.055); transform:translateY(-4px); }
+.step .ghost { position:absolute; right:14px; top:-24px; font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:130px; line-height:1; color:rgba(245,240,230,0.05); pointer-events:none; }
+.step .tag { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#F0C64B; margin-bottom:14px; }
+.step h3 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:25px; margin-bottom:10px; }
+.step p { font-size:14px; color:#B9AF9C; line-height:1.65; }
+.step p b { color:#DED5C4; font-weight:400; }
+@media (max-width:900px){
+  .steps-sec { padding:52px 0 56px; }
+  .steps { gap:6px; margin-top:22px; }
+  .step { padding:11px 14px 12px; border-radius:3px; }
+  .step .ghost { display:none; }
+  .step .tag { font-size:8px; letter-spacing:0.12em; margin-bottom:5px; }
+  .step h3 { font-size:16px; margin-bottom:4px; }
+  .step p { font-size:11.5px; line-height:1.45; }
+}
+
+/* cream band: tiers */
+.band { background:#F5F0E6; color:#17140F; padding:92px 0 96px; }
+.band .kicker { color:oklch(0.44 0.07 152); }
+.band .kicker::before { background:oklch(0.44 0.07 152); }
+.band h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(30px,3.9vw,50px); line-height:1.05; max-width:17em; }
+.band h2 em { font-style:normal; color:oklch(0.44 0.07 152); }
+.band .sub { color:#6A6055; font-size:16px; max-width:36em; margin:16px 0 44px; }
+.tiers { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+@media (max-width:860px){ .tiers { grid-template-columns:1fr; } }
+.tier { position:relative; background:#FCFAF4; border:1px solid #E4DBC9; border-radius:4px; padding:28px 26px 30px; box-shadow:0 18px 34px -26px rgba(23,20,15,0.35); transition:transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease; }
+.tier:hover { transform:translateY(-5px); box-shadow:0 30px 44px -26px rgba(23,20,15,0.42); }
+.tier .tt { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:oklch(0.44 0.07 152); margin-bottom:12px; }
+.tier .pct { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.05em; font-size:52px; line-height:1; margin-bottom:4px; }
+.tier .pl { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-bottom:16px; }
+.tier p { font-size:14px; color:#4A4438; line-height:1.6; }
+.tier.mid { border-color:oklch(0.44 0.07 152 / 0.55); }
+.band .fine { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#8A7F6E; margin-top:28px; line-height:1.8; }
+
+/* rules */
+.rules-sec { padding:92px 0 96px; position:relative; }
+.rules-sec h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(28px,3.4vw,44px); line-height:1.05; }
+.rules-sec h2 em { font-style:normal; color:#F0C64B; }
+.rules-sec .sub { color:#B9AF9C; font-size:15.5px; max-width:38em; margin:14px 0 38px; }
+.rules { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:760px){ .rules { grid-template-columns:1fr; } }
+.rule { display:flex; gap:14px; border:1px solid rgba(245,240,230,0.13); border-radius:4px; background:rgba(245,240,230,0.03); padding:18px 20px; }
+.rule .tick { flex:0 0 auto; width:20px; height:20px; margin-top:3px; border-radius:50%; background:rgba(240,198,75,0.16); color:#F0C64B; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+.rule div { font-size:14px; color:#DED5C4; line-height:1.6; }
+.rule b { color:#F5F0E6; }
+
+/* apply */
+.apply { padding:0 0 110px; }
+.apply-grid { display:grid; grid-template-columns:1.55fr 1fr; gap:22px; align-items:start; }
+@media (max-width:920px){ .apply-grid { grid-template-columns:1fr; } }
+.panel { border:1px solid rgba(245,240,230,0.16); border-radius:6px; background:linear-gradient(180deg, rgba(245,240,230,0.05), rgba(245,240,230,0.02)); box-shadow:0 40px 80px -50px rgba(0,0,0,0.8); overflow:hidden; }
+.panel-head { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px 28px; border-bottom:1px solid rgba(245,240,230,0.12); background:rgba(23,20,15,0.5); }
+.panel-head .ph-t { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; color:#C9BEA8; }
+.panel-head .ph-dot { display:flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:oklch(0.72 0.08 152); }
+.panel-head .ph-dot::before { content:''; width:7px; height:7px; border-radius:50%; background:oklch(0.72 0.08 152); box-shadow:0 0 0 3px oklch(0.72 0.08 152 / 0.2); }
+.panel-body { padding:32px 28px 36px; }
+@media (max-width:540px){ .panel-body { padding:26px 18px 30px; } }
+.panel-body h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:27px; margin-bottom:6px; }
+.panel-body .sub { color:#B9AF9C; font-size:14.5px; margin-bottom:28px; }
+form { display:grid; gap:20px; }
+.row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:560px){ .row { grid-template-columns:1fr; } }
+.field { display:grid; gap:8px; }
+label { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:#C9BEA8; }
+label .req { color:#F0C64B; }
+label .opt { color:#6A6055; }
+input, select, textarea {
+  width:100%; background:rgba(23,20,15,0.55); border:1px solid rgba(245,240,230,0.22); border-radius:3px;
+  padding:13px 15px; color:#F5F0E6; font-family:'DM Sans',sans-serif; font-size:15px; line-height:1.5;
+  transition:border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+textarea { resize:vertical; min-height:96px; }
+select { appearance:none; -webkit-appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%23C9BEA8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 15px center; padding-right:40px; }
+input:focus, select:focus, textarea:focus { outline:none; border-color:#F0C64B; background:rgba(23,20,15,0.75); box-shadow:0 0 0 3px rgba(240,198,75,0.14); }
+input::placeholder, textarea::placeholder { color:#6A6055; }
+.hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+label.consent { display:flex; align-items:flex-start; gap:12px; font-family:'DM Sans',sans-serif; font-size:13px; letter-spacing:0; text-transform:none; color:#B9AF9C; line-height:1.55; }
+.consent input { width:auto; margin-top:3px; flex:0 0 auto; accent-color:#F0C64B; }
+button.submit {
+  font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+  padding:17px 34px; border:none; border-radius:3px; background:#F0C64B; color:#17140F; cursor:pointer;
+  transition:background 0.2s ease, transform 0.2s ease; justify-self:start;
+}
+button.submit:hover { background:#f4d268; transform:translateY(-1px); }
+button.submit:disabled { opacity:0.55; cursor:default; transform:none; }
+.formnote { font-size:12.5px; color:#8A7F6E; line-height:1.6; }
+.msg { border-radius:3px; padding:15px 19px; font-size:14px; line-height:1.6; display:none; margin-bottom:22px; }
+.msg.err { border:1px solid rgba(224,122,95,0.5); background:rgba(224,122,95,0.08); color:#EDBBA9; }
+.aside { display:grid; gap:16px; position:sticky; top:96px; }
+@media (max-width:920px){ .aside { position:static; } }
+.abox { border:1px solid rgba(245,240,230,0.14); border-radius:6px; background:rgba(245,240,230,0.035); padding:24px 24px 26px; }
+.abox .at { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#F0C64B; margin-bottom:16px; }
+.abox ul { list-style:none; display:grid; gap:12px; }
+.abox li { display:flex; gap:12px; font-size:13.5px; color:#DED5C4; line-height:1.55; }
+.abox li .tick { flex:0 0 auto; width:17px; height:17px; margin-top:2px; border-radius:50%; background:rgba(240,198,75,0.18); display:flex; align-items:center; justify-content:center; color:#F0C64B; font-size:9px; }
+.abox.gold { border-color:rgba(240,198,75,0.4); background:rgba(240,198,75,0.06); }
+.abox p { font-size:13.5px; color:#B9AF9C; line-height:1.6; }
+.abox .big { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:21px; color:#F5F0E6; line-height:1.25; margin-bottom:6px; }
+.success { display:none; text-align:center; padding:56px 30px; }
+.success.show { display:block; }
+.success .dot { width:52px; height:52px; border-radius:50%; background:#F0C64B; display:inline-flex; align-items:center; justify-content:center; margin-bottom:22px; animation:pop 0.45s cubic-bezier(0.2,0.7,0.2,1) both; color:#17140F; font-size:20px; font-weight:700; }
+@keyframes pop { from { transform:scale(0.4); opacity:0; } to { transform:scale(1); opacity:1; } }
+.success h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:29px; margin-bottom:12px; }
+.success p { color:#DED5C4; max-width:30em; margin:0 auto 8px; font-size:15px; }
+
+footer.site { border-top:1px solid rgba(245,240,230,0.14); }
+footer.site .shell { padding-top:26px; padding-bottom:26px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:#8A7F6E; }
+footer.site a { color:#8A7F6E; }
+footer.site a:hover { color:#F0C64B; border-bottom:none; }
+
+@media (max-width:620px){
+  header.site .bar { padding:13px 16px; gap:12px; }
+  .mark b { font-size:19px; }
+  .mark > span { display:none; }
+  .shell { padding:0 16px; }
+  .hero { padding-top:44px; }
+  h1 { font-size:clamp(30px,8.4vw,42px); }
+  .lede { font-size:15.5px; margin:18px 0 28px; }
+  .band, .rules-sec { padding:52px 0 56px; }
+}
+</style>
+</head><body>
+
+<header class="site">
+  <div class="bar">
+    <a class="mark" href="/"><b>happy bean<span class="bean"><span>ı</span></span>e</b><span>Hormone Care</span></a>
+    <input type="checkbox" id="navtoggle" class="nav-toggle" aria-label="Toggle navigation menu">
+    <label for="navtoggle" class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></label>
+    <nav class="site-nav">
+      <a href="/shop">Shop</a>
+      <a href="/product">Products</a>
+      <a href="/about">About</a>
+      <a href="/wholesale">Wholesale</a>
+      <a href="/ambassador" class="current">Ambassadors</a>
+      <a href="/account">Account</a>
+      <a class="hdr-cta" href="#apply">Apply now</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="shell">
+    <div class="kicker rv">Ambassador Program</div>
+    <h1 class="rv d1">Love your bean out loud — <em>and get paid for it.</em></h1>
+    <p class="lede rv d2">If your audience trusts you with their pets, we'd like to earn a place in that trust. Ambassadors get a personal code that gives their people money off every order — and a commission on every sale it drives, paid monthly.</p>
+    <div class="hero-ctas rv d3">
+      <a class="btn-gold" href="#apply">Apply for a code</a>
+      <a class="btn-ghost" href="#how">How it works</a>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="shell">
+      <div class="stat"><div class="n">10<i>%</i></div><div class="l">Off for your audience, every order</div></div>
+      <div class="stat"><div class="n">Up to 20<i>%</i></div><div class="l">Commission on net sales</div></div>
+      <div class="stat"><div class="n">Monthly</div><div class="l">Payouts · $25 minimum</div></div>
+      <div class="stat"><div class="n">Zero</div><div class="l">Cost to join · no purchase required</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="steps-sec" id="how">
+  <div class="shell">
+    <div class="kicker rv">How it works</div>
+    <h2 class="rv d1">One code. <em>Three steps.</em></h2>
+    <div class="steps">
+      <div class="step rv"><span class="ghost">1</span><div class="tag">Step 01</div><h3>Apply</h3><p>Tell us where you post and who follows you. <b>A person reads every application</b> — usually within two business days.</p></div>
+      <div class="step rv d1"><span class="ghost">2</span><div class="tag">Step 02</div><h3>Get your code</h3><p>Approved ambassadors get a personal code and link by email. <b>Your people save on every order</b>; every sale is credited to you automatically.</p></div>
+      <div class="step rv d2"><span class="ghost">3</span><div class="tag">Step 03</div><h3>Get paid</h3><p>A commission on every sale your code drives, <b>paid monthly once you've earned $25</b>. Watch it add up in your portal.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="shell">
+    <div class="kicker rv">Tiers</div>
+    <h2 class="rv d1">Grow with us — <em>bigger reach, bigger cut.</em></h2>
+    <p class="sub rv d2">Everyone starts as a Scout. Rates move up with the sales your code drives — reviewed monthly, and we'll email you when your tier changes.</p>
+    <div class="tiers">
+      <div class="tier rv"><div class="tt">Tier 01 · Scout</div><div class="pct">10%</div><div class="pl">Commission on net sales</div><p>Where everyone starts. Your code is live from day one, and every sale counts toward the next tier.</p></div>
+      <div class="tier mid rv d1"><div class="tt">Tier 02 · Advocate</div><div class="pct">15%</div><div class="pl">Commission on net sales</div><p>For ambassadors whose codes drive consistent monthly sales. Most active creators land here.</p></div>
+      <div class="tier rv d2"><div class="tt">Tier 03 · Partner</div><div class="pct">20%</div><div class="pl">Commission on net sales</div><p>Our top tier — for creators whose audiences have made Happy Beanie part of their routine. Early access and collabs live here too.</p></div>
+    </div>
+    <p class="fine rv">Net sales = product subtotal after discounts and refunds, before shipping and tax. Tier reviews are monthly; rates never drop mid-month.</p>
+  </div>
+</section>
+
+<section class="rules-sec">
+  <div class="shell">
+    <div class="kicker rv">The rules</div>
+    <h2 class="rv d1">Play it straight. <em>That's the whole rulebook.</em></h2>
+    <p class="sub rv d2">Happy Beanie is a supplement brand — what you say about it matters legally, for you and for us. These aren't fine print; they're conditions of the program.</p>
+    <div class="rules">
+      <div class="rule rv"><span class="tick">✓</span><div><b>Always disclose.</b> Every post that uses your code or link carries a clear disclosure — #ad, #happybeaniepartner, or the platform's paid-partnership tool.</div></div>
+      <div class="rule rv d1"><span class="tick">✓</span><div><b>No health claims we don't make.</b> Share your own pet's story, but never claim Happy Beanie treats, cures or prevents any disease.</div></div>
+      <div class="rule rv"><span class="tick">✓</span><div><b>Keep your code off coupon sites.</b> Your code is for your audience. Posting it to deal aggregators or coupon sites ends the partnership.</div></div>
+      <div class="rule rv d1"><span class="tick">✓</span><div><b>No brand-term ads.</b> Don't run paid ads on "Happy Beanie" or our misspellings, and don't impersonate the brand in handles or domains.</div></div>
+      <div class="rule rv"><span class="tick">✓</span><div><b>No self-commission.</b> Your code works for your audience, not on your own orders — ask us for your personal ambassador discount instead.</div></div>
+      <div class="rule rv d1"><span class="tick">✓</span><div><b>We can part ways.</b> Either side can end the partnership anytime; earned commissions are always paid out on the next cycle.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="apply" id="apply">
+  <div class="shell">
+    <div class="apply-grid">
+      <div class="panel">
+        <div class="panel-head"><span class="ph-t">Ambassador application</span><span class="ph-dot">Reviewed by a person</span></div>
+        <div class="panel-body" id="formWrap">
+          <h2>Apply for your code</h2>
+          <p class="sub">Two minutes. We read every application and reply either way — usually within two business days.</p>
+          <div class="msg err" id="errBox"></div>
+          <form id="ambForm" novalidate>
+            <div class="row">
+              <div class="field"><label for="firstName">First name <span class="req">*</span></label><input id="firstName" name="firstName" type="text" required autocomplete="given-name" placeholder="Jamie"></div>
+              <div class="field"><label for="lastName">Last name <span class="req">*</span></label><input id="lastName" name="lastName" type="text" required autocomplete="family-name" placeholder="Rivera"></div>
+            </div>
+            <div class="field"><label for="email">Email <span class="req">*</span></label><input id="email" name="email" type="email" required autocomplete="email" placeholder="you@email.com"></div>
+            <div class="row">
+              <div class="field"><label for="instagram">Instagram <span class="opt">· if you post there</span></label><input id="instagram" name="instagram" type="text" placeholder="@yourhandle"></div>
+              <div class="field"><label for="tiktok">TikTok <span class="opt">· if you post there</span></label><input id="tiktok" name="tiktok" type="text" placeholder="@yourhandle"></div>
+            </div>
+            <div class="field"><label for="otherChannel">Other channel <span class="opt">· YouTube, newsletter, blog…</span></label><input id="otherChannel" name="otherChannel" type="text" placeholder="youtube.com/@yourchannel"></div>
+            <div class="field"><label for="audience">Audience size <span class="req">*</span></label>
+              <select id="audience" name="audience" required>
+                <option value="" disabled selected>Select one&hellip;</option>
+                <option>Under 1,000</option>
+                <option>1,000 – 10,000</option>
+                <option>10,000 – 50,000</option>
+                <option>50,000 – 250,000</option>
+                <option>250,000+</option>
+              </select>
+            </div>
+            <div class="field"><label for="why">Why Happy Beanie? <span class="req">*</span></label><textarea id="why" name="why" required placeholder="Tell us about your pet, your audience, and why this partnership fits."></textarea></div>
+            <div class="hp" aria-hidden="true"><label for="hb_extra">Leave this empty</label><input id="hb_extra" name="hb_extra" type="text" tabindex="-1" autocomplete="off"></div>
+            <label class="consent"><input type="checkbox" id="consent" name="consent" required><span>I agree to the program rules above, including always disclosing the partnership, and to be contacted about this application. See our <a href="/policies/privacy.html">Privacy Policy</a>.</span></label>
+            <button type="submit" class="submit" id="submitBtn">Submit application</button>
+            <p class="formnote">Already an ambassador? <a href="/account">Your code and stats live in your portal</a>.</p>
+          </form>
+        </div>
+        <div class="success" id="successPanel">
+          <div class="dot">✓</div>
+          <h2>Application received.</h2>
+          <p>A person will read it — not a bot — and you'll hear back either way, usually within two business days.</p>
+          <p><a href="/">Back to the shop →</a></p>
+        </div>
+      </div>
+      <div class="aside">
+        <div class="abox">
+          <div class="at">What you get</div>
+          <ul>
+            <li><span class="tick">✓</span>A personal code — 10% off for your audience, every order</li>
+            <li><span class="tick">✓</span>10–20% commission on every sale it drives</li>
+            <li><span class="tick">✓</span>Monthly payouts, $25 minimum, no fees</li>
+            <li><span class="tick">✓</span>A portal with your link, code and rules</li>
+            <li><span class="tick">✓</span>A real person answering your questions</li>
+          </ul>
+        </div>
+        <div class="abox gold">
+          <div class="big">No follower minimum.</div>
+          <p>We care that your audience trusts you, not how big it is. A 400-person newsletter of devoted dog people beats a million drive-by views.</p>
+        </div>
+        <div class="abox">
+          <div class="at">Questions first?</div>
+          <p>Email <a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a> — a person reads it, and we're happy to talk it through before you apply.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="shell">
+    <span>© 2026 Happy Beanie · Scottsdale, AZ</span>
+    <span><a href="/">Shop</a> &nbsp;·&nbsp; <a href="/wholesale">Wholesale</a> &nbsp;·&nbsp; <a href="/policies/privacy.html">Privacy</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // reveal on scroll
+  var io = ('IntersectionObserver' in window) ? new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 }) : null;
+  Array.prototype.forEach.call(document.querySelectorAll('.rv'), function (el) {
+    if (io) io.observe(el); else el.classList.add('in');
+  });
+
+  var form = document.getElementById('ambForm');
+  var btn = document.getElementById('submitBtn');
+  var errBox = document.getElementById('errBox');
+  var formWrap = document.getElementById('formWrap');
+  var successPanel = document.getElementById('successPanel');
+
+  function showError(m) {
+    errBox.textContent = m;
+    errBox.style.display = 'block';
+    errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    errBox.style.display = 'none';
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    var data = {
+      firstName: form.firstName.value.trim(),
+      lastName: form.lastName.value.trim(),
+      email: form.email.value.trim(),
+      instagram: form.instagram.value.trim(),
+      tiktok: form.tiktok.value.trim(),
+      otherChannel: form.otherChannel.value.trim(),
+      audience: form.audience.value,
+      why: form.why.value.trim(),
+      hb_extra: form.hb_extra.value
+    };
+    btn.disabled = true;
+    var original = btn.textContent;
+    btn.textContent = 'Submitting…';
+
+    fetch('/api/ambassador-apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        return { ok: res.ok, body: body };
+      });
+    }).then(function (r) {
+      if (r.ok && r.body && r.body.ok) {
+        formWrap.style.display = 'none';
+        successPanel.classList.add('show');
+        successPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        showError((r.body && r.body.error) || 'Something went wrong submitting your application. Please try again, or email hello@happybeanie.com.');
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    }).catch(function () {
+      showError('We couldn’t reach the server. Check your connection and try again, or email hello@happybeanie.com.');
+      btn.disabled = false;
+      btn.textContent = original;
+    });
+  });
+})();
+</script>
+</body></html>

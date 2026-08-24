@@ -105,9 +105,10 @@ module.exports = async function handler(req, res) {
     if (!fresh) return res.status(200).json({ in: false });
     if (fresh.setCookie) res.setHeader('Set-Cookie', fresh.setCookie);
 
-    // Wholesale status + tier from the customer's own record.
+    // Wholesale + ambassador status from the customer's own record.
     let wholesale = false;
     let tierPct = null;
+    let ambassador = null;
     try {
       const out = await auth.customerGraphql(fresh.session.at, 'query { customer { tags } }');
       const tags = ((out.json && out.json.data && out.json.data.customer) || {}).tags || [];
@@ -116,9 +117,24 @@ module.exports = async function handler(req, res) {
         const m = String(tags[i]).match(/^wholesale-pct-(\d+)$/);
         if (m) { tierPct = parseInt(m[1], 10); break; }
       }
+      // Ambassador terms ride on tags too: amb-pct-NN (commission) and
+      // amb-code-CODE (their public discount code) — set by the desk.
+      if (tags.some(function (t) { return String(t).toLowerCase() === 'ambassador'; })) {
+        let ambPct = null, ambCode = null;
+        tags.forEach(function (t) {
+          let m = String(t).match(/^amb-pct-(\d+)$/);
+          if (m) ambPct = parseInt(m[1], 10);
+          m = String(t).match(/^amb-code-(.+)$/);
+          if (m) ambCode = m[1];
+        });
+        if (ambCode) {
+          ambassador = { pct: ambPct, code: ambCode,
+            link: 'https://www.happybeanie.com/?ref=' + encodeURIComponent(ambCode) };
+        }
+      }
     } catch (e) { /* probe only — signed-in still stands */ }
 
-    if (!wholesale) return res.status(200).json({ in: true, wholesale: false });
+    if (!wholesale) return res.status(200).json({ in: true, wholesale: false, ambassador: ambassador });
 
     let trade = null;
     try { trade = await tradeTerms(); } catch (e) {}
@@ -133,7 +149,7 @@ module.exports = async function handler(req, res) {
         code: 'TRADE' + tierPct
       };
     }
-    return res.status(200).json({ in: true, wholesale: true, trade: trade });
+    return res.status(200).json({ in: true, wholesale: true, trade: trade, ambassador: ambassador });
   } catch (e) {
     return res.status(200).json({ in: false });
   }
