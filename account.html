@@ -735,16 +735,23 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   // belong via data-view; the switcher only appears when the account holds
   // more than one role, so single-role users never see extra chrome.
   var acctView = 'personal';
-  function setupViews(tags) {
-    var roles = ['personal'];
-    if (tags.indexOf('wholesale') !== -1) roles.push('wholesale');
+  function setupViews(tags, subs) {
+    var isWholesale = tags.indexOf('wholesale') !== -1;
+    var roles = [];
+    // A wholesale account cannot purchase retail (one-time trade orders only,
+    // five-box minimum), so it has no personal shopping life to manage — the
+    // Personal workspace only stays if a subscription predates the tagging
+    // and still needs managing.
+    if (!isWholesale || (subs && subs.length)) roles.push('personal');
+    if (isWholesale) roles.push('wholesale');
     if (tags.indexOf('ambassador') !== -1 && tags.some(function (t) { return /^amb-code-/i.test(t); })) roles.push('ambassador');
     var host = document.getElementById('acctViews');
     if (!host) return;
-    if (roles.length < 2) { host.style.display = 'none'; applyView('personal', roles); return; }
+    if (roles.length < 2) { host.style.display = 'none'; applyView(roles[0] || 'personal', roles); return; }
     var saved = '';
     try { saved = localStorage.getItem('hb_acct_view') || ''; } catch (e) {}
-    acctView = roles.indexOf(saved) !== -1 ? saved : 'personal';
+    var fallback = isWholesale ? 'wholesale' : 'personal';
+    acctView = roles.indexOf(saved) !== -1 ? saved : fallback;
     host.style.display = '';
     host.innerHTML = '';
     var labels = { personal: 'Personal', wholesale: 'Wholesale', ambassador: 'Ambassador' };
@@ -1231,10 +1238,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     }
     $('badgeRow').innerHTML = badges;
     renderAmbassador(tags);
-    setupViews(tags);
 
     var orders = (c.orders && c.orders.nodes) || [];
     var subs = (c.subscriptionContracts && c.subscriptionContracts.nodes) || [];
+    setupViews(tags, subs);
 
     renderReadouts(orders, subs);
     renderOrders(orders);
