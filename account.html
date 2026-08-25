@@ -1728,16 +1728,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   }
 
   function applyPetsToHeader(pets) {
+    // Just the name for a single pet — no icons in the panel head.
     var slot = $('deliveriesFor');
     if (!slot) return;
-    if (!pets.length) { slot.innerHTML = ''; return; }
-    if (pets.length === 1) {
-      slot.innerHTML = ' for ' + esc(pets[0].name) + '<span class="dash-pet">' + petIcon(pets[0], 28, 23) + '</span>';
-      return;
-    }
-    slot.innerHTML = '<span class="dash-pet dash-pets">' + pets.map(function (p) {
-      return '<span title="' + esc(p.name) + '">' + petIcon(p, 26, 21) + '</span>';
-    }).join('') + '</span>';
+    slot.innerHTML = pets.length === 1 ? ' for ' + esc(pets[0].name) : '';
   }
 
   function renderOrderPets() {
