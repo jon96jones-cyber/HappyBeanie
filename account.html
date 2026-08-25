@@ -799,6 +799,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       if (show && el.id === 'wsPanel' && roles.indexOf('wholesale') === -1) show = false;
       el.style.display = show ? '' : 'none';
     });
+    // The pet-name suffix on the delivery log is a Personal-workspace touch —
+    // a shop ordering stock isn't ordering "for Mochi".
+    var df = document.getElementById('deliveriesFor');
+    if (df) df.style.display = v === 'personal' ? '' : 'none';
   }
 
   // Wholesale view: live trade terms, how ordering works, and the shortcut in.
