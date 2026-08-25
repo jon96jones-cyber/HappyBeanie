@@ -80,6 +80,23 @@ main { padding:28px 0 90px; }
 .ctlnote { font-family:'DM Sans',sans-serif; font-size:11.5px; line-height:1.5; color:#8A7F6E; padding:0 20px 16px; }
 .editpen { background:none; border:none; cursor:pointer; font-size:12px; line-height:1; color:#8A7F6E; padding:2px 0 2px 8px; }
 .editpen:hover { color:#17140F; }
+.pay-total { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:15px 20px; background:#17140F; color:#F5F0E6; border-radius:6px 6px 0 0; }
+.pay-total b { font-size:19px; letter-spacing:-0.02em; }
+.pay-total span { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; }
+.pay-list { background:#FCFAF4; border:1px solid #E0D6C2; border-top:none; border-radius:0 0 6px 6px; overflow:hidden; }
+.payrow { display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:15px 20px; border-bottom:1px solid #EDE6D8; }
+.payrow:last-child { border-bottom:none; }
+.p-who { flex:1 1 150px; min-width:0; }
+.p-name { display:block; font-weight:700; letter-spacing:-0.02em; font-size:15px; line-height:1.3; }
+.p-mail { display:block; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.06em; color:#8A7F6E; word-break:break-all; margin-top:2px; }
+.p-method { flex:1 1 190px; min-width:0; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.p-handle { font-family:'DM Mono',monospace; font-size:12.5px; letter-spacing:0.03em; color:#17140F; word-break:break-all; }
+.p-none { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:#8C4630; }
+.p-bal { min-width:96px; text-align:right; font-weight:700; font-size:18px; letter-spacing:-0.02em; }
+.p-bal .sm { display:block; font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.05em; color:#8A7F6E; font-weight:400; margin-top:2px; }
+.p-min { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.08em; text-transform:uppercase; color:#A79C8A; }
+.payrow .fld input { width:92px; }
+.pay-done { padding:14px 20px; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; }
 </style>
 </head><body>
 
@@ -91,8 +108,8 @@ main { padding:28px 0 90px; }
       <span>Creator approvals &amp; payouts</span>
     </div>
     <div class="con-body">
-      <h1>Ambassador approvals</h1>
-      <div class="sub">Approving creates their public code and emails it automatically</div>
+      <h1>Ambassador desk</h1>
+      <div class="sub">Approvals, rates and monthly payouts — ambassadors claim their own code in their portal</div>
     </div>
   </div>
 </div>
@@ -114,7 +131,7 @@ main { padding:28px 0 90px; }
       </div>
       <div id="banner"></div>
       <div class="apps" id="apps"></div>
-      <div class="fine">Approvals email the creator their code and link from hello@happybeanie.com · commission owed = net sales × their rate · payouts are manual, monthly, $25 minimum</div>
+      <div class="fine">Approving emails the invite from hello@happybeanie.com — ambassadors claim their code and add their Zelle/Venmo in their portal · commission owed = net sales × their rate · pay from the Payouts tab: copy the handle, send in your bank app, then Record</div>
     </div>
   </div>
 </main>
@@ -174,17 +191,93 @@ main { padding:28px 0 90px; }
     return bits.join(' · ');
   }
 
+  // Balance math shared by the Ambassadors and Payouts views — the single
+  // source of what each person is owed.
+  function payoutInfo(a) {
+    var st = a.stats || {};
+    var owed = a.pct ? Math.round((st.sales || 0) * a.pct) / 100 : 0;
+    var paid = a.paidTotal || 0;
+    return { owed: owed, paid: paid, balance: Math.max(0, Math.round((owed - paid) * 100) / 100) };
+  }
+
   function draw() {
     var d = state.data || { pending: [], approved: [] };
+    var due = d.approved.reduce(function (n, a) { return n + payoutInfo(a).balance; }, 0);
     $('vtabs').innerHTML =
       '<button class="vtab' + (state.view === 'pending' ? ' on' : '') + '" data-v="pending">Pending · ' + d.pending.length + '</button>' +
-      '<button class="vtab' + (state.view === 'approved' ? ' on' : '') + '" data-v="approved">Ambassadors · ' + d.approved.length + '</button>';
+      '<button class="vtab' + (state.view === 'approved' ? ' on' : '') + '" data-v="approved">Ambassadors · ' + d.approved.length + '</button>' +
+      '<button class="vtab' + (state.view === 'payouts' ? ' on' : '') + '" data-v="payouts">Payouts · ' + usd(Math.round(due * 100) / 100) + '</button>';
     Array.prototype.forEach.call($('vtabs').querySelectorAll('.vtab'), function (b) {
       b.onclick = function () { state.view = b.getAttribute('data-v'); draw(); };
     });
     $('banner').innerHTML = '';
     if (state.view === 'pending') drawPending(d.pending);
+    else if (state.view === 'payouts') drawPayouts(d.approved);
     else drawApproved(d.approved);
+  }
+
+  // The payout run: everyone who's owed money, biggest balance first, with
+  // their handle one click from the clipboard and the amount prefilled.
+  // Flow per row: copy handle → send in your bank app → Record.
+  function drawPayouts(list) {
+    var host = $('apps');
+    var rows = list.map(function (a) { return { a: a, p: payoutInfo(a) }; })
+      .filter(function (r) { return r.p.balance > 0; })
+      .sort(function (x, y) { return y.p.balance - x.p.balance; });
+    var total = rows.reduce(function (n, r) { return n + r.p.balance; }, 0);
+    var settled = list.length - rows.length;
+
+    if (!rows.length) {
+      host.innerHTML = '<div class="empty">Everyone is paid up — nothing owed right now</div>';
+      return;
+    }
+
+    var wrap = document.createElement('div');
+    wrap.innerHTML =
+      '<div class="pay-total"><span>Owed across ' + rows.length + (rows.length === 1 ? ' ambassador' : ' ambassadors') + '</span><b>' + usd(Math.round(total * 100) / 100) + '</b></div>' +
+      '<div class="pay-list" id="payList"></div>';
+    host.innerHTML = '';
+    host.appendChild(wrap);
+    var listEl = wrap.querySelector('#payList');
+
+    rows.forEach(function (r) {
+      var a = r.a, p = r.p;
+      var row = document.createElement('div');
+      row.className = 'payrow';
+      row.innerHTML =
+        '<span class="p-who"><span class="p-name">' + esc(a.firstName + ' ' + a.lastName) + '</span>' +
+          '<span class="p-mail">' + esc(a.email) + '</span></span>' +
+        '<span class="p-method">' + (a.payoutMethod
+          ? '<span class="p-handle">' + esc(a.payoutMethod) + '</span><button class="copy" data-act="copyhandle">Copy</button>'
+          : '<span class="p-none">No payout method yet — they add it in their portal</span>') + '</span>' +
+        '<span class="p-bal">' + usd(p.balance) + '<span class="sm">' + usd(p.paid) + ' paid to date</span>' +
+          (p.balance < 25 ? '<span class="p-min">Under $25 min · rolls over</span>' : '') + '</span>' +
+        '<span class="grp"><span class="fld"><label>Paid $</label><input data-f="amt" inputmode="decimal" value="' + p.balance.toFixed(2) + '"></span>' +
+        '<button class="btn" data-act="record">Record</button></span>';
+
+      var cp = row.querySelector('[data-act="copyhandle"]');
+      if (cp) cp.onclick = function () {
+        navigator.clipboard.writeText(a.payoutMethod).then(function () { cp.textContent = 'Copied ✓'; setTimeout(function () { cp.textContent = 'Copy'; }, 1400); });
+      };
+      row.querySelector('[data-act="record"]').onclick = function () {
+        var amt = parseFloat(row.querySelector('[data-f="amt"]').value);
+        if (!(amt > 0)) { alert('Enter the amount you paid, in dollars.'); return; }
+        if (!confirm('Record a ' + usd(amt) + ' payout to ' + a.firstName + (a.payoutMethod ? ' (' + a.payoutMethod + ')' : '') + '? Do this after the money has actually been sent.')) return;
+        var btn = this; btn.disabled = true; btn.textContent = 'Recording…';
+        api({ method: 'POST', body: JSON.stringify({ action: 'record_payout', customerId: a.id, amount: amt }) }).then(function (b) {
+          if (b.ok) { btn.textContent = '✓ Paid'; setTimeout(load, 900); }
+          else { btn.disabled = false; btn.textContent = 'Record'; alert(b.message || 'Could not record the payout.'); }
+        });
+      };
+      listEl.appendChild(row);
+    });
+
+    if (settled > 0) {
+      var done = document.createElement('div');
+      done.className = 'pay-done';
+      done.textContent = settled + (settled === 1 ? ' ambassador is' : ' ambassadors are') + ' settled · $0 owed';
+      listEl.appendChild(done);
+    }
   }
 
   function drawPending(list) {
