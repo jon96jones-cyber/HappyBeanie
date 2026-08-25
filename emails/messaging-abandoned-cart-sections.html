@@ -1,0 +1,52 @@
+<!--
+  Happy Beanie — "We saved your cart for you" (abandoned cart) email
+  for the Shopify Messaging editor.
+
+  Assembly (top to bottom):
+    1. Custom Liquid section  → paste SNIPPET 1
+    2. Abandoned cart section (Reengagement) — the app's native item
+       list + cart button. Button label: "Back to your cart".
+       Button colors if editable: background #F2CE59, text #17140F.
+    3. Custom Liquid section  → paste SNIPPET 2
+  Delete the default text sections ("Happy Beanie", "You left items…",
+  "Your cart is waiting") — the snippets replace them.
+  Template colors: Content background #FCFAF4 · Border #E0D6C2
+  Subject: Your bean is still in your cart
+  Preview text: Your cart is saved — one tap brings it all back.
+-->
+
+
+<!-- ============ SNIPPET 1 — header + headline (paste into the FIRST Custom Liquid section, at the very top) ============ -->
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td style="background:#17140f; border-radius:10px 10px 0 0; padding:22px 30px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td align="left"><img src="https://www.happybeanie.com/assets/email-logo-2.png" width="133" height="38" alt="happy beanie" style="display:block; border:0;"></td>
+      <td align="right" style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Order&nbsp;desk</td>
+    </tr></table>
+  </td></tr>
+  <tr><td style="height:3px; background:#f2ce59; font-size:0; line-height:0;">&nbsp;</td></tr>
+  <tr><td style="padding:32px 6px 4px;">
+    <p style="margin:0 0 14px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">— &nbsp;Your cart · saved for you</p>
+    <h1 style="margin:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:27px; line-height:1.1; letter-spacing:-1px; font-weight:700; color:#17140f;">Your bean is still waiting.</h1>
+    <p style="margin:0; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15.5px; line-height:1.62; color:#554c40;">You left a few things in your cart — we saved them exactly as you built it. One tap brings it all back, whenever you're ready.</p>
+  </td></tr>
+</table>
+
+
+<!-- ============ SNIPPET 2 — trust points + help note (paste into the SECOND Custom Liquid section, below the abandoned cart block) ============ -->
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr><td style="padding:10px 6px 0;">
+    <p style="margin:0 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">— &nbsp;While you decide</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr><td style="padding:0 0 12px;"><span style="display:inline-block; width:22px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:11px; color:#325e3f; vertical-align:top;">01</span><span style="display:inline-block; width:490px; max-width:88%; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14.5px; line-height:1.6; color:#554c40; vertical-align:top;"><b style="color:#17140f;">30-day guarantee</b> — give it a full month. If your bean isn't visibly happier, it's on us. No return label, no questions.</span></td></tr>
+      <tr><td style="padding:0 0 12px;"><span style="display:inline-block; width:22px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:11px; color:#325e3f; vertical-align:top;">02</span><span style="display:inline-block; width:490px; max-width:88%; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14.5px; line-height:1.6; color:#554c40; vertical-align:top;"><b style="color:#17140f;">Every lot third-party tested</b> — the certificate for your batch is published before it ships. See them anytime at happybeanie.com/certificates.</span></td></tr>
+      <tr><td style="padding:0 0 6px;"><span style="display:inline-block; width:22px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:11px; color:#325e3f; vertical-align:top;">03</span><span style="display:inline-block; width:490px; max-width:88%; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14.5px; line-height:1.6; color:#554c40; vertical-align:top;"><b style="color:#17140f;">Made to order in Scottsdale, AZ</b> — we blend in small batches, so your box is made fresh when you order it.</span></td></tr>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0 4px; background:#f5f0e6; border:1px solid #e0d6c2; border-radius:8px;"><tr><td style="padding:18px 20px;">
+      <p style="margin:0; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14.5px; line-height:1.6; color:#554c40;">Not sure it's right for your bean? Reply to this email with your pet's age, weight and anything they're sensitive to — a person reads this inbox, not a queue, and we'll tell you honestly whether it's a fit.</p>
+    </td></tr></table>
+    <p style="margin:16px 0 0; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;" align="center">Formulated fresh · Scottsdale, AZ</p>
+  </td></tr>
+</table>

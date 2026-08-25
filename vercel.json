@@ -1,8 +1,5 @@
 {
   "cleanUrls": true,
-  "crons": [
-    { "path": "/api/cron/recover-checkouts", "schedule": "15 * * * *" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
