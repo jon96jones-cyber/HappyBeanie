@@ -1828,9 +1828,12 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     cells = [];
+    // The field lives on the right side of the console only — the headline
+    // and chips on the left stay clear of it.
+    var left = Math.max(GAP / 2, w * 0.56);
     for (var y = GAP / 2; y < h; y += GAP)
       for (var x = GAP / 2; x < w; x += GAP)
-        cells.push({ x: x, y: y, e: 0, seed: Math.random() * 6.2832 });
+        if (x >= left) cells.push({ x: x, y: y, e: 0, seed: Math.random() * 6.2832 });
   }
   build();
   var rs; window.addEventListener('resize', function () { clearTimeout(rs); rs = setTimeout(function () { build(); }, 180); });
@@ -1854,7 +1857,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     var px = p.x, py = p.y;
     if (!p.active || t - idle > 2200) {
       var k = t / 4200;
-      px = w * (0.5 + 0.34 * Math.cos(k)); py = h * (0.52 + 0.3 * Math.sin(k * 1.4));
+      // Idle orbit stays inside the right-side field.
+      px = w * (0.77 + 0.16 * Math.cos(k)); py = h * (0.52 + 0.3 * Math.sin(k * 1.4));
     }
     ctx.clearRect(0, 0, w, h);
     var i, c, live = [];
