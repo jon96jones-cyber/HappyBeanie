@@ -1600,8 +1600,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   var PET_W = {
     dog: [['u20', 'Under 20 lb', '½ chew daily'], ['20-100', '20 to 100 lb', '1 chew daily'],
           ['o100', 'Over 100 lb', 'Up to 2 chews daily']],
-    cat: [['u8', 'Under 8 lb', '½ chew daily'], ['8-12', '8 to 12 lb', '1 chew daily'],
-          ['o12', 'Over 12 lb', '1 chew daily, split AM & PM']]
+    cat: [['u8', 'Under 8 lb', '1 chew daily'], ['8-12', '8 to 12 lb', '1 chew daily'],
+          ['o12', 'Over 12 lb', '1 chew daily']]
   };
   function weightOpts(species, sel) {
     var rows = PET_W[species] || PET_W.dog;
@@ -1627,7 +1627,9 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
               '<span><i>Formula</i><b>Happy Beans for ' + (p.species === 'cat' ? 'Cats' : 'Dogs') + '</b></span>' +
               '<span><i>Daily dose</i>' + (wDef
                 ? '<b class="gold">' + wDef[2] + '</b>'
-                : '<button type="button" class="pet-setw" data-edit="' + esc(p.id) + '">Set weight for dose</button>') + '</span>' +
+                : (p.species === 'cat'
+                  ? '<b class="gold">1 chew daily</b>'
+                  : '<button type="button" class="pet-setw" data-edit="' + esc(p.id) + '">Set weight for dose</button>')) + '</span>' +
               '<span><i>Screener</i><b><a href="/quiz">Check eligibility →</a></b></span>' +
             '</div></span>' +
             '<span class="pet-rowacts">' +
