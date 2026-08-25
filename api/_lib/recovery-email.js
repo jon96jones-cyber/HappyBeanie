@@ -56,9 +56,6 @@ module.exports = function build(t) {
       '<tr><td style="padding:0 0 12px;"><span style="display:inline-block; width:22px; ' + MONO + ' font-size:11px; color:#325e3f; vertical-align:top;">02</span><span style="display:inline-block; width:520px; max-width:88%; ' + SANS + ' font-size:14.5px; line-height:1.6; color:#554c40; vertical-align:top;"><b style="color:#17140f;">Every lot third-party tested</b> — the certificate for your batch is published before it ships. See them anytime at happybeanie.com/certificates.</span></td></tr>' +
       '<tr><td style="padding:0 0 6px;"><span style="display:inline-block; width:22px; ' + MONO + ' font-size:11px; color:#325e3f; vertical-align:top;">03</span><span style="display:inline-block; width:520px; max-width:88%; ' + SANS + ' font-size:14.5px; line-height:1.6; color:#554c40; vertical-align:top;"><b style="color:#17140f;">Made to order in Scottsdale, AZ</b> — we blend in small batches, so your box is made fresh when you order it.</span></td></tr>' +
     '</table>\n' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 30px; background:#f5f0e6; border:1px solid #e0d6c2; border-radius:8px;"><tr><td style="padding:18px 20px;">' +
-      '<p style="margin:0; ' + SANS + ' font-size:14.5px; line-height:1.6; color:#554c40;">Not sure it’s right for your bean? Reply to this email with your pet’s age, weight and anything they’re sensitive to — a person reads this inbox, not a queue, and we’ll tell you honestly whether it’s a fit.</p>' +
-    '</td></tr></table>\n' +
   '</td></tr>\n' +
   '<tr><td style="background:#f5f0e6; border-top:1px solid #e0d6c2; padding:26px 34px 30px;" align="center">' +
     '<p style="margin:0 0 12px; ' + MONO + ' font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Formulated fresh · Scottsdale, AZ</p>' +
