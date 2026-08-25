@@ -2720,6 +2720,22 @@ class Component extends DCLogic {
     }
   };
 
+  // Idle showcase: the room turns slowly on its own until the visitor grabs
+  // it — the first drag hands over the wheel for good. Pauses while zoomed
+  // into a station or while the tab is hidden.
+  roomSpinLoop = (t) => {
+    if (!this._roomSpin) return;
+    this._roomSpinRaf = requestAnimationFrame(this.roomSpinLoop);
+    if (this.state.page !== 'about' || !this._roomStage || !this.state.roomReady ||
+        document.hidden || this.state.roomZoom || this._roomDrag) { this._roomSpinLast = null; return; }
+    if (this._roomSpinLast == null) { this._roomSpinLast = t; return; }
+    const dt = t - this._roomSpinLast;
+    if (dt < 33) return;
+    this._roomSpinLast = t;
+    const yaw = this.state.roomYaw == null ? 45 : this.state.roomYaw;
+    this.setState({ roomYaw: yaw + Math.min(100, dt) * 0.0032 });
+  };
+
   // Selecting a unit cannot ride on click: the stage captures the pointer on
   // pointerdown (so a drag survives leaving the element), and pointer capture
   // retargets the following click to the stage. So a press that ends without
@@ -2849,6 +2865,8 @@ class Component extends DCLogic {
 
   roomPointer(e, kind) {
     if (kind === 'down') {
+      // First grab ends the idle auto-rotate for the rest of the visit.
+      this._roomSpin = false;
       this._roomDrag = { x: e.clientX, y: e.clientY, yaw: this.state.roomYaw, tilt: this.state.roomTilt,
         station: this.roomHit(e.clientX, e.clientY), moved: 0 };
       try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
@@ -2920,7 +2938,10 @@ class Component extends DCLogic {
         sy = Math.max(-maxY, Math.min(maxY, sy));
         return 'translate(-50%, -50%) scale(' + (k * z).toFixed(3) + ') translate(' + (-sx).toFixed(1) + 'px, ' + (-sy).toFixed(1) + 'px)';
       })(),
-      roomCamTrans: (!this.state.roomReady || this.reduced) ? 'none' : (this.state.roomGrab ? 'transform 0.1s linear' : 'transform 0.85s cubic-bezier(0.22,0.75,0.16,1)'),
+      roomCamTrans: (!this.state.roomReady || this.reduced) ? 'none'
+        : (this.state.roomGrab ? 'transform 0.1s linear'
+        : (this._roomSpin && !this.state.roomZoom ? 'transform 0.12s linear'
+        : 'transform 0.85s cubic-bezier(0.22,0.75,0.16,1)')),
       roomZoomed: !!this.state.roomZoom,
       roomZoomOut: () => this.setState({ roomZoom: false }),
       roomStageH: Math.round(760 * this.roomK() + 84) + 'px',
@@ -3291,6 +3312,11 @@ class Component extends DCLogic {
     window.addEventListener('popstate', this.onPopState);
     this.rvNodes = [];
     this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Lab room idle rotation — a no-op until the About page's stage mounts.
+    if (!this.reduced) {
+      this._roomSpin = true;
+      this._roomSpinRaf = requestAnimationFrame(this.roomSpinLoop);
+    }
     this.onScroll = () => {
       const doc = document.documentElement;
       const foot = document.querySelector('footer');
