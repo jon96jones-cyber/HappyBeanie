@@ -3010,6 +3010,11 @@ class Component extends DCLogic {
     const rows = [];
     if (this.state.cartDog > 0) rows.push({ key: 'dog', badge: 'For dogs', name: 'Happy Beans for Dogs', slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans box', qty: this.state.cartDog, plan: this.state.cartPlanDog });
     if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box', qty: this.state.cartCat, plan: this.state.cartPlanCat });
+    // Wholesale accounts are never offered subscriptions or bundles — any
+    // plan that slipped into the cart (the picker's subscription default, a
+    // cart saved before sign-in) is coerced to one-time here, so pricing
+    // shows trade terms and checkout never attaches a selling plan.
+    if (this.state.wholesale) rows.forEach(r => { r.plan = 0; });
     // Trade accounts see their own per-box rate on every one-time line, same
     // as the product page (terms live from /api/auth/me — what checkout's
     // code discount charges). Below the minimum the checkout gate blocks
