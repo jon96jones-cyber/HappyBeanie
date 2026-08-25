@@ -1,5 +1,6 @@
-// POST /api/account/subscription — cancel or skip a care plan from the portal.
-// Body: { id: "gid://shopify/SubscriptionContract/…", action: "cancel" | "skip" }
+// POST /api/account/subscription — manage a care plan from the portal.
+// Body: { id: "gid://shopify/SubscriptionContract/…",
+//         action: "cancel" | "skip" | "pause" | "resume" }
 // Tokens stay in the httpOnly cookie; the browser never sees them.
 // 401 means "show the signed-out view"; the front-end falls back to the desk
 // email on anything else.
@@ -7,6 +8,13 @@
 const auth = require('../_lib/customer-auth.js');
 
 const CANCEL = 'mutation Cancel($id: ID!) { subscriptionContractCancel(subscriptionContractId: $id) ' +
+  '{ contract { id status } userErrors { field message } } }';
+
+// Pause stops billing and deliveries without losing the contract; activate
+// picks it back up on the same cadence.
+const PAUSE = 'mutation Pause($id: ID!) { subscriptionContractPause(subscriptionContractId: $id) ' +
+  '{ contract { id status } userErrors { field message } } }';
+const RESUME = 'mutation Resume($id: ID!) { subscriptionContractActivate(subscriptionContractId: $id) ' +
   '{ contract { id status } userErrors { field message } } }';
 
 // "Skip" pushes the next billing attempt out by one delivery cycle.
@@ -40,7 +48,7 @@ module.exports = async function handler(req, res) {
   const body = readBody(req);
   const id = String(body.id || '');
   const action = String(body.action || '');
-  if (!id || (action !== 'cancel' && action !== 'skip')) {
+  if (!id || ['cancel', 'skip', 'pause', 'resume'].indexOf(action) === -1) {
     return res.status(400).json({ ok: false, error: 'bad_request' });
   }
 
@@ -53,18 +61,25 @@ module.exports = async function handler(req, res) {
 
   const at = fresh.session.at;
 
+  const SIMPLE = {
+    cancel: { q: CANCEL, root: 'subscriptionContractCancel' },
+    pause: { q: PAUSE, root: 'subscriptionContractPause' },
+    resume: { q: RESUME, root: 'subscriptionContractActivate' }
+  };
+
   try {
-    if (action === 'cancel') {
-      const out = await auth.customerGraphql(at, CANCEL, { id: id });
+    if (SIMPLE[action]) {
+      const m = SIMPLE[action];
+      const out = await auth.customerGraphql(at, m.q, { id: id });
       if (out.status === 401 || out.status === 403) {
         return res.status(401).json({ ok: false, error: 'signed_out' });
       }
-      const msg = firstUserError(out.json, 'subscriptionContractCancel');
+      const msg = firstUserError(out.json, m.root);
       if (msg || (out.json && out.json.errors && out.json.errors.length)) {
-        console.error('[account/subscription] cancel:', msg || JSON.stringify(out.json.errors));
+        console.error('[account/subscription] ' + action + ':', msg || JSON.stringify(out.json.errors));
         return res.status(502).json({ ok: false, error: 'upstream', message: msg || undefined });
       }
-      return res.status(200).json({ ok: true, action: 'cancel' });
+      return res.status(200).json({ ok: true, action: action });
     }
 
     // Skip: find the upcoming billing cycle on the customer's own contract.

@@ -170,6 +170,8 @@ h1 em { font-style:normal; color:oklch(0.86 0.14 92); }
 .dot.gold { background:oklch(0.78 0.13 92); }
 .dot.grey { background:#C9BEA8; }
 .tracklink { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:oklch(0.44 0.07 152); border-bottom-color:oklch(0.44 0.07 152 / 0.4); }
+.o-reorder { margin-left:auto; font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; background:none; border:1px solid oklch(0.86 0.14 92 / 0.55); border-radius:2px; color:oklch(0.86 0.14 92); padding:8px 13px; cursor:pointer; transition:background 0.2s ease, color 0.2s ease; }
+.o-reorder:hover { background:oklch(0.86 0.14 92); color:#17140F; }
 .trackno { color:#A79C8A; }
 .empty { color:#8A7F6E; font-size:14.5px; }
 
@@ -206,6 +208,13 @@ h1 em { font-style:normal; color:oklch(0.86 0.14 92); }
 .pet-avatar { position:relative; flex:0 0 auto; width:52px; height:52px; border-radius:2px; border:1px solid #E0D6C2; background:#F5F0E6; display:flex; align-items:center; justify-content:center; }
 .pet-name { font-weight:700; letter-spacing:-0.02em; font-size:17px; color:#17140F; }
 .pet-breed { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; margin-top:3px; }
+.pet-care { display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:9px; }
+.pet-care span i { font-style:normal; display:block; font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; margin-bottom:2px; }
+.pet-care span b { font-weight:700; font-size:12.5px; letter-spacing:-0.01em; color:#DED5C4; }
+.pet-care .gold { color:oklch(0.9 0.1 92); }
+.pet-care a { color:#DED5C4; text-decoration:none; border-bottom:1px solid rgba(245,240,230,0.3); }
+.pet-care a:hover { color:oklch(0.9 0.1 92); border-color:oklch(0.9 0.1 92); }
+.pet-setw { background:none; border:none; padding:0; font-family:inherit; font-size:12.5px; font-weight:700; color:oklch(0.9 0.1 92); border-bottom:1px solid oklch(0.9 0.1 92 / 0.5); cursor:pointer; }
 .pet-rowacts { margin-left:auto; display:flex; gap:12px; }
 .pet-edit { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#A79C8A; background:none; border:none; cursor:pointer; }
 .pet-edit:hover { color:#17140F; }
@@ -751,6 +760,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     // Approved ambassadors get the workspace even before they claim a code —
     // claiming it happens IN the portal.
     if (tags.indexOf('ambassador') !== -1) roles.push('ambassador');
+    // Wholesale accounts reorder through trade pricing, not the retail cart.
+    acctCanReorder = roles.indexOf('personal') !== -1;
     var host = document.getElementById('acctViews');
     if (!host) return;
     if (roles.length < 2) { host.style.display = 'none'; applyView(roles[0] || 'personal', roles); return; }
@@ -1094,6 +1105,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     }).join('');
   }
 
+  var acctCanReorder = true;
+
   function renderOrders(orders) {
     $('orderCount').textContent = orders.length ? orders.length + ' on record' : '';
     if (!orders.length) {
@@ -1101,9 +1114,21 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       return;
     }
     $('ordersList').innerHTML = orders.map(function (o) {
-      var items = ((o.lineItems && o.lineItems.nodes) || []).map(function (li) {
+      var nodes = (o.lineItems && o.lineItems.nodes) || [];
+      var items = nodes.map(function (li) {
         return esc(li.title) + (li.quantity > 1 ? ' &times; ' + li.quantity : '');
       }).join(', ');
+      // Reorder: rebuild the cart from this box's formulas (bandanas and
+      // other extras don't re-add — they ride along with boxes).
+      var rDog = 0, rCat = 0;
+      nodes.forEach(function (li) {
+        var t = String(li.title || '');
+        if (!/happy bean/i.test(t) || /bandana/i.test(t)) return;
+        if (/cat/i.test(t)) rCat += li.quantity || 1; else rDog += li.quantity || 1;
+      });
+      var reorder = (acctCanReorder && rDog + rCat > 0)
+        ? '<button type="button" class="o-reorder" data-redog="' + rDog + '" data-recat="' + rCat + '">Reorder this box &rarr;</button>'
+        : '';
       var tracks = '';
       (((o.fulfillments && o.fulfillments.nodes) || [])).forEach(function (f) {
         (f.trackingInformation || []).forEach(function (t) {
@@ -1118,10 +1143,28 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
           '<span class="o-total">' + money(o.totalPrice) + '</span></div>' +
         (items ? '<div class="o-items">' + items + '</div>' : '') +
         railHtml(stageOf(o)) +
-        '<div class="o-foot">' + payLine(o.financialStatus) + tracks + '</div>' +
+        '<div class="o-foot">' + payLine(o.financialStatus) + tracks + reorder + '</div>' +
         '<div class="o-pet" data-order="' + esc(o.id) + '"></div>' +
         '</div>';
     }).join('');
+
+    // Reorder writes the same hbCart the shop reads on load, then lands on
+    // the cart page with this box's formulas already in it.
+    Array.prototype.forEach.call(document.querySelectorAll('.o-reorder'), function (b) {
+      b.onclick = function () {
+        var saved = {};
+        try { saved = JSON.parse(localStorage.getItem('hbCart') || '{}') || {}; } catch (e) {}
+        var cart = {
+          cartDog: parseInt(b.getAttribute('data-redog'), 10) || 0,
+          cartCat: parseInt(b.getAttribute('data-recat'), 10) || 0,
+          cartPlanDog: saved.cartPlanDog != null ? saved.cartPlanDog : 1,
+          cartPlanCat: saved.cartPlanCat != null ? saved.cartPlanCat : 1
+        };
+        try { localStorage.setItem('hbCart', JSON.stringify(cart)); } catch (e) {}
+        b.textContent = 'Opening your cart…';
+        window.location.href = '/cart';
+      };
+    });
   }
 
   function renderPlan(subs) {
@@ -1134,20 +1177,33 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       var count = (dp.intervalCount && dp.intervalCount.count) || 1;
       var unit = String(dp.interval || '').toLowerCase();
       var cadence = unit ? (count === 1 ? 'every ' + unit : 'every ' + count + ' ' + unit + 's') : '';
-      var active = String(s.status || '').toUpperCase() === 'ACTIVE';
+      var status = String(s.status || '').toUpperCase();
+      var active = status === 'ACTIVE';
+      var paused = status === 'PAUSED';
       var line = active
         ? '<p class="plan-line"><span class="dot green"></span><b>Running smoothly.</b>' + (cadence ? ' A fresh box ' + esc(cadence) + '.' : '') + '</p>'
+        : paused
+        ? '<p class="plan-line"><span class="dot grey"></span><b>Paused.</b> No boxes and no billing until you resume.</p>'
         : '<p class="plan-line"><span class="dot grey"></span><b>' + esc(String(s.status || '').toLowerCase()) + '.</b></p>';
       var cad = '';
-      var next = s.nextBillingDate ? '<div class="plan-next">Next box billed ' + fmtDate(s.nextBillingDate) + '</div>' : '';
-      var acts = active
-        ? '<div class="plan-acts">' +
+      var next = active && s.nextBillingDate ? '<div class="plan-next">Next box billed ' + fmtDate(s.nextBillingDate) + '</div>' : '';
+      var acts = '';
+      if (active) {
+        acts = '<div class="plan-acts">' +
             '<button type="button" class="plan-btn" data-act="skip" data-id="' + esc(s.id) + '">Skip next box</button>' +
+            '<button type="button" class="plan-btn" data-act="pause" data-id="' + esc(s.id) + '">Pause plan</button>' +
             '<button type="button" class="plan-btn danger" data-act="cancel" data-id="' + esc(s.id) + '">Cancel plan</button>' +
           '</div>' +
-          '<div class="plan-note">Cancel any time before the next billing date — no fees, no phone call. Skipping pushes your next box out one cycle.</div>' +
-          '<div class="cancel-slot" data-slot="' + esc(s.id) + '"></div>'
-        : '';
+          '<div class="plan-note">Skipping pushes your next box out one cycle. Pausing stops boxes and billing until you resume. Cancel any time — no fees, no phone call.</div>' +
+          '<div class="cancel-slot" data-slot="' + esc(s.id) + '"></div>';
+      } else if (paused) {
+        acts = '<div class="plan-acts">' +
+            '<button type="button" class="plan-btn" data-act="resume" data-id="' + esc(s.id) + '">Resume plan</button>' +
+            '<button type="button" class="plan-btn danger" data-act="cancel" data-id="' + esc(s.id) + '">Cancel plan</button>' +
+          '</div>' +
+          '<div class="plan-note">Resuming picks your plan back up on its normal cadence.</div>' +
+          '<div class="cancel-slot" data-slot="' + esc(s.id) + '"></div>';
+      }
       return line + cad + next + acts;
     }).join('<div class="pet-divider"></div>');
   }
@@ -1539,6 +1595,21 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
 
   var petFormFor = null; // null = closed, 'new' = add, or a pet id = edit
 
+  // Weight bands — same cut-offs and chew counts the eligibility screener
+  // uses, so the account and the quiz never disagree about a dose.
+  var PET_W = {
+    dog: [['u15', 'Under 15 lb', '½ chew daily'], ['15-40', '15 to 40 lb', '1 chew daily'],
+          ['40-80', '40 to 80 lb', '2 chews daily'], ['o80', 'Over 80 lb', '3 chews daily']],
+    cat: [['u8', 'Under 8 lb', '½ chew daily'], ['8-12', '8 to 12 lb', '1 chew daily'],
+          ['o12', 'Over 12 lb', '1 chew daily, split AM & PM']]
+  };
+  function weightOpts(species, sel) {
+    var rows = PET_W[species] || PET_W.dog;
+    return '<option value=""' + (!sel ? ' selected' : '') + '>Not sure yet</option>' + rows.map(function (r) {
+      return '<option value="' + r[0] + '"' + (r[0] === sel ? ' selected' : '') + '>' + r[1] + ' · ' + r[2] + '</option>';
+    }).join('');
+  }
+
   function renderPets() {
     var box = $('petBox');
     if (!box) return;
@@ -1547,10 +1618,18 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
 
     if (pets.length) {
       html += '<div class="pet-list">' + pets.map(function (p) {
+        var wDef = (PET_W[p.species] || PET_W.dog).filter(function (x) { return x[0] === p.weight; })[0];
         return '<div class="pet-card">' +
             '<span class="pet-avatar">' + petIcon(p, 38, 31) + '</span>' +
             '<span><span class="pet-name">' + esc(p.name) + '</span>' +
-            '<div class="pet-breed">' + esc(p.breed) + '</div></span>' +
+            '<div class="pet-breed">' + esc(p.breed) + '</div>' +
+            '<div class="pet-care">' +
+              '<span><i>Formula</i><b>Happy Beans for ' + (p.species === 'cat' ? 'Cats' : 'Dogs') + '</b></span>' +
+              '<span><i>Daily dose</i>' + (wDef
+                ? '<b class="gold">' + wDef[2] + '</b>'
+                : '<button type="button" class="pet-setw" data-edit="' + esc(p.id) + '">Set weight for dose</button>') + '</span>' +
+              '<span><i>Screener</i><b><a href="/quiz">Check eligibility →</a></b></span>' +
+            '</div></span>' +
             '<span class="pet-rowacts">' +
               '<button type="button" class="pet-edit" data-edit="' + esc(p.id) + '">Edit</button>' +
               '<button type="button" class="pet-edit" data-remove="' + esc(p.id) + '">Remove</button>' +
@@ -1588,6 +1667,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
           '<option value="cat"' + (species === 'cat' ? ' selected' : '') + '>Cat</option></select></div>' +
         '<div class="pet-field"><label for="petBreed">Breed</label>' +
           '<select id="petBreed">' + breedOpts(BREEDS[species], pet && pet.breed) + '</select></div>' +
+        '<div class="pet-field"><label for="petWeight">Weight — sets the daily dose</label>' +
+          '<select id="petWeight">' + weightOpts(species, pet && pet.weight) + '</select></div>' +
         '<div class="pet-formacts">' +
           '<button type="button" class="pet-save" id="petSave">' + (pet ? 'Save changes' : 'Save pet') + '</button>' +
           '<button type="button" class="pet-edit" id="petCancel">Cancel</button>' +
@@ -1623,18 +1704,21 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
 
     var sp = $('petSpecies');
     if (sp) {
-      sp.onchange = function () { $('petBreed').innerHTML = breedOpts(BREEDS[this.value], null); };
+      sp.onchange = function () {
+        $('petBreed').innerHTML = breedOpts(BREEDS[this.value], null);
+        $('petWeight').innerHTML = weightOpts(this.value, null);
+      };
       $('petCancel').onclick = function () { petFormFor = null; renderPets(); };
       $('petSave').onclick = function () {
         var name = $('petName').value.trim();
         if (!name) { $('petName').focus(); return; }
         var pets = readPets();
-        var next = { name: name, species: $('petSpecies').value, breed: $('petBreed').value };
+        var next = { name: name, species: $('petSpecies').value, breed: $('petBreed').value, weight: $('petWeight').value };
         if (petFormFor === 'new') {
           next.id = 'p' + Date.now();
           pets.push(next);
         } else {
-          pets = pets.map(function (p) { return p.id === petFormFor ? { id: p.id, name: next.name, species: next.species, breed: next.breed } : p; });
+          pets = pets.map(function (p) { return p.id === petFormFor ? { id: p.id, name: next.name, species: next.species, breed: next.breed, weight: next.weight } : p; });
         }
         writePets(pets);
         petFormFor = null;
@@ -1702,6 +1786,25 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
         };
         return;
       }
+      if (act === 'pause') {
+        slot.innerHTML =
+          '<div class="cancel-confirm" style="border-color:rgba(200,160,50,0.4); background:oklch(0.86 0.14 92 / 0.08);">' +
+            '<p>Pause your care plan? No boxes and no billing until you resume — your cadence and pricing stay saved exactly as they are.</p>' +
+            '<div class="row">' +
+              '<button type="button" class="plan-btn" data-pauseconfirm="1">Yes, pause it</button>' +
+              '<button type="button" class="plan-btn" data-pauseconfirm="0">Keep it running</button>' +
+            '</div>' +
+          '</div>';
+        slot.querySelector('[data-pauseconfirm="0"]').onclick = function () { slot.innerHTML = ''; };
+        slot.querySelector('[data-pauseconfirm="1"]').onclick = function () {
+          planRequest(id, 'pause', slot, 'Pausing your plan…', 'Plan paused — resume right here whenever you’re ready.');
+        };
+        return;
+      }
+      if (act === 'resume') {
+        planRequest(id, 'resume', slot, 'Resuming your plan…', 'Welcome back — your plan is running again on its normal cadence.');
+        return;
+      }
       slot.innerHTML =
         '<div class="cancel-confirm">' +
           '<p>Cancel your care plan? Peptide results build over months, so most owners skip a box instead. You can restart any time.</p>' +
@@ -1736,8 +1839,9 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   }
 
   function planFallback(slot, action) {
+    var subjects = { cancel: 'Cancel my care plan', skip: 'Skip my next box', pause: 'Pause my care plan', resume: 'Resume my care plan' };
     slot.innerHTML = '<div class="plan-note">We could not reach the plan service just now. Email ' +
-      '<a href="mailto:hello@happybeanie.com?subject=' + (action === 'cancel' ? 'Cancel my care plan' : 'Skip my next box') +
+      '<a href="mailto:hello@happybeanie.com?subject=' + (subjects[action] || 'My care plan') +
       '">hello@happybeanie.com</a> and the help desk will handle it the same business day.</div>';
   }
 
