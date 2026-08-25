@@ -3024,9 +3024,12 @@ class Component extends DCLogic {
     const sub = Math.round(items.reduce((n, i) => n + i.line, 0) * 100) / 100;
     const disc = this.state.wallPhoto ? Math.round(sub * 0.15) : 0;
     const oneTimeQty = items.reduce((n, i) => n + (i.plan === 0 ? i.qty : 0), 0);
+    // The trade minimum counts every box in the cart, across species and
+    // plans — 2 dog + 3 cat clears a 5-box minimum.
+    const totalQty = items.reduce((n, i) => n + i.qty, 0);
     const tradeApplied = !!(trade && oneTimeQty > 0);
     const ship = sub - disc >= 60 || sub === 0 ? 0 : 8;
-    return { items, sub, disc, tradeApplied, oneTimeQty, ship, total: Math.round((sub - disc + ship) * 100) / 100 };
+    return { items, sub, disc, tradeApplied, oneTimeQty, totalQty, ship, total: Math.round((sub - disc + ship) * 100) / 100 };
   }
 
   money(n) {
@@ -3601,8 +3604,8 @@ class Component extends DCLogic {
     // Wholesale accounts cannot proceed to purchase below the trade minimum —
     // the discount would not apply and they would be charged retail.
     const tradeMin = this.state.trade && this.state.trade.minQty ? this.state.trade.minQty : 5;
-    const tradeBlocked = this.state.wholesale && M.items.length > 0 && M.oneTimeQty < tradeMin;
-    const tradeShort = tradeBlocked ? tradeMin - M.oneTimeQty : 0;
+    const tradeBlocked = this.state.wholesale && M.items.length > 0 && M.totalQty < tradeMin;
+    const tradeShort = tradeBlocked ? tradeMin - M.totalQty : 0;
     // "What to expect" checklist — static rows, no interactivity by design.
     const wkRows = [
       { when: 'Week 1–2', title: 'Nothing dramatic', body: 'A few owners notice appetite and drinking change first — most notice nothing at all yet.' },
@@ -4165,7 +4168,7 @@ class Component extends DCLogic {
         { k: 'Subtotal', v: this.money(M.sub), color: '#8A7F6E' },
         ...(M.disc ? [{ k: 'Bean wall · BEAN15', v: '−$' + M.disc, color: 'oklch(0.86 0.14 92)' }] : []),
         ...(M.tradeApplied ? [{
-          k: M.oneTimeQty >= (this.state.trade.minQty || 5)
+          k: M.totalQty >= (this.state.trade.minQty || 5)
             ? 'Trade pricing · ' + this.pctLabel(this.state.trade.pct) + ' off applied'
             : 'Trade price shown · minimum ' + (this.state.trade.minQty || 5) + ' boxes',
           v: '', color: 'oklch(0.72 0.16 152)' }] : []),
