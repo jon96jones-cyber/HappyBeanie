@@ -1860,26 +1860,6 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
       </div>
     </section>
 
-    <section data-m="pad short" style="position: relative; background: radial-gradient(110% 80% at 15% 0%, #F4EEE1 0%, #EDE6D8 50%, #E4DBC9 100%); padding: 96px 44px; border-top: 1px solid #DDD3C0;">
-      <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr 1fr; gap: 68px; align-items: center; max-width: 1180px; margin: 0 auto;">
-        <div data-m="first" style="height: 480px; border-radius: 8px; overflow: hidden; background: #EFE8D9; box-shadow: 0 40px 70px -40px rgba(23,20,15,0.5), 0 8px 18px -12px rgba(23,20,15,0.16);"><image-slot id="hbv2-about-facility" placeholder="Scottsdale formulation suite, wide shot" style="width: 100%; height: 100%;"></image-slot></div>
-        <div>
-          <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 22px;">The facility</div>
-          <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.4vw, 48px); line-height: 1.05; margin: 0 0 20px;">One suite in Scottsdale, <span style="color: oklch(0.44 0.07 152);">nothing outsourced.</span></h2>
-          <p style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 26px; max-width: 32em;">Over 3000 square feet, with a cold-blend room and an analytical bench. Every box you receive was weighed, blended and sealed here.</p>
-          <div style="display: grid; gap: 0; margin-bottom: 30px;">
-            <sc-for list="{{ facilityFacts }}" as="ff" hint-placeholder-count="4">
-              <div style="display: grid; grid-template-columns: auto 1fr; gap: 18px; padding: 15px 0; border-top: 1px solid #D5CAB5; align-items: baseline;">
-                <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E; min-width: 96px;">{{ ff.k }}</span>
-                <span style="font-size: 15px; line-height: 1.5;">{{ ff.v }}</span>
-              </div>
-            </sc-for>
-          </div>
-          
-        </div>
-      </div>
-    </section>
-
     <section data-m="pad short" style="position: relative; background: #17140F; color: #F5F0E6; padding: 92px 44px; overflow: hidden;">
       <div aria-hidden="true" style="position: absolute; left: -120px; bottom: -180px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.12), transparent 70%); pointer-events: none;"></div>
       <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; max-width: 1180px; margin: 0 auto;">
@@ -4545,11 +4525,6 @@ class Component extends DCLogic {
         { n: '03', title: 'Publish everything', body: 'Every certificate of analysis is online by lot number, including the panels that are unflattering.' },
         { n: '04', title: 'Say the boring truth', body: 'Peptides are supportive, not curative. We would rather lose the sale than overstate what a chew can do.' }
       ].map((s, i) => ({ ...s, delay: i * 100 })),
-      facilityFacts: [
-        { k: 'Licensing', v: 'cGMP registered · Arizona Board of Pharmacy' },
-        { k: 'Testing', v: 'Independently tested, held until cleared' },
-        { k: 'Team', v: 'Two pharmacists, one DVM, one QA lead' }
-      ],
       partnerBlocks: [
         { tag: 'For veterinarians', title: 'Clinic pricing and full data', body: 'Formulation sheets, lab history and dose curves by species, plus practice pricing and a direct line to our team.', cta: 'Request the vet packet', href: '#contact-form', act: (e) => { e.preventDefault(); this.setState({ topic: 3, sent: false }); const el = document.getElementById('contact-form'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' }); }, slot: 'hbv2-contact-vet', ph: 'Veterinarian with dog in clinic', delay: 0 },
         { tag: 'Retail & wholesale', title: 'Shelf space in your shop', body: 'Small-batch allocation for independent pet retailers and groomers, with training on how to dose customers honestly.', cta: 'Open a wholesale account', href: '/wholesale', act: () => {}, slot: 'hbv2-contact-retail', ph: 'Independent pet shop interior', delay: 100 }
