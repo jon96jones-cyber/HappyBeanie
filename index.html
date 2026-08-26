@@ -36,6 +36,14 @@ window.HB_SHOPIFY = {
   },
   sellingPlan: 'gid://shopify/SellingPlan/974946368'
 };
+// PRELAUNCH MODE — one switch for the whole site. While a batch is in
+// production the site hides the bean wall + review counts and reframes
+// shipping copy as "reserve from this batch". Launch day: set on to false
+// and deploy — every swap below reverts at once.
+window.HB_PRELAUNCH = { on: true, batch: '0072', eta: '~4 weeks' };
+if (window.HB_PRELAUNCH.on) {
+  document.documentElement.className += ' hb-prelaunch';
+}
 window.hbShopifyCheckout = async function (rows, buyer, opts) {
   const cfg = window.HB_SHOPIFY;
   if (!cfg.token || cfg.token.indexOf('PLACEHOLDER') !== -1) {
@@ -122,6 +130,15 @@ src="https://www.facebook.com/tr?id=2580258509080253&ev=PageView&noscript=1"/></
    that scaffolding stays invisible — the box just reads as an empty image
    area — then the real color returns the moment the image lands. */
 image-slot:not([data-filled]) { color: transparent !important; }
+
+/* Prelaunch mode (window.HB_PRELAUNCH). Elements marked data-pre-show /
+   data-pre-show-inline exist only for the prelaunch window; data-pre-hide
+   blocks disappear while it's on. Driven by the hb-prelaunch class the head
+   config script sets before first paint, so nothing flashes. */
+[data-pre-show], [data-pre-show-inline] { display: none !important; }
+html.hb-prelaunch [data-pre-show] { display: block !important; }
+html.hb-prelaunch [data-pre-show-inline] { display: inline !important; }
+html.hb-prelaunch [data-pre-hide] { display: none !important; }
 </style>
 
 <!-- Chew inspector (product page, 3D view). The scene modules import
@@ -980,7 +997,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
     </div>
   </section>
 
-  <section data-m="pad short wallsec" style="background: #EDE6D8; padding: 96px 44px; border-top: 1px solid #DDD3C0;">
+  <section data-pre-hide data-m="pad short wallsec" style="background: #EDE6D8; padding: 96px 44px; border-top: 1px solid #DDD3C0;">
       <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
         <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-bottom: 12px;">
           <div>
@@ -1002,7 +1019,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <p style="font-size: 16px; line-height: 1.7; color: #554C40; max-width: 34em; margin: 0 0 30px;">Sent in by owners, unedited. Add your own and take 15% off your next box.</p>
       </div>
 
-      <div data-m="wall" style="max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 196px; gap: 10px;">
+      <div data-pre-hide data-m="wall" style="max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 196px; gap: 10px;">
         <div style="position: relative; grid-column: 1 / span 2; grid-row: 1 / span 2; overflow: hidden; border-radius: 4px; background: #E4DBC9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><image-slot id="hbv2-rev1" placeholder="Older dog on a walk, sunlit" style="width: 100%; height: 100%;"></image-slot></div>
           <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(23,20,15,0.82) 0%, rgba(23,20,15,0.28) 44%, transparent 72%); pointer-events: none;"></div>
@@ -1063,7 +1080,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
           </div>
         </div>
       </div>
-      <div style="max-width: 1180px; margin: 14px auto 0; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; color: #8A7F6E;">Bandanas ship free with every first order. One discount per household.</div>
+      <div data-pre-hide style="max-width: 1180px; margin: 14px auto 0; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; color: #8A7F6E;">Bandanas ship free with every first order. One discount per household.</div>
   </section>
 
   <section data-m="pad short" style="background: #17140F; color: #F5F0E6; padding: 78px 44px;">
@@ -1121,7 +1138,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
     <div data-m="wrapflex" style="max-width: 1180px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px 20px;">
       <div data-m="hide" style="display: flex; align-items: baseline; gap: 12px;">
         <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 17px; color: #F5F0E6;">Happy Beanie</span>
-        <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;">One chew daily · ships in 24h</span>
+        <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;"><span data-pre-hide>One chew daily · ships in 24h</span><span data-pre-show-inline>Batch 0072 · reserving now</span></span>
       </div>
       <button sc-camel-on-click="{{ goProduct }}" data-m="tap w100" style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 16px 30px; border: none; border-radius: 999px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; white-space: nowrap; box-shadow: 0 16px 30px -18px oklch(0.86 0.14 92 / 0.7); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">Start the 30 days →</button>
     </div>
@@ -1213,7 +1230,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
           </div>
         </sc-for>
       </div>
-      <div data-m="stack" style="max-width: 1180px; margin: 42px auto 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 4px; overflow: hidden; text-align: center;">
+      <div data-pre-hide data-m="stack" style="max-width: 1180px; margin: 42px auto 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 4px; overflow: hidden; text-align: center;">
         <div style="background: #FCFAF4; padding: 22px 20px;"><div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1; margin-bottom: 8px;">4.9★</div><div style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.5; color: #6A6055;">From 1,204 verified owners</div></div>
         <div style="background: #FCFAF4; padding: 22px 20px;"><div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1; margin-bottom: 8px;">100%</div><div style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.5; color: #6A6055;">Of lots third-party tested</div></div>
         <div style="background: #FCFAF4; padding: 22px 20px;"><div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1; margin-bottom: 8px;">cGMP</div><div style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.5; color: #6A6055;">Licensed suite, Scottsdale AZ</div></div>
@@ -1335,7 +1352,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <div style="flex: 1 1 300px; min-width: 0;">
               <div style="font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 14px;">{{ pdpEyebrow }}</div>
               <p style="font-size: 16.5px; line-height: 1.65; color: #4E463B; margin: 0 0 18px; max-width: 26em; text-wrap: pretty;">{{ pdpBody }}</p>
-              <div style="display: inline-flex; align-items: center; gap: 10px;">
+              <div data-pre-hide style="display: inline-flex; align-items: center; gap: 10px;">
                 <span style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 999px; background: #17140F;">
                   <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 16px; line-height: 1; color: #F5F0E6;">4.9</span>
                   <span style="font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.12em; color: rgba(245,240,230,0.55);">/5</span>
@@ -1360,9 +1377,13 @@ image-slot:not([data-filled]) { color: transparent !important; }
             </div>
             <div style="margin-top: 10px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">{{ batchNote }}</div>
           </div>
+          <div data-pre-show style="border: 1px solid oklch(0.86 0.14 92 / 0.55); border-left: 3px solid oklch(0.86 0.14 92); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.1); padding: 14px 16px 15px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; margin-bottom: 6px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.14 78); animation: qzBlip 1.6s ease-in-out infinite;"></span>Batch 0072 · in production</div>
+            <div style="font-size: 13px; line-height: 1.6; color: #554C40;">Order now to reserve your box from this run. Batch 0072 ships in ~4 weeks, as soon as it clears testing.</div>
+          </div>
           <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 9px; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">
             <span>Choose your supply</span>
-            <span style="display: flex; align-items: center; gap: 7px; color: oklch(0.44 0.07 152);"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.44 0.07 152);"></span>In stock · ships in 24h</span>
+            <span style="display: flex; align-items: center; gap: 7px; color: oklch(0.44 0.07 152);"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.44 0.07 152);"></span><span data-pre-hide>In stock · ships in 24h</span><span data-pre-show-inline>Batch 0072 · in production</span></span>
           </div>
           <div style="display: grid; gap: 7px; margin-bottom: 16px;">
             <sc-for list="{{ plans }}" as="p2" hint-placeholder-count="3">
@@ -1479,7 +1500,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
         </div>
       </div>
 
-      <div style="max-width: 1180px; margin: 88px auto 0;">
+      <div data-pre-hide style="max-width: 1180px; margin: 88px auto 0;">
         <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-bottom: 12px;">
           <div>
             <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 18px;">The bean wall</div>
@@ -1502,7 +1523,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <p style="font-size: 16px; line-height: 1.7; color: #554C40; max-width: 34em; margin: 0 0 30px;">Sent in by owners, unedited. Add your own and take 15% off your next box.</p>
       </div>
 
-      <div data-m="wall" style="max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 196px; gap: 10px;">
+      <div data-pre-hide data-m="wall" style="max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 196px; gap: 10px;">
         <div style="position: relative; grid-column: 1 / span 2; grid-row: 1 / span 2; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><image-slot id="hbv2-rev1" placeholder="Older dog on a walk, sunlit" style="width: 100%; height: 100%;"></image-slot></div>
           <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(23,20,15,0.82) 0%, rgba(23,20,15,0.28) 44%, transparent 72%); pointer-events: none;"></div>
@@ -1563,7 +1584,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
           </div>
         </div>
       </div>
-      <div style="max-width: 1180px; margin: 14px auto 0; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; color: #8A7F6E;">Bandanas ship free with every first order. One discount per household.</div>
+      <div data-pre-hide style="max-width: 1180px; margin: 14px auto 0; font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; color: #8A7F6E;">Bandanas ship free with every first order. One discount per household.</div>
 
       <div data-m="evsec" style="position: relative; max-width: 980px; margin: 92px auto 0;">
         <div data-m="evhead" style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; margin-bottom: 26px;">
@@ -1677,7 +1698,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
               <button sc-camel-on-click="{{ cartCta }}" style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 20px 36px; border: none; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 38px -22px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">{{ cartLabel }}</button>
               <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;">{{ planRecap }}</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.72 0.08 152);"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.72 0.08 152);"></span>Order today, ships within 24 hours from Scottsdale</div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.72 0.08 152);"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.72 0.08 152);"></span><span data-pre-hide>Order today, ships within 24 hours from Scottsdale</span><span data-pre-show-inline>Order today to reserve from Batch 0072 · ships in ~4 weeks</span></div>
             <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; line-height: 1.6; color: #8A7F6E; margin: 14px 0 0;">Terms and conditions apply. <a href="policies/refunds.html#guarantee" target="_blank" rel="noopener" style="color: oklch(0.72 0.08 152); text-decoration: none; border-bottom: 1px solid oklch(0.72 0.08 152 / 0.45);">Read the guarantee terms</a></p>
           </div>
           <div data-m="auto" style="height: 320px; border-radius: 4px; overflow: hidden; box-shadow: 0 26px 60px rgba(0,0,0,0.5);">
@@ -1694,7 +1715,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
           <div style="width: 46px; height: 46px; border-radius: 3px; overflow: hidden; flex: 0 0 auto;"><image-slot id="{{ pdpSlotMain }}" placeholder="Product shot" style="width: 100%; height: 100%;"></image-slot></div>
           <div>
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 20px; color: #F5F0E6; line-height: 1.1;">{{ pdpName }}</div>
-            <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;">Ships within 24 hours</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;"><span data-pre-hide>Ships within 24 hours</span><span data-pre-show-inline>Batch 0072 · ships in ~4 weeks</span></div>
           </div>
         </div>
         <div data-m="wrapflex w100" style="display: flex; align-items: center; gap: 14px; justify-content: flex-end; flex: 1 1 auto;">
@@ -2399,6 +2420,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <div data-m="cartsum" style="position: sticky; top: 96px; border: 1px solid rgba(245,240,230,0.16); border-radius: 8px; background: linear-gradient(#1D1913, #17140F); color: #F5F0E6; padding: 26px 26px 28px; overflow: hidden; box-shadow: 0 40px 70px -40px rgba(0,0,0,0.85);">
               <div aria-hidden="true" style="position: absolute; right: -70px; top: -90px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.14), transparent 70%); pointer-events: none;"></div>
               <div style="position: relative; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 18px;">Order summary</div>
+              <div data-pre-show style="position: relative; border: 1px solid oklch(0.86 0.14 92 / 0.4); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.12); padding: 12px 14px 13px; margin-bottom: 16px;">
+                <div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 5px;">Batch 0072 · in production</div>
+                <div style="font-size: 12.5px; line-height: 1.55; color: #DED5C4;">Your order reserves a box from this run — it ships in ~4 weeks, as soon as the batch clears testing.</div>
+              </div>
               <div style="position: relative; display: grid; gap: 0;">
                 <sc-for list="{{ cartTotals }}" as="ct2" hint-placeholder-count="3">
                   <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid rgba(245,240,230,0.12); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: {{ ct2.color }};">
@@ -2420,7 +2445,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
                 </div>
               </div>
               <button sc-camel-on-click="{{ goCheckout }}" data-m="tap cbtn" style="position: relative; width: 100%; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: {{ checkoutCtaBg }}; color: {{ checkoutCtaFg }}; cursor: {{ checkoutCtaCursor }}; box-shadow: 0 20px 36px -20px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: {{ checkoutCtaHoverBg }}; transform: translateY(-2px);">{{ checkoutCtaLabel }}</button>
-              <div data-m="ctrust" style="position: relative; margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E; text-align: center; line-height: 2;">30-day guarantee · Ships in 24h · Cancel anytime</div>
+              <div data-m="ctrust" style="position: relative; margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E; text-align: center; line-height: 2;"><span data-pre-hide>30-day guarantee · Ships in 24h · Cancel anytime</span><span data-pre-show-inline>30-day guarantee · Batch 0072 reservation · Cancel anytime</span></div>
             </div>
           </div>
         </sc-if>
@@ -2442,7 +2467,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
               <svg width="26" height="26" sc-camel-view-box="0 0 26 26" fill="none" style="position: absolute; left: 15px; top: 15px;"><path d="M2 13.5 9 20 24 4" stroke="#FCFAF4" sc-camel-stroke-width="2.6" sc-camel-stroke-linecap="round" sc-camel-stroke-linejoin="round"></path></svg>
             </div>
             <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 16px;">Order confirmed</div>
-            <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.6vw, 46px); line-height: 1.05; margin: 0 0 16px;">It ships in the morning.</h1>
+            <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.6vw, 46px); line-height: 1.05; margin: 0 0 16px;"><span data-pre-hide>It ships in the morning.</span><span data-pre-show-inline>Your box is reserved.</span></h1>
             <p style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 auto 26px; max-width: 32em; text-wrap: pretty;">{{ orderNote }}</p>
             <div data-m="stack" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 6px; overflow: hidden; margin-bottom: 28px;">
               <div style="background: #FCFAF4; padding: 16px 12px;"><div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Order</div><div style="font-family: 'DM Mono', monospace; font-size: 13px;">{{ orderId }}</div></div>
@@ -2499,6 +2524,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <div data-m="cartsum" style="position: sticky; top: 96px; border: 1px solid rgba(245,240,230,0.16); border-radius: 10px; background: linear-gradient(#1D1913, #17140F); color: #F5F0E6; padding: 26px 26px 28px; overflow: hidden; box-shadow: 0 40px 70px -40px rgba(0,0,0,0.85);">
               <div aria-hidden="true" style="position: absolute; right: -70px; top: -90px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.14), transparent 70%); pointer-events: none;"></div>
               <div style="position: relative; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 18px;">Order summary</div>
+              <div data-pre-show style="position: relative; border: 1px solid oklch(0.86 0.14 92 / 0.4); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.12); padding: 12px 14px 13px; margin-bottom: 16px;">
+                <div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 5px;">Batch 0072 · in production</div>
+                <div style="font-size: 12.5px; line-height: 1.55; color: #DED5C4;">Your order reserves a box from this run — it ships in ~4 weeks, as soon as the batch clears testing.</div>
+              </div>
               <div style="position: relative; display: grid; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid rgba(245,240,230,0.12);">
                 <sc-for list="{{ cartItems }}" as="cl" hint-placeholder-count="1">
                   <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px;">
@@ -4012,12 +4041,26 @@ class Component extends DCLogic {
       // counts come from /api/batch and only appear once it has loaded.
       tickerItems: (() => {
         const r = this.state.batch;
+        const PRE = window.HB_PRELAUNCH || {};
         const live = [];
         if (r && r.dog && typeof r.dog.remaining === 'number') {
           live.push({ label: r.dog.remaining.toLocaleString('en-US') + ' of ' + r.dog.total.toLocaleString('en-US') + ' dog boxes left' });
         }
         if (r && r.cat && typeof r.cat.remaining === 'number') {
           live.push({ label: r.cat.remaining.toLocaleString('en-US') + ' of ' + r.cat.total.toLocaleString('en-US') + ' cat boxes left' });
+        }
+        if (PRE.on) {
+          return [
+            { label: 'Batch ' + PRE.batch + ' · in production' }
+          ].concat(live, [
+            { label: 'Reserving now · ships in ' + PRE.eta },
+            { label: 'Every lot third-party tested' },
+            { label: 'cGMP · Scottsdale, AZ' },
+            { label: 'Human-grade · made in USA' },
+            { label: 'Free shipping over $60' },
+            { label: '30-day money-back guarantee' },
+            { label: 'Cancel anytime, one click' }
+          ]);
         }
         return [
           { label: 'Lot HB-0426 released' }
@@ -4237,8 +4280,12 @@ class Component extends DCLogic {
       orderPlaced: this.state.ordered,
       orderPending: !this.state.ordered,
       orderId: this.state.orderId,
-      orderEta: '2–4 business days',
-      orderNote: 'We formulate to order, so your chews are blended fresh and leave Scottsdale in the morning. A confirmation and the lot number for your batch are on the way by email.',
+      orderEta: (window.HB_PRELAUNCH || {}).on
+        ? '~4 weeks · Batch 0072'
+        : '2–4 business days',
+      orderNote: (window.HB_PRELAUNCH || {}).on
+        ? 'Your box is reserved from Batch 0072, which is in production now. It ships in about 4 weeks, as soon as the batch clears third-party testing — a confirmation is on the way by email, and we’ll email again the day it ships.'
+        : 'We formulate to order, so your chews are blended fresh and leave Scottsdale in the morning. A confirmation and the lot number for your batch are on the way by email.',
       checkoutSections: [
         { n: '01', title: 'Contact', fields: [
           { key: 'email', label: 'Email', value: co.email, set: this.setCo('email'), mode: 'email', span: 'span 2' },
