@@ -89,9 +89,27 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
   // Remember the email so the account sign-in can pre-fill it after checkout —
   // turns a returning guest's sign-in into "tap continue + enter code".
   try { if (buyer && buyer.email) localStorage.setItem('hb_email', buyer.email); } catch (e) {}
+  // Express checkout skips the on-site checkout page, so the InitiateCheckout
+  // pixel event fires here at the true handoff (deduped against the page).
+  try { if (window.fbq && !window.__hbFbIC) { window.__hbFbIC = true; window.fbq('track', 'InitiateCheckout'); } } catch (e) {}
   window.location.href = url;
 };
 </script>
+<script>
+/* Meta pixel — base code. Purchase fires from Shopify's checkout (connect
+   this same pixel in the Facebook & Instagram app in Shopify admin); the
+   site fires PageView / ViewContent / AddToCart / InitiateCheckout itself
+   (SPA events wired in componentDidUpdate). */
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1748524569793183');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" alt=""
+src="https://www.facebook.com/tr?id=1748524569793183&ev=PageView&noscript=1"/></noscript>
 <script>window.__resources = {"https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js": "/assets/vendor/react-dom.production.min.js", "https://unpkg.com/react@18.3.1/umd/react.production.min.js": "/assets/vendor/react.production.min.js"};</script>
 
 <script src="/assets/js/e936a6cc.js"></script>
@@ -3411,6 +3429,35 @@ class Component extends DCLogic {
       const s = this.state;
       const cart = JSON.stringify({ cartDog: s.cartDog, cartCat: s.cartCat, cartPlanDog: s.cartPlanDog, cartPlanCat: s.cartPlanCat });
       if (cart !== this._lastCart) { this._lastCart = cart; localStorage.setItem('hbCart', cart); }
+    } catch (e) {}
+    // Meta pixel SPA events — the base snippet fired the first PageView, so
+    // only page CHANGES track here. Cart-count increases fire AddToCart no
+    // matter which control added the box.
+    try {
+      if (window.fbq) {
+        const pg = this.state.page || 'home';
+        if (this._fbPage !== pg) {
+          if (this._fbPage != null) window.fbq('track', 'PageView');
+          if (pg === 'product') {
+            window.fbq('track', 'ViewContent', {
+              content_type: 'product',
+              content_ids: [this.state.sp === 'cat' ? 'happy-beans-cat' : 'happy-beans-dog'],
+              content_name: 'Happy Beans', currency: 'USD', value: 115
+            });
+          }
+          if (pg === 'checkout' && !window.__hbFbIC) { window.__hbFbIC = true; window.fbq('track', 'InitiateCheckout'); }
+          this._fbPage = pg;
+        }
+        const fbQty = (this.state.cartDog || 0) + (this.state.cartCat || 0);
+        if (this._fbQty == null) this._fbQty = fbQty;
+        else if (fbQty !== this._fbQty) {
+          if (fbQty > this._fbQty) {
+            window.fbq('track', 'AddToCart', { content_type: 'product', currency: 'USD', value: 115 * (fbQty - this._fbQty) });
+            window.__hbFbIC = false;
+          }
+          this._fbQty = fbQty;
+        }
+      }
     } catch (e) {}
     const page = this.state.page || 'home';
     // The hero <video> lives inside the home section, so SPA nav back to home
