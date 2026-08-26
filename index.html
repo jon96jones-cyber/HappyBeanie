@@ -362,7 +362,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
     [data-m~="flipwrap"]:focus-visible [data-m~="flipback"] { transform: translateY(0) !important; }
     [data-m~="fliparrow"] { display: none; }
   }
-  /* ---- contact hero: drifting beans + the pharmacist chat vignette ---- */
+  /* ---- contact hero: drifting beans + the support chat vignette ---- */
   @keyframes cthDrift { 0%, 100% { transform: translateY(0) rotate(var(--tilt, -18deg)); } 50% { transform: translateY(-18px) rotate(calc(var(--tilt, -18deg) + 12deg)); } }
   @keyframes cthQ { 0% { opacity: 0; transform: translateY(12px); } 3% { opacity: 1; transform: none; } 44% { opacity: 1; transform: none; } 48% { opacity: 0; transform: translateY(-8px); } 100% { opacity: 0; } }
   @keyframes cthDots { 0%, 6% { opacity: 0; transform: translateY(8px); } 9% { opacity: 1; transform: none; } 18% { opacity: 1; } 21% { opacity: 0; transform: translateY(-4px); } 100% { opacity: 0; } }
@@ -1137,7 +1137,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
         </div>
       </div>
       <div data-m="labimg" style="height: 520px; border-radius: 3px; overflow: hidden;">
-        <image-slot id="hbv2-lab2" placeholder="Pharmacist at sterile prep hood" style="width: 100%; height: 100%;"></image-slot>
+        <image-slot id="hbv2-lab2" placeholder="Technician at sterile prep hood" style="width: 100%; height: 100%;"></image-slot>
       </div>
     </div>
   </section>
@@ -1651,7 +1651,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
           <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">Why this exists</div>
           <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.04; margin: 0 0 22px; max-width: 20em; text-wrap: balance;">He stopped meeting me at the door.</h2>
           <p style="font-size: 16.5px; line-height: 1.72; color: #554C40; margin: 0 0 18px; max-width: 34em; text-wrap: pretty;">Beanie was fourteen. Nothing was wrong on paper — bloodwork fine, no diagnosis, nothing to treat. He had just quietly stopped doing the things that made him him. The stairs became a decision. The greeting at the door became a look up from the rug.</p>
-          <p style="font-size: 16.5px; line-height: 1.72; color: #554C40; margin: 0 0 26px; max-width: 34em; text-wrap: pretty;">His owner is a licensed pharmacist. He spent a year reading canine trials instead of marketing copy, then blended the first batch on a borrowed bench for one dog. Eleven weeks later Beanie beat him to the door. Every batch since is that formula, published lot by lot.</p>
+          <p style="font-size: 16.5px; line-height: 1.72; color: #554C40; margin: 0 0 26px; max-width: 34em; text-wrap: pretty;">His owner came from fifteen years of sterile human formulation. He spent a year reading canine trials instead of marketing copy, then blended the first batch on a borrowed bench for one dog. Eleven weeks later Beanie beat him to the door. Every batch since is that formula, published lot by lot.</p>
           <div style="display: flex; align-items: center; gap: 14px; padding-top: 22px; border-top: 1px solid #E0D6C2; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;"><span style="width: 26px; height: 1px; background: oklch(0.44 0.07 152);"></span>Scottsdale, Arizona · since 2022</div>
         </div>
       </div>
@@ -1679,7 +1679,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
           <sc-if value="{{ askSent }}" hint-placeholder-val="{{ false }}">
             <div style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Question received</div>
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.25; color: #17140F; margin-bottom: 8px;">We'll come back to you by email.</div>
-            <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0;">A pharmacist reads every one of these — no bots, no canned replies. If it's urgent, call the number in the footer.</p>
+            <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0;">A real person on our support team reads every one of these — no bots, no canned replies. If it's urgent, call the number in the footer.</p>
           </sc-if>
           </div>
         </div>
@@ -1890,7 +1890,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
         <div>
           <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin: 0 0 22px; display: flex; align-items: center; gap: 14px;"><span style="width: 30px; height: 1px; background: oklch(0.72 0.08 152);"></span>Contact</div>
           <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: clamp(38px, 4.6vw, 64px); line-height: 1.02; letter-spacing: -0.042em; margin: 0 0 24px; max-width: 11em; text-wrap: balance;">Talk to the people <span style="color: oklch(0.86 0.14 92);">behind the bean.</span></h1>
-          <p style="font-size: 17px; line-height: 1.65; color: #B9AF9C; max-width: 30em; margin: 0 0 30px;">General questions, a picky eater, a vet who wants the data — send it here. No bots, no canned replies: a licensed pharmacist reads every message.</p>
+          <p style="font-size: 17px; line-height: 1.65; color: #B9AF9C; max-width: 30em; margin: 0 0 30px;">General questions, a picky eater, a vet who wants the data — send it here. No bots, no canned replies: a real person on our support team reads every message.</p>
           <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             <div style="display: inline-flex; align-items: center; gap: 11px; padding: 11px 18px; border: 1px solid rgba(245,240,230,0.24); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #DED5C4;">
               <span style="position: relative; width: 8px; height: 8px;">
@@ -1931,7 +1931,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
             <div style="border: 1px solid oklch(0.44 0.07 152); border-radius: 0; padding: 40px 36px; background: #F5F0E6;">
               <div style="width: 44px; height: 44px; border-radius: 0; background: oklch(0.44 0.07 152); color: #F5F0E6; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 22px; animation: checkPop 0.5s cubic-bezier(0.2,0.7,0.2,1) both;">✓</div>
               <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 14px;">Message received · {{ ticketId }}</div>
-              <p style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1.3; margin: 0 0 12px;">Thanks {{ sentName }} — we have it. Expect a reply from a licensed pharmacist within one business day.</p>
+              <p style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1.3; margin: 0 0 12px;">Thanks {{ sentName }} — we have it. Expect a reply from our support team within one business day.</p>
               <button sc-camel-on-click="{{ resetForm }}" style="font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; background: transparent; border: none; padding: 0; color: oklch(0.44 0.07 152); cursor: pointer; border-bottom: 1px solid oklch(0.44 0.07 152);">Send another</button>
             </div>
           </sc-if>
@@ -2020,7 +2020,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
           <sc-if value="{{ askSent }}" hint-placeholder-val="{{ false }}">
             <div style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Question received</div>
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.25; color: #17140F; margin-bottom: 8px;">We'll come back to you by email.</div>
-            <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0;">A pharmacist reads every one of these — no bots, no canned replies. If it's urgent, call the number in the footer.</p>
+            <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0;">A real person on our support team reads every one of these — no bots, no canned replies. If it's urgent, call the number in the footer.</p>
           </sc-if>
           </div>
         </div>
@@ -2148,7 +2148,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
               <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: {{ pn.markColor }};">{{ pn.mark }}</span>
             </div>
           </sc-for>
-          <p style="font-size: 12px; line-height: 1.6; color: #8A7F6E; margin: 22px 0 0;">Signed by Marcus Vance, PharmD, on release. Results apply to the lot named above. Retained samples are held for 24 months and available for re-test on request.</p>
+          <p style="font-size: 12px; line-height: 1.6; color: #8A7F6E; margin: 22px 0 0;">Signed by Marcus Vance on release. Results apply to the lot named above. Retained samples are held for 24 months and available for re-test on request.</p>
         </div>
       </div>
     </sc-if>
@@ -4446,7 +4446,7 @@ class Component extends DCLogic {
       assurances: [
         { k: '30 days', v: 'Full refund if you do not see a change — opened boxes included, no return shipment.' },
         { k: 'Made to order', v: 'Blended and shipped within 48 hours of your order, never warehoused.' },
-        { k: 'Ask first', v: 'A licensed pharmacist reviews interactions with your animal\u2019s prescriptions, free.' }
+        { k: 'Ask first', v: 'Every ingredient is screened against your animal\u2019s prescriptions in our eligibility quiz, free.' }
       ],
       wkRows: wkRows,
       // "Try it risk-free" — the buy box sits at the top of the product page.
@@ -4515,7 +4515,7 @@ class Component extends DCLogic {
       })),
       timeline: this.evRecs(),
       team: [
-        { name: 'Marcus Vance, PharmD', role: 'Founder · formulation', body: 'Fifteen years in human sterile prep. Owns every formulation decision and signs each release.', slot: 'hbv2-team1', ph: 'Pharmacist portrait' },
+        { name: 'Marcus Vance', role: 'Founder · formulation', body: 'Fifteen years in human sterile prep. Owns every formulation decision and signs each release.', slot: 'hbv2-team1', ph: 'Founder portrait' },
         { name: 'Dr. Priya Raman, DVM', role: 'Veterinary lead', body: 'Sets the dose curves by species and reviews every claim before it reaches a label.', slot: 'hbv2-team2', ph: 'Veterinarian portrait' },
         { name: 'Lena Ortiz', role: 'Quality & lots', body: 'Runs assay scheduling, COA publishing, and the recall drill nobody hopes to need.', slot: 'hbv2-team3', ph: 'Quality lead portrait' }
       ],
@@ -4561,14 +4561,14 @@ class Component extends DCLogic {
       sendFg: canSend ? '#F5F0E6' : '#8A7F6E',
       sendCursor: canSend ? 'pointer' : 'not-allowed',
       sendOpacity: canSend ? 1 : 0.85,
-      sendNote: canSend ? 'A pharmacist reads this, not a bot.' : '',
+      sendNote: canSend ? 'A real person reads this, not a bot.' : '',
       sentName: form.name ? form.name.split(' ')[0] : 'friend',
       ticketId: this.state.ticket,
       deskShort: deskOpen ? 'Open now' : 'Closed',
       deskColor: deskOpen ? 'oklch(0.72 0.17 145)' : '#8A7F6E',
-      deskStatus: deskOpen ? 'Desk open · 2 pharmacists on shift' : 'Desk closed · replies resume 8am MST',
+      deskStatus: deskOpen ? 'Desk open · support team on shift' : 'Desk closed · replies resume 8am MST',
       contactBlocks: [
-        { k: 'Email', v: 'hello@happybeanie.com', note: 'Answered by a licensed pharmacist, weekdays inside one business day.', copyable: true },
+        { k: 'Email', v: 'hello@happybeanie.com', note: 'Answered by our support team, weekdays inside one business day.', copyable: true },
         { k: 'Phone', v: '(480) 555-2263', note: 'Mon–Fri, 8am–5pm MST. Dosing questions welcome.', copyable: true },
         { k: 'Veterinary line', v: 'vet@happybeanie.com', note: 'Formulation data, COAs and clinic pricing for practices.', copyable: true },
         { k: 'The lab', v: '4120 N Marshall Way, Scottsdale, AZ', note: 'Tours by appointment. Yes, you can bring your bean.', copyable: false }
