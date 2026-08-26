@@ -4900,17 +4900,18 @@ Object.assign(Component.prototype, {
       qzBuyName: a.species === 'cat' ? 'Happy Beans for Cats™' : 'Happy Beans™ for Dogs',
       qzBuyAddLabel: this.state.qzAdded ? 'Added — view cart →' : 'Add to cart',
       qzBuyAdd: () => {
-        if (this.state.qzAdded) { this.setState({ page: 'cart', menuOpen: false }); window.scrollTo({ top: 0 }); return; }
+        // nav() keeps the address bar in sync (pushState to /cart), so a
+        // refresh from the cart stays on the cart instead of re-running the quiz.
+        if (this.state.qzAdded) { this.nav('cart')(); return; }
         const qp = (this.state.wholesale || (window.HB_PRELAUNCH || {}).on) ? 0 : 1;
         this.setState(st => a.species === 'cat'
           ? { qzAdded: true, cartCat: st.cartCat + 1, cartPlanCat: qp }
           : { qzAdded: true, cartDog: st.cartDog + 1, cartPlanDog: qp });
-        this.setState({ page: 'cart', menuOpen: false });
-        window.scrollTo({ top: 0 });
+        this.nav('cart')();
       },
       qzGoBuy: () => {
-        this.setState({ page: 'product', sp: a.species === 'cat' ? 'cat' : 'dog', plan: (this.state.wholesale || (window.HB_PRELAUNCH || {}).on) ? 0 : 1, added: false, ordered: false, menuOpen: false });
-        window.scrollTo({ top: 0 });
+        this.setState({ sp: a.species === 'cat' ? 'cat' : 'dog', plan: (this.state.wholesale || (window.HB_PRELAUNCH || {}).on) ? 0 : 1, ordered: false });
+        this.nav('product')();
       },
       qzShowOrder: verdict !== 'block' && verdict !== 'ok',
       qzShowProfile: verdict !== 'ok',
