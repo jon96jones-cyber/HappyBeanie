@@ -36,10 +36,18 @@ window.HB_SHOPIFY = {
   },
   sellingPlan: 'gid://shopify/SellingPlan/974946368'
 };
-// PRELAUNCH MODE — one switch for the whole site. While a batch is in
-// production the site hides the bean wall + review counts and reframes
-// shipping copy as "reserve from this batch". Launch day: set on to false
-// and deploy — every swap below reverts at once.
+// PRELAUNCH MODE — one switch for the whole site. While on:
+//   · bean wall, star ratings, review counts and stat strips are hidden
+//   · every ships-in-24h claim reads "reserve from Batch NNNN" instead
+//   · small-batch "boxes left" counters are held back (previous run's data)
+//   · Subscribe & save is paused — the card is hidden and any subscription
+//     line in a cart is charged as one-time, so nobody gets a second bill
+//     before their first box arrives
+// LAUNCH DAY: set on to false and deploy. All of the above reverts in that
+// one change — wall and ratings return, 24h copy returns, live counters
+// return, subscriptions reopen. Nothing else to flip.
+// Batch number and ETA below appear in a few hardcoded copy spots too — if
+// they change, search the file for the old values.
 window.HB_PRELAUNCH = { on: true, batch: '0072', eta: '~4 weeks' };
 if (window.HB_PRELAUNCH.on) {
   document.documentElement.className += ' hb-prelaunch';
@@ -990,6 +998,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
               </div>
             </div>
           </sc-for>
+          <div data-pre-show style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">Subscribe &amp; save returns when Batch 0072 ships</div>
         </div>
         <button sc-camel-on-click="{{ cartCta }}" style="width: 100%; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 20px; border: none; border-radius: 2px; background: #17140F; color: #F5F0E6; cursor: pointer;" style-hover="background: oklch(0.44 0.07 152);">{{ cartLabel }}</button>
         <div data-m="buynote" style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 14px 0 34px; text-align: center;">Free shipping over $60 · Cancel anytime · 30-day guarantee</div>
@@ -1400,6 +1409,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
                 <span style="display: {{ p2.badgeDisplay }}; position: absolute; top: -9px; left: 56px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; padding: 4px 9px; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F;">{{ p2.badge }}</span>
               </div>
             </sc-for>
+            <div data-pre-show style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">Subscribe &amp; save returns when Batch 0072 ships</div>
           </div>
           <button sc-camel-on-click="{{ cartCta }}" style="width: 100%; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer; box-shadow: 0 20px 34px -22px rgba(23,20,15,0.8), 0 3px 8px -4px rgba(23,20,15,0.28); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.25s ease;" style-hover="background: oklch(0.44 0.07 152); transform: translateY(-2px); box-shadow: 0 26px 42px -24px rgba(23,20,15,0.85), 0 4px 10px -4px rgba(23,20,15,0.32);">{{ cartLabel }}</button>
           <div data-m="stack" style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 4px; margin: 14px 0 24px; overflow: hidden;">
@@ -3062,6 +3072,11 @@ class Component extends DCLogic {
     // cart saved before sign-in) is coerced to one-time here, so pricing
     // shows trade terms and checkout never attaches a selling plan.
     if (this.state.wholesale) rows.forEach(r => { r.plan = 0; });
+    // Prelaunch pauses Subscribe & save: a contract opened now would bill its
+    // second month right as the first box arrives. Any subscription line
+    // (picker default, saved cart) becomes one-time; bundles stay — they're
+    // a single charge. Reverts with the HB_PRELAUNCH flag.
+    if ((window.HB_PRELAUNCH || {}).on) rows.forEach(r => { if (r.plan === 1) r.plan = 0; });
     // Trade accounts see their own per-box rate on every one-time line, same
     // as the product page (terms live from /api/auth/me — what checkout's
     // code discount charges). Below the minimum the checkout gate blocks
@@ -3821,23 +3836,30 @@ class Component extends DCLogic {
     const isDog = this.state.sp === 'dog';
     const base = (this.props.basePrice ?? 68) - (isDog ? 0 : 6);
     const planDefsAll = [
-      { title: 'One-time', sub: '30-day supply, shipped once', price: 115, save: '', badge: '' },
-      { title: 'Subscribe & save', sub: '30-day supply · cancel anytime', price: 99, save: 'Save $16/mo', badge: 'Most chosen' },
-      { title: 'Buy 3, get 1 free', sub: '4 months · best value', price: 297, save: 'Save $163', badge: 'Best value' }
+      { idx: 0, title: 'One-time', sub: '30-day supply, shipped once', price: 115, save: '', badge: '' },
+      { idx: 1, title: 'Subscribe & save', sub: '30-day supply · cancel anytime', price: 99, save: 'Save $16/mo', badge: 'Most chosen' },
+      { idx: 2, title: 'Buy 3, get 1 free', sub: '4 months · best value', price: 297, save: 'Save $163', badge: 'Best value' }
     ];
+    // idx is the canonical plan number checkout maps on (1 = selling plan,
+    // 2 = bundle variant) — it must survive any filtering of this list.
+    const preOn = !!(window.HB_PRELAUNCH || {}).on;
     // Wholesale accounts order single boxes only — no subscription, no bundle.
     // The lone plan card shows the live trade unit price when the discount is
     // active (what checkout charges at the minimum quantity or more).
     const tradeUnit = this.state.trade ? Math.round(115 * (1 - this.state.trade.pct) * 100) / 100 : null;
     const planDefs = this.state.wholesale ? [{
-      title: 'One-time', sub: 'Single boxes · 30-day supply',
+      idx: 0, title: 'One-time', sub: 'Single boxes · 30-day supply',
       price: tradeUnit || 115,
       save: tradeUnit ? 'Trade price · ' + (this.state.trade.minQty || 5) + '+ boxes' : '',
       badge: 'Trade account'
-    }] : planDefsAll;
-    const planSel = planDefs[this.state.plan] || planDefs[0];
-    const bestIdx = this.state.wholesale ? 0 : 1;
-    const bestDef = planDefs[bestIdx];
+    }] : (preOn ? planDefsAll.filter(p => p.idx !== 1) : planDefsAll);
+    const planSel = planDefs.find(p => p.idx === this.state.plan) || planDefs[0];
+    // The plan the shopper is effectively on: a selection that's no longer
+    // offered (subscription default while prelaunch is on) resolves to
+    // one-time, matching what cartMath will charge.
+    const effPlan = planSel.idx;
+    const bestIdx = this.state.wholesale ? 0 : (preOn ? 2 : 1);
+    const bestDef = planDefs.find(p => p.idx === bestIdx) || planDefs[0];
     const speciesDefs = [
       { key: 'dog', label: 'For dogs', meta: 'Happy Beans™ · 6–120 lb', slot: 'hbv2-species-dog', ph: 'Dog portrait, natural light' },
       { key: 'cat', label: 'For cats', meta: 'Happy Beans for Cats™ · 4–22 lb', slot: 'hbv2-species-cat', ph: 'Cat portrait, natural light' }
@@ -4186,12 +4208,12 @@ class Component extends DCLogic {
           }
         };
       }),
-      plans: planDefs.map((p, i) => {
-        const on = this.state.plan === i;
+      plans: planDefs.map((p) => {
+        const on = effPlan === p.idx;
         return {
           badge: p.badge, badgeDisplay: p.badge ? 'inline-block' : 'none',
           title: p.title, sub: p.sub, price: this.money(p.price), save: p.save,
-          pick: () => this.setState({ plan: i, added: false }),
+          pick: () => this.setState({ plan: p.idx, added: false }),
           border: on ? '#17140F' : '#E0D6C2',
           bg: on ? '#F5F0E6' : '#FCFAF4',
           dot: on ? '#17140F' : 'transparent',
@@ -4209,15 +4231,15 @@ class Component extends DCLogic {
       cartCta: () => {
         if (this.state.added) { this.nav('cart')(); return; }
         this.setState(st => st.sp === 'cat'
-          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
-          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan });
+          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: effPlan }
+          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: effPlan });
         this.nav('cart')();
       },
       barCtaGo: () => {
         if (this.state.added) { this.nav('cart')(); return; }
         this.setState(st => st.sp === 'cat'
-          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
-          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan });
+          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: effPlan }
+          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: effPlan });
         this.nav('cart')();
       },
       joined: this.state.joined,
@@ -4410,26 +4432,26 @@ class Component extends DCLogic {
         rd.readAsDataURL(f);
       },
       cartLabel: this.state.added ? 'Added — checkout →'
-        : 'Start the ' + (this.state.plan === 2 ? '120' : '30') + ' days · ' + this.money(planSel.price),
+        : 'Start the ' + (effPlan === 2 ? '120' : '30') + ' days · ' + this.money(planSel.price),
       bestTitle: bestDef.title,
       bestSub: '30-day supply',
       bestPrice: this.money(bestDef.price),
-      bestBorder: this.state.plan === bestIdx ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.28)',
-      bestBg: this.state.plan === bestIdx ? 'rgba(245,240,230,0.08)' : 'transparent',
-      bestDot: this.state.plan === bestIdx ? 'oklch(0.86 0.14 92)' : 'transparent',
+      bestBorder: effPlan === bestIdx ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.28)',
+      bestBg: effPlan === bestIdx ? 'rgba(245,240,230,0.08)' : 'transparent',
+      bestDot: effPlan === bestIdx ? 'oklch(0.86 0.14 92)' : 'transparent',
       pickBest: () => this.setState({ plan: bestIdx }),
       addBest: () => {
         this.setState(st => st.sp === 'cat'
-          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
-          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan });
+          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: bestIdx }
+          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: bestIdx });
         this.nav('cart')();
       },
       barCta: this.state.added ? 'Added — checkout →'
-        : 'Start the ' + (this.state.plan === 2 ? '120' : '30') + ' days · ' + this.money(planSel.price),
+        : 'Start the ' + (effPlan === 2 ? '120' : '30') + ' days · ' + this.money(planSel.price),
       addToCart: () => {
         this.setState(st => st.sp === 'cat'
-          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: st.plan }
-          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: st.plan });
+          ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: effPlan }
+          : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: effPlan });
         this.nav('cart')();
       },
       factsOpen: this.state.factsOpen,
@@ -4904,7 +4926,7 @@ Object.assign(Component.prototype, {
       qzBuyAddLabel: this.state.qzAdded ? 'Added — view cart →' : 'Add to cart',
       qzBuyAdd: () => {
         if (this.state.qzAdded) { this.setState({ page: 'cart', menuOpen: false }); window.scrollTo({ top: 0 }); return; }
-        const qp = this.state.wholesale ? 0 : 1;
+        const qp = (this.state.wholesale || (window.HB_PRELAUNCH || {}).on) ? 0 : 1;
         this.setState(st => a.species === 'cat'
           ? { qzAdded: true, cartCat: st.cartCat + 1, cartPlanCat: qp }
           : { qzAdded: true, cartDog: st.cartDog + 1, cartPlanDog: qp });
@@ -4912,7 +4934,7 @@ Object.assign(Component.prototype, {
         window.scrollTo({ top: 0 });
       },
       qzGoBuy: () => {
-        this.setState({ page: 'product', sp: a.species === 'cat' ? 'cat' : 'dog', plan: this.state.wholesale ? 0 : 1, added: false, ordered: false, menuOpen: false });
+        this.setState({ page: 'product', sp: a.species === 'cat' ? 'cat' : 'dog', plan: (this.state.wholesale || (window.HB_PRELAUNCH || {}).on) ? 0 : 1, added: false, ordered: false, menuOpen: false });
         window.scrollTo({ top: 0 });
       },
       qzShowOrder: verdict !== 'block' && verdict !== 'ok',
