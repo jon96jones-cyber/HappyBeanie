@@ -1611,7 +1611,7 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
         <div data-m="evtabs" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-bottom: 0;">
           <sc-for list="{{ evidence }}" as="ev" hint-placeholder-count="3">
             <button sc-camel-on-click="{{ ev.pick }}" data-m="evtab" style="{{ ev.tabStyle }}">
-              <span style="{{ ev.kickerStyle }}">Active {{ ev.n }}</span>
+              <span style="{{ ev.kickerStyle }}">Active ingredient {{ ev.n }}</span>
               <span data-m="evtabname" style="{{ ev.nameStyle }}">{{ ev.active }}</span>
             </button>
           </sc-for>
