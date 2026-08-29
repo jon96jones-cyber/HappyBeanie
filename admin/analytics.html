@@ -95,6 +95,7 @@ tr:last-child td { border-bottom:none; }
     <div><b>Live desk</b> <span class="sub" id="stamp"></span></div>
     <div class="tools">
       <select id="days">
+        <option value="0">Today</option>
         <option value="7">Last 7 days</option>
         <option value="30">Last 30 days</option>
         <option value="90">Last 90 days</option>
@@ -115,7 +116,7 @@ tr:last-child td { border-bottom:none; }
     <h2 class="sec">Funnel · <span id="funWin">last 7 days</span></h2>
     <div class="card"><div class="fun" id="funnel"></div></div>
 
-    <h2 class="sec">Sessions per day</h2>
+    <h2 class="sec" id="sparkTitle">Sessions per day</h2>
     <div class="card"><div class="spark" id="spark"></div></div>
 
     <div class="grid2" style="margin-top:16px;">
@@ -148,11 +149,22 @@ tr:last-child td { border-bottom:none; }
 
   var timer = null;
 
+  // Local midnight — so "today" is the viewer's calendar day, not UTC's.
+  function dayStart() {
+    var d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString();
+  }
+  function windowStart(days) {
+    if (!days) return dayStart();
+    var d = new Date(); d.setDate(d.getDate() - days); return d.toISOString();
+  }
   function api(opts) {
     var p = prefs();
+    var days = p.days === 0 ? 0 : (p.days || 7);
     opts = opts || {};
     opts.headers = Object.assign({ 'x-analytics-key': p.key || '', 'Content-Type': 'application/json' }, opts.headers || {});
-    var qs = '?days=' + encodeURIComponent(p.days || 7);
+    var qs = '?days=' + encodeURIComponent(days || 7) +
+             '&since=' + encodeURIComponent(windowStart(days)) +
+             '&dayStart=' + encodeURIComponent(dayStart());
     return fetch('/api/admin/analytics' + qs, opts).then(function (r) {
       return r.json().catch(function () { return { ok: false, error: 'bad_response' }; });
     }).catch(function () { return { ok: false, error: 'unreachable' }; });
@@ -168,7 +180,7 @@ tr:last-child td { border-bottom:none; }
   }
 
   $('unlock').onclick = function () {
-    var p = prefs(); p.key = $('key').value.trim(); p.days = p.days || 7; savePrefs(p);
+    var p = prefs(); p.key = $('key').value.trim(); if (p.days == null) p.days = 7; savePrefs(p);
     $('gateErr').innerHTML = '';
     api({}).then(function (b) {
       if (b.ok) { open_(b); return; }
@@ -195,14 +207,14 @@ tr:last-child td { border-bottom:none; }
     $('gate').style.display = 'none';
     $('desk').style.display = '';
     var p = prefs();
-    $('days').value = String(p.days || 7);
+    $('days').value = String(p.days == null ? 7 : p.days);
     draw(b);
     if (timer) clearInterval(timer);
     timer = setInterval(load, 10000);
   }
   function load() { api({}).then(function (b) { if (b.ok) draw(b); }); }
   $('refresh').onclick = load;
-  $('days').onchange = function () { var p = prefs(); p.days = parseInt(this.value, 10) || 7; savePrefs(p); load(); };
+  $('days').onchange = function () { var p = prefs(); p.days = parseInt(this.value, 10); if (isNaN(p.days)) p.days = 7; savePrefs(p); load(); };
 
   function draw(b) {
     $('vNow').textContent = b.live.visitorsNow;
@@ -211,7 +223,7 @@ tr:last-child td { border-bottom:none; }
     $('vSess').textContent = b.today.sessions;
     $('vPv').textContent = b.today.pageviews;
     $('stamp').textContent = 'Updated ' + new Date().toLocaleTimeString();
-    $('funWin').textContent = 'last ' + b.days + ' days';
+    $('funWin').textContent = (prefs().days === 0) ? 'today' : ('last ' + b.days + ' days');
 
     // Funnel — each step also shows what share of the visits above it survived.
     var f = b.funnel, top = Math.max(1, f.visits);
@@ -226,12 +238,14 @@ tr:last-child td { border-bottom:none; }
              '<div class="n">' + s[1] + ' <span>' + pct + '%</span></div></div>';
     }).join('');
 
+    var isToday = prefs().days === 0;
+    $('sparkTitle').textContent = isToday ? 'Sessions today' : 'Sessions per day';
     var max = Math.max(1, Math.max.apply(null, b.series.map(function (d) { return d.sessions; })));
     $('spark').innerHTML = b.series.length
       ? b.series.map(function (d) {
           return '<div class="b" style="height:' + Math.max(2, Math.round((d.sessions / max) * 100)) + '%" data-t="' + esc(d.day) + ' · ' + d.sessions + ' sessions"></div>';
         }).join('')
-      : '<div class="empty">No sessions in this window yet.</div>';
+      : '<div class="empty">No sessions ' + (isToday ? 'today' : 'in this window') + ' yet.</div>';
 
     $('pages').innerHTML = b.topPages.length
       ? b.topPages.map(function (r) { return '<tr><td class="mono">' + esc(r.path) + '</td><td class="num">' + r.views + '</td></tr>'; }).join('')

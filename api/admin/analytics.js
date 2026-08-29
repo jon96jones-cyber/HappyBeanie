@@ -23,6 +23,19 @@ function readBody(req) {
 }
 function n(v) { return Number(v || 0); }
 
+// Accepts an ISO timestamp from the desk only if it is real, not in the
+// future, and not absurdly old — so a hand-edited URL cannot make the desk
+// scan the whole table.
+function isoWithin(v, maxDaysBack) {
+  if (!v) return null;
+  const d = new Date(String(v));
+  if (isNaN(d.getTime())) return null;
+  const now = Date.now();
+  if (d.getTime() > now + 86400000) return null;
+  if (d.getTime() < now - maxDaysBack * 86400000) return null;
+  return d.toISOString();
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
@@ -46,7 +59,15 @@ module.exports = async function handler(req, res) {
     if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'method_not_allowed' });
 
     const sql = db.sql();
-    const days = Math.min(90, Math.max(1, parseInt(req.query && req.query.days, 10) || 7));
+    const q = req.query || {};
+    const days = Math.min(90, Math.max(1, parseInt(q.days, 10) || 7));
+
+    // The desk sends both window edges as absolute timestamps computed in the
+    // viewer's own timezone, so "today" means their calendar day rather than
+    // UTC's — in Arizona those differ by seven hours. Falls back to the
+    // server's own reckoning if the params are missing or implausible.
+    const since = isoWithin(q.since, 400) || new Date(Date.now() - days * 86400000).toISOString();
+    const dayStart = isoWithin(q.dayStart, 2);
 
     const [live, today, series, topPages, topSources, funnel, recent] = await Promise.all([
       sql`select
@@ -62,19 +83,19 @@ module.exports = async function handler(req, res) {
             count(*) filter (where added_to_cart)       as carts,
             count(*) filter (where began_checkout)      as checkouts
           from sessions
-          where first_seen >= date_trunc('day', now())`,
+          where first_seen >= coalesce(${dayStart}::timestamptz, date_trunc('day', now()))`,
 
       sql`select to_char(date_trunc('day', first_seen), 'YYYY-MM-DD') as day,
                  count(*)                               as sessions,
                  coalesce(sum(pageviews), 0)            as pageviews,
                  count(*) filter (where added_to_cart)  as carts
           from sessions
-          where first_seen >= now() - (${days} || ' days')::interval
+          where first_seen >= ${since}::timestamptz
           group by 1 order by 1`,
 
       sql`select coalesce(path, '(unknown)') as path, count(*) as views
           from events
-          where name = 'pageview' and ts >= now() - (${days} || ' days')::interval
+          where name = 'pageview' and ts >= ${since}::timestamptz
           group by 1 order by views desc limit 10`,
 
       sql`select
@@ -84,7 +105,7 @@ module.exports = async function handler(req, res) {
             count(*) as sessions,
             count(*) filter (where added_to_cart) as carts
           from sessions
-          where first_seen >= now() - (${days} || ' days')::interval
+          where first_seen >= ${since}::timestamptz
           group by 1 order by sessions desc limit 10`,
 
       sql`select
@@ -93,7 +114,7 @@ module.exports = async function handler(req, res) {
             count(*) filter (where added_to_cart)   as cart,
             count(*) filter (where began_checkout)  as checkout
           from sessions
-          where first_seen >= now() - (${days} || ' days')::interval`,
+          where first_seen >= ${since}::timestamptz`,
 
       sql`select to_char(ts, 'HH24:MI') as at, name, path, species, value
           from events
@@ -105,6 +126,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       ok: true,
       days: days,
+      since: since,
       live: {
         visitorsNow: n(l.visitors_now),
         activeCarts: n(l.active_carts),
