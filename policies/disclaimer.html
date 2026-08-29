@@ -30,7 +30,7 @@ header.site { display:flex; align-items:center; justify-content:space-between; m
 .mark b .bean { position:relative; }
 .mark b .bean::before { content:''; position:absolute; left:50%; top:0.26em; width:0.19em; height:0.135em; margin-left:-0.095em; border-radius:46% 54% 50% 50% / 58% 42% 58% 42%; background:oklch(0.8 0.13 92); transform:rotate(-18deg); }
 .mark b .bean span { position:relative; z-index:1; }
-.mark span { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; }
+.mark > span { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; }
 .back { font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; color:#C9BEA8; }
 .kicker { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:#F0C64B; margin:64px 0 14px; }
 h1 { font-family:'Instrument Serif',serif; font-weight:400; font-size:46px; line-height:1.1; margin-bottom:14px; }
@@ -47,7 +47,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 @media (max-width:620px){
   header.site { padding:14px 16px; gap:12px; }
   .mark b { font-size:19px; }
-  .mark span { display:none; }
+  .mark > span { display:none; }
   .back { font-size:9.5px; letter-spacing:0.14em; white-space:nowrap; }
   .wrap { padding:0 16px 64px; }
   .kicker { margin-top:40px; }
