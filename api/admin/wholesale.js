@@ -51,9 +51,6 @@ const PENDING = `query Pending {
       minOrder: metafield(namespace: "wholesale", key: "min_order") { value }
     }
   }
-  recent: customers(first: 5, sortKey: UPDATED_AT, reverse: true) {
-    nodes { email tags updatedAt }
-  }
 }`;
 
 // Record the prices quoted to an account (approval or reprice) on the customer
@@ -420,13 +417,7 @@ module.exports = async function handler(req, res) {
         };
       });
 
-      // Diagnostic feed: the last few touched customer records with their tags,
-      // shown by the desk when the queue is empty so "form submitted but nothing
-      // here" is debuggable at a glance (tag missing vs search-index lag).
-      const recent = ((out.json.data.recent || {}).nodes || []).map(function (c) {
-        return { email: c.email || '(no email)', tags: c.tags || [], updatedAt: c.updatedAt };
-      });
-      return res.status(200).json({ ok: true, apps: apps, approved: approved, recent: recent, resend: resendInfo, discount: discount, emailReady: !!process.env.RESEND_API_KEY });
+      return res.status(200).json({ ok: true, apps: apps, approved: approved, resend: resendInfo, discount: discount, emailReady: !!process.env.RESEND_API_KEY });
     }
 
     if (req.method !== 'POST') {

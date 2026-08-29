@@ -52,13 +52,6 @@ main { padding:28px 0 90px; }
 .fld input.wide { width:130px; }
 .fld input:focus { outline:none; border-color:oklch(0.44 0.07 152); }
 .empty { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; padding:40px 22px; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:6px; text-align:center; }
-.diag { margin-top:14px; padding:16px 18px; background:#FCFAF4; border:1px dashed #E0D6C2; border-radius:6px; }
-.diag-h { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin-bottom:10px; }
-.diag-row { font-family:'DM Mono',monospace; font-size:11px; color:#554C40; padding:5px 0; border-bottom:1px solid #F0EADC; }
-.diag-row span { color:#8A7F6E; }
-.diag-row.hit { color:#325E3F; font-weight:700; }
-.diag-row.hit span { color:#325E3F; }
-.diag-f { font-family:'DM Sans',sans-serif; font-size:12px; line-height:1.55; color:#8A7F6E; margin-top:10px; }
 .err { margin-top:18px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:13px 16px; font-size:14px; }
 .warn { border:1px solid rgba(196,88,60,0.4); background:rgba(242,206,89,0.15); color:#6a5a10; border-radius:3px; padding:11px 14px; font-size:13px; margin:0 20px 16px; }
 .okrow { padding:13px 20px; font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:oklch(0.44 0.07 152); }
@@ -152,6 +145,7 @@ main { padding:28px 0 90px; }
   $('unlock').onclick = function () {
     key = $('key').value.trim();
     if (!key) return;
+    savePrefs({ key: key });   // remembered the same way a handed-over key is
     $('gateErr').innerHTML = '';
     api({}).then(function (b) {
       if (!b.ok && (b.error === 'bad_key' || b.error === 'not_configured' || b.error === 'unreachable' || b.error === 'bad_response')) {
@@ -366,21 +360,7 @@ main { padding:28px 0 90px; }
     }
     if (view === 'approved') { renderApproved(b); return; }
     if (!apps.length) {
-      // Empty queue: show what Shopify recorded most recently so a submitted-but-
-      // missing application is debuggable (no wholesale-pending tag = the form
-      // write failed; tag present here = search index still catching up, refresh).
-      var recent = b.recent || [];
-      var diag = recent.length
-        ? '<div class="diag"><div class="diag-h">Last customer records touched in Shopify</div>' +
-          recent.map(function (r) {
-            var tags = (r.tags || []).length ? r.tags.join(', ') : 'no tags';
-            var pending = (r.tags || []).indexOf('wholesale-pending') !== -1;
-            return '<div class="diag-row' + (pending ? ' hit' : '') + '">' + esc(r.email) +
-              ' · <span>' + esc(tags) + '</span> · ' + fmt(r.updatedAt) + '</div>';
-          }).join('') +
-          '<div class="diag-f">A row marked green carries the wholesale-pending tag — if one is there but the queue is empty, Shopify’s search index is catching up; refresh in a minute.</div></div>'
-        : '';
-      $('apps').innerHTML = '<div class="empty">No pending applications</div>' + diag;
+      $('apps').innerHTML = '<div class="empty">No pending applications</div>';
       return;
     }
     var p = prefs();
