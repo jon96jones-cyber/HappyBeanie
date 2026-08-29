@@ -1,0 +1,8 @@
+{
+  "name": "happybeanie",
+  "private": true,
+  "description": "Happy Beanie storefront. Static pages plus zero-config Vercel serverless functions in /api. No build step — Vercel serves the repo root as-is; this file exists only so the analytics functions can use the Neon driver.",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  }
+}

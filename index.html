@@ -50,6 +50,55 @@ window.HB_SHOPIFY = {
 // Batch number and ETA below appear in a few hardcoded copy spots too — if
 // they change, search the file for the old values.
 window.HB_PRELAUNCH = { on: true, batch: '0072', eta: '~4 weeks' };
+// First-party analytics — powers the live desk at /admin/analytics.
+// Cookie-free by design: the session id lives in sessionStorage and dies with
+// the tab, and the server only ever stores a daily-rotating hash for counting.
+// Every send is a beacon: it cannot block navigation, and if the collector is
+// down or the tables do not exist yet, the storefront never notices.
+window.hbTrack = (function () {
+  var KEY = 'hb_sid', started = false, sid = '', acq = null;
+  function id() {
+    try {
+      var v = sessionStorage.getItem(KEY);
+      if (!v) { v = Date.now().toString(36) + Math.random().toString(36).slice(2, 10); sessionStorage.setItem(KEY, v); }
+      return v;
+    } catch (e) { return 'nostore'; }
+  }
+  // Acquisition detail is read once, on the first send of the visit — after
+  // that the server keeps whatever it already recorded.
+  function acquisition() {
+    if (acq) return acq;
+    var q = {};
+    try { new URLSearchParams(location.search).forEach(function (v, k) { q[k] = v; }); } catch (e) {}
+    var code = q.ref || '';
+    if (!code) { try { code = localStorage.getItem('hb_ref') || ''; } catch (e) {} }
+    acq = {
+      ref: document.referrer || '',
+      refCode: code,
+      utm: { source: q.utm_source || '', medium: q.utm_medium || '', campaign: q.utm_campaign || '' }
+    };
+    return acq;
+  }
+  function send(name, extra) {
+    try {
+      if (!sid) sid = id();
+      var body = Object.assign({ sid: sid, name: name, path: location.pathname }, acquisition(), extra || {});
+      var blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
+      if (navigator.sendBeacon) navigator.sendBeacon('/api/track', blob);
+      else fetch('/api/track', { method: 'POST', body: blob, keepalive: true });
+    } catch (e) {}
+  }
+  function start() {
+    if (started) return; started = true;
+    send('pageview');
+    // Heartbeats are what make "visitors right now" true. Paused while the tab
+    // is hidden so a forgotten background tab never counts as a live visitor.
+    setInterval(function () { if (!document.hidden) send('heartbeat'); }, 20000);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+  return send;
+})();
 if (window.HB_PRELAUNCH.on) {
   document.documentElement.className += ' hb-prelaunch';
 }
@@ -109,6 +158,7 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
   // Express checkout skips the on-site checkout page, so the InitiateCheckout
   // pixel event fires here at the true handoff (deduped against the page).
   try { if (window.fbq && !window.__hbFbIC) { window.__hbFbIC = true; window.fbq('track', 'InitiateCheckout'); } } catch (e) {}
+  try { if (window.hbTrack) window.hbTrack('begin_checkout'); } catch (e) {}
   window.location.href = url;
 };
 </script>
@@ -3480,6 +3530,29 @@ class Component extends DCLogic {
             window.__hbFbIC = false;
           }
           this._fbQty = fbQty;
+        }
+      }
+    } catch (e) {}
+    // First-party analytics — deliberately its own block rather than riding on
+    // the pixel's, so the desk still sees the full funnel for the ~25% of
+    // visitors whose browser blocks Meta outright.
+    try {
+      if (window.hbTrack) {
+        const tp = this.state.page || 'home';
+        if (this._trkPage !== tp) {
+          if (this._trkPage != null) window.hbTrack('pageview');
+          if (tp === 'product') window.hbTrack('view_product', { species: this.state.sp });
+          if (tp === 'quiz') window.hbTrack('quiz_start');
+          if (tp === 'checkout') window.hbTrack('begin_checkout');
+          this._trkPage = tp;
+        }
+        const tq = (this.state.cartDog || 0) + (this.state.cartCat || 0);
+        if (this._trkQty == null) this._trkQty = tq;
+        else if (tq !== this._trkQty) {
+          if (tq > this._trkQty) {
+            window.hbTrack('add_to_cart', { species: this.state.sp, value: 115 * (tq - this._trkQty) });
+          }
+          this._trkQty = tq;
         }
       }
     } catch (e) {}
