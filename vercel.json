@@ -4,50 +4,80 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
       ]
     },
     {
       "source": "/assets/js/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/assets/js/chew/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
       ]
     },
     {
       "source": "/assets/fonts/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/assets/(.*)\\.(jpg|jpeg|png|webp|svg|mp4|webm)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, must-revalidate"
+        }
       ]
     }
   ],
   "redirects": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "happybeanie.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "happybeanie.com"
+        }
+      ],
       "destination": "https://www.happybeanie.com/$1",
       "permanent": true
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "happybeany.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "happybeany.com"
+        }
+      ],
       "destination": "https://www.happybeanie.com/$1",
       "permanent": true
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "www.happybeany.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.happybeany.com"
+        }
+      ],
       "destination": "https://www.happybeanie.com/$1",
       "permanent": true
     }
@@ -56,6 +86,16 @@
     {
       "source": "/((?!assets/|policies|api/|admin|wholesale|ambassador|account|favicon).*)",
       "destination": "/"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/recover-checkouts",
+      "schedule": "0 17 * * *"
+    },
+    {
+      "path": "/api/cron/send-quiz-reminders",
+      "schedule": "0 16 * * *"
     }
   ]
 }

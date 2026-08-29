@@ -2341,6 +2341,33 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
             </div>
           </div>
         </sc-if>
+        <sc-if value="{{ qzCanDefer }}" hint-placeholder-val="{{ false }}">
+          <div style="background: #FCFAF4; border: 1px solid #E7DECB; border-radius: 5px; padding: 26px 30px; margin-bottom: 14px; box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset, 0 14px 28px -22px rgba(23,20,15,0.45);">
+            <div style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Not yet, not never</div>
+            <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35; margin-bottom: 8px;">{{ qzDeferHead }}</div>
+            <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0 0 18px; max-width: 44em;">{{ qzDeferNote }}</p>
+            <div data-m="stack" style="display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center;">
+              <input value="{{ qzDeferEmail }}" sc-camel-on-change="{{ setDeferEmail }}" placeholder="Your email" inputmode="email" type="email" autocomplete="email" style="min-width: 0; background: #FFF; border: 1px solid #DDD3C0; border-radius: 3px; padding: 13px 14px; color: #17140F; font-family: 'DM Sans', sans-serif; font-size: 15px;" style-focus="border-color: oklch(0.44 0.07 152); outline: none;">
+              <select value="{{ qzDeferMonths }}" sc-camel-on-change="{{ setDeferMonths }}" style="background: #FFF; border: 1px solid #DDD3C0; border-radius: 3px; padding: 13px 12px; color: #17140F; font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer;">
+                <sc-for list="{{ qzDeferOptions }}" as="op" hint-placeholder-count="4">
+                  <option value="{{ op.v }}" selected="{{ op.sel }}">{{ op.label }}</option>
+                </sc-for>
+              </select>
+              <button sc-camel-on-click="{{ qzDeferSave }}" disabled="{{ qzDeferBusy }}" data-m="w100" style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; padding: 14px 20px; border: none; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer; white-space: nowrap;" style-hover="background: oklch(0.44 0.07 152);">{{ qzDeferLabel }}</button>
+            </div>
+            <div style="display: {{ qzDeferErrShow }}; font-size: 13px; color: #8C4630; margin-top: 10px;">{{ qzDeferErr }}</div>
+            <div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; margin-top: 14px; line-height: 1.8;">One email, then we forget you · your answers are not stored with it · unsubscribe in the email</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ qzDeferDone }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 13px; background: #FCFAF4; border: 1px solid oklch(0.72 0.08 152 / 0.5); border-radius: 5px; padding: 22px 26px; margin-bottom: 14px;">
+            <span style="position: relative; width: 20px; height: 20px; flex: 0 0 auto;">
+              <span style="position: absolute; inset: 0; border-radius: 50%; background: oklch(0.72 0.08 152); animation: checkPop 0.4s cubic-bezier(0.2,0.7,0.2,1) both;"></span>
+              <svg width="11" height="9" sc-camel-view-box="0 0 11 9" fill="none" style="position: absolute; left: 4.5px; top: 5.5px;"><path d="M1 4.4 4 7.2 10 1" stroke="#17140F" sc-camel-stroke-width="1.9" sc-camel-stroke-linecap="round" sc-camel-stroke-linejoin="round"></path></svg>
+            </span>
+            <span style="font-size: 14.5px; line-height: 1.55; color: #3D372D;">We will check back in. Nothing else is stored, and every message we send has a one-click way off.</span>
+          </div>
+        </sc-if>
         <sc-if value="{{ qzCanBuy }}" hint-placeholder-val="{{ false }}">
           <div style="margin: 40px 0 40px;">
             <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
@@ -4775,7 +4802,7 @@ const QZ_QUESTIONS = [
     { v: 'dog', label: 'Dog', meta: '' },
     { v: 'cat', label: 'Cat', meta: '' } ] },
   { id: 'age', kind: 'single', eyebrow: 'Question 02 · Life stage', title: 'How old is your pet?', help: 'Neither formula has been dosed for growing animals. Elk velvet antler and the B-complex load are built for a finished skeleton.', options: [
-    { v: 'under1', label: 'Under 12 months', meta: 'Still growing', tag: 'Not eligible', flags: [QZ_F('block', 'Elk velvet antler · full formula', 'Pri. 04', 'The formula is dosed for adult maintenance and has not been evaluated in growing animals. Come back at twelve months.')] },
+    { v: 'under1', label: 'Under 12 months', meta: 'Still growing', tag: 'Not eligible', flags: [{ ...QZ_F('block', 'Elk velvet antler · full formula', 'Pri. 04', 'The formula is dosed for adult maintenance and has not been evaluated in growing animals. Come back at twelve months.'), defer: 'age' }] },
     { v: '1-6', label: '1 to 6 years', meta: 'Adult maintenance' },
     { v: '7-10', label: '7 to 10 years', meta: 'Early senior — the core use case' },
     { v: '11plus', label: '11 years or older', meta: 'Senior', flags: [QZ_F('caution', 'CoQ10 · L-Carnitine', 'Pri. 09 · 10', 'Senior animals are more likely to be on cardiac or thyroid medication. If yours is, weigh that against these two inputs before starting.')] } ] },
@@ -4790,8 +4817,8 @@ const QZ_QUESTIONS = [
   { id: 'repro', kind: 'single', eyebrow: 'Question 04 · Status', title: 'Is your pet pregnant or nursing?', help: 'Several of the concentrated inputs in these formulas cross into a developing or nursing animal. None of it has been studied there.', options: [
     { v: 'no', label: 'No', meta: 'Not pregnant, not nursing' },
     { v: 'yes', label: 'Yes, or possibly', meta: 'Pregnant, in season, or feeding a litter', tag: 'Not eligible', flags: [
-      { speciesOnly: 'dog', ...QZ_F('block', 'Elk Liver · Turmeric / Curcumin', 'Pri. 05 · 02', 'Preformed vitamin A is teratogenic at concentration and curcumin is uterine-active. We do not sell to pregnant or nursing animals — wait until the litter is weaned.') },
-      { speciesOnly: 'cat', ...QZ_F('block', 'Full formula', '—', 'The formula has not been evaluated in pregnant or nursing cats. We do not sell into that window — wait until the litter is weaned.') } ] },
+      { speciesOnly: 'dog', ...QZ_F('block', 'Elk Liver · Turmeric / Curcumin', 'Pri. 05 · 02', 'Preformed vitamin A is teratogenic at concentration and curcumin is uterine-active. We do not sell to pregnant or nursing animals — wait until the litter is weaned.'), defer: 'repro' },
+      { speciesOnly: 'cat', ...QZ_F('block', 'Full formula', '—', 'The formula has not been evaluated in pregnant or nursing cats. We do not sell into that window — wait until the litter is weaned.'), defer: 'repro' } ] },
     { v: 'unsure', label: 'Not sure', meta: 'Intact female, unknown status', tag: 'Not eligible', flags: [QZ_F('block', 'Full formula', '—', 'Confirm whether she is pregnant before starting. Until you know, we treat unknown as pregnant.')] } ] },
   { id: 'allergies', kind: 'multi', eyebrow: 'Question 05 · Allergies', title: 'Any known food or environmental allergies?', help: 'Select everything that applies. Omega-3 leads both formulas, so a fish allergy is the one hard stop we cannot formulate around.', options: [
     { v: 'none', label: 'None that we know of', meta: 'No diagnosed or suspected allergies', exclusive: true },
@@ -4895,8 +4922,19 @@ Object.assign(Component.prototype, {
     const canContinue = !multi || sel.length > 0;
     const cBlock = 'oklch(0.5 0.13 38)', cCaution = 'oklch(0.88 0.15 96)';
     const flags = this.qzCollect();
-    const blocked = flags.some(f => f.level === 'block');
+    const blockFlags = flags.filter(f => f.level === 'block');
+    const blocked = blockFlags.length > 0;
     const verdict = blocked ? 'block' : flags.length ? 'caution' : 'ok';
+    // A reminder is only honest when every reason we said no is one that stops
+    // being true by itself. Under twelve months and pregnant/nursing qualify;
+    // a fish allergy or a pancreatitis history never will. One permanent block
+    // among them and we offer nothing, because they will not become eligible.
+    const deferReasons = [];
+    blockFlags.forEach(f => {
+      if (f.defer && deferReasons.indexOf(f.defer) === -1) deferReasons.push(f.defer);
+    });
+    const canDefer = blocked && blockFlags.every(f => !!f.defer);
+    const deferReason = canDefer ? deferReasons[0] : null;
     const species = a.species === 'cat' ? 'Cat Formula' : 'Dog Formula';
     const V = {
       ok: { eyebrow: 'Result · Eligible', head: 'Your pet is eligible.', italic: '', copy: '', bg: '#17140F', fg: '#F5F0E6', body: '#B9AF9C', accent: 'oklch(0.86 0.14 92)', eye: 'oklch(0.72 0.08 152)' },
@@ -4908,7 +4946,7 @@ Object.assign(Component.prototype, {
       qzAsking: stage === 'quiz',
       qzResult: stage === 'result',
       qzStart: () => { this.setState({ qzStage: 'quiz', qzStep: 0 }); window.scrollTo(0, 0); },
-      qzRestart: () => { this.setState({ qzStage: 'intro', qzStep: 0, qzAnswers: {}, qzAdded: false }); window.scrollTo(0, 0); },
+      qzRestart: () => { this.setState({ qzStage: 'intro', qzStep: 0, qzAnswers: {}, qzAdded: false, qzDeferDone: false, qzDeferEmail: '', qzDeferMonths: 0, qzDeferErr: '', qzDeferBusy: false }); window.scrollTo(0, 0); },
       qzBack: () => {
         window.scrollTo(0, 0);
         if (stage === 'result') { this.setState({ qzStage: 'quiz', qzStep: Math.min(step, list.length - 1) }); return; }
@@ -4959,6 +4997,45 @@ Object.assign(Component.prototype, {
         src: 'You selected: ' + f.srcs.join(' · '),
         badgeBg: f.level === 'block' ? cBlock : cCaution, badgeFg: f.level === 'block' ? '#FCFAF4' : '#17140F' })),
       qzCanBuy: verdict !== 'block',
+      // Deferral capture — shown only where every blocking reason expires.
+      qzCanDefer: canDefer && !st.qzDeferDone,
+      qzDeferDone: !!st.qzDeferDone,
+      qzDeferHead: deferReason === 'repro'
+        ? 'Want us to check back once the litter is weaned?'
+        : 'Want us to check back when they turn one?',
+      qzDeferNote: deferReason === 'repro'
+        ? 'We will hold your email and nothing else, and send one message when you tell us to. The screener will run again then — it can still say no.'
+        : 'We will hold your email and nothing else, and send one message when you tell us to. The screener will run again then — it can still say no.',
+      qzDeferEmail: st.qzDeferEmail || '',
+      qzDeferMonths: String(st.qzDeferMonths || (deferReason === 'repro' ? 3 : 6)),
+      qzDeferOptions: (deferReason === 'repro' ? [2, 3, 6] : [3, 6, 9, 12])
+        .map(m => ({ v: String(m), label: 'In ' + m + ' months', sel: String(st.qzDeferMonths || (deferReason === 'repro' ? 3 : 6)) === String(m) })),
+      qzDeferBusy: !!st.qzDeferBusy,
+      qzDeferLabel: st.qzDeferBusy ? 'Saving…' : 'Remind me',
+      qzDeferErr: st.qzDeferErr || '',
+      qzDeferErrShow: st.qzDeferErr ? 'block' : 'none',
+      setDeferEmail: (e) => this.setState({ qzDeferEmail: e.target.value, qzDeferErr: '' }),
+      setDeferMonths: (e) => this.setState({ qzDeferMonths: parseInt(e.target.value, 10) }),
+      qzDeferSave: () => {
+        const email = (this.state.qzDeferEmail || '').trim();
+        const months = this.state.qzDeferMonths || (deferReason === 'repro' ? 3 : 6);
+        if (!/^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/.test(email)) {
+          this.setState({ qzDeferErr: 'That does not look like an email address.' });
+          return;
+        }
+        if (this.state.qzDeferBusy) return;
+        this.setState({ qzDeferBusy: true, qzDeferErr: '' });
+        fetch('/api/quiz-remind', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, reason: deferReason, months: months, species: a.species })
+        }).then(r => r.json().catch(() => ({}))).then(b => {
+          if (b && b.ok) { this.setState({ qzDeferBusy: false, qzDeferDone: true }); return; }
+          this.setState({ qzDeferBusy: false, qzDeferErr: 'That did not save. Try again in a moment, or email hello@happybeanie.com.' });
+        }).catch(() => {
+          this.setState({ qzDeferBusy: false, qzDeferErr: 'That did not save. Try again in a moment, or email hello@happybeanie.com.' });
+        });
+      },
       qzBuyRule: 'rgba(245,240,230,0.22)',
       qzBuyLabel: 'Get ' + (a.species === 'cat' ? 'Happy Beans for Cats' : 'Happy Beans for Dogs') + ' →',
       qzBuyNote: verdict === 'ok' ? 'One chew daily · 30-day box' : 'Start at ½ dose for week one',

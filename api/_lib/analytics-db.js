@@ -93,7 +93,28 @@ async function ensureSchema() {
   await q`create index if not exists events_ts_idx on events (ts desc)`;
   await q`create index if not exists events_name_ts_idx on events (name, ts desc)`;
   await q`create index if not exists events_session_idx on events (session_id)`;
-  return 7;
+
+  // Screener deferrals. Someone whose pet is only temporarily ineligible —
+  // under twelve months, or pregnant/nursing — can ask to be told when that
+  // window closes. One row per person per reason; the cron sends one email.
+  await q`create table if not exists quiz_reminders (
+     id          bigserial primary key,
+     email       text not null,
+     reason      text not null,
+     species     text,
+     remind_on   date not null,
+     created_at  timestamptz not null default now(),
+     sent_at     timestamptz,
+     cancelled_at timestamptz,
+     attempts    integer not null default 0,
+     last_error  text
+   )`;
+  // One live reminder per address per reason — asking twice just moves the date.
+  await q`create unique index if not exists quiz_reminders_email_reason_idx
+          on quiz_reminders (email, reason)`;
+  await q`create index if not exists quiz_reminders_due_idx
+          on quiz_reminders (remind_on) where sent_at is null and cancelled_at is null`;
+  return 10;
 }
 
 module.exports = { sql, isConfigured, keyOk, visitorId, deviceOf, ensureSchema };
