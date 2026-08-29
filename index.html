@@ -2356,7 +2356,6 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
               <button sc-camel-on-click="{{ qzDeferSave }}" disabled="{{ qzDeferBusy }}" data-m="w100" style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; padding: 14px 20px; border: none; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer; white-space: nowrap;" style-hover="background: oklch(0.44 0.07 152);">{{ qzDeferLabel }}</button>
             </div>
             <div style="display: {{ qzDeferErrShow }}; font-size: 13px; color: #8C4630; margin-top: 10px;">{{ qzDeferErr }}</div>
-            <div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; margin-top: 14px; line-height: 1.8;">One email, then we forget you · your answers are not stored with it · unsubscribe in the email</div>
           </div>
         </sc-if>
         <sc-if value="{{ qzDeferDone }}" hint-placeholder-val="{{ false }}">
@@ -5003,9 +5002,7 @@ Object.assign(Component.prototype, {
       qzDeferHead: deferReason === 'repro'
         ? 'Want us to check back once the litter is weaned?'
         : 'Want us to check back when they turn one?',
-      qzDeferNote: deferReason === 'repro'
-        ? 'We will hold your email and nothing else, and send one message when you tell us to. The screener will run again then — it can still say no.'
-        : 'We will hold your email and nothing else, and send one message when you tell us to. The screener will run again then — it can still say no.',
+      qzDeferNote: 'We will hold your email and nothing else, and send one message when you tell us to.',
       qzDeferEmail: st.qzDeferEmail || '',
       qzDeferMonths: String(st.qzDeferMonths || (deferReason === 'repro' ? 3 : 6)),
       qzDeferOptions: (deferReason === 'repro' ? [2, 3, 6] : [3, 6, 9, 12])
