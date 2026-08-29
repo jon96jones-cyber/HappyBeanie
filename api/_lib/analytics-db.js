@@ -55,8 +55,11 @@ function deviceOf(ua) {
   return 'desktop';
 }
 
-const SCHEMA = [
-  `create table if not exists sessions (
+// Written as tagged templates because that is the driver's only call form —
+// neon() returns a template tag, with no .query() for raw strings.
+async function ensureSchema() {
+  const q = sql();
+  await q`create table if not exists sessions (
      session_id   text primary key,
      visitor_id   text,
      first_seen   timestamptz not null default now(),
@@ -73,10 +76,10 @@ const SCHEMA = [
      viewed_product  boolean not null default false,
      added_to_cart   boolean not null default false,
      began_checkout  boolean not null default false
-   )`,
-  `create index if not exists sessions_last_seen_idx on sessions (last_seen desc)`,
-  `create index if not exists sessions_first_seen_idx on sessions (first_seen desc)`,
-  `create table if not exists events (
+   )`;
+  await q`create index if not exists sessions_last_seen_idx on sessions (last_seen desc)`;
+  await q`create index if not exists sessions_first_seen_idx on sessions (first_seen desc)`;
+  await q`create table if not exists events (
      id         bigserial primary key,
      ts         timestamptz not null default now(),
      session_id text not null,
@@ -86,16 +89,11 @@ const SCHEMA = [
      species    text,
      value      numeric,
      meta       jsonb
-   )`,
-  `create index if not exists events_ts_idx on events (ts desc)`,
-  `create index if not exists events_name_ts_idx on events (name, ts desc)`,
-  `create index if not exists events_session_idx on events (session_id)`
-];
-
-async function ensureSchema() {
-  const q = sql();
-  for (const stmt of SCHEMA) await q.query(stmt);
-  return SCHEMA.length;
+   )`;
+  await q`create index if not exists events_ts_idx on events (ts desc)`;
+  await q`create index if not exists events_name_ts_idx on events (name, ts desc)`;
+  await q`create index if not exists events_session_idx on events (session_id)`;
+  return 7;
 }
 
 module.exports = { sql, isConfigured, keyOk, visitorId, deviceOf, ensureSchema };
