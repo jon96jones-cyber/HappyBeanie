@@ -770,6 +770,18 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="ticker"] { padding: 7px 14px !important; font-size: 9px !important; letter-spacing: 0.1em !important; }
     [data-m~="spimg"] { height: 116px !important; }
     [data-m~="heromos"] { gap: 10px !important; }
+    /* Footer: twelve links stacked one per line ran longer than the screen.
+       Shop and Company sit side by side on a phone while the brand block and
+       the signup keep the full width, which halves the height without
+       shrinking any tap target. */
+    [data-m~="footgrid"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; column-gap: 18px !important; row-gap: 26px !important; margin-bottom: 30px !important; }
+    [data-m~="footgrid"] > :first-child,
+    [data-m~="footgrid"] > :last-child { grid-column: 1 / -1 !important; }
+    [data-m~="footgrid"] [data-m~="tap"] { font-size: 13.5px !important; line-height: 1.35 !important; }
+    [data-m~="footpad"] { padding-top: 40px !important; padding-bottom: 26px !important; }
+    /* Nine policy links in tracked-out mono need the tracking pulled in to
+       stay on two lines once each separator is bound to its link. */
+    [data-m~="footbar"] { letter-spacing: 0.04em !important; row-gap: 10px !important; padding-top: 20px !important; }
   }
 </style>
 </helmet>
@@ -2679,9 +2691,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   </div>
   </sc-if>
 
-  <footer data-m="pad" style="background: #17140F; color: #B9AF9C; border-top: 1px solid rgba(245,240,230,0.14); padding: 68px 44px 34px;">
+  <footer data-m="pad footpad" style="background: #17140F; color: #B9AF9C; border-top: 1px solid rgba(245,240,230,0.14); padding: 68px 44px 34px;">
 
-    <div data-m="stack gap" style="position: relative; z-index: 1; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.2fr; gap: 44px; max-width: 1180px; margin: 0 auto 52px;">
+    <div data-m="stack gap footgrid" style="position: relative; z-index: 1; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.2fr; gap: 44px; max-width: 1180px; margin: 0 auto 52px;">
       <div>
         <div style="font-weight: 700; font-size: 21px; letter-spacing: -0.045em; color: #F5F0E6; margin-bottom: 14px; white-space: nowrap;">happy bean<span style="position: relative;"><span style="position: absolute; left: 50%; top: 0.26em; width: 0.19em; height: 0.135em; margin-left: -0.095em; border-radius: 46% 54% 50% 50% / 58% 42% 58% 42%; background: oklch(0.8 0.13 92); transform: rotate(-18deg);"></span><span style="position: relative; z-index: 1;">ı</span></span>e</div>
         <p style="font-size: 14px; line-height: 1.65; margin: 0; max-width: 26em;">Peptide-infused daily care, formulated in Scottsdale, Arizona.</p>
@@ -2716,9 +2728,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         </sc-if>
       </div>
     </div>
-    <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 16px; max-width: 1180px; margin: 0 auto; padding-top: 26px; border-top: 1px solid rgba(245,240,230,0.14); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A7F6E;">
+    <div data-m="stack gap footbar" style="display: grid; grid-template-columns: 1fr auto; gap: 16px; max-width: 1180px; margin: 0 auto; padding-top: 26px; border-top: 1px solid rgba(245,240,230,0.14); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A7F6E;">
       <span>© 2026 Happy Beanie</span>
-      <span><a href="account.html" style="color: inherit; text-decoration: none;">Account</a> · <a href="wholesale.html" style="color: inherit; text-decoration: none;">Wholesale</a> · <a href="/ambassador" style="color: inherit; text-decoration: none;">Ambassadors</a> · <a href="policies/terms.html" style="color: inherit; text-decoration: none;">Terms</a> · <a href="policies/privacy.html" style="color: inherit; text-decoration: none;">Privacy</a> · <a href="policies/shipping.html" style="color: inherit; text-decoration: none;">Shipping</a> · <a href="policies/refunds.html" style="color: inherit; text-decoration: none;">Refunds</a> · <a href="policies/subscriptions.html" style="color: inherit; text-decoration: none;">Subscriptions</a> · <a href="policies/disclaimer.html" style="color: inherit; text-decoration: none;">Disclaimer</a></span>
+      <span><a href="account.html" style="color: inherit; text-decoration: none;">Account</a>&nbsp;· <a href="wholesale.html" style="color: inherit; text-decoration: none;">Wholesale</a>&nbsp;· <a href="/ambassador" style="color: inherit; text-decoration: none;">Ambassadors</a>&nbsp;· <a href="policies/terms.html" style="color: inherit; text-decoration: none;">Terms</a>&nbsp;· <a href="policies/privacy.html" style="color: inherit; text-decoration: none;">Privacy</a>&nbsp;· <a href="policies/shipping.html" style="color: inherit; text-decoration: none;">Shipping</a>&nbsp;· <a href="policies/refunds.html" style="color: inherit; text-decoration: none;">Refunds</a>&nbsp;· <a href="policies/subscriptions.html" style="color: inherit; text-decoration: none;">Subscriptions</a>&nbsp;· <a href="policies/disclaimer.html" style="color: inherit; text-decoration: none;">Disclaimer</a></span>
     </div>
   </footer>
 </div>
