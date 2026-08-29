@@ -2343,7 +2343,6 @@ html.hb-prelaunch [data-pre-hide] { display: none !important; }
         </sc-if>
         <sc-if value="{{ qzCanDefer }}" hint-placeholder-val="{{ false }}">
           <div style="background: #FCFAF4; border: 1px solid #E7DECB; border-radius: 5px; padding: 26px 30px; margin-bottom: 14px; box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset, 0 14px 28px -22px rgba(23,20,15,0.45);">
-            <div style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Not yet, not never</div>
             <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35; margin-bottom: 8px;">{{ qzDeferHead }}</div>
             <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0 0 18px; max-width: 44em;">{{ qzDeferNote }}</p>
             <div data-m="stack" style="display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center;">
@@ -4999,9 +4998,7 @@ Object.assign(Component.prototype, {
       // Deferral capture — shown only where every blocking reason expires.
       qzCanDefer: canDefer && !st.qzDeferDone,
       qzDeferDone: !!st.qzDeferDone,
-      qzDeferHead: deferReason === 'repro'
-        ? 'Want us to check back once the litter is weaned?'
-        : 'Want us to check back when they turn one?',
+      qzDeferHead: 'Want us to check back in?',
       qzDeferNote: 'We will hold your email and nothing else, and send one message when you tell us to.',
       qzDeferEmail: st.qzDeferEmail || '',
       qzDeferMonths: String(st.qzDeferMonths || (deferReason === 'repro' ? 3 : 6)),
