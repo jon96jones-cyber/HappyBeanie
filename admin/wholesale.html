@@ -163,7 +163,7 @@ main { padding:28px 0 90px; }
   $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('unlock').click(); });
   $('refresh').onclick = load;
 
-  // A key handed over by the front desk opens this one on arrival.
+  // A key handed over by the admin desk opens this one on arrival.
   if (prefs().key) { $('key').value = prefs().key; $('unlock').click(); }
   function load() { api({}).then(draw); }
 
