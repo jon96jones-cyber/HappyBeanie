@@ -180,7 +180,10 @@ tr:last-child td { border-bottom:none; }
   }
 
   $('unlock').onclick = function () {
-    var p = prefs(); p.key = $('key').value.trim(); if (p.days == null) p.days = 7; savePrefs(p);
+    // An empty box means "use what is already saved" — otherwise unlocking on
+    // arrival, with nothing typed, would erase the remembered key.
+    var typed = $('key').value.trim();
+    var p = prefs(); if (typed) p.key = typed; if (p.days == null) p.days = 7; savePrefs(p);
     $('gateErr').innerHTML = '';
     api({}).then(function (b) {
       if (b.ok) { open_(b); return; }
@@ -267,7 +270,9 @@ tr:last-child td { border-bottom:none; }
       : '<div class="empty">No activity recorded yet.</div>';
   }
 
-  if (prefs().key) $('unlock').click();
+  // A remembered key — or one handed over by the front desk — opens the desk
+  // on arrival.
+  if (prefs().key) { $('key').value = prefs().key; $('unlock').click(); }
 })();
 </script>
 </body></html>

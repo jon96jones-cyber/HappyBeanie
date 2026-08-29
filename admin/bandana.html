@@ -146,6 +146,13 @@ main { padding:28px 0 90px; }
 
   $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('unlock').click(); });
 
+  // The front desk can hand a key over on its way here. sessionStorage keeps
+  // that to this tab, which is the same promise the gate already makes.
+  try {
+    var handed = sessionStorage.getItem('hb_bandana_key');
+    if (handed) { $('key').value = handed; $('unlock').click(); }
+  } catch (e) {}
+
   Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (t) {
     t.onclick = function () {
       Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === t); });

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Front desk — Happy Beanie</title>
+<link rel="icon" type="image/png" href="/favicon.png?v=3">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#17140F; color:#F5F0E6; font-family:'DM Sans',-apple-system,'Segoe UI',sans-serif; font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; padding:0 24px 80px; }
+.shell { max-width:1100px; margin:0 auto; }
+.mono { font-family:'DM Mono',ui-monospace,monospace; }
+
+header.top { padding:52px 0 26px; display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; border-bottom:1px solid rgba(245,240,230,0.12); }
+header.top h1 { font-size:34px; letter-spacing:-0.04em; line-height:1.05; }
+header.top h1 span { color:#F0C64B; }
+header.top p { color:#B9AF9C; font-size:14.5px; margin-top:6px; max-width:52ch; }
+button { font-family:'DM Mono',ui-monospace,monospace; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; padding:10px 16px; border-radius:3px; border:1px solid rgba(245,240,230,0.24); background:transparent; color:#F5F0E6; cursor:pointer; transition:border-color .2s, color .2s, background .2s; }
+button:hover { border-color:#F0C64B; color:#F0C64B; }
+button.primary { background:#F0C64B; border-color:#F0C64B; color:#17140F; font-weight:700; }
+button.primary:hover { background:#f4d268; color:#17140F; }
+button:disabled { opacity:.4; cursor:not-allowed; }
+button:disabled:hover { border-color:rgba(245,240,230,0.24); color:#F5F0E6; }
+
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:16px; margin-top:26px; }
+.desk { border:1px solid rgba(245,240,230,0.14); border-radius:8px; background:rgba(245,240,230,0.035); padding:22px 22px 20px; display:flex; flex-direction:column; gap:14px; transition:border-color .25s, transform .25s cubic-bezier(.2,.7,.2,1); }
+.desk:hover { border-color:rgba(240,198,75,0.4); transform:translateY(-2px); }
+.desk .head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.desk h2 { font-size:19px; letter-spacing:-0.025em; }
+.desk .what { color:#B9AF9C; font-size:13.5px; line-height:1.55; margin-top:4px; }
+
+.pill { font-family:'DM Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; padding:5px 9px; border-radius:999px; white-space:nowrap; flex:0 0 auto; border:1px solid transparent; }
+.pill.ready { background:rgba(111,191,139,0.15); color:#8FD3A6; border-color:rgba(111,191,139,0.35); }
+.pill.needs { background:rgba(240,198,75,0.13); color:#F0C64B; border-color:rgba(240,198,75,0.3); }
+.pill.bad   { background:rgba(224,164,143,0.13); color:#E0A48F; border-color:rgba(224,164,143,0.35); }
+.pill.wait  { background:rgba(245,240,230,0.08); color:#8A7F6E; }
+
+.row { display:flex; gap:8px; }
+input { flex:1 1 auto; min-width:0; background:rgba(245,240,230,0.06); border:1px solid rgba(245,240,230,0.2); border-radius:3px; color:#F5F0E6; padding:10px 12px; font-size:14px; font-family:'DM Mono',ui-monospace,monospace; letter-spacing:0.06em; }
+input:focus { outline:none; border-color:#F0C64B; }
+.msg { font-size:12.5px; color:#8A7F6E; min-height:18px; }
+.msg.bad { color:#E0A48F; }
+.msg.good { color:#8FD3A6; }
+.actions { display:flex; gap:8px; margin-top:auto; padding-top:4px; }
+.actions button { flex:1; }
+
+.note { font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.07em; color:#6E6556; line-height:2; margin-top:34px; padding-top:22px; border-top:1px solid rgba(245,240,230,0.1); }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div>
+      <h1>Front <span>desk</span></h1>
+      <p>Every back-office desk in one place. Save a key once and it carries you straight in — each desk keeps its own key, so losing one never opens the others.</p>
+    </div>
+    <button id="checkAll">Re-check all</button>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <p class="note" id="foot">
+    KEYS ARE STORED IN THIS BROWSER ONLY, NEVER SENT ANYWHERE BUT THEIR OWN DESK<br>
+    KEEP THIS PAGE PRIVATE · CLEAR EVERY KEY WITH THE BUTTON BELOW
+  </p>
+  <button id="forget">Forget all keys on this device</button>
+</div>
+
+<script>
+(function () {
+  // Each desk owns its key, its header, and the slot its page reads on load.
+  // The hub writes into that slot right before handing over, so arriving at a
+  // desk means arriving unlocked — no desk had to change how it works.
+  var DESKS = [
+    { id:'analytics',   name:'Live desk',    page:'/admin/analytics',
+      api:'/api/admin/analytics', header:'x-analytics-key',
+      what:'Visitors right now, traffic, funnel and where they came from.',
+      hand:function (k) { mergePrefs('hb_stats_prefs', k); } },
+
+    { id:'fulfillment', name:'Fulfillment',  page:'/admin/fulfillment',
+      api:'/api/admin/fulfillment', header:'x-fulfillment-key',
+      what:'Orders to pack, labels and shipment status.',
+      hand:function (k) { setItem('hb_fkey', k); } },
+
+    { id:'ambassadors', name:'Ambassadors',  page:'/admin/ambassadors',
+      api:'/api/admin/ambassadors', header:'x-ambassador-key',
+      what:'Applications, commission rates and monthly payouts.',
+      hand:function (k) { mergePrefs('hb_amb_prefs', k); } },
+
+    { id:'wholesale',   name:'Wholesale',    page:'/admin/wholesale',
+      api:'/api/admin/wholesale', header:'x-wholesale-key',
+      what:'Trade applications, account approvals and pricing.',
+      hand:function (k) { mergePrefs('hb_ws_prefs', k); } },
+
+    { id:'bandana',     name:'Bandana queue', page:'/admin/bandana',
+      api:'/api/admin/bandana-queue', header:'x-review-key',
+      what:'Customer bean-wall photos waiting on review.',
+      hand:function (k) { try { sessionStorage.setItem('hb_bandana_key', k); } catch (e) {} } }
+  ];
+
+  var VAULT = 'hb_front_desk';
+  function vault() { try { return JSON.parse(localStorage.getItem(VAULT) || '{}'); } catch (e) { return {}; } }
+  function saveVault(v) { try { localStorage.setItem(VAULT, JSON.stringify(v)); } catch (e) {} }
+  function setItem(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function mergePrefs(slot, key) {
+    var cur = {};
+    try { cur = JSON.parse(localStorage.getItem(slot) || '{}'); } catch (e) {}
+    cur.key = key;
+    try { localStorage.setItem(slot, JSON.stringify(cur)); } catch (e) {}
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
+  function $(id) { return document.getElementById(id); }
+
+  // Render
+  $('grid').innerHTML = DESKS.map(function (d) {
+    return '<div class="desk">' +
+      '<div class="head"><div>' +
+        '<h2>' + esc(d.name) + '</h2>' +
+        '<div class="what">' + esc(d.what) + '</div>' +
+      '</div><span class="pill wait" id="pill-' + d.id + '">Checking</span></div>' +
+      '<div class="row">' +
+        '<input type="password" id="key-' + d.id + '" placeholder="Desk key" autocomplete="off" spellcheck="false">' +
+        '<button id="save-' + d.id + '">Save</button>' +
+      '</div>' +
+      '<div class="msg" id="msg-' + d.id + '"></div>' +
+      '<div class="actions">' +
+        '<button class="primary" id="open-' + d.id + '">Open desk →</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  function setPill(d, cls, text) {
+    var el = $('pill-' + d.id);
+    el.className = 'pill ' + cls;
+    el.textContent = text;
+  }
+  function setMsg(d, cls, text) {
+    var el = $('msg-' + d.id);
+    el.className = 'msg' + (cls ? ' ' + cls : '');
+    el.textContent = text || '';
+  }
+
+  // A desk is "ready" only if its key actually works, so the pills mean
+  // something — a saved-but-rejected key is exactly what you want to catch
+  // here rather than after clicking through.
+  function check(d) {
+    var key = vault()[d.id] || '';
+    if (!key) { setPill(d, 'needs', 'Key needed'); setMsg(d, '', ''); return Promise.resolve(); }
+    setPill(d, 'wait', 'Checking');
+    return fetch(d.api, { headers: makeHeaders(d, key) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { s: r.status, b: b }; }); })
+      .then(function (res) {
+        if (res.s === 401) { setPill(d, 'bad', 'Key rejected'); setMsg(d, 'bad', 'That key was not accepted.'); return; }
+        if (res.s === 503) { setPill(d, 'bad', 'Not set up'); setMsg(d, 'bad', res.b.message || 'This desk is not configured on the server.'); return; }
+        if (!res.b || res.b.ok === false) { setPill(d, 'bad', 'Error'); setMsg(d, 'bad', res.b && res.b.message ? res.b.message : 'The desk returned an error.'); return; }
+        setPill(d, 'ready', 'Ready'); setMsg(d, 'good', 'Key saved and working.');
+      })
+      .catch(function () { setPill(d, 'bad', 'Offline'); setMsg(d, 'bad', 'Could not reach the desk.'); });
+  }
+  function makeHeaders(d, key) {
+    var h = { 'Content-Type': 'application/json' };
+    h[d.header] = key;
+    return h;
+  }
+
+  DESKS.forEach(function (d) {
+    var v = vault();
+    if (v[d.id]) $('key-' + d.id).value = v[d.id];
+
+    $('save-' + d.id).onclick = function () {
+      var k = $('key-' + d.id).value.trim();
+      var vv = vault();
+      if (k) vv[d.id] = k; else delete vv[d.id];
+      saveVault(vv);
+      check(d);
+    };
+    $('key-' + d.id).addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') $('save-' + d.id).click();
+    });
+
+    $('open-' + d.id).onclick = function () {
+      var k = ($('key-' + d.id).value || '').trim();
+      if (k) {
+        var vv = vault(); vv[d.id] = k; saveVault(vv);
+        d.hand(k);            // drop the key where that desk looks for it
+      }
+      window.location.href = d.page;
+    };
+  });
+
+  function checkAll() { DESKS.forEach(check); }
+  $('checkAll').onclick = checkAll;
+
+  $('forget').onclick = function () {
+    if (!window.confirm('Remove every saved desk key from this browser?')) return;
+    try {
+      localStorage.removeItem(VAULT);
+      ['hb_stats_prefs', 'hb_amb_prefs', 'hb_ws_prefs'].forEach(function (s) {
+        var cur = {};
+        try { cur = JSON.parse(localStorage.getItem(s) || '{}'); } catch (e) {}
+        delete cur.key;
+        localStorage.setItem(s, JSON.stringify(cur));
+      });
+      localStorage.removeItem('hb_fkey');
+      sessionStorage.removeItem('hb_bandana_key');
+    } catch (e) {}
+    DESKS.forEach(function (d) { $('key-' + d.id).value = ''; });
+    checkAll();
+  };
+
+  checkAll();
+})();
+</script>
+</body></html>
