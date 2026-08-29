@@ -1,0 +1,13 @@
+# https://www.happybeanie.com
+User-agent: *
+Allow: /
+
+# Back-office desks and order flow — nothing here for a search engine.
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /account
+
+Sitemap: https://www.happybeanie.com/sitemap.xml

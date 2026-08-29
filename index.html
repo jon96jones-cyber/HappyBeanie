@@ -4757,6 +4757,7 @@ class Component extends DCLogic {
         { title: 'Company', links: [
           { label: 'About Happy Beanie', go: this.nav('about') },
           { label: 'Certificate library', go: this.nav('certs') },
+          { label: 'Journal · ingredients explained', go: () => { window.location.href = '/blog'; } },
           { label: 'Contact us', go: this.nav('contact') },
           { label: 'For veterinarians', go: this.nav('contact') },
           { label: 'Wholesale', go: () => { window.location.href = 'wholesale.html'; } },
