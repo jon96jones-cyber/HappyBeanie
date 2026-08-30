@@ -266,6 +266,93 @@ src="https://www.facebook.com/tr?id=2580258509080253&ev=PageView&noscript=1"/></
   if (document.readyState !== 'loading') onScroll();
   else addEventListener('DOMContentLoaded', onScroll);
 })();
+
+(function () {
+  // The bean wall's rating readout: the score counts up, the stars land one
+  // after another, and the two rules draw themselves — once, the first time the
+  // card is scrolled into view.
+  var REDUCED = false;
+  try { REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  function play(card) {
+    var i = card.id.replace('hbRate', '');
+    var q = function (p) { return document.getElementById(p + i); };
+    var num = q('hbRateNum'), cnt = q('hbRateCount'), bar = q('hbRateBar'), tick = q('hbRateTick');
+    var stars = [0, 1, 2, 3, 4].map(function (k) { return document.getElementById('hbRateStar' + i + '_' + k); });
+
+    // Asked for less motion: show the finished readout rather than a first frame
+    // that never resolves. The handoff left this out; it is the same end state.
+    if (REDUCED) {
+      [bar, tick].forEach(function (el) { if (el) { el.style.transition = 'none'; el.style.transform = 'scaleX(1)'; } });
+      stars.forEach(function (s) { if (s) { s.style.transition = 'none'; s.style.opacity = '1'; s.style.transform = 'none'; } });
+      if (num) num.textContent = '4.9';
+      if (cnt) cnt.textContent = (1204).toLocaleString('en-US');
+      return;
+    }
+
+    [bar, tick].forEach(function (el) {
+      if (!el) return;
+      el.style.transition = 'none';
+      el.style.transform = 'scaleX(0)';
+    });
+    stars.forEach(function (s) {
+      if (!s) return;
+      s.style.transition = 'none';
+      s.style.opacity = '0';
+      s.style.transform = 'scale(0.4)';
+    });
+
+    requestAnimationFrame(function () {
+      if (tick) { tick.style.transition = 'transform 0.7s cubic-bezier(0.2,0.7,0.2,1)'; tick.style.transform = 'scaleX(1)'; }
+      if (bar) { bar.style.transition = 'transform 1.1s cubic-bezier(0.2,0.7,0.2,1) 0.25s'; bar.style.transform = 'scaleX(1)'; }
+      stars.forEach(function (s, k) {
+        if (!s) return;
+        var d = 0.12 + k * 0.09;
+        s.style.transition = 'opacity 0.3s ease ' + d + 's, transform 0.42s cubic-bezier(0.2,1.5,0.4,1) ' + d + 's';
+        s.style.opacity = '1';
+        s.style.transform = 'scale(1)';
+      });
+    });
+
+    var t0 = performance.now(), dur = 900;
+    (function step() {
+      var p = Math.min(1, (performance.now() - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 3);
+      if (num) num.textContent = (4.9 * e).toFixed(1);
+      if (cnt) cnt.textContent = Math.round(1204 * e).toLocaleString('en-US');
+      if (p < 1) requestAnimationFrame(step);
+    })();
+  }
+
+  var obs = null;
+  function scan() {
+    var cards = document.querySelectorAll('[data-m~="ratecard"]');
+    if (!window.IntersectionObserver) {
+      Array.prototype.forEach.call(cards, function (c) { if (!c.dataset.rated) { c.dataset.rated = '1'; play(c); } });
+      return;
+    }
+    if (!obs) {
+      obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting || en.target.dataset.rated) return;
+          en.target.dataset.rated = '1';
+          obs.unobserve(en.target);
+          play(en.target);
+        });
+      }, { threshold: 0.35 });
+    }
+    Array.prototype.forEach.call(cards, function (c) {
+      if (c.dataset.rateWatched) return;
+      c.dataset.rateWatched = '1';
+      obs.observe(c);
+    });
+  }
+
+  // The wall mounts and unmounts with the page, so re-scan after every render.
+  window.hbRateScan = scan;
+  if (document.readyState !== 'loading') scan();
+  else addEventListener('DOMContentLoaded', scan);
+})();
 </script>
 <script>window.__resources = {"https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js": "/assets/vendor/react-dom.production.min.js", "https://unpkg.com/react@18.3.1/umd/react.production.min.js": "/assets/vendor/react.production.min.js"};</script>
 
@@ -712,9 +799,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="wall"] > :nth-child(3) { grid-row: auto / span 1 !important; }
     [data-m~="wall"] > :nth-child(4) { grid-column: auto / span 4 !important; grid-row: auto / span 3 !important; }
     [data-m~="wall"] > [data-m~="upcell"] { grid-column: auto / span 4 !important; grid-row: auto / span 2 !important; }
-    /* Dense packing was pulling the upload cell into the first free block, so
-       the invitation to send a photo landed above every photo. Order it last. */
-    [data-m~="wall"] > [data-m~="upcell"] { order: 2 !important; }
     [data-m~="collage"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; grid-template-rows: none !important; grid-auto-rows: 104px !important; gap: 8px !important; }
     [data-m~="collage"] > * { height: auto !important; grid-column: auto !important; grid-row: auto !important; }
     [data-m~="collage"] > :nth-child(1) { grid-column: 1 / span 2 !important; grid-row: 1 / span 3 !important; }
@@ -1820,20 +1904,20 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-bottom: 12px;">
           <div>
             <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 18px;">The bean wall</div>
-            <h2 data-pre-hide style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0; max-width: 22em;">1,204 beans, <span style="color: oklch(0.44 0.07 152);">and counting.</span></h2>
-            <h2 data-pre-show style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0; max-width: 22em;">The first beans, <span style="color: oklch(0.44 0.07 152);">in their bandanas.</span></h2>
+            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0; max-width: 22em;">1,204 beans, <span style="color: oklch(0.44 0.07 152);">and counting.</span></h2>
           </div>
-          <div data-pre-hide style="display: flex; align-items: stretch; gap: 0; margin-top: 26px; border: 1px solid rgba(23,20,15,0.1); border-radius: 999px; overflow: hidden; background: #FCFAF4; box-shadow: 0 28px 50px -26px rgba(23,20,15,0.32), 0 8px 18px -12px rgba(23,20,15,0.18), 0 1px 0 rgba(255,255,255,0.9) inset; transition: transform 0.35s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.35s ease;" style-hover="transform: translateY(-4px); box-shadow: 0 38px 62px -26px rgba(23,20,15,0.38), 0 10px 22px -12px rgba(23,20,15,0.2);">
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 16px 24px 16px 26px; background: #17140F; color: #F5F0E6; border-radius: 999px 0 0 999px;">
-              <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 40px; line-height: 1;">4.9</span>
-              <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; color: rgba(245,240,230,0.6);">OUT OF 5</span>
+          <div id="hbRate1" data-m="ratecard" style="display: flex; align-items: stretch; gap: 0; margin-top: 26px; border: 1px solid rgba(23,20,15,0.16); border-radius: 2px; overflow: hidden; background: #FCFAF4; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.28); transition: box-shadow 0.35s ease, border-color 0.35s ease;" style-hover="box-shadow: 0 24px 44px -26px rgba(23,20,15,0.34); border-color: rgba(23,20,15,0.3);">
+            <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 18px 26px 16px; background: #17140F; color: #F5F0E6;">
+              <span id="hbRateNum1" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; min-width: 2.7ch; text-align: center;">4.9</span>
+              <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; color: rgba(245,240,230,0.55);">OUT OF 5</span>
+              <span aria-hidden="true" id="hbRateTick1" style="position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: oklch(0.86 0.14 92); transform-origin: left center;"></span>
             </div>
-            <div style="display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 14px 28px 14px 20px;">
-              <span style="display: flex; gap: 3px; align-items: center;">
-                <span style="font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span style="font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span style="font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span style="font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span style="font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span>
-              </span>
-              <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #17140F; white-space: nowrap;">1,204 verified owners</span>
+            <div style="position: relative; display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 14px 28px 16px 20px;">
+              <span style="display: flex; gap: 4px; align-items: center;"><span id="hbRateStar1_0" style="display: inline-block; font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span id="hbRateStar1_1" style="display: inline-block; font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span id="hbRateStar1_2" style="display: inline-block; font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span id="hbRateStar1_3" style="display: inline-block; font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span id="hbRateStar1_4" style="display: inline-block; font-size: 13px; line-height: 1; color: oklch(0.72 0.14 78);">★</span></span>
+              <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #17140F; white-space: nowrap;"><span id="hbRateCount1" style="font-variant-numeric: tabular-nums;">1,204</span> verified owners</span>
               <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap;">94% would buy again</span>
+              <span aria-hidden="true" style="position: absolute; left: 20px; right: 28px; bottom: 8px; height: 2px; background: rgba(23,20,15,0.1);"></span>
+              <span aria-hidden="true" id="hbRateBar1" style="position: absolute; left: 20px; bottom: 8px; width: calc((100% - 48px) * 0.94); height: 2px; background: oklch(0.72 0.14 78); transform-origin: left center;"></span>
             </div>
           </div>
         </div>
@@ -1843,35 +1927,23 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
       <div data-m="wall" style="max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 196px; gap: 10px;">
         <div style="position: relative; grid-column: 1 / span 2; grid-row: 1 / span 2; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><img src="/assets/img/wall/aussie-daisy.webp" alt="An Australian shepherd in a pink daisy Happy Beanie bandana" width="800" height="820" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 30%;"></div>
-          <div data-pre-hide aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(23,20,15,0.82) 0%, rgba(23,20,15,0.28) 44%, transparent 72%); pointer-events: none;"></div>
-          <div data-pre-hide data-m="wqbox" style="position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 26px 24px; pointer-events: none;">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.86 0.14 92); margin-bottom: 10px;">★★★★★</div>
-            <p data-m="wq" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1.3; color: #F5F0E6; margin: 0 0 8px; text-wrap: pretty;">“Two weeks in and he was waiting at the door again.”</p>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,230,0.66);">Brenda S. · Jim, 13 yrs</div>
-          </div>
         </div>
-        <div style="display: none; /* no photo for this slot yet — drop one in and delete this display rule to bring the cell back */ position: relative; grid-column: 3 / span 1; grid-row: 1; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
+        <div style="position: relative; grid-column: 3 / span 1; grid-row: 1; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><image-slot id="hbv2-wall1" placeholder="Dog in Happy Beanie bandana, close crop" style="width: 100%; height: 100%;"></image-slot></div>
         </div>
-        <div style="position: relative; grid-column: 3 / span 2; grid-row: 1; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
-          <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><img src="/assets/img/wall/tuxedo-cat.webp" alt="A tuxedo cat in a Happy Beanie bandana looking up" width="460" height="470" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 56%;"></div>
+        <div style="position: relative; grid-column: 4 / span 1; grid-row: 1; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
+          <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><img src="/assets/img/wall/tuxedo-cat.webp" alt="A tuxedo cat in a Happy Beanie bandana looking up" width="460" height="470" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 32%;"></div>
         </div>
         <div style="position: relative; grid-column: 5 / span 2; grid-row: 1 / span 2; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><img src="/assets/img/wall/doodle-daisy.webp" alt="A goldendoodle in a pink daisy Happy Beanie bandana" width="800" height="820" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 34%;"></div>
-          <div data-pre-hide aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(23,20,15,0.82) 0%, rgba(23,20,15,0.28) 44%, transparent 72%); pointer-events: none;"></div>
-          <div data-pre-hide data-m="wqbox" style="position: absolute; left: 0; right: 0; bottom: 0; padding: 20px 20px 18px; pointer-events: none;">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.86 0.14 92); margin-bottom: 10px;">★★★★★</div>
-            <p data-m="wq" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 17px; line-height: 1.3; color: #F5F0E6; margin: 0 0 8px; text-wrap: pretty;">“The coat change is what everyone comments on now.”</p>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,230,0.66);">Makenzie B. · Finley, 6 yrs</div>
-          </div>
         </div>
         <div style="position: relative; grid-column: 3 / span 2; grid-row: 2; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><img src="/assets/img/wall/two-cats.webp" alt="A tabby in a Happy Beanie bandana dozing beside a black cat" width="880" height="440" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 32%;"></div>
         </div>
-        <div style="display: none; /* no photo for this slot yet — drop one in and delete this display rule to bring the cell back */ position: relative; grid-column: 1 / span 1; grid-row: 3; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
+        <div style="position: relative; grid-column: 1 / span 1; grid-row: 3; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><image-slot id="hbv2-rev3" placeholder="Senior cat stretching" style="width: 100%; height: 100%;"></image-slot></div>
         </div>
-        <label data-m="upcell" style="grid-column: 1 / span 6; grid-row: 3; position: relative; overflow: hidden; border-radius: 4px; border: 1px dashed oklch(0.44 0.07 152); background: oklch(0.96 0.032 152); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 20px; transition: background 0.25s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.28s ease;" style-hover="background: oklch(0.93 0.05 152); transform: translateY(-3px); box-shadow: 0 22px 40px -26px oklch(0.44 0.07 152 / 0.6);">
+        <label data-m="upcell" style="grid-column: 2 / span 2; grid-row: 3; position: relative; overflow: hidden; border-radius: 4px; border: 1px dashed oklch(0.44 0.07 152); background: oklch(0.96 0.032 152); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 20px; transition: background 0.25s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.28s ease;" style-hover="background: oklch(0.93 0.05 152); transform: translateY(-3px); box-shadow: 0 22px 40px -26px oklch(0.44 0.07 152 / 0.6);">
           <input type="file" accept="image/*" sc-camel-on-change="{{ onWallUpload }}" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;">
           <sc-if value="{{ wallHasPhoto }}" hint-placeholder-val="{{ false }}">
             <span style="position: absolute; inset: 0; background-image: {{ wallPhotoCss }}; background-size: cover; background-position: center;"></span>
@@ -1888,17 +1960,11 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
             <span style="display: inline-block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.44 0.07 152); padding: 11px 16px; border-radius: 3px;">Upload a photo →</span>
           </sc-if>
         </label>
-        <div style="display: none; /* no photo for this slot yet — drop one in and delete this display rule to bring the cell back */ position: relative; grid-column: 4 / span 1; grid-row: 3; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
+        <div style="position: relative; grid-column: 4 / span 1; grid-row: 3; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><image-slot id="hbv2-wall4" placeholder="Cat wearing the bandana" style="width: 100%; height: 100%;"></image-slot></div>
         </div>
-        <div style="display: none; /* no photo for this slot yet — drop one in and delete this display rule to bring the cell back */ position: relative; grid-column: 5 / span 2; grid-row: 3; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
+        <div style="position: relative; grid-column: 5 / span 2; grid-row: 3; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><image-slot id="hbv2-wall5" placeholder="Owner and dog on the porch" style="width: 100%; height: 100%;"></image-slot></div>
-          <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(23,20,15,0.82) 0%, rgba(23,20,15,0.28) 44%, transparent 72%); pointer-events: none;"></div>
-          <div data-m="wqbox" style="position: absolute; left: 0; right: 0; bottom: 0; padding: 20px 20px 18px; pointer-events: none;">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.86 0.14 92); margin-bottom: 10px;">★★★★★</div>
-            <p data-m="wq" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 17px; line-height: 1.3; color: #F5F0E6; margin: 0 0 8px; text-wrap: pretty;">“She is eleven and back on the stairs.”</p>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,230,0.66);">Dana R. · Poppy, 11 yrs</div>
-          </div>
         </div>
       </div>
       <div data-pre-hide style="max-width: 1180px; margin: 14px auto 0; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; color: #8A7F6E;">Bandanas ship free with every first order. One discount per household.</div>
@@ -3783,6 +3849,7 @@ class Component extends DCLogic {
     requestAnimationFrame(() => this.scan());
     // The catch section mounts and unmounts with the product page.
     try { if (window.hbCatchTick) window.hbCatchTick(); } catch (e) {}
+    try { if (window.hbRateScan) window.hbRateScan(); } catch (e) {}
     // Persist the cart whenever it changes (guarded so scroll updates don't rewrite it).
     try {
       const s = this.state;
