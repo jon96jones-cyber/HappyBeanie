@@ -860,16 +860,22 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
        the way they do on a wide screen — the dog is already in front — buys
        each of them about 40% more size. The runway shortens to match. */
     [data-m~="catchwrap"] { height: 280vh !important; }
-    /* The card has to land clear of the dog's bandana (its lowest point is 53.5%
-       down the dog) and the cat's face (which ends where the white chest starts,
-       34.2% down). Both pets are bottom-anchored inside a taller box, so drawing
-       them larger lifts those two landmarks without pulling their feet back into
-       the frame; the group is then lifted 40px and the card dropped as far as
-       the sticky buy bar allows. Measured at 390x844 that leaves the bandana
-       ~35px and the cat's chin ~55px above the top edge of the card. */
-    #hbCatchDog { max-width: 71vw !important; }
-    #hbCatchCat { max-width: 62vw !important; margin-left: -20vw !important; }
-    [data-m~="catchpets"] { bottom: 40px !important; }
+    /* Three things have to hold at once here, and they pull against each other.
+       The card must sit below the bandana's wordmark (its descenders end 46%
+       down the dog) and below the cat's chin (where the white chest starts,
+       34.2% down); the pets must not overlap, so their widths plus the gap have
+       to fit the viewport; and their feet must run past the bottom of the frame
+       so no yellow shows beneath them.
+
+       Both pets are bottom-anchored inside a taller box, so size is what moves
+       those two landmarks up. The cat is the tight one — two thirds of it sits
+       below its chin — and it lands 16px lower than the dog, so it gets that
+       back as margin to put both box bottoms on the same line. The gap between
+       them comes down to 6px so the widths can go up: 50vw + 47vw + 6px still
+       leaves a few pixels either side, and every extra vw is clearance. */
+    #hbCatchDog { max-width: 50vw !important; }
+    #hbCatchCat { max-width: 47vw !important; margin-left: 0 !important; margin-bottom: 16px !important; }
+    [data-m~="catchpets"] { bottom: 8.2vh !important; gap: 6px !important; }
     #hbCatchTag { bottom: calc(1.5vh + 82px) !important; }
     [data-m~="catchh2"] { font-size: clamp(34px, 10vw, 52px) !important; }
     /* The batch tracker makes the closing card about twice as tall as the line
@@ -882,7 +888,10 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="catchtagrow"] > span:first-child { font-size: 8.5px !important; letter-spacing: 0.1em !important; }
     [data-m~="catchtagrow"] > span:last-child { font-size: 12px !important; }
     [data-m~="catchtagrow"] > span:last-child b { font-size: 14px !important; }
-    [data-m~="catchtagnote"] { margin-top: 6px !important; font-size: 8px !important; letter-spacing: 0.05em !important; line-height: 1.45 !important; }
+    /* Tight enough that the standard note is a single line — every pixel saved
+       here is a pixel of clearance above the bandana. The sold-out note is
+       longer and wraps to two; that state can afford the extra line. */
+    [data-m~="catchtagnote"] { margin-top: 6px !important; font-size: 7px !important; letter-spacing: 0.01em !important; line-height: 1.5 !important; }
   }
 </style>
 </helmet>
