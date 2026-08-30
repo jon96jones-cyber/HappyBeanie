@@ -198,7 +198,7 @@ src="https://www.facebook.com/tr?id=2580258509080253&ev=PageView&noscript=1"/></
   // asked for reduced motion, so they get the picture without the movement.
   function rest() {
     set('hbCatchHead', 'translateY(-70px)', 0);
-    set('hbCatchDog', 'translateY(4%) rotate(0deg)');
+    set('hbCatchDog', 'translateY(12%) rotate(0deg)');
     set('hbCatchCat', 'translateY(16%) rotate(0deg)');
     set('hbCatchChews', 'translateY(28vh) scale(0.78)');
     for (var i = 1; i <= 3; i++) set('hbCatchChew' + i, 'scale(0)', 0);
@@ -220,7 +220,7 @@ src="https://www.facebook.com/tr?id=2580258509080253&ev=PageView&noscript=1"/></
     set('hbCatchHead', 'translateY(' + (-70 * head) + 'px)', 1 - head);
 
     var dog = ease(seg(0.04, 0.52));
-    set('hbCatchDog', 'translateY(' + (100 - 96 * dog) + '%) rotate(' + (6 - 6 * dog) + 'deg)');
+    set('hbCatchDog', 'translateY(' + (100 - 88 * dog) + '%) rotate(' + (6 - 6 * dog) + 'deg)');
     var cat = ease(seg(0.22, 0.72));
     set('hbCatchCat', 'translateY(' + (100 - 84 * cat) + '%) rotate(' + (-5 + 5 * cat) + 'deg)');
 
