@@ -906,7 +906,10 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
        here resolves against the element's height any more: 6% of the artwork
        is missing whatever the viewport does. */
     #hbCatchDog { width: 50vw !important; max-width: none !important; height: auto !important; aspect-ratio: 418 / 829 !important; overflow: hidden !important; }
-    #hbCatchCat { width: 47vw !important; max-width: none !important; height: auto !important; aspect-ratio: 414 / 723 !important; overflow: hidden !important; margin-left: 0 !important; margin-bottom: 0 !important; }
+    /* The cat needs a deeper cut than the dog: its white front paws start 87%
+       down, so a tenth left their tops showing. Cutting at 86.5% takes the
+       paws and the shadow under them with one line. */
+    #hbCatchCat { width: 47vw !important; max-width: none !important; height: auto !important; aspect-ratio: 414 / 695 !important; overflow: hidden !important; margin-left: 0 !important; margin-bottom: 0 !important; }
     #hbCatchDog img, #hbCatchCat img { height: auto !important; }
     [data-m~="catchpets"] { bottom: -4px !important; gap: 6px !important; }
     /* The clip has to be deep enough to read as a crop rather than a rounding
