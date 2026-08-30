@@ -1467,7 +1467,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         </sc-for>
       </div>
     </div>
-    <section data-m="pad short barpad" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 34px 44px 104px; overflow: hidden;">
+    <section data-m="pad short" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 34px 44px 96px; overflow: hidden;">
       <div aria-hidden="true" data-m="hide" style="position: absolute; left: 0; right: 0; top: 0; height: 720px; overflow: hidden; pointer-events: none;">
         <div aria-hidden="true" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(23,20,15,0.055) 1px, transparent 1px); background-size: 30px 30px; mask-image: radial-gradient(90% 70% at 50% 0%, #000 10%, transparent 78%); -webkit-mask-image: radial-gradient(90% 70% at 50% 0%, #000 10%, transparent 78%); opacity: 0.7;"></div>
       </div>
@@ -1585,7 +1585,49 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         </div>
       </div>
 
-      <div data-m="tight" style="max-width: 1180px; margin: 88px auto 0;">
+    </section>
+
+    <section id="hbCatchWrap" data-m="catchwrap" style="position: relative; height: 320vh; background: oklch(0.86 0.14 92); border-top: 1px solid rgba(23,20,15,0.14);">
+      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
+        <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(rgba(23,20,15,0.07) 1px, transparent 1px); background-size: 30px 30px; mask-image: radial-gradient(120% 80% at 50% 10%, #000 0%, transparent 76%); -webkit-mask-image: radial-gradient(120% 80% at 50% 10%, #000 0%, transparent 76%);"></div>
+
+        <div id="hbCatchHead" data-m="catchhead" style="position: absolute; left: 0; right: 0; top: 47vh; z-index: 3; padding: 0 44px; text-align: center; will-change: transform, opacity;">
+          <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(23,20,15,0.6); margin-bottom: 18px;">One chew · once a day</div>
+          <h2 data-m="catchh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.048em; font-size: clamp(40px, 6vw, 88px); line-height: 0.95; margin: 0 auto; max-width: 15em; color: #17140F; text-wrap: balance;">You take vitamins. Why doesn&rsquo;t your pet?</h2>
+        </div>
+
+        <div id="hbCatchChews" style="position: absolute; left: 50%; top: 12vh; z-index: 2; width: 320px; margin-left: -160px; height: 200px; will-change: transform;">
+          <div id="hbCatchChew1" style="position: absolute; left: 8px; top: 0; width: 118px; height: 118px; will-change: transform, opacity;">
+            <img src="/assets/img/catch/chew-1.webp" width="440" height="414" loading="lazy" decoding="async" alt="" style="width: 100%; height: 100%; display: block; object-fit: contain;">
+          </div>
+          <div id="hbCatchChew2" style="position: absolute; right: 4px; top: 34px; width: 104px; height: 104px; will-change: transform, opacity;">
+            <img src="/assets/img/catch/chew-2.webp" width="440" height="404" loading="lazy" decoding="async" alt="" style="width: 100%; height: 100%; display: block; object-fit: contain;">
+          </div>
+          <div id="hbCatchChew3" style="position: absolute; left: 96px; top: 84px; width: 112px; height: 112px; will-change: transform, opacity;">
+            <img src="/assets/img/catch/chew-3.webp" width="440" height="404" loading="lazy" decoding="async" alt="" style="width: 100%; height: 100%; display: block; object-fit: contain;">
+          </div>
+        </div>
+
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; justify-content: center; align-items: flex-end; gap: clamp(8px, 3vw, 48px); pointer-events: none;">
+          <div id="hbCatchDog" style="position: relative; z-index: 2; flex: 0 0 auto; height: min(88vh, 900px); aspect-ratio: 418 / 921; width: auto; max-width: 46vw; will-change: transform;">
+            <img src="/assets/img/catch/dog.webp" width="418" height="921" loading="lazy" decoding="async" alt="A goldendoodle in a Happy Beanie bandana looking up for a chew" style="width: 100%; height: 100%; display: block; object-fit: contain; object-position: bottom center;">
+          </div>
+          <div id="hbCatchCat" style="position: relative; z-index: 1; flex: 0 0 auto; height: min(78vh, 760px); aspect-ratio: 414 / 803; width: auto; max-width: 52vw; will-change: transform;">
+            <img src="/assets/img/catch/cat.webp" width="414" height="803" loading="lazy" decoding="async" alt="A tuxedo cat sitting and looking up for a chew" style="width: 100%; height: 100%; display: block; object-fit: contain; object-position: bottom center;">
+          </div>
+        </div>
+
+        <div id="hbCatchTag" style="position: absolute; left: 0; right: 0; bottom: calc(3vh + 88px); z-index: 4; padding: 0 20px; text-align: center; opacity: 0; will-change: transform, opacity;">
+          <div data-m="catchtag" style="display: inline-flex; flex-direction: column; gap: 10px; align-items: center; background: #17140F; color: #F5F0E6; border-radius: 6px; padding: 26px 34px; box-shadow: 0 30px 60px -30px rgba(23,20,15,0.6);">
+            <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92);">Dog formula · Cat formula</div>
+            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(22px, 2.4vw, 32px); line-height: 1.1;">Two doses. One ritual.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-m="pad short barpad" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 88px 44px 104px; overflow: hidden;">
+      <div style="max-width: 1180px; margin: 0 auto;">
         <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
         <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em;">Ten ingredients, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
         <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
@@ -1899,44 +1941,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
       </div>
     </div>
 
-    <section id="hbCatchWrap" data-m="catchwrap" style="position: relative; height: 320vh; background: oklch(0.86 0.14 92); border-top: 1px solid rgba(23,20,15,0.14);">
-      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
-        <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(rgba(23,20,15,0.07) 1px, transparent 1px); background-size: 30px 30px; mask-image: radial-gradient(120% 80% at 50% 10%, #000 0%, transparent 76%); -webkit-mask-image: radial-gradient(120% 80% at 50% 10%, #000 0%, transparent 76%);"></div>
-
-        <div id="hbCatchHead" data-m="catchhead" style="position: absolute; left: 0; right: 0; top: 47vh; z-index: 3; padding: 0 44px; text-align: center; will-change: transform, opacity;">
-          <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(23,20,15,0.6); margin-bottom: 18px;">One chew · once a day</div>
-          <h2 data-m="catchh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.048em; font-size: clamp(40px, 6vw, 88px); line-height: 0.95; margin: 0 auto; max-width: 15em; color: #17140F; text-wrap: balance;">You take vitamins. Why doesn&rsquo;t your pet?</h2>
-        </div>
-
-        <div id="hbCatchChews" style="position: absolute; left: 50%; top: 12vh; z-index: 2; width: 320px; margin-left: -160px; height: 200px; will-change: transform;">
-          <div id="hbCatchChew1" style="position: absolute; left: 8px; top: 0; width: 118px; height: 118px; will-change: transform, opacity;">
-            <img src="/assets/img/catch/chew-1.webp" width="440" height="414" loading="lazy" decoding="async" alt="" style="width: 100%; height: 100%; display: block; object-fit: contain;">
-          </div>
-          <div id="hbCatchChew2" style="position: absolute; right: 4px; top: 34px; width: 104px; height: 104px; will-change: transform, opacity;">
-            <img src="/assets/img/catch/chew-2.webp" width="440" height="404" loading="lazy" decoding="async" alt="" style="width: 100%; height: 100%; display: block; object-fit: contain;">
-          </div>
-          <div id="hbCatchChew3" style="position: absolute; left: 96px; top: 84px; width: 112px; height: 112px; will-change: transform, opacity;">
-            <img src="/assets/img/catch/chew-3.webp" width="440" height="404" loading="lazy" decoding="async" alt="" style="width: 100%; height: 100%; display: block; object-fit: contain;">
-          </div>
-        </div>
-
-        <div style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; justify-content: center; align-items: flex-end; gap: clamp(8px, 3vw, 48px); pointer-events: none;">
-          <div id="hbCatchDog" style="position: relative; z-index: 2; flex: 0 0 auto; height: min(88vh, 900px); aspect-ratio: 418 / 921; width: auto; max-width: 46vw; will-change: transform;">
-            <img src="/assets/img/catch/dog.webp" width="418" height="921" loading="lazy" decoding="async" alt="A goldendoodle in a Happy Beanie bandana looking up for a chew" style="width: 100%; height: 100%; display: block; object-fit: contain; object-position: bottom center;">
-          </div>
-          <div id="hbCatchCat" style="position: relative; z-index: 1; flex: 0 0 auto; height: min(78vh, 760px); aspect-ratio: 414 / 803; width: auto; max-width: 52vw; will-change: transform;">
-            <img src="/assets/img/catch/cat.webp" width="414" height="803" loading="lazy" decoding="async" alt="A tuxedo cat sitting and looking up for a chew" style="width: 100%; height: 100%; display: block; object-fit: contain; object-position: bottom center;">
-          </div>
-        </div>
-
-        <div id="hbCatchTag" style="position: absolute; left: 0; right: 0; bottom: calc(3vh + 88px); z-index: 4; padding: 0 20px; text-align: center; opacity: 0; will-change: transform, opacity;">
-          <div data-m="catchtag" style="display: inline-flex; flex-direction: column; gap: 10px; align-items: center; background: #17140F; color: #F5F0E6; border-radius: 6px; padding: 26px 34px; box-shadow: 0 30px 60px -30px rgba(23,20,15,0.6);">
-            <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92);">Dog formula · Cat formula</div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(22px, 2.4vw, 32px); line-height: 1.1;">Two doses. One ritual.</div>
-          </div>
-        </div>
-      </div>
-    </section>
   </div>
   </sc-if>
 
