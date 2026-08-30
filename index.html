@@ -793,12 +793,32 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="wrapflex"] { flex-wrap: wrap !important; }
     [data-m~="cmp3"] { gap: 10px !important; padding: 15px 16px !important; font-size: 13px !important; }
     [data-m~="cmp3"] > :first-child { font-size: 10px !important; }
-    [data-m~="wall"] { grid-template-columns: repeat(4, minmax(0,1fr)) !important; grid-auto-rows: 78px !important; grid-auto-flow: row dense !important; gap: 8px !important; }
-    [data-m~="wall"] > * { grid-column: auto / span 2 !important; grid-row: auto / span 2 !important; }
-    [data-m~="wall"] > :nth-child(1) { grid-row: auto / span 3 !important; }
-    [data-m~="wall"] > :nth-child(3) { grid-row: auto / span 1 !important; }
-    [data-m~="wall"] > :nth-child(4) { grid-column: auto / span 4 !important; grid-row: auto / span 3 !important; }
-    [data-m~="wall"] > [data-m~="upcell"] { grid-column: auto / span 4 !important; grid-row: auto / span 2 !important; }
+    /* The wall on a phone: half the desktop grid, four columns, read as the same
+       two clusters stacked rather than everything restacked into one column.
+       Placement is explicit — auto-flow can only make bands, and an interlocking
+       mosaic needs to be told where each cell goes. Heights come from
+       aspect-ratio per cell rather than a fixed grid-auto-rows, because a fixed
+       row height only matches one viewport: at tablet widths the columns get
+       wide and the square cells turn landscape. Cluster two is mirrored, strip
+       above squares, so the two heroes do not line up into a left-hand column
+       and read as a stack. */
+    [data-m~="wall"] { grid-template-columns: repeat(4, minmax(0,1fr)) !important; grid-auto-rows: auto !important; grid-auto-flow: row !important; gap: 8px !important; }
+    [data-m~="wall"] > * { grid-column: auto !important; grid-row: auto !important; order: 0 !important; }
+    [data-m~="wall"] > :nth-child(1) { grid-column: 1 / span 2 !important; grid-row: 1 / span 2 !important; aspect-ratio: 1 / 1 !important; }
+    [data-m~="wall"] > :nth-child(2) { grid-column: 3 !important; grid-row: 1 !important; aspect-ratio: 1 / 1 !important; }
+    [data-m~="wall"] > :nth-child(3) { grid-column: 4 !important; grid-row: 1 !important; aspect-ratio: 1 / 1 !important; }
+    [data-m~="wall"] > :nth-child(5) { grid-column: 3 / span 2 !important; grid-row: 2 !important; aspect-ratio: 2 / 1 !important; }
+    [data-m~="wall"] > :nth-child(4) { grid-column: 1 / span 2 !important; grid-row: 3 / span 2 !important; aspect-ratio: 1 / 1 !important; }
+    [data-m~="wall"] > :nth-child(9) { grid-column: 3 / span 2 !important; grid-row: 3 !important; aspect-ratio: 2 / 1 !important; }
+    [data-m~="wall"] > :nth-child(8) { grid-column: 3 !important; grid-row: 4 !important; aspect-ratio: 1 / 1 !important; }
+    [data-m~="wall"] > :nth-child(6) { grid-column: 4 !important; grid-row: 4 !important; aspect-ratio: 1 / 1 !important; }
+    /* The upload cell closes the wall full width, as it does on desktop's last
+       row. order is reset here too: a bare [data-m~="upcell"] rule further down
+       this block sets order: -1, which ties on specificity and would otherwise
+       win on source order and pull the cell back to the top. */
+    [data-m~="wall"] > [data-m~="upcell"] { grid-column: 1 / span 4 !important; grid-row: 5 !important; aspect-ratio: auto !important; min-height: 168px !important; order: 0 !important; }
+    [data-m~="upcell"] { padding: 16px 16px 18px !important; gap: 8px !important; }
+    [data-m~="ratecard"] { margin-top: 18px !important; }
     [data-m~="collage"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; grid-template-rows: none !important; grid-auto-rows: 104px !important; gap: 8px !important; }
     [data-m~="collage"] > * { height: auto !important; grid-column: auto !important; grid-row: auto !important; }
     [data-m~="collage"] > :nth-child(1) { grid-column: 1 / span 2 !important; grid-row: 1 / span 3 !important; }
@@ -956,7 +976,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="gap"]   { gap: 22px !important; }
     [data-m~="inset"] { padding: 26px 17px !important; }
     [data-m~="tall"]  { height: 240px !important; }
-    [data-m~="wall"]  { grid-auto-rows: 66px !important; }
+    [data-m~="wall"] { gap: 6px !important; }
     [data-m~="collage"] { grid-auto-rows: 92px !important; }
     [data-m~="barpad"] { padding-bottom: 84px !important; }
     [data-m~="modal"] { padding: 24px 16px 28px !important; }
