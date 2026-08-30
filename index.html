@@ -1410,23 +1410,12 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <div style="position: relative; grid-column: 1 / span 1; grid-row: 3; overflow: hidden; border-radius: 4px; background: #E4DBC9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><image-slot id="hbv2-rev3" placeholder="Senior cat stretching" style="width: 100%; height: 100%;"></image-slot></div>
         </div>
-        <label data-m="upcell" style="grid-column: 2 / span 2; grid-row: 3; position: relative; overflow: hidden; border-radius: 4px; border: 1px dashed oklch(0.44 0.07 152); background: oklch(0.96 0.032 152); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 20px; transition: background 0.25s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.28s ease;" style-hover="background: oklch(0.93 0.05 152); transform: translateY(-3px); box-shadow: 0 22px 40px -26px oklch(0.44 0.07 152 / 0.6);">
-          <input type="file" accept="image/*" sc-camel-on-change="{{ onWallUpload }}" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;">
-          <sc-if value="{{ wallHasPhoto }}" hint-placeholder-val="{{ false }}">
-            <span style="position: absolute; inset: 0; background-image: {{ wallPhotoCss }}; background-size: cover; background-position: center;"></span>
-            <span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(23,20,15,0.88) 0%, rgba(23,20,15,0.7) 55%, rgba(23,20,15,0.6) 100%);"></span>
-            <span style="position: relative; display: block;">
-              <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 8px;">15% off unlocked</span>
-              <span style="display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 26px; line-height: 1.15; color: #F5F0E6; margin-bottom: 8px;">Code BEAN15</span>
-              <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,230,0.7);">Applied at checkout · tap to change photo</span>
-            </span>
-          </sc-if>
-          <sc-if value="{{ wallNoPhoto }}" hint-placeholder-val="{{ true }}">
-            <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">Get 15% off</span>
-            <span style="display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 25px; line-height: 1.18; max-width: 15em;">Show us your Bean in a Happy Beanie bandana</span>
-            <span style="display: inline-block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.44 0.07 152); padding: 11px 16px; border-radius: 3px;">Upload a photo →</span>
-          </sc-if>
-        </label>
+        <a data-m="upcell" href="/account" style="grid-column: 2 / span 2; grid-row: 3; position: relative; overflow: hidden; border-radius: 4px; border: 1px dashed oklch(0.44 0.07 152); background: oklch(0.96 0.032 152); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 20px; transition: background 0.25s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.28s ease;" style-hover="background: oklch(0.93 0.05 152); transform: translateY(-3px); box-shadow: 0 22px 40px -26px oklch(0.44 0.07 152 / 0.6);" text-decoration: none; color: inherit;">
+          <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">Get 15% off</span>
+          <span style="display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 25px; line-height: 1.18; max-width: 15em;">Show us your Bean in a Happy Beanie bandana</span>
+          <span style="display: inline-block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.44 0.07 152); padding: 11px 16px; border-radius: 3px;">Send a photo from your account →</span>
+          <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #6A6055; margin-top: 2px;">Reviewed by hand · your code arrives once it is approved</span>
+        </a>
         <div style="position: relative; grid-column: 4 / span 1; grid-row: 3; overflow: hidden; border-radius: 4px; background: #E4DBC9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><image-slot id="hbv2-wall4" placeholder="Cat wearing the bandana" style="width: 100%; height: 100%;"></image-slot></div>
         </div>
@@ -1963,23 +1952,12 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <div style="position: relative; grid-column: 1 / span 1; grid-row: 3; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><img src="/assets/img/wall/doodle-car.webp" alt="A goldendoodle in a car seat wearing a pink daisy Happy Beanie bandana" width="460" height="470" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 30%;"></div>
         </div>
-        <label data-m="upcell" style="grid-column: 2 / span 2; grid-row: 3; position: relative; overflow: hidden; border-radius: 4px; border: 1px dashed oklch(0.44 0.07 152); background: oklch(0.96 0.032 152); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 20px; transition: background 0.25s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.28s ease;" style-hover="background: oklch(0.93 0.05 152); transform: translateY(-3px); box-shadow: 0 22px 40px -26px oklch(0.44 0.07 152 / 0.6);">
-          <input type="file" accept="image/*" sc-camel-on-change="{{ onWallUpload }}" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;">
-          <sc-if value="{{ wallHasPhoto }}" hint-placeholder-val="{{ false }}">
-            <span style="position: absolute; inset: 0; background-image: {{ wallPhotoCss }}; background-size: cover; background-position: center;"></span>
-            <span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(23,20,15,0.88) 0%, rgba(23,20,15,0.7) 55%, rgba(23,20,15,0.6) 100%);"></span>
-            <span style="position: relative; display: block;">
-              <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 8px;">15% off unlocked</span>
-              <span style="display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 26px; line-height: 1.15; color: #F5F0E6; margin-bottom: 8px;">Code BEAN15</span>
-              <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,230,0.7);">Applied at checkout · tap to change photo</span>
-            </span>
-          </sc-if>
-          <sc-if value="{{ wallNoPhoto }}" hint-placeholder-val="{{ true }}">
-            <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">Get 15% off</span>
-            <span style="display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 25px; line-height: 1.18; max-width: 15em;">Show us your Bean in a Happy Beanie bandana</span>
-            <span style="display: inline-block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.44 0.07 152); padding: 11px 16px; border-radius: 3px;">Upload a photo →</span>
-          </sc-if>
-        </label>
+        <a data-m="upcell" href="/account" style="grid-column: 2 / span 2; grid-row: 3; position: relative; overflow: hidden; border-radius: 4px; border: 1px dashed oklch(0.44 0.07 152); background: oklch(0.96 0.032 152); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 20px; transition: background 0.25s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.28s ease;" style-hover="background: oklch(0.93 0.05 152); transform: translateY(-3px); box-shadow: 0 22px 40px -26px oklch(0.44 0.07 152 / 0.6);" text-decoration: none; color: inherit;">
+          <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">Get 15% off</span>
+          <span style="display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 25px; line-height: 1.18; max-width: 15em;">Show us your Bean in a Happy Beanie bandana</span>
+          <span style="display: inline-block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.44 0.07 152); padding: 11px 16px; border-radius: 3px;">Send a photo from your account →</span>
+          <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #6A6055; margin-top: 2px;">Reviewed by hand · your code arrives once it is approved</span>
+        </a>
         <div style="position: relative; grid-column: 4 / span 1; grid-row: 3; overflow: hidden; border-radius: 4px; background: #EFE8D9; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.45);">
           <div style="position: absolute; inset: 0; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.05);"><img src="/assets/img/wall/yorkie-grass.webp" alt="A yorkshire terrier on grass in a paw-print Happy Beanie bandana" width="460" height="470" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 30%;"></div>
         </div>
@@ -3488,14 +3466,13 @@ class Component extends DCLogic {
       return { ...r, unitPrice: unit, planLabel: term[r.plan], line: Math.round(unit * r.qty * 100) / 100 };
     });
     const sub = Math.round(items.reduce((n, i) => n + i.line, 0) * 100) / 100;
-    const disc = this.state.wallPhoto ? Math.round(sub * 0.15) : 0;
     const oneTimeQty = items.reduce((n, i) => n + (i.plan === 0 ? i.qty : 0), 0);
     // The trade minimum counts every box in the cart, across species and
     // plans — 2 dog + 3 cat clears a 5-box minimum.
     const totalQty = items.reduce((n, i) => n + i.qty, 0);
     const tradeApplied = !!(trade && oneTimeQty > 0);
-    const ship = sub - disc >= 60 || sub === 0 ? 0 : 8;
-    return { items, sub, disc, tradeApplied, oneTimeQty, totalQty, ship, total: Math.round((sub - disc + ship) * 100) / 100 };
+    const ship = sub >= 60 || sub === 0 ? 0 : 8;
+    return { items, sub, tradeApplied, oneTimeQty, totalQty, ship, total: Math.round((sub + ship) * 100) / 100 };
   }
 
   money(n) {
@@ -4712,7 +4689,6 @@ class Component extends DCLogic {
       subNoteDisplay: M.items.some(i => i.plan === 1) ? 'flex' : 'none',
       cartTotals: [
         { k: 'Subtotal', v: this.money(M.sub), color: '#8A7F6E' },
-        ...(M.disc ? [{ k: 'Bean wall · BEAN15', v: '−$' + M.disc, color: 'oklch(0.86 0.14 92)' }] : []),
         ...(M.tradeApplied ? [{
           k: M.totalQty >= (this.state.trade.minQty || 5)
             ? 'Trade pricing · ' + this.pctLabel(this.state.trade.pct) + ' off applied'
@@ -4724,10 +4700,8 @@ class Component extends DCLogic {
         { k: 'Shipping', v: M.ship ? '$' + M.ship : 'Free', color: '#8A7F6E' }
       ],
       cartTotal: this.money(M.total),
-      cartGiftTag: M.disc ? 'Applied' : 'Free gift',
-      cartGiftNote: M.disc
-        ? 'Your bean wall photo unlocked 15% off this order.'
-        : 'A Happy Beanie bandana ships free with your first order — send us a photo of your Bean wearing it for 15% off next time.',
+      cartGiftTag: 'Free gift',
+      cartGiftNote: 'A Happy Beanie bandana ships free with your first order — send us a photo of your Bean wearing it for 15% off next time.',
       orderPlaced: this.state.ordered,
       orderPending: !this.state.ordered,
       orderId: this.state.orderId,
@@ -4847,16 +4821,6 @@ class Component extends DCLogic {
           {},
           { discountCode: (this.state.trade && this.state.trade.code) || this.refCode() }
         ).catch(err => { console.error('[shopify]', err); setTimeout(() => { throw err; }, 0); });
-      },
-      wallHasPhoto: !!this.state.wallPhoto,
-      wallNoPhoto: !this.state.wallPhoto,
-      wallPhotoCss: this.state.wallPhoto ? 'url(' + this.state.wallPhoto + ')' : 'none',
-      onWallUpload: (e) => {
-        const f = e.target.files && e.target.files[0];
-        if (!f) return;
-        const rd = new FileReader();
-        rd.onload = () => this.setState({ wallPhoto: rd.result });
-        rd.readAsDataURL(f);
       },
       cartLabel: this.state.added ? 'Added — checkout →'
         : 'Start the ' + (effPlan === 2 ? '120' : '30') + ' days · ' + this.money(planSel.price),
