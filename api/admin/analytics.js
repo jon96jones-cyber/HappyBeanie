@@ -68,13 +68,17 @@ module.exports = async function handler(req, res) {
     // server's own reckoning if the params are missing or implausible.
     const since = isoWithin(q.since, 400) || new Date(Date.now() - days * 86400000).toISOString();
     const dayStart = isoWithin(q.dayStart, 2);
+    // Our own testing is labelled at collection and hidden here by default.
+    // ?internal=1 puts it back, so a test can still be seen to have landed.
+    const inc = q.internal === '1';
 
     const [live, today, series, topPages, topSources, funnel, recent] = await Promise.all([
       sql`select
             count(*) filter (where last_seen > now() - interval '5 minutes')                      as visitors_now,
             count(*) filter (where last_seen > now() - interval '5 minutes' and added_to_cart)    as active_carts,
             count(*) filter (where last_seen > now() - interval '5 minutes' and began_checkout)   as checking_out
-          from sessions`,
+          from sessions
+          where (${inc} or not internal)`,
 
       sql`select
             count(*)                                    as sessions,
@@ -83,19 +87,20 @@ module.exports = async function handler(req, res) {
             count(*) filter (where added_to_cart)       as carts,
             count(*) filter (where began_checkout)      as checkouts
           from sessions
-          where first_seen >= coalesce(${dayStart}::timestamptz, date_trunc('day', now()))`,
+          where first_seen >= coalesce(${dayStart}::timestamptz, date_trunc('day', now()))
+            and (${inc} or not internal)`,
 
       sql`select to_char(date_trunc('day', first_seen), 'YYYY-MM-DD') as day,
                  count(*)                               as sessions,
                  coalesce(sum(pageviews), 0)            as pageviews,
                  count(*) filter (where added_to_cart)  as carts
           from sessions
-          where first_seen >= ${since}::timestamptz
+          where first_seen >= ${since}::timestamptz and (${inc} or not internal)
           group by 1 order by 1`,
 
       sql`select coalesce(path, '(unknown)') as path, count(*) as views
           from events
-          where name = 'pageview' and ts >= ${since}::timestamptz
+          where name = 'pageview' and ts >= ${since}::timestamptz and (${inc} or not internal)
           group by 1 order by views desc limit 10`,
 
       sql`select
@@ -105,7 +110,7 @@ module.exports = async function handler(req, res) {
             count(*) as sessions,
             count(*) filter (where added_to_cart) as carts
           from sessions
-          where first_seen >= ${since}::timestamptz
+          where first_seen >= ${since}::timestamptz and (${inc} or not internal)
           group by 1 order by sessions desc limit 10`,
 
       sql`select
@@ -114,11 +119,11 @@ module.exports = async function handler(req, res) {
             count(*) filter (where added_to_cart)   as cart,
             count(*) filter (where began_checkout)  as checkout
           from sessions
-          where first_seen >= ${since}::timestamptz`,
+          where first_seen >= ${since}::timestamptz and (${inc} or not internal)`,
 
       sql`select to_char(ts, 'HH24:MI') as at, name, path, species, value
           from events
-          where name <> 'heartbeat'
+          where name <> 'heartbeat' and (${inc} or not internal)
           order by ts desc limit 25`
     ]);
 

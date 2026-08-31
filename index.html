@@ -83,6 +83,9 @@ window.hbTrack = (function () {
     try {
       if (!sid) sid = id();
       var body = Object.assign({ sid: sid, name: name, path: location.pathname }, acquisition(), extra || {});
+      // Our own testing is labelled rather than dropped, so the desk can hide
+      // it by default and still show it on demand. Set in the block below.
+      if (window.__hbInternal) body.internal = true;
       var blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
       if (navigator.sendBeacon) navigator.sendBeacon('/api/track', blob);
       else fetch('/api/track', { method: 'POST', body: blob, keepalive: true });
@@ -185,7 +188,13 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
     else if (q === '0') { localStorage.removeItem('hb_nofb'); said = 'on'; }
     off = localStorage.getItem('hb_nofb') === '1';
   } catch (e) { off = false; said = null; }
-  window.__hbNoFb = off;
+  // Anything that is not the live domain is ours by definition — preview
+  // deployments run this same pixel id and would otherwise report as real
+  // visitors, and local storage is per-origin so a flag set on the live site
+  // does not exist there. This needs no flag and cannot be forgotten.
+  var prod = /(^|\.)happybeanie\.com$/i.test(location.hostname);
+  window.__hbNoFb = off || !prod;
+  window.__hbInternal = off || !prod;
   if (!said) return;
   // Say so once, so flipping the switch is not a silent no-op you have to trust.
   function toast() {

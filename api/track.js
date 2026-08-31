@@ -57,10 +57,15 @@ module.exports = async function handler(req, res) {
     const vid = db.visitorId(req);
     const path = str(b.path, 255);
     const country = str(req.headers['x-vercel-ip-country'], 8);
+    // Our own traffic, from either signal: the server recognising the address,
+    // or the page telling us (opted-out browser, or a preview deployment).
+    // Labelled, never dropped — so a test still proves it registered.
+    const internal = db.isInternal(req) || b.internal === true;
 
     if (name === 'heartbeat') {
       await sql`update sessions
-                   set last_seen = now(), visitor_id = coalesce(visitor_id, ${vid})
+                   set last_seen = now(), visitor_id = coalesce(visitor_id, ${vid}),
+                       internal = sessions.internal or ${internal}
                  where session_id = ${sid}`;
       return res.status(204).end();
     }
@@ -71,12 +76,12 @@ module.exports = async function handler(req, res) {
     await sql`
       insert into sessions (
         session_id, visitor_id, landing_path, referrer,
-        utm_source, utm_medium, utm_campaign, ref_code, device, country, pageviews
+        utm_source, utm_medium, utm_campaign, ref_code, device, country, pageviews, internal
       ) values (
         ${sid}, ${vid}, ${path}, ${str(b.ref, 255)},
         ${str(utm.source, 120)}, ${str(utm.medium, 120)}, ${str(utm.campaign, 120)},
         ${str(b.refCode, 40)}, ${db.deviceOf(req.headers['user-agent'])}, ${country},
-        ${name === 'pageview' ? 1 : 0}
+        ${name === 'pageview' ? 1 : 0}, ${internal}
       )
       on conflict (session_id) do update set
         last_seen      = now(),
@@ -84,12 +89,13 @@ module.exports = async function handler(req, res) {
         viewed_product = sessions.viewed_product or ${name === 'view_product'},
         added_to_cart  = sessions.added_to_cart  or ${name === 'add_to_cart'},
         began_checkout = sessions.began_checkout or ${name === 'begin_checkout'},
-        ref_code       = coalesce(sessions.ref_code, ${str(b.refCode, 40)})`;
+        ref_code       = coalesce(sessions.ref_code, ${str(b.refCode, 40)}),
+        internal       = sessions.internal or ${internal}`;
 
     await sql`
-      insert into events (session_id, visitor_id, name, path, species, value, meta)
+      insert into events (session_id, visitor_id, name, path, species, value, meta, internal)
       values (${sid}, ${vid}, ${name}, ${path}, ${str(b.species, 16)}, ${num(b.value)},
-              ${b.meta ? JSON.stringify(b.meta).slice(0, 2000) : null})`;
+              ${b.meta ? JSON.stringify(b.meta).slice(0, 2000) : null}, ${internal})`;
 
     return res.status(204).end();
   } catch (err) {

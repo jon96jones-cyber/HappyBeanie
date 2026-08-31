@@ -48,6 +48,24 @@ function visitorId(req) {
     .digest('hex').slice(0, 24);
 }
 
+// Is this request our own? INTERNAL_IPS is a comma-separated list of the
+// addresses we browse and test from. The address is compared and discarded —
+// it is never written anywhere, exactly like the one behind visitorId.
+//
+// This is deliberately not the whole answer. A home IP is a dynamic lease, so
+// it goes stale without warning, and a phone on cellular sits behind carrier
+// NAT on an address shared with thousands of strangers — adding that would
+// mislabel them as us. So the page can also mark its own beacons (see the
+// opt-out flag in index.html), and either signal is enough.
+function isInternal(req) {
+  const list = String(process.env.INTERNAL_IPS || '')
+    .split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  if (!list.length) return false;
+  const ip = String((req.headers && req.headers['x-forwarded-for']) || '').split(',')[0].trim();
+  if (!ip) return false;
+  return list.indexOf(ip) !== -1;
+}
+
 function deviceOf(ua) {
   const s = String(ua || '').toLowerCase();
   if (/ipad|tablet/.test(s)) return 'tablet';
@@ -94,6 +112,13 @@ async function ensureSchema() {
   await q`create index if not exists events_name_ts_idx on events (name, ts desc)`;
   await q`create index if not exists events_session_idx on events (session_id)`;
 
+  // Our own testing, kept but labelled. Added after the fact, so existing rows
+  // default to false — everything recorded before this is treated as real,
+  // which is the safe direction: it can only ever over-count visitors.
+  await q`alter table sessions add column if not exists internal boolean not null default false`;
+  await q`alter table events   add column if not exists internal boolean not null default false`;
+  await q`create index if not exists sessions_internal_idx on sessions (internal, first_seen desc)`;
+
   // Screener deferrals. Someone whose pet is only temporarily ineligible —
   // under twelve months, or pregnant/nursing — can ask to be told when that
   // window closes. One row per person per reason; the cron sends one email.
@@ -114,7 +139,7 @@ async function ensureSchema() {
           on quiz_reminders (email, reason)`;
   await q`create index if not exists quiz_reminders_due_idx
           on quiz_reminders (remind_on) where sent_at is null and cancelled_at is null`;
-  return 10;
+  return 13;
 }
 
-module.exports = { sql, isConfigured, keyOk, visitorId, deviceOf, ensureSchema };
+module.exports = { sql, isConfigured, keyOk, visitorId, deviceOf, isInternal, ensureSchema };

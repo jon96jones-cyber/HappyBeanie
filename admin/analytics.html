@@ -14,7 +14,8 @@ header.bar { border-bottom:1px solid rgba(245,240,230,0.12); background:rgba(23,
 header.bar .in { max-width:1180px; margin:0 auto; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
 header.bar b { font-size:20px; letter-spacing:-0.03em; }
 header.bar .sub { font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
-.tools { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.tools label.mine { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #8A7F6E; white-space: nowrap; cursor: pointer; }
+  .tools { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 button, select { font-family:'DM Mono',ui-monospace,monospace; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; padding:9px 15px; border-radius:3px; border:1px solid rgba(245,240,230,0.24); background:transparent; color:#F5F0E6; cursor:pointer; }
 button:hover, select:hover { border-color:#F0C64B; color:#F0C64B; }
 button.primary { background:#F0C64B; border-color:#F0C64B; color:#17140F; font-weight:700; }
@@ -100,6 +101,7 @@ tr:last-child td { border-bottom:none; }
         <option value="30">Last 30 days</option>
         <option value="90">Last 90 days</option>
       </select>
+      <label class="mine"><input type="checkbox" id="mine"> Show my own traffic</label>
       <button id="refresh">Refresh</button>
     </div>
   </div></header>
@@ -164,7 +166,8 @@ tr:last-child td { border-bottom:none; }
     opts.headers = Object.assign({ 'x-analytics-key': p.key || '', 'Content-Type': 'application/json' }, opts.headers || {});
     var qs = '?days=' + encodeURIComponent(days || 7) +
              '&since=' + encodeURIComponent(windowStart(days)) +
-             '&dayStart=' + encodeURIComponent(dayStart());
+             '&dayStart=' + encodeURIComponent(dayStart()) +
+             (p.mine ? '&internal=1' : '');
     return fetch('/api/admin/analytics' + qs, opts).then(function (r) {
       return r.json().catch(function () { return { ok: false, error: 'bad_response' }; });
     }).catch(function () { return { ok: false, error: 'unreachable' }; });
@@ -211,6 +214,7 @@ tr:last-child td { border-bottom:none; }
     $('desk').style.display = '';
     var p = prefs();
     $('days').value = String(p.days == null ? 7 : p.days);
+    $('mine').checked = !!p.mine;
     draw(b);
     if (timer) clearInterval(timer);
     timer = setInterval(load, 10000);
@@ -218,6 +222,8 @@ tr:last-child td { border-bottom:none; }
   function load() { api({}).then(function (b) { if (b.ok) draw(b); }); }
   $('refresh').onclick = load;
   $('days').onchange = function () { var p = prefs(); p.days = parseInt(this.value, 10); if (isNaN(p.days)) p.days = 7; savePrefs(p); load(); };
+  // Off by default: the desk should read as customers unless asked otherwise.
+  $('mine').onchange = function () { var p = prefs(); p.mine = this.checked; savePrefs(p); load(); };
 
   function draw(b) {
     $('vNow').textContent = b.live.visitorsNow;
