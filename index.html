@@ -1694,7 +1694,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <sc-for list="{{ species }}" as="sz" hint-placeholder-count="2">
           <button sc-camel-on-click="{{ sz.pick }}" style="position: relative; display: block; text-align: left; border: none; cursor: pointer; padding: 0; background: {{ sz.bg }}; font-family: 'DM Sans', sans-serif; transition: background 0.2s ease;">
             <div data-m="spimg" style="height: 250px; overflow: hidden; opacity: {{ sz.imgOpacity }}; transition: opacity 0.2s ease;">
-              <image-slot id="{{ sz.slot }}" placeholder="{{ sz.ph }}" style="width: 100%; height: 100%;"></image-slot>
+              <img src="/assets/img/species-dog.webp" alt="Goldendoodle with the Happy Beans for Dogs boxes" width="1180" height="500" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: {{ sz.dogShow }}; object-fit: cover; object-position: center;"><img src="/assets/img/species-cat.webp" alt="Tuxedo cat with the Happy Beans for Cats boxes" width="1180" height="500" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: {{ sz.catShow }}; object-fit: cover; object-position: center;">
             </div>
             <div data-m="spcard" style="display: grid; grid-template-columns: 20px 1fr auto; gap: 16px; align-items: center; padding: 26px 30px 30px;">
               <span style="width: 15px; height: 15px; border-radius: 50%; border: 1px solid #17140F; background: {{ sz.dot }}; box-shadow: {{ sz.ring }};"></span>
@@ -1719,8 +1719,8 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
              sit outside it or they inherit thumbnail placement. -->
         <div data-m="nostick" style="position: sticky; top: 96px; align-self: start; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px;">
         <div data-m="collage" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto; gap: 12px;">
-          <div style="position: relative; grid-column: 1 / -1; grid-row: 1; align-self: start; width: 100%; aspect-ratio: 1308 / 816; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.5);">
-            <div style="width: 100%; height: 100%; opacity: {{ pdpPhotoOpacity }}; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.045);"><image-slot id="{{ pdpSlotMain }}" placeholder="{{ pdpPhMain }}" style="width: 100%; height: 100%;"></image-slot></div>
+          <div style="position: relative; grid-column: 1 / -1; grid-row: 1; align-self: start; width: 100%; aspect-ratio: 1264 / 848; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.5);">
+            <div style="width: 100%; height: 100%; opacity: {{ pdpPhotoOpacity }}; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.045);"><img src="/assets/img/pdp-dog.webp" alt="Goldendoodle in a Happy Beanie bandana beside the Happy Beans for Dogs box" width="1264" height="848" loading="eager" decoding="async" style="width: 100%; height: 100%; display: {{ pdpDogShow }}; object-fit: cover; object-position: center;"><img src="/assets/img/pdp-cat.webp" alt="Tuxedo cat beside the Happy Beans for Cats box" width="1264" height="848" loading="eager" decoding="async" style="width: 100%; height: 100%; display: {{ pdpCatShow }}; object-fit: cover; object-position: center;"></div>
             <!-- The stage is mounted imperatively into this node (see mountChew)
                  so a re-render never tears down the live WebGL context. -->
             <div id="hbChewMount" style="position: absolute; inset: 0; display: {{ pdpStageDisplay }}; opacity: {{ pdpStageOpacity }}; transition: opacity 0.4s ease; background: #EFE8D9;"></div>
@@ -2146,7 +2146,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
       <div aria-hidden="true" class="hb-progress" style="position: absolute; left: 0; top: 0; height: 2px; width: 0%; background: oklch(0.86 0.14 92); transition: width 0.12s linear;"></div>
       <div data-m="gap" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 1180px; margin: 0 auto;">
         <div data-m="hide" style="display: flex; align-items: center; gap: 14px;">
-          <div style="width: 46px; height: 46px; border-radius: 3px; overflow: hidden; flex: 0 0 auto;"><image-slot id="{{ pdpSlotMain }}" placeholder="Product shot" style="width: 100%; height: 100%;"></image-slot></div>
+          <div style="width: 46px; height: 46px; border-radius: 3px; overflow: hidden; flex: 0 0 auto;"><img src="/assets/img/pdp-dog.webp" alt="Happy Beans for Dogs" width="1264" height="848" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: {{ pdpDogShow }}; object-fit: cover; object-position: center;"><img src="/assets/img/pdp-cat.webp" alt="Happy Beans for Cats" width="1264" height="848" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: {{ pdpCatShow }}; object-fit: cover; object-position: center;"></div>
           <div>
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 20px; color: #F5F0E6; line-height: 1.1;">{{ pdpName }}</div>
             <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;"><span data-pre-hide>Ships within 24 hours</span><span data-pre-show-inline>Batch 0072 · ships in ~4 weeks</span></div>
@@ -4379,6 +4379,8 @@ class Component extends DCLogic {
         imgOpacity: this.state.sp === s.key ? 1 : 0.55,
         dot: this.state.sp === s.key ? '#17140F' : 'transparent',
         ring: this.state.sp === s.key ? 'inset 0 0 0 3px #F5F0E6' : 'none',
+        dogShow: s.key === 'dog' ? 'block' : 'none',
+        catShow: s.key === 'cat' ? 'block' : 'none',
         cue: this.state.sp === s.key ? 'Selected' : 'Select',
         cueColor: this.state.sp === s.key ? 'oklch(0.44 0.07 152)' : '#8A7F6E'
       })),
@@ -4386,6 +4388,8 @@ class Component extends DCLogic {
       pdpHead: copy.head,
       pdpHeadItalic: copy.italic,
       pdpBody: copy.body,
+      pdpDogShow: isDog ? 'block' : 'none',
+      pdpCatShow: isDog ? 'none' : 'block',
       pdpSlotMain: copy.main.slot,
       pdpPhMain: copy.main.ph,
       pdpThumbs: [],
