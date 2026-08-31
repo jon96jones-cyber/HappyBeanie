@@ -239,6 +239,7 @@ h1 em { font-style:normal; color:oklch(0.86 0.14 92); }
 .pet-rowacts { margin-left:auto; display:flex; gap:12px; }
 .pet-edit { font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:#A79C8A; background:none; border:none; cursor:pointer; }
 .pet-edit:hover { color:#17140F; }
+.pet-edit.armed { color:#8C4630; }
 .pet-add { margin-top:20px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; padding:11px 15px; border:1px solid #DDD3C0; border-radius:2px; background:transparent; color:#3D372D; cursor:pointer; }
 .pet-add:hover { border-color:#17140F; }
 .pet-divider { height:1px; background:#EDE5D4; margin:20px 0; }
@@ -462,6 +463,7 @@ h1 em { color:oklch(0.86 0.14 92); }
 .pet-name { color:#F5F0E6; }
 .pet-breed, .pet-edit { color:#8A7F6E; }
 .pet-edit:hover { color:oklch(0.86 0.14 92); }
+.pet-edit.armed, .pet-edit.armed:hover { color:#E2A18C; }
 .pet-add, .bz-drop { border:1px dashed oklch(0.86 0.14 92 / 0.45); border-radius:8px;
   background:rgba(233,226,212,0.035); color:#E9E2D4;
   box-shadow:0 1px 0 rgba(255,255,255,0.04) inset;
@@ -538,6 +540,45 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   .pet-list { margin:0; }
   .panel-body { padding:16px 16px 18px; }
   .panel-head { padding:12px 16px; }
+}
+
+/* ---- touch targets ----
+   Every control in this portal exists and works at every width — nothing is
+   hidden or dropped on a phone. What differed was whether a thumb could hit
+   them: the row actions rendered at 27x12 and 40x12, roughly a quarter of the
+   44px both platform guidelines ask for, sitting a few pixels from a Remove.
+   Coarse pointers and narrow windows get real targets; a mouse keeps the
+   compact layout the panels were designed around. */
+@media (max-width:900px), (pointer:coarse) {
+  .pet-rowacts { gap:6px; }
+  .pet-edit,
+  .pet-add, .pet-save, .plan-btn, .o-reorder,
+  .acctabs button, .signout,
+  /* The ambassador panel is drawn with inline styles, so its controls are
+     reached by id — min-height and display are not set inline, so these land. */
+  #ambBox button, #ambRulesBox button {
+    min-height:44px; display:inline-flex; align-items:center; justify-content:center;
+  }
+  .pet-rowacts button { min-width:44px; padding:0 10px; }
+  .pet-add, .pet-save, .plan-btn, .o-reorder { padding-top:0; padding-bottom:0; }
+  .o-petsel, #ambBox select, #ambBox input { min-height:44px; padding:6px 10px; }
+  .pet-field input, .pet-field select, .bz-note { min-height:44px; }
+  /* Inline controls that sit inside a sentence keep their size — growing them
+     would break the line — so the hit area is grown around them instead. */
+  /* The card is a row of avatar / detail / actions. At phone widths that
+     squeezes the actions into the middle and wraps the formula name across two
+     lines, so the actions get their own full-width row underneath and the
+     detail column gets the space back. */
+  .pet-card, .qz-card { flex-wrap:wrap; }
+  .pet-card > .pet-rowacts, .qz-top > .pet-rowacts {
+    margin-left:0; width:100%; justify-content:flex-end;
+    border-top:1px solid rgba(233,226,212,0.09); margin-top:4px; padding-top:2px;
+  }
+  .pet-setw, .tracklink { position:relative; }
+  .pet-setw::after, .tracklink::after {
+    content:''; position:absolute; left:-6px; right:-6px; top:50%;
+    height:44px; transform:translateY(-50%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) { * { animation:none !important; } }
@@ -1659,6 +1700,17 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
 
   var petFormFor = null; // null = closed, 'new' = add, or a pet id = edit
 
+  // Remove deleted on the first tap. On a mouse that was merely brisk; with a
+  // 44px target sitting beside Edit it is a misfire waiting to happen, and a
+  // registered pet lives only in this browser — there is nothing to restore it
+  // from. So the first tap arms, the second removes, and it disarms itself.
+  var petArmed = null, petArmTimer = null;
+  function armPet(id) {
+    clearTimeout(petArmTimer);
+    petArmed = id;
+    if (id) petArmTimer = setTimeout(function () { petArmed = null; renderPets(); }, 4000);
+  }
+
   // Weight bands — same cut-offs and chew counts the eligibility screener
   // uses, so the account and the quiz never disagree about a dose.
   var PET_W = {
@@ -1709,7 +1761,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
             '</div></span>' +
             '<span class="pet-rowacts">' +
               '<button type="button" class="pet-edit" data-edit="' + esc(p.id) + '">Edit</button>' +
-              '<button type="button" class="pet-edit" data-remove="' + esc(p.id) + '">Remove</button>' +
+              '<button type="button" class="pet-edit' + (petArmed === p.id ? ' armed' : '') + '" data-remove="' + esc(p.id) + '">' +
+                (petArmed === p.id ? 'Confirm?' : 'Remove') + '</button>' +
             '</span>' +
           '</div>';
       }).join('') + '</div>';
@@ -1782,6 +1835,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     Array.prototype.forEach.call(box.querySelectorAll('[data-remove]'), function (b) {
       b.onclick = function () {
         var id = b.getAttribute('data-remove');
+        if (petArmed !== id) { armPet(id); renderPets(); return; }
+        armPet(null);
         writePets(readPets().filter(function (p) { return p.id !== id; }));
         var map = readOrderPets();
         Object.keys(map).forEach(function (k) { if (map[k] === id) delete map[k]; });
@@ -1837,6 +1892,14 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   var quizList = [];
   var quizState = 'loading';
   var quizRenaming = null;   // id of the screening being named, or null
+  // Same two-tap guard the pet rows use — a removed screening is gone from the
+  // account, and the only way back is retaking all eight questions.
+  var quizArmed = null, quizArmTimer = null;
+  function armQuiz(id) {
+    clearTimeout(quizArmTimer);
+    quizArmed = id;
+    if (id) quizArmTimer = setTimeout(function () { quizArmed = null; renderQuiz(); }, 4000);
+  }
   var quizSavedId = null;    // id just saved on arrival, for the confirmation line
   var quizBusy = false;
 
@@ -1964,7 +2027,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       '<span class="qz-badge' + v.tone + '">' + v.label + '</span>' +
       '<span class="pet-rowacts">' +
         '<button type="button" class="pet-edit" data-qzname="' + esc(s.id) + '">' + (s.name ? 'Rename' : 'Name') + '</button>' +
-        '<button type="button" class="pet-edit" data-qzdel="' + esc(s.id) + '">Remove</button>' +
+        '<button type="button" class="pet-edit' + (quizArmed === s.id ? ' armed' : '') + '" data-qzdel="' + esc(s.id) + '">' +
+          (quizArmed === s.id ? 'Confirm?' : 'Remove') + '</button>' +
       '</span></div>' +
       '<div class="qz-meta">' + meta + '</div>' +
       // Body font for the dose, not the mono face: the borrowed-digit face
@@ -2083,6 +2147,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     Array.prototype.forEach.call(box.querySelectorAll('[data-qzdel]'), function (b) {
       b.onclick = function () {
         var id = b.getAttribute('data-qzdel');
+        if (quizArmed !== id) { armQuiz(id); renderQuiz(); return; }
+        armQuiz(null);
         if (DEMO) {
           quizList = quizList.filter(function (s) { return s.id !== id; });
           renderQuiz();
