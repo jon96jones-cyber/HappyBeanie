@@ -267,6 +267,12 @@ h1 em { font-style:normal; color:oklch(0.86 0.14 92); }
 /* What they answered belongs under the note, not trailing off the end of its
    last sentence — it is a citation, not the rest of the thought. */
 .qz-flag .qz-meta { display:block; margin-top:5px; }
+.qz-picks { display:flex; flex-wrap:wrap; gap:8px; }
+/* These carry a pet's name, so they keep its capitalisation — unlike the
+   Edit/Remove controls they borrow their styling from. */
+.qz-picks button { padding:6px 10px; border:1px solid #DDD3C0; border-radius:2px;
+  font-family:'DM Sans',sans-serif; font-size:13px; letter-spacing:-0.01em; text-transform:none; color:#3D372D; }
+.qz-picks button:hover { border-color:#17140F; }
 .bz-lede { font-size:15px; color:#3D372D; line-height:1.7; max-width:40em; }
 .bz-lede b { font-weight:700; letter-spacing:-0.02em; }
 .bz-drop { display:flex; align-items:center; gap:16px; margin-top:18px; padding:18px 20px; border:1px dashed #D5C9B2; border-radius:3px; background:#F5F0E6; cursor:pointer; transition:border-color .2s ease; }
@@ -480,6 +486,8 @@ h1 em { color:oklch(0.86 0.14 92); }
 .qz-badge.block { background:oklch(0.6 0.15 38 / 0.2); color:oklch(0.78 0.12 38); }
 .qz-meta { color:#8A7F6E; }
 .qz-flags { border-top-color:rgba(233,226,212,0.1); }
+.qz-picks button { border-color:rgba(233,226,212,0.2); border-radius:4px; color:#DED5C4; }
+.qz-picks button:hover { border-color:oklch(0.86 0.14 92); }
 .qz-flag { color:#B9AF9C; }
 .qz-flag b { color:#F5F0E6; }
 
@@ -1686,7 +1694,18 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
                 : (p.species === 'cat'
                   ? '<b class="gold">1 chew daily</b>'
                   : '<button type="button" class="pet-setw" data-edit="' + esc(p.id) + '">Set weight for dose</button>')) + '</span>' +
-              '<span><i>Screener</i><b><a href="/quiz">Check eligibility →</a></b></span>' +
+              '<span><i>Screener</i>' + (function () {
+                // A saved screening for this animal belongs on its card. Sending
+                // someone to "check eligibility" for a pet they already screened
+                // is the panel forgetting what the account knows.
+                var scr = screeningFor(p.species);
+                if (!scr) return '<b><a href="/quiz">Check eligibility →</a></b>';
+                var v = QZ_VERDICT[scr.verdict] || QZ_VERDICT.ok;
+                // The same three colours the screening badges use, so a result
+                // that wants attention is the one that gets it — the gold here
+                // is the dose's, and lending it to a clean pass inverted that.
+                return '<b style="color:' + QZ_TONE[scr.verdict] + ';">' + v.label + '</b>';
+              })() + '</span>' +
             '</div></span>' +
             '<span class="pet-rowacts">' +
               '<button type="button" class="pet-edit" data-edit="' + esc(p.id) + '">Edit</button>' +
@@ -1715,18 +1734,30 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   }
 
   function petFormHtml(pet, divider) {
-    var species = (pet && pet.species) || 'dog';
+    // A new pet follows the most recent screening: they have just told us which
+    // animal they have and roughly how big it is, so the form should not make
+    // them say it twice. Editing an existing pet keeps that pet's own values,
+    // and with nothing screened the old dog default stands.
+    var seed = pet ? null : (quizList[0] || null);
+    var seedW = seed ? ((seed.answers || {}).weightDog || (seed.answers || {}).weightCat || '') : '';
+    var species = (pet && pet.species) || (seed && seed.species) || 'dog';
+    var weight = (pet && pet.weight) || seedW;
+    var fromScreener = seed
+      ? '<div class="bz-fine" style="margin:0;">Prefilled from your ' +
+        (seed.species === 'cat' ? 'cat' : 'dog') + ' screening &mdash; change anything that is not right</div>'
+      : '';
     return (divider ? '<div class="pet-divider"></div>' : '') +
       '<div class="pet-form">' +
+        fromScreener +
         '<div class="pet-field"><label for="petName">Pet name</label>' +
-          '<input id="petName" type="text" maxlength="32" placeholder="Beanie" value="' + esc((pet && pet.name) || '') + '"></div>' +
+          '<input id="petName" type="text" maxlength="32" placeholder="Beanie" value="' + esc((pet && pet.name) || (seed && seed.name) || '') + '"></div>' +
         '<div class="pet-field"><label for="petSpecies">Dog or cat</label>' +
           '<select id="petSpecies"><option value="dog"' + (species === 'dog' ? ' selected' : '') + '>Dog</option>' +
           '<option value="cat"' + (species === 'cat' ? ' selected' : '') + '>Cat</option></select></div>' +
         '<div class="pet-field"><label for="petBreed">Breed</label>' +
           '<select id="petBreed">' + breedOpts(BREEDS[species], pet && pet.breed) + '</select></div>' +
         '<div class="pet-field"><label for="petWeight">Weight — sets the daily dose</label>' +
-          '<select id="petWeight">' + weightOpts(species, pet && pet.weight) + '</select></div>' +
+          '<select id="petWeight">' + weightOpts(species, weight) + '</select></div>' +
         '<div class="pet-formacts">' +
           '<button type="button" class="pet-save" id="petSave">' + (pet ? 'Save changes' : 'Save pet') + '</button>' +
           '<button type="button" class="pet-edit" id="petCancel">Cancel</button>' +
@@ -1815,11 +1846,26 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     caution: { label: 'Eligible · review', tone: ' caution' },
     block: { label: 'Not eligible', tone: ' block' }
   };
+  var QZ_TONE = {
+    ok: 'oklch(0.82 0.13 152)',
+    caution: 'oklch(0.88 0.13 92)',
+    block: 'oklch(0.78 0.12 38)'
+  };
 
   // Abandoning sign-in leaves the parked result behind. A week is long enough
   // to cover a distracted afternoon and short enough that a forgotten one never
   // turns up months later looking like a fresh screening.
   var QZ_PENDING_TTL = 7 * 24 * 60 * 60 * 1000;
+
+  // The newest saved screening for one animal, or null. Screenings are stored
+  // newest first and only one per species survives a retake, so the first match
+  // is the current one.
+  function screeningFor(species) {
+    for (var i = 0; i < quizList.length; i++) {
+      if (quizList[i].species === species) return quizList[i];
+    }
+    return null;
+  }
 
   function takePendingQuiz() {
     var raw = null;
@@ -1871,6 +1917,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
         quizSavedId = b.saved || null;
         quizState = 'ready';
         renderQuiz();
+        // Pets render before this resolves, and their cards and their add form
+        // both read the screenings. Skip it mid-form so a half-typed pet is not
+        // wiped out from under them.
+        if (!petFormFor) renderPets();
       })
       .catch(function () {
         quizState = pending ? 'savefailed' : 'error';
@@ -1932,9 +1982,19 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
 
     var form = '';
     if (quizRenaming === s.id) {
+      // Whoever they screened is very likely a pet they have already registered,
+      // so offer those by name rather than asking them to retype one. Only pets
+      // of the screened species — a dog result is not Mochi's.
+      var mine = readPets().filter(function (p) { return p.species === s.species && p.name; });
+      var picks = mine.length
+        ? '<div class="qz-picks">' + mine.map(function (p) {
+            return '<button type="button" class="pet-edit" data-qzpick="' + esc(p.name) + '">' + esc(p.name) + '</button>';
+          }).join('') + '</div>'
+        : '';
       form = '<div class="qz-flags"><div class="pet-field">' +
         '<label for="qzNameInput">Whose result is this?</label>' +
-        '<input id="qzNameInput" type="text" maxlength="40" value="' + esc(s.name || '') + '" placeholder="Rosie" autocomplete="off">' +
+        '<input id="qzNameInput" type="text" maxlength="40" value="' + esc(s.name || (mine.length === 1 ? mine[0].name : '')) + '" placeholder="Rosie" autocomplete="off">' +
+        picks +
         '</div><div class="pet-formacts">' +
           '<button type="button" class="pet-save" data-qzsave="' + esc(s.id) + '">' + (quizBusy ? 'Saving…' : 'Save') + '</button>' +
           '<button type="button" class="pet-edit" data-qzcancel="1">Cancel</button>' +
@@ -1998,6 +2058,12 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     if (!box) return;
     Array.prototype.forEach.call(box.querySelectorAll('[data-qzname]'), function (b) {
       b.onclick = function () { quizRenaming = b.getAttribute('data-qzname'); renderQuiz(); };
+    });
+    Array.prototype.forEach.call(box.querySelectorAll('[data-qzpick]'), function (b) {
+      b.onclick = function () {
+        var input = $('qzNameInput');
+        if (input) { input.value = b.getAttribute('data-qzpick'); input.focus(); }
+      };
     });
     var cancel = box.querySelector('[data-qzcancel]');
     if (cancel) cancel.onclick = function () { quizRenaming = null; renderQuiz(); };
