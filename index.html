@@ -2750,6 +2750,27 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
             <span style="font-size: 14.5px; line-height: 1.55; color: #3D372D;">We will check back in. Nothing else is stored, and every message we send has a one-click way off.</span>
           </div>
         </sc-if>
+        <sc-if value="{{ qzSaveIdle }}" hint-placeholder-val="{{ true }}">
+          <div data-m="stack" style="display: grid; grid-template-columns: 1fr auto; gap: 20px 30px; align-items: center; background: #FCFAF4; border: 1px solid #E7DECB; border-radius: 5px; padding: 26px 30px; margin-bottom: 14px; box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset, 0 14px 28px -22px rgba(23,20,15,0.45);">
+            <div>
+              <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 9px;">{{ qzSaveEyebrow }}</div>
+              <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35; margin-bottom: 8px;">{{ qzSaveHead }}</div>
+              <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0; max-width: 44em; text-wrap: pretty;">{{ qzSaveNote }}</p>
+            </div>
+            <button sc-camel-on-click="{{ qzSaveGo }}" disabled="{{ qzSaveBusy }}" data-m="w100" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; padding: 15px 26px; border: 1.5px solid #17140F; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-weight: 500; cursor: pointer; white-space: nowrap; box-shadow: 0 16px 28px -20px oklch(0.86 0.14 92 / 0.72); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: oklch(0.9 0.15 92); transform: translateY(-2px);">{{ qzSaveLabel }}</button>
+            <div style="display: {{ qzSaveErrShow }}; grid-column: 1 / -1; font-size: 13px; color: #8C4630;">{{ qzSaveErr }}</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ qzSaveDone }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 13px; background: #FCFAF4; border: 1px solid oklch(0.72 0.08 152 / 0.5); border-radius: 5px; padding: 22px 26px; margin-bottom: 14px;">
+            <span style="position: relative; width: 20px; height: 20px; flex: 0 0 auto;">
+              <span style="position: absolute; inset: 0; border-radius: 50%; background: oklch(0.72 0.08 152); animation: checkPop 0.4s cubic-bezier(0.2,0.7,0.2,1) both;"></span>
+              <svg width="11" height="9" sc-camel-view-box="0 0 11 9" fill="none" style="position: absolute; left: 4.5px; top: 5.5px;"><path d="M1 4.4 4 7.2 10 1" stroke="#17140F" sc-camel-stroke-width="1.9" sc-camel-stroke-linecap="round" sc-camel-stroke-linejoin="round"></path></svg>
+            </span>
+            <span style="flex: 1 1 260px; font-size: 14.5px; line-height: 1.55; color: #3D372D;">Saved to your account, under Eligibility profile.</span>
+            <a href="/account" style="flex: 0 0 auto; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px;">Open your account →</a>
+          </div>
+        </sc-if>
         <sc-if value="{{ qzCanBuy }}" hint-placeholder-val="{{ false }}">
           <div style="margin: 40px 0 40px;">
             <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
@@ -5312,6 +5333,10 @@ Object.assign(Component.prototype, {
     const canDefer = blocked && blockFlags.every(f => !!f.defer);
     const deferReason = canDefer ? deferReasons[0] : null;
     const species = a.species === 'cat' ? 'Cat Formula' : 'Dog Formula';
+    // One dose line, read by the profile grid and by whatever gets saved to
+    // the account, so the two can never disagree about what we advised.
+    const doseLine = verdict === 'block' ? 'Held'
+      : verdict === 'caution' ? '1 chew daily, ½ for week one' : '1 chew daily';
     const V = {
       ok: { eyebrow: 'Result · Eligible', head: 'Your pet is eligible.', italic: '', copy: '', bg: '#17140F', fg: '#F5F0E6', body: '#B9AF9C', accent: 'oklch(0.86 0.14 92)', eye: 'oklch(0.72 0.08 152)' },
       caution: { eyebrow: 'Result', head: 'Your pet is eligible.', italic: '', copy: 'Nothing you told us rules Happy Beanie out, but some of your answers touch inputs that interact with medication, diet or a diagnosis. Start at half dose for the first week.', bg: '#17140F', fg: '#F5F0E6', body: '#B9AF9C', accent: cCaution, eye: cCaution },
@@ -5322,7 +5347,7 @@ Object.assign(Component.prototype, {
       qzAsking: stage === 'quiz',
       qzResult: stage === 'result',
       qzStart: () => { this.setState({ qzStage: 'quiz', qzStep: 0 }); window.scrollTo(0, 0); },
-      qzRestart: () => { this.setState({ qzStage: 'intro', qzStep: 0, qzAnswers: {}, qzAdded: false, qzDeferDone: false, qzDeferEmail: '', qzDeferMonths: 0, qzDeferErr: '', qzDeferBusy: false }); window.scrollTo(0, 0); },
+      qzRestart: () => { this.setState({ qzStage: 'intro', qzStep: 0, qzAnswers: {}, qzAdded: false, qzDeferDone: false, qzDeferEmail: '', qzDeferMonths: 0, qzDeferErr: '', qzDeferBusy: false, qzSaveDone: false, qzSaveBusy: false, qzSaveErr: '' }); window.scrollTo(0, 0); },
       qzBack: () => {
         window.scrollTo(0, 0);
         if (stage === 'result') { this.setState({ qzStage: 'quiz', qzStep: Math.min(step, list.length - 1) }); return; }
@@ -5365,7 +5390,7 @@ Object.assign(Component.prototype, {
       qzProfile: [
         { k: 'Formula', v: species },
         { k: 'Life stage', v: ({ under1: 'Under 12 months', '1-6': '1 to 6 years', '7-10': '7 to 10 years', '11plus': '11 years or older' })[a.age] || '—' },
-        { k: 'Suggested dose', v: verdict === 'block' ? 'Held' : verdict === 'caution' ? '1 chew daily, ½ for week one' : '1 chew daily' },
+        { k: 'Suggested dose', v: doseLine },
         { k: 'Flags raised', v: flags.length === 0 ? 'None' : flags.length + (flags.length === 1 ? ' item' : ' items') }
       ],
       qzHasFlags: flags.length > 0,
@@ -5406,6 +5431,55 @@ Object.assign(Component.prototype, {
           this.setState({ qzDeferBusy: false, qzDeferErr: 'That did not save. Try again in a moment, or email hello@happybeanie.com.' });
         }).catch(() => {
           this.setState({ qzDeferBusy: false, qzDeferErr: 'That did not save. Try again in a moment, or email hello@happybeanie.com.' });
+        });
+      },
+      // Saving the screening to an account. The reason to make one is plain and
+      // worth saying plainly: this result lives in the tab and nowhere else,
+      // and the account is the only thing that keeps it. No reward attached —
+      // the pitch is the thing itself.
+      qzSaveIdle: !st.qzSaveDone,
+      qzSaveDone: !!st.qzSaveDone,
+      qzSaveEyebrow: st.signedIn ? 'Your account' : 'Before you go',
+      qzSaveHead: st.signedIn ? 'Keep this on your account.' : 'Keep this result.',
+      qzSaveNote: st.signedIn
+        ? 'Saves the formula, the dose and every ingredient we flagged to your account — there when you reorder, and on your phone.'
+        : 'This page is the only copy. Close the tab and it is gone. An account keeps the formula, the dose and every ingredient we flagged, on any device, ready the next time you order.',
+      qzSaveLabel: st.qzSaveBusy ? 'Saving…' : (st.signedIn ? 'Save to my account' : 'Save it to an account →'),
+      qzSaveBusy: !!st.qzSaveBusy,
+      qzSaveErr: st.qzSaveErr || '',
+      qzSaveErrShow: st.qzSaveErr ? 'block' : 'none',
+      qzSaveGo: () => {
+        if (this.state.qzSaveBusy) return;
+        const payload = {
+          species: a.species, age: a.age, verdict: verdict, dose: doseLine,
+          flags: flags.map(f => ({ level: f.level, ing: f.ing, note: f.note, srcs: f.srcs })),
+          answers: a
+        };
+        // Signed out: park the result and send them through Shopify's sign-in.
+        // The portal picks it up on the way back, so the round trip costs them
+        // nothing and nobody has to retake the screener to save it.
+        if (!this.state.signedIn) {
+          try { localStorage.setItem('hb-quiz-pending', JSON.stringify({ at: Date.now(), screening: payload })); } catch (e) {}
+          window.location.href = '/api/auth/login';
+          return;
+        }
+        this.setState({ qzSaveBusy: true, qzSaveErr: '' });
+        fetch('/api/account/quiz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ screening: payload })
+        }).then(r => r.json().catch(() => ({}))).then(b => {
+          if (b && b.ok) { this.setState({ qzSaveBusy: false, qzSaveDone: true }); return; }
+          // The session can lapse between page load and this click — same
+          // hand-off as the signed-out path rather than an error they can't act on.
+          if (b && b.error === 'signed_out') {
+            try { localStorage.setItem('hb-quiz-pending', JSON.stringify({ at: Date.now(), screening: payload })); } catch (e) {}
+            window.location.href = '/api/auth/login';
+            return;
+          }
+          this.setState({ qzSaveBusy: false, qzSaveErr: 'That did not save. Try again in a moment, or email hello@happybeanie.com.' });
+        }).catch(() => {
+          this.setState({ qzSaveBusy: false, qzSaveErr: 'That did not save. Try again in a moment, or email hello@happybeanie.com.' });
         });
       },
       qzBuyRule: 'rgba(245,240,230,0.22)',

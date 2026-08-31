@@ -253,6 +253,20 @@ h1 em { font-style:normal; color:oklch(0.86 0.14 92); }
 .dash-pet { display:inline-flex; align-items:center; vertical-align:-4px; margin-left:8px; }
 .dash-pets { gap:4px; }
 
+/* ---------- saved screenings ---------- */
+.qz-card { display:grid; gap:10px; background:#FCFAF4; padding:18px 22px; }
+.qz-top { display:flex; align-items:baseline; gap:9px 12px; flex-wrap:wrap; }
+.qz-badge { font-family:'HB Mono Figures','DM Mono',monospace; font-size:8.5px; letter-spacing:0.14em; text-transform:uppercase; padding:5px 8px; border-radius:2px;
+  background:oklch(0.72 0.16 152 / 0.16); color:oklch(0.4 0.09 152); }
+.qz-badge.caution { background:oklch(0.88 0.15 96 / 0.3); color:#6B4E12; }
+.qz-badge.block { background:oklch(0.5 0.13 38 / 0.14); color:oklch(0.45 0.13 38); }
+.qz-meta { font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; line-height:1.7; }
+.qz-flags { display:grid; gap:7px; padding-top:11px; border-top:1px solid #EDE5D4; }
+.qz-flag { font-size:12.5px; line-height:1.5; color:#554C40; }
+.qz-flag b { font-weight:700; letter-spacing:-0.01em; color:#17140F; }
+/* What they answered belongs under the note, not trailing off the end of its
+   last sentence — it is a citation, not the rest of the thought. */
+.qz-flag .qz-meta { display:block; margin-top:5px; }
 .bz-lede { font-size:15px; color:#3D372D; line-height:1.7; max-width:40em; }
 .bz-lede b { font-weight:700; letter-spacing:-0.02em; }
 .bz-drop { display:flex; align-items:center; gap:16px; margin-top:18px; padding:18px 20px; border:1px dashed #D5C9B2; border-radius:3px; background:#F5F0E6; cursor:pointer; transition:border-color .2s ease; }
@@ -457,6 +471,18 @@ h1 em { color:oklch(0.86 0.14 92); }
   transition:transform .3s cubic-bezier(0.2,0.7,0.2,1), box-shadow .3s ease; }
 .pet-save:hover { background:oklch(0.86 0.14 92); transform:translateY(-2px); box-shadow:0 14px 26px -14px oklch(0.86 0.14 92 / 0.7); }
 
+/* ---- saved screenings ---- */
+.qz-card { background:linear-gradient(168deg,#211C14 0%,#17130C 100%);
+  border:1px solid rgba(233,226,212,0.11); border-radius:8px; padding:16px 22px;
+  box-shadow:0 16px 30px -28px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.05) inset; }
+.qz-badge { background:oklch(0.72 0.16 152 / 0.18); color:oklch(0.82 0.13 152); }
+.qz-badge.caution { background:oklch(0.86 0.14 92 / 0.16); color:oklch(0.88 0.13 92); }
+.qz-badge.block { background:oklch(0.6 0.15 38 / 0.2); color:oklch(0.78 0.12 38); }
+.qz-meta { color:#8A7F6E; }
+.qz-flags { border-top-color:rgba(233,226,212,0.1); }
+.qz-flag { color:#B9AF9C; }
+.qz-flag b { color:#F5F0E6; }
+
 /* ---- bandana ---- */
 .bz-drop-ic { background:rgba(233,226,212,0.05); border-color:rgba(233,226,212,0.16); border-radius:6px; }
 .bz-drop-txt { color:#C9C0AE; }
@@ -620,6 +646,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
           <div class="panel" id="petsPanel" data-view="personal">
             <div class="panel-head"><h2>Registered pets</h2><span class="count" id="petCount"></span></div>
             <div class="panel-body" id="petBox"></div>
+          </div>
+          <div class="panel" id="quizPanel" data-view="personal">
+            <div class="panel-head"><h2>Eligibility profile</h2><span class="count" id="quizCount"></span></div>
+            <div class="panel-body" id="quizBox"></div>
           </div>
           <div class="panel" data-view="personal wholesale">
             <div class="panel-head"><h2>Ship to</h2></div>
@@ -1469,6 +1499,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     stampSync();
     wirePlanActions();
     renderPets();
+    loadQuiz();
     show('dash');
   }
 
@@ -1759,6 +1790,241 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     var slot = $('deliveriesFor');
     if (!slot) return;
     slot.innerHTML = pets.length === 1 ? ' for ' + esc(pets[0].name) : '';
+  }
+
+  // ---- eligibility profile (screenings saved from /quiz) ----
+  //
+  // Unlike registered pets, these live on the Shopify customer record, not in
+  // this browser — that is the whole promise the quiz makes when it asks
+  // someone to sign in, so it has to be true on their phone too.
+  //
+  // Someone who took the screener signed out and chose to save it arrives here
+  // straight from sign-in with the result parked in localStorage. We hand it to
+  // the server on this first load and clear it, so the round trip through
+  // Shopify's hosted sign-in costs them nothing.
+  var QZ_PENDING_KEY = 'hb-quiz-pending';
+  var quizList = [];
+  var quizState = 'loading';
+  var quizRenaming = null;   // id of the screening being named, or null
+  var quizSavedId = null;    // id just saved on arrival, for the confirmation line
+  var quizBusy = false;
+
+  var QZ_AGE = { under1: 'Under 12 months', '1-6': '1 to 6 years', '7-10': '7 to 10 years', '11plus': '11 years or older' };
+  var QZ_VERDICT = {
+    ok: { label: 'Eligible', tone: '' },
+    caution: { label: 'Eligible · review', tone: ' caution' },
+    block: { label: 'Not eligible', tone: ' block' }
+  };
+
+  // Abandoning sign-in leaves the parked result behind. A week is long enough
+  // to cover a distracted afternoon and short enough that a forgotten one never
+  // turns up months later looking like a fresh screening.
+  var QZ_PENDING_TTL = 7 * 24 * 60 * 60 * 1000;
+
+  function takePendingQuiz() {
+    var raw = null;
+    try { raw = localStorage.getItem(QZ_PENDING_KEY); } catch (e) {}
+    if (!raw) return null;
+    try { localStorage.removeItem(QZ_PENDING_KEY); } catch (e) {}
+    try {
+      var p = JSON.parse(raw);
+      if (!p || !p.screening || !p.screening.species || !p.screening.verdict) return null;
+      if (!p.at || (Date.now() - p.at) > QZ_PENDING_TTL) return null;
+      return p.screening;
+    } catch (e) { return null; }
+  }
+
+  function loadQuiz() {
+    var pending = takePendingQuiz();
+    quizState = 'loading';
+    renderQuiz();
+
+    if (DEMO) {
+      quizList = [{
+        id: 'demo1', name: 'Rosie', species: 'dog', age: '1-6', verdict: 'caution',
+        dose: '1 chew daily, ½ for week one', savedAt: '2026-07-02T00:00:00Z',
+        flags: [{ level: 'caution', ing: 'Salmon oil', note: 'Interacts with blood thinners — worth a word with your vet before the first chew.', srcs: ['On prescription medication'] }]
+      }];
+      quizState = 'ready';
+      renderQuiz();
+      return;
+    }
+
+    var req = pending
+      ? fetch('/api/account/quiz', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ screening: pending })
+        })
+      : fetch('/api/account/quiz', { credentials: 'same-origin' });
+
+    req.then(function (r) { return r.json().catch(function () { return null; }); })
+      .then(function (b) {
+        if (!b || !b.ok) {
+          // A failed save is worth telling them about — they were sent here to
+          // do exactly that, and the result is now gone from the tab it lived in.
+          quizState = pending ? 'savefailed' : 'error';
+          renderQuiz();
+          return;
+        }
+        quizList = b.screenings || [];
+        quizSavedId = b.saved || null;
+        quizState = 'ready';
+        renderQuiz();
+      })
+      .catch(function () {
+        quizState = pending ? 'savefailed' : 'error';
+        renderQuiz();
+      });
+  }
+
+  function quizRequest(opts, after) {
+    if (quizBusy) return;
+    quizBusy = true;
+    renderQuiz();
+    if (DEMO) {
+      quizBusy = false;
+      if (after) after();
+      renderQuiz();
+      return;
+    }
+    fetch('/api/account/quiz' + (opts.qs || ''), {
+      method: opts.method, credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    }).then(function (r) { return r.json().catch(function () { return null; }); })
+      .then(function (b) {
+        quizBusy = false;
+        if (b && b.ok) { quizList = b.screenings || []; quizRenaming = null; }
+        renderQuiz();
+      })
+      .catch(function () { quizBusy = false; renderQuiz(); });
+  }
+
+  function quizCard(s) {
+    var v = QZ_VERDICT[s.verdict] || QZ_VERDICT.ok;
+    var formula = s.species === 'cat' ? 'Cat Formula' : 'Dog Formula';
+    var title = s.name || formula;
+    var meta = [s.name ? formula : '', QZ_AGE[s.age] || '', 'Saved ' + fmtShort(s.savedAt)]
+      .filter(Boolean).join(' &middot; ');
+    var flags = Array.isArray(s.flags) ? s.flags : [];
+
+    var head = '<div class="qz-top">' +
+      '<span class="pet-name">' + esc(title) + '</span>' +
+      '<span class="qz-badge' + v.tone + '">' + v.label + '</span>' +
+      '<span class="pet-rowacts">' +
+        '<button type="button" class="pet-edit" data-qzname="' + esc(s.id) + '">' + (s.name ? 'Rename' : 'Name') + '</button>' +
+        '<button type="button" class="pet-edit" data-qzdel="' + esc(s.id) + '">Remove</button>' +
+      '</span></div>' +
+      '<div class="qz-meta">' + meta + '</div>' +
+      // Body font for the dose, not the mono face: the borrowed-digit face
+      // only covers U+0030-0039, so "½" falls through to DM Mono and renders
+      // badly. Same label/value pair the pet cards use.
+      '<div class="pet-care"><span><i>Suggested dose</i><b>' + esc(s.dose || '—') + '</b></span></div>';
+
+    var body = '';
+    if (flags.length) {
+      body = '<div class="qz-flags">' + flags.map(function (f) {
+        var srcs = (Array.isArray(f.srcs) && f.srcs.length) ? ' <span class="qz-meta">You said: ' + esc(f.srcs.join(' · ')) + '</span>' : '';
+        return '<div class="qz-flag"><b>' + esc(f.ing) + '</b> — ' + esc(f.note) + srcs + '</div>';
+      }).join('') + '</div>';
+    }
+
+    var form = '';
+    if (quizRenaming === s.id) {
+      form = '<div class="qz-flags"><div class="pet-field">' +
+        '<label for="qzNameInput">Whose result is this?</label>' +
+        '<input id="qzNameInput" type="text" maxlength="40" value="' + esc(s.name || '') + '" placeholder="Rosie" autocomplete="off">' +
+        '</div><div class="pet-formacts">' +
+          '<button type="button" class="pet-save" data-qzsave="' + esc(s.id) + '">' + (quizBusy ? 'Saving…' : 'Save') + '</button>' +
+          '<button type="button" class="pet-edit" data-qzcancel="1">Cancel</button>' +
+        '</div></div>';
+    }
+
+    return '<div class="qz-card">' + head + body + form + '</div>';
+  }
+
+  function renderQuiz() {
+    var box = $('quizBox');
+    var count = $('quizCount');
+    if (!box) return;
+
+    if (quizState === 'loading') {
+      if (count) count.textContent = '';
+      box.innerHTML = '<p class="bz-lede">Looking for a saved screening…</p>';
+      return;
+    }
+
+    if (quizState === 'savefailed') {
+      if (count) count.textContent = '';
+      box.innerHTML = '<p class="bz-lede"><b>That did not save.</b> Your result could not be written to the account just now. ' +
+        'Run the screener again and save it, or email the desk and we will sort it.</p>' +
+        '<a class="pet-add" style="display:inline-block; text-decoration:none;" href="/quiz">Retake the screener &rarr;</a>' +
+        '<div class="bz-fine">hello@happybeanie.com</div>';
+      return;
+    }
+
+    if (quizState === 'error') {
+      if (count) count.textContent = '';
+      box.innerHTML = '<p class="bz-lede">We could not reach your saved screenings just now. Refresh in a moment.</p>';
+      return;
+    }
+
+    if (!quizList.length) {
+      if (count) count.textContent = '';
+      box.innerHTML = '<p class="bz-lede"><b>Nothing saved yet.</b> The eligibility screener checks your pet&rsquo;s age, ' +
+        'diet, diagnoses and medications against the ingredient list. Save the result here and the formula, the dose and ' +
+        'anything we flagged stay with your account &mdash; on any device, ready the next time you order.</p>' +
+        '<a class="pet-add" style="display:inline-block; text-decoration:none;" href="/quiz">Take the screener &rarr;</a>';
+      return;
+    }
+
+    if (count) count.textContent = quizList.length === 1 ? '1 saved' : quizList.length + ' saved';
+
+    var saved = quizSavedId
+      ? '<p class="bz-lede" style="margin-bottom:16px;"><b>Saved.</b> This is yours now &mdash; it will be here next time, on any device.</p>'
+      : '';
+
+    box.innerHTML = saved +
+      '<div class="pet-list">' + quizList.map(quizCard).join('') + '</div>' +
+      '<a class="pet-add" style="display:inline-block; text-decoration:none;" href="/quiz">Retake the screener &rarr;</a>' +
+      '<div class="bz-fine">A screening is a snapshot of the day it was taken, not veterinary advice. Retake it if your pet&rsquo;s diet, medication or diagnosis changes.</div>';
+
+    wireQuiz();
+  }
+
+  function wireQuiz() {
+    var box = $('quizBox');
+    if (!box) return;
+    Array.prototype.forEach.call(box.querySelectorAll('[data-qzname]'), function (b) {
+      b.onclick = function () { quizRenaming = b.getAttribute('data-qzname'); renderQuiz(); };
+    });
+    var cancel = box.querySelector('[data-qzcancel]');
+    if (cancel) cancel.onclick = function () { quizRenaming = null; renderQuiz(); };
+    var save = box.querySelector('[data-qzsave]');
+    if (save) save.onclick = function () {
+      var input = $('qzNameInput');
+      var id = save.getAttribute('data-qzsave');
+      var name = input ? input.value.trim().slice(0, 40) : '';
+      if (DEMO) {
+        quizList = quizList.map(function (s) { return s.id === id ? Object.assign({}, s, { name: name }) : s; });
+        quizRenaming = null;
+        renderQuiz();
+        return;
+      }
+      quizRequest({ method: 'PATCH', body: { id: id, name: name } });
+    };
+    Array.prototype.forEach.call(box.querySelectorAll('[data-qzdel]'), function (b) {
+      b.onclick = function () {
+        var id = b.getAttribute('data-qzdel');
+        if (DEMO) {
+          quizList = quizList.filter(function (s) { return s.id !== id; });
+          renderQuiz();
+          return;
+        }
+        quizRequest({ method: 'DELETE', qs: '?id=' + encodeURIComponent(id) });
+      };
+    });
   }
 
   function renderOrderPets() {
