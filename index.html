@@ -1727,7 +1727,12 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         </sc-for>
       </div>
     </div>
-    <section data-m="pad short" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 34px 44px 96px; overflow: hidden;">
+    <!-- overflow is clip, not hidden, and the difference matters: hidden makes
+         this section a scroll container, which silently kills position:sticky on
+         the media column inside it — the gallery had the sticky declaration all
+         along and scrolled away regardless. clip crops the same way without
+         becoming a scroll container. Do not change it back to hidden. -->
+    <section data-m="pad short" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 34px 44px 96px; overflow: clip;">
       <div aria-hidden="true" data-m="hide" style="position: absolute; left: 0; right: 0; top: 0; height: 720px; overflow: hidden; pointer-events: none;">
         <div aria-hidden="true" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(23,20,15,0.055) 1px, transparent 1px); background-size: 30px 30px; mask-image: radial-gradient(90% 70% at 50% 0%, #000 10%, transparent 78%); -webkit-mask-image: radial-gradient(90% 70% at 50% 0%, #000 10%, transparent 78%); opacity: 0.7;"></div>
       </div>
