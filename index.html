@@ -1744,13 +1744,16 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <!-- The photo collage keeps its own grid: its mobile rules position
              children by nth-child, so the inspector's tabs and panel have to
              sit outside it or they inherit thumbnail placement. -->
-        <!-- margin-bottom is not spacing, it is a brake. A sticky element may
+        <!-- margin-bottom is not spacing, it is a brake: a sticky element may
              travel until its MARGIN box reaches the bottom of its containing
-             block, so 72px here stops the photo that far short of the buy
-             column's last line, leaving it room to breathe before the section
-             ends instead of finishing hard against the edge. The column is
-             align-self:start in a taller row, so the margin costs no layout. -->
-        <div data-m="nostick" style="position: sticky; top: 96px; align-self: start; margin-bottom: 72px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px;">
+             block, so this subtracts from how far the photo can move.
+             32px is not arbitrary — the buy column's box ends 32px below the
+             last thing you can see in it, because its closing rule carries a
+             32px margin. Braking by exactly that lands the photo's bottom edge
+             on that rule instead of 32px past it. If the rule's margin changes,
+             change this to match. The column is align-self:start in a taller
+             row, so the margin costs no layout. -->
+        <div data-m="nostick" style="position: sticky; top: 96px; align-self: start; margin-bottom: 32px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px;">
         <div data-m="collage" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto; gap: 12px;">
           <div style="position: relative; grid-column: 1 / -1; grid-row: 1; align-self: start; width: 100%; aspect-ratio: 1264 / 848; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.5);">
             <div style="width: 100%; height: 100%; opacity: {{ pdpPhotoOpacity }}; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.045);"><img src="/assets/img/pdp-dog.webp" alt="Goldendoodle in a Happy Beanie bandana beside the Happy Beans for Dogs box" width="1264" height="848" loading="eager" decoding="async" style="width: 100%; height: 100%; display: {{ pdpDogShow }}; object-fit: cover; object-position: center;"><img src="/assets/img/pdp-cat.webp" alt="Tuxedo cat beside the Happy Beans for Cats box" width="1264" height="848" loading="eager" decoding="async" style="width: 100%; height: 100%; display: {{ pdpCatShow }}; object-fit: cover; object-position: center;"></div>
