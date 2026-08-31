@@ -163,10 +163,53 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
 };
 </script>
 <script>
+/* Own-traffic opt-out, decided before the pixel loads.
+   Visiting /?nofb=1 marks THIS browser and the snippet below never runs on it
+   again; /?nofb=0 clears the mark. Nothing else changes — without the flag the
+   pixel code is exactly what it has always been.
+
+   Two deliberate choices. The storage read is wrapped and defaults to
+   tracking, so a browser that blocks storage still measures: the failure has
+   to fall towards data, never towards silence. And when opted out the snippet
+   is skipped entirely rather than stubbed, leaving window.fbq undefined —
+   every in-app event call is already guarded by `if (window.fbq)`, so they all
+   skip cleanly with nothing half-fired.
+
+   It does not cover Shopify's checkout pixel, which fires Purchase from their
+   domain, nor the <noscript> fallback below, which only runs with JS off. */
+(function () {
+  var off = false, said = null;
+  try {
+    var q = new URLSearchParams(location.search).get('nofb');
+    if (q === '1') { localStorage.setItem('hb_nofb', '1'); said = 'off'; }
+    else if (q === '0') { localStorage.removeItem('hb_nofb'); said = 'on'; }
+    off = localStorage.getItem('hb_nofb') === '1';
+  } catch (e) { off = false; said = null; }
+  window.__hbNoFb = off;
+  if (!said) return;
+  // Say so once, so flipping the switch is not a silent no-op you have to trust.
+  function toast() {
+    var d = document.createElement('div');
+    d.setAttribute('role', 'status');
+    d.textContent = said === 'off' ? 'Meta pixel off for this browser'
+                                   : 'Meta pixel back on for this browser';
+    d.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);' +
+      'z-index:2147483647;background:#17140F;color:#F5F0E6;font-size:11px;letter-spacing:0.14em;' +
+      'text-transform:uppercase;padding:13px 20px;border-radius:2px;font-family:ui-monospace,monospace;' +
+      'box-shadow:0 18px 34px -20px rgba(23,20,15,0.6);transition:opacity .4s ease';
+    document.body.appendChild(d);
+    setTimeout(function () { d.style.opacity = '0'; }, 4000);
+    setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 4500);
+  }
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', toast);
+  else toast();
+})();
+
 /* Meta pixel — base code. Purchase fires from Shopify's checkout (connect
    this same pixel in the Facebook & Instagram app in Shopify admin); the
    site fires PageView / ViewContent / AddToCart / InitiateCheckout itself
    (SPA events wired in componentDidUpdate). */
+if (!window.__hbNoFb) {
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
@@ -174,6 +217,7 @@ t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '2580258509080253');
 fbq('track', 'PageView');
+}
 </script>
 <noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=2580258509080253&ev=PageView&noscript=1"/></noscript>
