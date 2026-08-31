@@ -1787,9 +1787,20 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         </div>
         <div>
           <div style="display: flex; flex-wrap: wrap; gap: 26px 30px; align-items: flex-start; margin-bottom: 22px;">
-            <div style="flex: 1 1 300px; min-width: 0;">
+            <!-- 348, not 300. The eligibility card beside this drops to its own
+                 row once the two stop fitting, and at a 300px basis that hand-off
+                 came too late: between roughly 1160 and 1270 both stayed on one
+                 line and squeezed this column to 307px, pushing the lede to a
+                 third line. 348 is the narrowest the lede can be and still set in
+                 two, so the card now leaves exactly when it has to — and no
+                 earlier, which is why this is not 360: at 360 the card dropped
+                 below even at 1440, where there is comfortably room for both. -->
+            <div style="flex: 1 1 348px; min-width: 0;">
               <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 14px;">{{ pdpEyebrow }}</div>
-              <p data-m="pdplede" style="font-size: 16.5px; line-height: 1.65; color: #4E463B; margin: 0 0 18px; max-width: 26em; text-wrap: pretty;">{{ pdpBody }}</p>
+              <!-- 15px so the lede sets in two lines rather than three. At 16.5 it
+                   needed 429px and the column is 354, so it wrapped a third line
+                   everywhere on desktop. -->
+              <p data-m="pdplede" style="font-size: 15px; line-height: 1.65; color: #4E463B; margin: 0 0 18px; max-width: 26em; text-wrap: pretty;">{{ pdpBody }}</p>
               <div data-pre-hide style="display: inline-flex; align-items: center; gap: 10px;">
                 <span style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 999px; background: #17140F;">
                   <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 16px; line-height: 1; color: #F5F0E6;">4.9</span>
