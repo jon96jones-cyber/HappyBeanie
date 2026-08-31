@@ -41,15 +41,27 @@ window.HB_SHOPIFY = {
 //   · bean wall, star ratings, review counts and stat strips are hidden
 //   · every ships-in-24h claim reads "reserve from Batch NNNN" instead
 //   · small-batch "boxes left" counters are held back (previous run's data)
-//   · Subscribe & save is paused — the card is hidden and any subscription
-//     line in a cart is charged as one-time, so nobody gets a second bill
-//     before their first box arrives
+//   · Subscribe & save follows its own switch, `subs`, below
 // LAUNCH DAY: set on to false and deploy. All of the above reverts in that
 // one change — wall and ratings return, 24h copy returns, live counters
-// return, subscriptions reopen. Nothing else to flip.
+// return. Nothing else to flip.
 // Batch number and ETA below appear in a few hardcoded copy spots too — if
 // they change, search the file for the old values.
-window.HB_PRELAUNCH = { on: true, batch: '0072', eta: '~4 weeks' };
+//
+// subs — Subscribe & save, on its own switch so it can reopen without
+// dragging the rest of prelaunch with it. False pauses it: the plan card is
+// filtered out of both pickers, any subscription line in a cart is charged
+// as one-time, and a notice says it returns when the batch ships. The reason
+// it was ever paused: a contract opened during prelaunch bills its second
+// month right as the first box arrives. Open it only when that is acceptable.
+window.HB_PRELAUNCH = { on: true, subs: true, batch: '0072', eta: '~4 weeks' };
+// One reading of the switch, so the gates below can't drift apart. Paused
+// only while prelaunch is on and subs is off — once prelaunch ends,
+// subscriptions are open regardless of what subs says.
+window.hbSubsPaused = function () {
+  var P = window.HB_PRELAUNCH || {};
+  return !!P.on && !P.subs;
+};
 // First-party analytics — powers the live desk at /admin/analytics.
 // Cookie-free by design: the session id lives in sessionStorage and dies with
 // the tab, and the server only ever stores a daily-rotating hash for counting.
@@ -104,6 +116,9 @@ window.hbTrack = (function () {
 })();
 if (window.HB_PRELAUNCH.on) {
   document.documentElement.className += ' hb-prelaunch';
+}
+if (!window.hbSubsPaused()) {
+  document.documentElement.className += ' hb-subs-open';
 }
 window.hbShopifyCheckout = async function (rows, buyer, opts) {
   const cfg = window.HB_SHOPIFY;
@@ -428,6 +443,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
 html.hb-prelaunch [data-pre-show] { display: block !important; }
 html.hb-prelaunch [data-pre-show-inline] { display: inline !important; }
 html.hb-prelaunch [data-pre-hide] { display: none !important; }
+/* Subscribe & save has its own switch inside prelaunch (HB_PRELAUNCH.subs).
+   data-subs-hide marks the copy that only makes sense while it is paused —
+   it goes away the moment subscriptions reopen, prelaunch or not. */
+html.hb-subs-open [data-subs-hide] { display: none !important; }
 /* That 18px under the product lede spaces it from the rating chip. The
    chip is hidden while prelaunch is on, so the margin would otherwise
    stack onto the row gap below it. Comes back with the chip. */
@@ -1402,7 +1421,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
               </div>
             </div>
           </sc-for>
-          <div data-pre-show style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">Subscribe &amp; save returns when Batch 0072 ships</div>
+          <div data-pre-show data-subs-hide style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">Subscribe &amp; save returns when Batch 0072 ships</div>
         </div>
         <button sc-camel-on-click="{{ cartCta }}" style="width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 20px; border: none; border-radius: 2px; background: #17140F; color: #F5F0E6; cursor: pointer;" style-hover="background: oklch(0.44 0.07 152);">{{ cartLabel }}</button>
         <div data-m="buynote" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 14px 0 34px; text-align: center;">Free shipping over $60 · Cancel anytime · 30-day guarantee</div>
@@ -1769,16 +1788,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
               <span data-m="qzcta" style="display: block; text-align: center; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 12px 14px; border-radius: 999px;">Check eligibility →</span>
             </a>
           </div>
-          <div data-pre-hide data-m="pdbatch" style="display: {{ batchShow }}; border: 1px solid #E0D6C2; border-radius: 4px; background: #FCFAF4; padding: 15px 18px 16px; margin-bottom: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px 18px; flex-wrap: wrap; margin-bottom: 10px;">
-              <span style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ batchPulse }}; animation: qzBlip 1.6s ease-in-out infinite;"></span>Small batch · current run</span>
-              <span style="font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: -0.01em; color: {{ batchNumColor }};"><b style="font-weight: 700; font-size: 14.5px; letter-spacing: -0.02em;">{{ batchLeft }}</b> of {{ batchTotal }} boxes left</span>
-            </div>
-            <div style="height: 6px; border-radius: 999px; background: #EDE6D8; overflow: hidden;">
-              <div style="height: 100%; width: {{ batchPct }}%; min-width: 4px; background: {{ batchBarColor }}; border-radius: 999px; transition: width 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);"></div>
-            </div>
-            <div style="margin-top: 10px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">{{ batchNote }}</div>
-          </div>
           <div data-pre-show style="border: 1px solid oklch(0.86 0.14 92 / 0.55); border-left: 3px solid oklch(0.86 0.14 92); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.1); padding: 14px 16px 15px; margin-bottom: 14px;">
             <div style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; margin-bottom: 6px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.14 78); animation: qzBlip 1.6s ease-in-out infinite;"></span>Batch 0072 · in production</div>
             <div style="font-size: 13px; line-height: 1.6; color: #554C40;">Order now to reserve your box from this run. Batch 0072 ships in ~4 weeks, as soon as it&rsquo;s formulated and clears testing.</div>
@@ -1802,7 +1811,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
                 <span style="display: {{ p2.badgeDisplay }}; position: absolute; top: -9px; left: 56px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; padding: 4px 9px; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F;">{{ p2.badge }}</span>
               </div>
             </sc-for>
-            <div data-pre-show style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">Subscribe &amp; save returns when Batch 0072 ships</div>
+            <div data-pre-show data-subs-hide style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">Subscribe &amp; save returns when Batch 0072 ships</div>
           </div>
           <button sc-camel-on-click="{{ cartCta }}" style="width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: 1.5px solid #17140F; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-weight: 500; cursor: pointer; box-shadow: 0 20px 34px -22px oklch(0.86 0.14 92 / 0.72), 0 3px 8px -4px rgba(23,20,15,0.22); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.25s ease;" style-hover="background: oklch(0.9 0.15 92); transform: translateY(-2px); box-shadow: 0 26px 42px -24px oklch(0.86 0.14 92 / 0.8), 0 4px 10px -4px rgba(23,20,15,0.26);">{{ cartLabel }}</button>
           <div data-m="stack" style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 4px; margin: 14px 0 24px; overflow: hidden;">
@@ -3502,11 +3511,11 @@ class Component extends DCLogic {
     // cart saved before sign-in) is coerced to one-time here, so pricing
     // shows trade terms and checkout never attaches a selling plan.
     if (this.state.wholesale) rows.forEach(r => { r.plan = 0; });
-    // Prelaunch pauses Subscribe & save: a contract opened now would bill its
-    // second month right as the first box arrives. Any subscription line
-    // (picker default, saved cart) becomes one-time; bundles stay — they're
-    // a single charge. Reverts with the HB_PRELAUNCH flag.
-    if ((window.HB_PRELAUNCH || {}).on) rows.forEach(r => { if (r.plan === 1) r.plan = 0; });
+    // While Subscribe & save is paused, any subscription line (picker default,
+    // saved cart) becomes one-time so nobody is billed a second month before
+    // their first box arrives; bundles stay — they're a single charge.
+    // Reverts with HB_PRELAUNCH.subs.
+    if (window.hbSubsPaused()) rows.forEach(r => { if (r.plan === 1) r.plan = 0; });
     // Trade accounts see their own per-box rate on every one-time line, same
     // as the product page (terms live from /api/auth/me — what checkout's
     // code discount charges). Below the minimum the checkout gate blocks
@@ -4298,7 +4307,7 @@ class Component extends DCLogic {
     ];
     // idx is the canonical plan number checkout maps on (1 = selling plan,
     // 2 = bundle variant) — it must survive any filtering of this list.
-    const preOn = !!(window.HB_PRELAUNCH || {}).on;
+    const subsOff = window.hbSubsPaused();
     // Wholesale accounts order single boxes only — no subscription, no bundle.
     // The lone plan card shows the live trade unit price when the discount is
     // active (what checkout charges at the minimum quantity or more).
@@ -4308,13 +4317,13 @@ class Component extends DCLogic {
       price: tradeUnit || 115,
       save: tradeUnit ? 'Trade price · ' + (this.state.trade.minQty || 5) + '+ boxes' : '',
       badge: 'Trade account'
-    }] : (preOn ? planDefsAll.filter(p => p.idx !== 1) : planDefsAll);
+    }] : (subsOff ? planDefsAll.filter(p => p.idx !== 1) : planDefsAll);
     const planSel = planDefs.find(p => p.idx === this.state.plan) || planDefs[0];
     // The plan the shopper is effectively on: a selection that's no longer
     // offered (subscription default while prelaunch is on) resolves to
     // one-time, matching what cartMath will charge.
     const effPlan = planSel.idx;
-    const bestIdx = this.state.wholesale ? 0 : (preOn ? 2 : 1);
+    const bestIdx = this.state.wholesale ? 0 : (subsOff ? 2 : 1);
     const bestDef = planDefs.find(p => p.idx === bestIdx) || planDefs[0];
     const speciesDefs = [
       { key: 'dog', label: 'For dogs', meta: 'Happy Beans™ · 6–120 lb', slot: 'hbv2-species-dog', ph: 'Dog portrait, natural light' },
@@ -5418,14 +5427,14 @@ Object.assign(Component.prototype, {
         // nav() keeps the address bar in sync (pushState to /cart), so a
         // refresh from the cart stays on the cart instead of re-running the quiz.
         if (this.state.qzAdded) { this.nav('cart')(); return; }
-        const qp = (this.state.wholesale || (window.HB_PRELAUNCH || {}).on) ? 0 : 1;
+        const qp = (this.state.wholesale || window.hbSubsPaused()) ? 0 : 1;
         this.setState(st => a.species === 'cat'
           ? { qzAdded: true, cartCat: st.cartCat + 1, cartPlanCat: qp }
           : { qzAdded: true, cartDog: st.cartDog + 1, cartPlanDog: qp });
         this.nav('cart')();
       },
       qzGoBuy: () => {
-        this.setState({ sp: a.species === 'cat' ? 'cat' : 'dog', plan: (this.state.wholesale || (window.HB_PRELAUNCH || {}).on) ? 0 : 1, ordered: false });
+        this.setState({ sp: a.species === 'cat' ? 'cat' : 'dog', plan: (this.state.wholesale || window.hbSubsPaused()) ? 0 : 1, ordered: false });
         this.nav('product')();
       },
       qzShowOrder: verdict !== 'block' && verdict !== 'ok',
