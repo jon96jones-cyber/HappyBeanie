@@ -72,7 +72,7 @@ module.exports = async function handler(req, res) {
     // ?internal=1 puts it back, so a test can still be seen to have landed.
     const inc = q.internal === '1';
 
-    const [live, today, series, topPages, topSources, funnel, recent] = await Promise.all([
+    const [live, today, series, topPages, topSources, funnel, recent] = await db.withSchema(() => Promise.all([
       sql`select
             count(*) filter (where last_seen > now() - interval '5 minutes')                      as visitors_now,
             count(*) filter (where last_seen > now() - interval '5 minutes' and added_to_cart)    as active_carts,
@@ -125,7 +125,7 @@ module.exports = async function handler(req, res) {
           from events
           where name <> 'heartbeat' and (${inc} or not internal)
           order by ts desc limit 25`
-    ]);
+    ]));
 
     const l = live[0] || {}, t = today[0] || {}, f = funnel[0] || {};
     return res.status(200).json({

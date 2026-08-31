@@ -142,4 +142,23 @@ async function ensureSchema() {
   return 13;
 }
 
-module.exports = { sql, isConfigured, keyOk, visitorId, deviceOf, isInternal, ensureSchema };
+// Run a query, and if it fails only because the schema is behind the code,
+// bring the schema up and try once more.
+//
+// This exists because ensureSchema() runs from one button in the Live desk, so
+// a deploy that adds a column lands with the database still on the old shape.
+// The collector swallows its own errors by design — analytics must never break
+// the storefront — which means that gap loses beacons silently until someone
+// notices the desk is broken. Healing on the failing request closes it.
+async function withSchema(run) {
+  try {
+    return await run();
+  } catch (err) {
+    const m = (err && err.message) || '';
+    if (!/(column|relation)\b.*does not exist/i.test(m)) throw err;
+    await ensureSchema();
+    return await run();
+  }
+}
+
+module.exports = { sql, isConfigured, keyOk, visitorId, deviceOf, isInternal, ensureSchema, withSchema };

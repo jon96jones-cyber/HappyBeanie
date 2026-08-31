@@ -63,17 +63,17 @@ module.exports = async function handler(req, res) {
     const internal = db.isInternal(req) || b.internal === true;
 
     if (name === 'heartbeat') {
-      await sql`update sessions
+      await db.withSchema(() => sql`update sessions
                    set last_seen = now(), visitor_id = coalesce(visitor_id, ${vid}),
                        internal = sessions.internal or ${internal}
-                 where session_id = ${sid}`;
+                 where session_id = ${sid}`);
       return res.status(204).end();
     }
 
     const utm = b.utm || {};
     // First beacon of a visit writes the acquisition detail; later ones only
     // move last_seen forward, so the landing page and source stay as they were.
-    await sql`
+    await db.withSchema(() => sql`
       insert into sessions (
         session_id, visitor_id, landing_path, referrer,
         utm_source, utm_medium, utm_campaign, ref_code, device, country, pageviews, internal
@@ -90,12 +90,12 @@ module.exports = async function handler(req, res) {
         added_to_cart  = sessions.added_to_cart  or ${name === 'add_to_cart'},
         began_checkout = sessions.began_checkout or ${name === 'begin_checkout'},
         ref_code       = coalesce(sessions.ref_code, ${str(b.refCode, 40)}),
-        internal       = sessions.internal or ${internal}`;
+        internal       = sessions.internal or ${internal}`);
 
-    await sql`
+    await db.withSchema(() => sql`
       insert into events (session_id, visitor_id, name, path, species, value, meta, internal)
       values (${sid}, ${vid}, ${name}, ${path}, ${str(b.species, 16)}, ${num(b.value)},
-              ${b.meta ? JSON.stringify(b.meta).slice(0, 2000) : null}, ${internal})`;
+              ${b.meta ? JSON.stringify(b.meta).slice(0, 2000) : null}, ${internal})`);
 
     return res.status(204).end();
   } catch (err) {
