@@ -768,7 +768,10 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   [data-m~="roomrow"] > span:nth-child(3) { font-size: 13px !important; }
     [data-m~="showf"] { display: flex !important; }
     [data-m~="first"] { order: -1 !important; }
-    [data-m~="nostick"] { position: static !important; }
+    /* One column here, so the media block is static again — and its desktop
+       margin-bottom, which exists only to stop the sticky travel short, would
+       become a real gap above the buy panel. */
+    [data-m~="nostick"] { position: static !important; margin-bottom: 0 !important; }
     [data-m~="auto"]  { height: auto !important; min-height: 0 !important; }
     /* Lab image is a 1:1 source; on mobile give the box a square frame so the
        full composition fits with no crop (desktop keeps its inline height). */
@@ -1741,7 +1744,13 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <!-- The photo collage keeps its own grid: its mobile rules position
              children by nth-child, so the inspector's tabs and panel have to
              sit outside it or they inherit thumbnail placement. -->
-        <div data-m="nostick" style="position: sticky; top: 96px; align-self: start; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px;">
+        <!-- margin-bottom is not spacing, it is a brake. A sticky element may
+             travel until its MARGIN box reaches the bottom of its containing
+             block, so 72px here stops the photo that far short of the buy
+             column's last line, leaving it room to breathe before the section
+             ends instead of finishing hard against the edge. The column is
+             align-self:start in a taller row, so the margin costs no layout. -->
+        <div data-m="nostick" style="position: sticky; top: 96px; align-self: start; margin-bottom: 72px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px;">
         <div data-m="collage" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto; gap: 12px;">
           <div style="position: relative; grid-column: 1 / -1; grid-row: 1; align-self: start; width: 100%; aspect-ratio: 1264 / 848; border-radius: 5px; overflow: hidden; background: #EFE8D9; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.5);">
             <div style="width: 100%; height: 100%; opacity: {{ pdpPhotoOpacity }}; transition: transform 0.9s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.045);"><img src="/assets/img/pdp-dog.webp" alt="Goldendoodle in a Happy Beanie bandana beside the Happy Beans for Dogs box" width="1264" height="848" loading="eager" decoding="async" style="width: 100%; height: 100%; display: {{ pdpDogShow }}; object-fit: cover; object-position: center;"><img src="/assets/img/pdp-cat.webp" alt="Tuxedo cat beside the Happy Beans for Cats box" width="1264" height="848" loading="eager" decoding="async" style="width: 100%; height: 100%; display: {{ pdpCatShow }}; object-fit: cover; object-position: center;"></div>
