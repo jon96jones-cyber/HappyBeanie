@@ -3191,9 +3191,6 @@ const POP_ON = true;
 const POP_FLOOR = 5000;    // scroll and exit-intent hold off this long after load
 const POP_DWELL = 5000;    // ...and on its own, it opens at this mark
 const POP_SCROLL = 40;     // engaged-by-depth, percent of the page
-// The product page's own threshold, for touch only — see maybePop(). Deeper
-// than POP_SCROLL because it has to mean "finished reading", not "engaged".
-const POP_SCROLL_DEEP = 70;
 const POP_QUIET = 30 * 24 * 60 * 60 * 1000;  // a dismissal is honoured for a month
 // Pages the popup must never interrupt. Two of them are converting; the quiz
 // already asks for the address itself, and asking twice reads as a shakedown.
@@ -3240,19 +3237,11 @@ class Component extends DCLogic {
     if (kind !== 'dwell' && (!this._popBorn || Date.now() - this._popBorn < POP_FLOOR)) return;
     const page = this.state.page || 'home';
     if (POP_NEVER.indexOf(page) !== -1) return;
-    // The product page is where someone is closest to buying, so it only fires
-    // when they are on their way out anyway.
-    //
-    // On a pointer device that means exit-intent. A touch device has no
-    // exit-intent, and "exit-intent only" therefore meant the popup never fired
-    // on the product page on a phone — not rarely, never — which is most of the
-    // traffic the ads send there. Three quarters of the way down the page is
-    // the touch equivalent of leaving: they have finished reading it rather
-    // than paused in the middle of deciding.
-    if (page === 'product') {
-      const touch = !(window.matchMedia && window.matchMedia('(pointer: fine)').matches);
-      if (kind !== 'exit' && !(touch && kind === 'scrolldeep')) return;
-    }
+    // The product page used to be held back to exit-intent, and then to a 70%
+    // scroll on touch. Both are gone: at a five-second dwell the timer wins
+    // every time, so those branches were unreachable, and an unreachable rule
+    // reads as a promise the code is not keeping. The product page is now like
+    // any other page that is not a checkout step.
     // Someone with an account is already reachable; asking them to "join" is
     // asking for something we have.
     if (this.state.signedIn) return;
@@ -3967,9 +3956,7 @@ class Component extends DCLogic {
       const bar = document.querySelector('.hb-progress');
       if (bar) bar.style.width = pct + '%';
       if (show !== this.state.barOn) this.setState({ barOn: show });
-      // Depth is carried in the kind rather than as a second argument, so the
-      // gate keeps its single-parameter shape and every caller reads alike.
-      if (pct >= POP_SCROLL) this.maybePop(pct >= POP_SCROLL_DEEP ? 'scrolldeep' : 'scroll');
+      if (pct >= POP_SCROLL) this.maybePop('scroll');
     };
     window.addEventListener('scroll', this.onScroll, { passive: true });
     // Capture popup, three ways in. All of them land in maybePop(), which owns
