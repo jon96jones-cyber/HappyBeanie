@@ -24,7 +24,11 @@ const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 // it, and a bounce is the honest test.
 const EMAIL_RE = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
 
-const SOURCES = ['footer', 'waitlist', 'quiz', 'shop'];
+// Each becomes a newsletter-<source> tag in Shopify, so the list stays
+// segmentable by where the address was given. Keep this list closed — an
+// unrecognised source falls back to 'footer' rather than minting a new tag
+// from whatever the client happened to post.
+const SOURCES = ['footer', 'waitlist', 'quiz', 'shop', 'popup'];
 
 async function admin(token, query, variables) {
   const res = await fetch('https://' + STORE_DOMAIN + '/admin/api/' + API_VERSION + '/graphql.json', {

@@ -655,6 +655,11 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   @keyframes shLock { 0% { transform: scale(0.6); opacity: 0; } 4% { transform: scale(1.25); opacity: 0.8; } 22% { transform: scale(1); opacity: 0.35; } 46% { opacity: 0; } 100% { opacity: 0; } }
   @keyframes pingRing { 0% { transform: scale(0.7); opacity: 0.9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }
   @keyframes checkPop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  /* The capture popup. Deliberately not checkPop: that overshoots to 1.08,
+     which reads as playful on a 34px check mark and as a jolt on a 470px card
+     arriving uninvited. A short rise is enough to register as "new". */
+  @keyframes hbPopIn { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: none; } }
+  @keyframes hbPopUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   @keyframes navDrop { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes navItem { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes hbFloatA { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
@@ -864,6 +869,22 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="rth3"] { font-size: 22px !important; margin-bottom: 6px !important; }
     [data-m~="rtp"] { font-size: 14px !important; line-height: 1.55 !important; }
     [data-m~="modal"] { max-height: 92vh !important; padding: 30px 20px 34px !important; }
+    /* The capture popup becomes a bottom sheet on a phone. A centred modal is
+       the wrong shape here: focusing the email field raises the keyboard, which
+       shrinks the viewport and pushes a vertically-centred card up behind the
+       header — you end up typing into a field you cannot see. Anchored to the
+       bottom, the field sits directly above the keyboard instead.
+       It also stays partial-height and dismissible on purpose: Google treats a
+       full-screen mobile interstitial as intrusive, and these pages are ad
+       landing pages. */
+    [data-m~="popwrap"] { align-items: flex-end !important; padding: 0 !important; }
+    [data-m~="popcard"] { max-width: none !important; border-width: 1px 0 0 !important; border-radius: 14px 14px 0 0 !important; padding: 30px 22px 26px !important; animation: hbPopUp 0.32s cubic-bezier(0.2,0.7,0.2,1) both !important; }
+    [data-m~="popx"] { width: 44px !important; height: 44px !important; right: 8px !important; top: 8px !important; }
+    /* Stacked, because side by side the field is ~150px wide on a 360px phone
+       and the button crowds it out. */
+    [data-m~="popform"] { flex-wrap: wrap !important; }
+    [data-m~="popform"] > input, [data-m~="popform"] > button { flex: 1 1 100% !important; min-height: 48px !important; }
+    [data-m~="poph"] { font-size: 26px !important; }
     [data-m~="barpad"] { padding-bottom: 104px !important; }
     [data-m~="wrapflex"] { flex-wrap: wrap !important; }
     [data-m~="cmp3"] { gap: 10px !important; padding: 15px 16px !important; font-size: 13px !important; }
@@ -1055,6 +1076,8 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="collage"] { grid-auto-rows: 92px !important; }
     [data-m~="barpad"] { padding-bottom: 84px !important; }
     [data-m~="modal"] { padding: 24px 16px 28px !important; }
+    [data-m~="popcard"] { padding: 26px 18px 22px !important; }
+    [data-m~="poph"] { font-size: 23px !important; }
     [data-m~="tap"]   { min-height: 48px !important; }
     [data-m~="footlinks"] { gap: 0 !important; }
     section[data-m~="herosec"] { padding-top: 30px !important; padding-bottom: 0 !important; }
@@ -3149,6 +3172,37 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
       <span><a href="account.html" style="color: inherit; text-decoration: none;">Account</a>&nbsp;· <a href="wholesale.html" style="color: inherit; text-decoration: none;">Wholesale</a>&nbsp;· <a href="/ambassador" style="color: inherit; text-decoration: none;">Ambassadors</a>&nbsp;· <a href="policies/terms.html" style="color: inherit; text-decoration: none;">Terms</a>&nbsp;· <a href="policies/privacy.html" style="color: inherit; text-decoration: none;">Privacy</a>&nbsp;· <a href="policies/shipping.html" style="color: inherit; text-decoration: none;">Shipping</a>&nbsp;· <a href="policies/refunds.html" style="color: inherit; text-decoration: none;">Refunds</a>&nbsp;· <a href="policies/subscriptions.html" style="color: inherit; text-decoration: none;">Subscriptions</a>&nbsp;· <a href="policies/disclaimer.html" style="color: inherit; text-decoration: none;">Disclaimer</a></span>
     </div>
   </footer>
+
+  <!-- Email capture. Global on purpose — it sits outside every page's sc-if so
+       one instance serves the whole SPA, and maybePop() decides where it may
+       appear rather than the markup doing it. The copy is deliberately
+       evergreen: no batch number, no launch date, no discount. A popup outlives
+       any one production run, and a stale offer is worse than no offer. If the
+       promise here changes, change api/subscribe.js's tagging with it so the
+       list stays segmentable. -->
+  <sc-if value="{{ popOpen }}" hint-placeholder-val="{{ false }}">
+    <div sc-camel-on-click="{{ popClose }}" data-m="popwrap" style="position: fixed; inset: 0; z-index: 140; background: rgba(23,20,15,0.68); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 32px 20px;">
+      <div role="dialog" aria-modal="true" aria-label="Join the Happy Beanie list" sc-camel-on-click="{{ stop }}" data-m="popcard" style="position: relative; width: 100%; max-width: 470px; background: #FCFAF4; border: 1px solid #17140F; padding: 40px 42px 36px; animation: hbPopIn 0.3s cubic-bezier(0.2,0.7,0.2,1) both;">
+        <button id="hbPopX" sc-camel-on-click="{{ popClose }}" aria-label="Close" data-m="popx" style="position: absolute; right: 14px; top: 14px; width: 34px; height: 34px; border: 1px solid #E0D6C2; background: transparent; color: #17140F; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 14px; line-height: 1; cursor: pointer;" style-hover="background: #17140F; color: #F5F0E6;">×</button>
+        <sc-if value="{{ popIdle }}" hint-placeholder-val="{{ true }}">
+          <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 14px;">—&nbsp; The list</div>
+          <h2 data-m="poph" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 31px; line-height: 1.08; margin: 0 0 14px;">We won’t email you much.</h2>
+          <p style="font-size: 15px; line-height: 1.62; color: #554C40; margin: 0 0 22px;">New formulas, restocks, and the lab results for every lot we make. That is the whole list — no discount codes, no daily send, and we never sell your address.</p>
+          <div data-m="popform" style="display: flex; gap: 8px;">
+            <input id="hbPopEmail" value="{{ popEmail }}" sc-camel-on-change="{{ setPopEmail }}" placeholder="your@email.com" inputmode="email" aria-label="Email address" style="flex: 1; min-width: 0; background: #FFFFFF; border: 1px solid #DDD3C0; border-radius: 2px; padding: 13px 14px; color: #17140F; font-family: 'DM Sans', sans-serif; font-size: 15px;" style-focus="border-color: oklch(0.86 0.14 92); outline: none;">
+            <button sc-camel-on-click="{{ doPop }}" disabled="{{ popBusy }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 13px 20px; border: none; border-radius: 2px; background: {{ popBg }}; color: {{ popFg }}; cursor: {{ popCursor }}; transition: background 0.25s ease;">{{ popLabel }}</button>
+          </div>
+          <div style="display: {{ popErrShow }}; font-size: 13px; line-height: 1.6; color: #8C4630; margin-top: 10px;">{{ popErr }}</div>
+          <p style="font-size: 12px; line-height: 1.6; color: #8A7F6E; margin: 16px 0 0;">Unsubscribe any time. Read our <a href="policies/privacy.html" style="color: #8A7F6E;">privacy policy</a>.</p>
+        </sc-if>
+        <sc-if value="{{ popDone }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 14px;">—&nbsp; You are on the list</div>
+          <h2 data-m="poph" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 31px; line-height: 1.08; margin: 0 0 14px;">That is all we needed.</h2>
+          <p style="font-size: 15px; line-height: 1.62; color: #554C40; margin: 0 0 4px;">We will be in touch when there is something worth sending, and not before.</p>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;oklch(0.86 0.14 92)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;oklch(0.86 0.14 92)&quot;,&quot;oklch(0.72 0.08 152)&quot;,&quot;oklch(0.78 0.11 45)&quot;,&quot;oklch(0.8 0.06 250)&quot;],&quot;section&quot;:&quot;Brand&quot;},&quot;basePrice&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:68,&quot;min&quot;:30,&quot;max&quot;:180,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Commerce&quot;}}">
@@ -3182,6 +3236,16 @@ const CHEW_IGS = {
   ]
 };
 
+// Capture-popup timing, kept in one place so the rules can be read at a glance
+// instead of being reconstructed from three listeners.
+const POP_FLOOR = 15000;   // never within the first 15s, whichever trigger fires
+const POP_DWELL = 25000;   // engaged-by-time
+const POP_SCROLL = 40;     // engaged-by-depth, percent of the page
+const POP_QUIET = 30 * 24 * 60 * 60 * 1000;  // a dismissal is honoured for a month
+// Pages the popup must never interrupt. Two of them are converting; the quiz
+// already asks for the address itself, and asking twice reads as a shakedown.
+const POP_NEVER = ['cart', 'checkout', 'quiz'];
+
 class Component extends DCLogic {
   state = { igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
@@ -3189,6 +3253,7 @@ class Component extends DCLogic {
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
     pdpView: 'photo', pdpSel: 0, pdpCut: false, pdpReady: false,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
+    popOpen: false, popEmail: '', popBusy: false, popErr: '', popDone: false,
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
 
@@ -3197,6 +3262,96 @@ class Component extends DCLogic {
       const v = e.target.value;
       this.setState(st => ({ co: { ...st.co, [k]: v } }));
     };
+  }
+
+  // One flag for "this browser is already on the list", written by whichever
+  // ask won — popup or footer. Both read it, so nobody gets asked twice.
+  hbListed() {
+    try { localStorage.setItem('hb-list', '1'); } catch (e) {}
+  }
+
+  // Every trigger funnels through here so the suppression rules are enforced
+  // once rather than copied into three listeners. Silently does nothing when
+  // the visitor should not be asked.
+  maybePop(kind) {
+    if (this._popShown || this.state.popOpen) return;
+    if (!this._popBorn || Date.now() - this._popBorn < POP_FLOOR) return;
+    const page = this.state.page || 'home';
+    if (POP_NEVER.indexOf(page) !== -1) return;
+    // The product page is where someone is closest to buying, so it gets only
+    // the trigger that fires when they are on their way out anyway.
+    if (page === 'product' && kind !== 'exit') return;
+    // Someone with an account is already reachable; asking them to "join" is
+    // asking for something we have.
+    if (this.state.signedIn) return;
+    try {
+      if (localStorage.getItem('hb-list') === '1') return;
+      const d = JSON.parse(localStorage.getItem('hb-pop') || 'null');
+      if (d && d.at && Date.now() - d.at < POP_QUIET) return;
+    } catch (e) {}
+    this._popShown = true;
+    this._popReturn = document.activeElement;
+    this.setState({ popOpen: true });
+    // Move focus into the dialog, or a keyboard user is left tabbing through
+    // the page behind it. On a touch device that focus goes to the close
+    // button rather than the field: focusing an input there throws up the
+    // keyboard unasked, which is a genuinely hostile way to greet someone.
+    const fine = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+    const grab = tries => {
+      const el = document.getElementById(fine ? 'hbPopEmail' : 'hbPopX');
+      if (el) {
+        try { el.focus({ preventScroll: true }); } catch (e) { try { el.focus(); } catch (e2) {} }
+        return;
+      }
+      // The node does not exist until the render this setState schedules has
+      // run, and that timing is the framework's to decide, not ours.
+      if (tries > 0) setTimeout(() => grab(tries - 1), 50);
+    };
+    setTimeout(() => grab(6), 0);
+  }
+
+  // why: 'dismiss' parks the popup for POP_QUIET. 'done' does not need to —
+  // hb-list already suppresses it for good.
+  popShut(why) {
+    if (!this.state.popOpen) return;
+    clearTimeout(this._popBye);
+    if (why === 'dismiss') {
+      try { localStorage.setItem('hb-pop', JSON.stringify({ at: Date.now() })); } catch (e) {}
+    }
+    this.setState({ popOpen: false });
+    const back = this._popReturn;
+    this._popReturn = null;
+    if (back && back.focus) { try { back.focus({ preventScroll: true }); } catch (e) {} }
+  }
+
+  // Shared by the button and by Enter in the field, so the two cannot drift.
+  popSubmit() {
+    const email = String(this.state.popEmail || '').trim();
+    if (!/.+@.+\..+/.test(email) || this.state.popBusy || this.state.popDone) return;
+    this.setState({ popBusy: true, popErr: '' });
+    fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, source: 'popup' })
+    }).then(r => r.json().catch(() => ({}))).then(b => {
+      if (b && b.ok) {
+        // Marked before the confirmation renders: if they close the tab while
+        // reading it, the popup still must not come back. `joined` flips the
+        // footer's own form to its success state for the same reason.
+        this.hbListed();
+        this.setState({ popBusy: false, popDone: true, joined: true });
+        this._popBye = setTimeout(() => this.popShut('done'), 3200);
+        return;
+      }
+      this.setState({
+        popBusy: false,
+        popErr: (b && b.error === 'bad_email')
+          ? 'That does not look like an email address.'
+          : 'That did not go through. Try again in a moment, or email hello@happybeanie.com.'
+      });
+    }).catch(() => {
+      this.setState({ popBusy: false, popErr: 'That did not go through. Try again in a moment, or email hello@happybeanie.com.' });
+    });
   }
 
 
@@ -3825,6 +3980,11 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.heroVideo(0);
+    // Stamped first: onScroll runs before this method returns, and the popup's
+    // 15-second floor is measured from here. Left unset, the floor comparison
+    // is NaN — which is false, so the floor would not hold.
+    this._popBorn = Date.now();
+    this._popShown = false;
     // Ambassador referral: /?ref=CODE stores the code for 30 days, and
     // checkout attaches it as a discount code (unless a trade code applies —
     // trade terms always win for wholesale accounts). The discount code on
@@ -3897,8 +4057,47 @@ class Component extends DCLogic {
       const bar = document.querySelector('.hb-progress');
       if (bar) bar.style.width = pct + '%';
       if (show !== this.state.barOn) this.setState({ barOn: show });
+      if (pct >= POP_SCROLL) this.maybePop('scroll');
     };
     window.addEventListener('scroll', this.onScroll, { passive: true });
+    // Capture popup, three ways in. All of them land in maybePop(), which owns
+    // the suppression rules; these only decide *when* the question gets asked.
+    this._popTimer = setTimeout(() => this.maybePop('dwell'), POP_DWELL);
+    // Exit-intent is desktop-only by necessity — there is no cursor to leave
+    // the viewport on a phone, and the usual mobile stand-ins (scroll-up,
+    // intercepting the back button) are hostile. Touch gets dwell and depth.
+    if (window.matchMedia && window.matchMedia('(pointer: fine)').matches) {
+      this.onPopExit = e => {
+        if (e.clientY <= 0 && !e.relatedTarget) this.maybePop('exit');
+      };
+      document.addEventListener('mouseout', this.onPopExit);
+    }
+    this.onPopKey = e => {
+      if (!this.state.popOpen) return;
+      if (e.key === 'Escape') { e.preventDefault(); this.popShut('dismiss'); return; }
+      // Enter submits from the field. A <form> would give this for free, but
+      // the card is not one: a nested form inside the app's markup can commit
+      // a real page POST if it is submitted mid-hydrate.
+      if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'hbPopEmail') {
+        e.preventDefault();
+        this.popSubmit();
+        return;
+      }
+      // Keep Tab inside the card. Without this, focus walks straight out into
+      // the page behind the backdrop, where a keyboard user is operating a
+      // page they cannot see and cannot click.
+      if (e.key === 'Tab') {
+        const card = document.querySelector('[data-m~="popcard"]');
+        if (!card) return;
+        const f = card.querySelectorAll('a[href], button:not([disabled]), input:not([disabled])');
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (!card.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+        else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    };
+    document.addEventListener('keydown', this.onPopKey);
     requestAnimationFrame(() => this.startField());
     // Always create the observer. Under reduced-motion we still reveal, but as
     // an opacity-only fade (no transform) — a fade isn't vestibular motion, so
@@ -4238,6 +4437,7 @@ class Component extends DCLogic {
     const allFilled = coKeys.every(k => String(co[k] || '').trim().length > 0);
     const coReady = allFilled && emailOk && zipOk && M.items.length > 0;
     const joinReady = /.+@.+\..+/.test(String(this.state.joinEmail || '').trim());
+    const popReady = /.+@.+\..+/.test(String(this.state.popEmail || '').trim());
     const pages = [
       { key: 'shop', label: 'Shop' },
       { key: 'product', label: 'Products' },
@@ -4793,7 +4993,7 @@ class Component extends DCLogic {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email, source: 'footer' })
         }).then(r => r.json().catch(() => ({}))).then(b => {
-          if (b && b.ok) { this.setState({ joinBusy: false, joined: true }); return; }
+          if (b && b.ok) { this.hbListed(); this.setState({ joinBusy: false, joined: true }); return; }
           this.setState({
             joinBusy: false,
             joinErr: (b && b.error === 'bad_email')
@@ -4804,6 +5004,24 @@ class Component extends DCLogic {
           this.setState({ joinBusy: false, joinErr: 'That did not go through. Try again in a moment, or email hello@happybeanie.com.' });
         });
       },
+      // Capture popup. When and where it may open is maybePop()'s job; these
+      // are only the card's own behaviour once it is on screen.
+      popOpen: !!this.state.popOpen,
+      popIdle: !this.state.popDone,
+      popDone: !!this.state.popDone,
+      popEmail: this.state.popEmail,
+      setPopEmail: e => this.setState({ popEmail: e.target.value }),
+      popBg: popReady ? 'oklch(0.86 0.14 92)' : '#E8E1D2',
+      popFg: popReady ? '#17140F' : '#8A7F6E',
+      popCursor: popReady ? 'pointer' : 'not-allowed',
+      popBusy: !!this.state.popBusy,
+      popLabel: this.state.popBusy ? 'Joining…' : 'Join',
+      popErr: this.state.popErr || '',
+      popErrShow: this.state.popErr ? 'block' : 'none',
+      // Backdrop, × and Esc all mean the same thing, and all of them park the
+      // popup for a month. Closing it is an answer, not an accident.
+      popClose: () => this.popShut('dismiss'),
+      doPop: () => this.popSubmit(),
       orderTotal: this.state.orderTotal || this.money(M.total),
       orderItems: this.state.orderItems,
       isCart: page === 'cart',
