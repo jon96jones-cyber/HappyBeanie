@@ -3,7 +3,7 @@
 // can unsubscribe it. Sets the no-recovery-email tag on the customer —
 // the recovery cron skips anyone carrying it.
 
-const recover = require('./cron/recover-checkouts.js');
+const mailer = require('./_lib/mailer.js');
 
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
 const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
@@ -32,7 +32,9 @@ module.exports = async function handler(req, res) {
     const q = (req.query || {});
     const email = String(q.e || '').toLowerCase().slice(0, 200);
     const tok = String(q.t || '');
-    if (!email || tok !== recover.unsubToken(email)) {
+    // Accepts a token signed with either the current secret or the one it
+    // replaced, so setting CRON_SECRET never orphans an opt-out link.
+    if (!email || !mailer.unsubTokenValid(email, tok)) {
       return res.status(400).send(page('That link didn’t check out', 'The unsubscribe link looks incomplete — try the link in your email again, or just reply to the email and we’ll take you off by hand.'));
     }
     // Which list they are leaving. The token signs the address only, so old

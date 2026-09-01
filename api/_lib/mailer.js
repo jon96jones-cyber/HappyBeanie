@@ -16,12 +16,50 @@ const SITE = 'https://www.happybeanie.com';
 const FROM = process.env.RESEND_FROM || 'Happy Beanie <hello@happybeanie.com>';
 const REPLY_TO = 'hello@happybeanie.com';
 
-// The signature over an address, unchanged from the scheme the recovery emails
-// have been using — every unsubscribe link already in someone's inbox must
-// keep working, so this stays email-only with no purpose mixed in.
+// Every key a live link could have been signed with, newest first.
+//
+// The signing key used to be "CRON_SECRET, or SHOPIFY_ADMIN_TOKEN if that is
+// unset". That made setting CRON_SECRET for the first time a silent one-way
+// door: every unsubscribe link already in an inbox would stop validating, and
+// the person clicking it would be told their link was broken. An opt-out link
+// is the one link that must never fail.
+//
+// So signing uses the first entry and verification accepts any of them. Old
+// links keep working, new links use the new key, and the secret is rotatable.
+function secrets() {
+  const out = [];
+  if (process.env.CRON_SECRET) out.push(process.env.CRON_SECRET);
+  if (process.env.SHOPIFY_ADMIN_TOKEN) out.push(process.env.SHOPIFY_ADMIN_TOKEN);
+  return out.length ? out.filter((s, i) => out.indexOf(s) === i) : [''];
+}
+
+function sign(secret, payload) {
+  return crypto.createHmac('sha256', secret).update(payload).digest('hex').slice(0, 32);
+}
+
+// Compared through a digest so neither length nor content differences leak.
+function sameToken(a, b) {
+  const x = crypto.createHash('sha256').update(String(a)).digest();
+  const y = crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(x, y);
+}
+
+// The signature over an address, unchanged in shape from the scheme the
+// recovery emails have been using — email-only, no purpose mixed in.
 function unsubToken(email) {
-  const secret = process.env.CRON_SECRET || process.env.SHOPIFY_ADMIN_TOKEN || '';
-  return crypto.createHmac('sha256', secret).update(String(email).toLowerCase()).digest('hex').slice(0, 32);
+  return sign(secrets()[0], String(email).toLowerCase());
+}
+
+function unsubTokenValid(email, token) {
+  const addr = String(email).toLowerCase();
+  return secrets().some(function (s) { return sameToken(sign(s, addr), token); });
+}
+
+// The same two-key treatment for any other signed link. The payload is
+// namespaced by the caller, so a token for one purpose is not one for another.
+function signedToken(payload) { return sign(secrets()[0], payload); }
+function signedTokenValid(payload, token) {
+  return secrets().some(function (s) { return sameToken(sign(s, payload), token); });
 }
 
 // purpose picks which list the opt-out applies to. Left off, the endpoint
@@ -69,4 +107,9 @@ async function send(opts) {
   }
 }
 
-module.exports = { send: send, unsubToken: unsubToken, unsubUrl: unsubUrl, SITE: SITE, FROM: FROM };
+module.exports = {
+  send: send,
+  unsubToken: unsubToken, unsubTokenValid: unsubTokenValid, unsubUrl: unsubUrl,
+  signedToken: signedToken, signedTokenValid: signedTokenValid,
+  SITE: SITE, FROM: FROM
+};

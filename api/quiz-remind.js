@@ -13,8 +13,8 @@
 //
 // Env: DATABASE_URL. CRON_SECRET (or SHOPIFY_ADMIN_TOKEN) signs the cancel link.
 
-const crypto = require('crypto');
 const db = require('./_lib/analytics-db.js');
+const mailer = require('./_lib/mailer.js');
 
 const REASONS = { age: [3, 6, 9, 12], repro: [2, 3, 6] };
 const SITE = 'https://www.happybeanie.com';
@@ -32,11 +32,17 @@ function cleanEmail(v) {
   return s;
 }
 
+// Namespaced so a cancel token is never also an unsubscribe token. Signed with
+// the current secret, accepted against that and the one it replaced — someone
+// who was promised a reminder months ago must still be able to call it off.
 function cancelToken(email) {
-  const secret = process.env.CRON_SECRET || process.env.SHOPIFY_ADMIN_TOKEN || '';
-  return crypto.createHmac('sha256', secret).update('quiz-remind:' + email).digest('hex').slice(0, 32);
+  return mailer.signedToken('quiz-remind:' + email);
+}
+function cancelTokenValid(email, token) {
+  return mailer.signedTokenValid('quiz-remind:' + email, token);
 }
 module.exports.cancelToken = cancelToken;
+module.exports.cancelTokenValid = cancelTokenValid;
 
 function cancelUrl(email) {
   return SITE + '/api/quiz-remind?cancel=' + encodeURIComponent(email) + '&t=' + cancelToken(email);
@@ -71,10 +77,9 @@ async function handleCancel(req, res) {
   const email = cleanEmail(q.cancel);
   const tok = String(q.t || '');
 
-  // Constant-time compare so the token cannot be probed a character at a time.
-  const want = email ? cancelToken(email) : '';
-  const okToken = email && tok.length === want.length &&
-    crypto.timingSafeEqual(Buffer.from(tok), Buffer.from(want));
+  // Constant-time compare, against the current signing secret and the one it
+  // replaced — a reminder promised months ago must stay cancellable.
+  const okToken = !!email && cancelTokenValid(email, tok);
   if (!okToken) {
     return res.status(400).send(page('That link didn’t check out',
       'The link looks incomplete — try it again from your email, or reply to us and we’ll take you off by hand.'));
@@ -140,4 +145,4 @@ module.exports = Object.assign(async function handler(req, res) {
     console.error('[quiz-remind]', err && err.message);
     return res.status(502).json({ ok: false, error: 'save_failed' });
   }
-}, { cancelToken: cancelToken, cancelUrl: cancelUrl, REASONS: REASONS });
+}, { cancelToken: cancelToken, cancelTokenValid: cancelTokenValid, cancelUrl: cancelUrl, REASONS: REASONS });

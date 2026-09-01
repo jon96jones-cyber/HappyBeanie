@@ -14,8 +14,8 @@
 // Env: SHOPIFY_ADMIN_TOKEN, RESEND_API_KEY, CRON_SECRET.
 // Optional: RECOVERY_FROM (default 'Happy Beanie <hello@happybeanie.com>').
 
-const crypto = require('crypto');
 const buildEmail = require('../_lib/recovery-email.js');
+const mailer = require('../_lib/mailer.js');
 
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
 const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
@@ -52,10 +52,10 @@ function usd(n) {
   return '$' + (Math.round((n || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function unsubToken(email) {
-  const secret = process.env.CRON_SECRET || process.env.SHOPIFY_ADMIN_TOKEN || '';
-  return crypto.createHmac('sha256', secret).update(String(email).toLowerCase()).digest('hex').slice(0, 32);
-}
+// Delegated so there is one signing scheme rather than a copy per caller —
+// and so this inherits accepting a rotated secret. Still re-exported here
+// because the unsubscribe endpoint has always reached for it by this name.
+const unsubToken = mailer.unsubToken;
 module.exports.unsubToken = unsubToken;
 
 module.exports = Object.assign(async function handler(req, res) {
