@@ -5747,37 +5747,42 @@ Component.prototype.renderVals = function () {
     }
     /* Everything below is a size pass: the card was over half the screen on a
        phone, mostly headline and stage. */
-    #hbHead { padding:20px 20px 14px !important; }
-    #hbFoot { padding:0 20px 20px !important; }
+    #hbHead { padding:16px 20px 12px !important; }
+    #hbFoot { padding:0 20px 16px !important; }
     #hbPopup h2 { font-size:19.5px !important; line-height:1.14 !important; }
-    #hbHead p, #hbFoot p:not(#hbErr) { font-size:13.5px !important; }
-    #hbStage { height:196px !important; }
-    #hbPet { width:137px !important; height:196px !important; margin-left:-68px !important; }
-    #hbBean { width:56px !important; left:16px !important; bottom:16px !important; }
+    #hbHead p, #hbFoot p:not(#hbErr) { font-size:13px !important; line-height:1.5 !important; }
+    /* One height for every step. Sized so the tallest step — email, with the
+       offer bar and the form under her — still fits an iOS Safari viewport. */
+    #hbStage { height:176px !important; }
+    #hbPet { width:123px !important; height:176px !important; margin-left:-62px !important; }
+    #hbBean { width:52px !important; left:14px !important; bottom:14px !important; }
     /* The target is a fixed 74px against a dog that is now 137px wide instead
        of 224, so it overflowed the top of the stage and got clipped. Scaled to
        hold the same proportion of her head. The catch radius in the script is
        deliberately left alone — being forgiving costs nothing here. */
-    #hbMouth, #hbHot { width:48px !important; height:48px !important; margin:-24px 0 0 -24px !important; }
-    #hbHint { top:178px !important; font-size:8.5px !important; }
+    #hbMouth, #hbHot { width:44px !important; height:44px !important; margin:-22px 0 0 -22px !important; }
+    #hbHint { top:158px !important; font-size:8.5px !important; }
+    /* Side by side rather than stacked. Stacking cost 56px of height on the one
+       step that has none to spare, and the card is ~313px of inner width even
+       on a 360px phone — plenty for both. flex-basis on the field means they
+       still wrap, but only once the field would be squeezed below 150px. */
     #hbForm { flex-wrap:wrap; }
-    #hbEmail, #hbSend { flex:1 1 100% !important; min-height:48px; }
+    #hbEmail { flex:1 1 150px !important; min-height:48px; }
+    #hbSend { flex:0 0 auto !important; min-height:48px; padding:14px 15px !important; }
     #hbNo { min-height:44px; font-size:12.5px !important; }
   }
-  /* Once the email step is showing there is nothing left to drag, so the stage
-     gives its height back to the form. Not gated on viewport height: whether
-     the layout viewport shrinks when the keyboard opens differs by browser, so
-     relying on that would make the field reachable on some phones only. */
+  /* The stage is ONE size across all three steps, exactly as it is on desktop.
+     The two photographs are aligned to each other pixel for pixel — same frame,
+     same bandana width, same head row — so the cross-fade reads as a single dog
+     turning to camera. Shrinking the stage for the email step made her visibly
+     jump smaller at the moment she turns, which destroys the only illusion the
+     component has. Height the email step needs comes out of the blocks around
+     her, never out of her. */
   @media (max-width: 560px) {
-    #hbPopup[data-step-now="email"] #hbStage, #hbPopup[data-step-now="done"] #hbStage { height:104px !important; }
-    #hbPopup[data-step-now="email"] #hbPet, #hbPopup[data-step-now="done"] #hbPet { width:73px !important; height:104px !important; margin-left:-36px !important; }
-    /* The offer bar is the other big block on this step. Measured at 96% of a
-       360x640 screen before the keyboard is even up, which leaves the field
-       nowhere to go. */
-    #hbOffer { margin:12px 0 12px !important; padding:10px 14px !important; }
-    #hbOfferPct { font-size:30px !important; }
-    #hbOfferLbl { font-size:17px !important; }
-    #hbDots { margin-top:14px !important; }
+    #hbOffer { margin:10px 0 10px !important; padding:9px 14px !important; }
+    #hbOfferPct { font-size:28px !important; }
+    #hbOfferLbl { font-size:16px !important; }
+    #hbDots { margin-top:10px !important; }
   }
   /* There was a rule here that hid the stage entirely below 700px of viewport
      height, on the theory that only small phones are that short. They are not:
