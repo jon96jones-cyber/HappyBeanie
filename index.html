@@ -3230,6 +3230,7 @@ class Component extends DCLogic {
   maybePop(kind) {
     if (!POP_ON) return;
     if (!window.HBPop || this._popShown || window.HBPop.isOpen()) return;
+    if (this._popForce) { this._popShown = true; window.HBPop.open(); return; }
     // The floor is there to stop a fast scroll or a stray cursor firing this
     // the instant the page paints. The dwell timer is already a time gate, so
     // it is exempt — otherwise the two are set to the same mark and a
@@ -3884,6 +3885,20 @@ class Component extends DCLogic {
     // is NaN — which is false, so the floor would not hold.
     this._popBorn = Date.now();
     this._popShown = false;
+    // Testing aid, same shape as the ?nofb switch above. /?pop=1 clears the
+    // suppression keys and opens the popup on the next tick regardless of the
+    // rules — including the signed-in rule, which is the one that makes this
+    // invisible to anyone who owns the store and is logged into it.
+    // /?pop=0 clears the keys and then behaves normally, which is what you
+    // want to check that the real timing works.
+    try {
+      const q = new URLSearchParams(window.location.search).get('pop');
+      if (q === '1' || q === '0') {
+        localStorage.removeItem('hb-pop');
+        localStorage.removeItem('hb-list');
+        this._popForce = q === '1';
+      }
+    } catch (e) {}
     // Ambassador referral: /?ref=CODE stores the code for 30 days, and
     // checkout attaches it as a discount code (unless a trade code applies —
     // trade terms always win for wholesale accounts). The discount code on
