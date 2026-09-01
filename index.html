@@ -3228,8 +3228,18 @@ class Component extends DCLogic {
   // on every pointermove, and a reconcile mid-drag would throw them away.
   // This method stays the single gate that decides whether it may open.
   maybePop(kind) {
-    if (!POP_ON) return;
-    if (!window.HBPop || this._popShown || window.HBPop.isOpen()) return;
+    // Says why, once per load, on the trigger that is supposed to do the work.
+    // "It isn't popping up" is otherwise indistinguishable from a stale deploy,
+    // and every rule here fails silently by design.
+    const no = why => {
+      if (kind === 'dwell' && !this._popSaid) {
+        this._popSaid = true;
+        console.info('[hb popup] not shown: ' + why + '. Use /?pop=1 to force it, /?pop=0 to clear and behave normally.');
+      }
+    };
+    if (!POP_ON) return no('switched off in the build');
+    if (!window.HBPop) return no('the popup component is missing — this page is an older deploy');
+    if (this._popShown || window.HBPop.isOpen()) return;
     if (this._popForce) { this._popShown = true; window.HBPop.open(); return; }
     // The floor is there to stop a fast scroll or a stray cursor firing this
     // the instant the page paints. The dwell timer is already a time gate, so
@@ -3237,7 +3247,7 @@ class Component extends DCLogic {
     // millisecond of timer jitter silently drops the one-shot dwell trigger.
     if (kind !== 'dwell' && (!this._popBorn || Date.now() - this._popBorn < POP_FLOOR)) return;
     const page = this.state.page || 'home';
-    if (POP_NEVER.indexOf(page) !== -1) return;
+    if (POP_NEVER.indexOf(page) !== -1) return no('the ' + page + ' page is never interrupted');
     // The product page used to be held back to exit-intent, and then to a 70%
     // scroll on touch. Both are gone: at a five-second dwell the timer wins
     // every time, so those branches were unreachable, and an unreachable rule
@@ -3245,11 +3255,13 @@ class Component extends DCLogic {
     // any other page that is not a checkout step.
     // Someone with an account is already reachable; asking them to "join" is
     // asking for something we have.
-    if (this.state.signedIn) return;
+    if (this.state.signedIn) return no('you are signed in');
     try {
-      if (localStorage.getItem('hb-list') === '1') return;
+      if (localStorage.getItem('hb-list') === '1') return no('this browser is already on the list');
       const d = JSON.parse(localStorage.getItem('hb-pop') || 'null');
-      if (d && d.at && Date.now() - d.at < POP_QUIET) return;
+      if (d && d.at && Date.now() - d.at < POP_QUIET) {
+        return no('dismissed ' + Math.round((Date.now() - d.at) / 86400000) + ' day(s) ago, quiet for 30');
+      }
     } catch (e) {}
     this._popShown = true;
     window.HBPop.open();
