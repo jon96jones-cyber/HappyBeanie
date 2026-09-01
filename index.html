@@ -5710,6 +5710,7 @@ Component.prototype.renderVals = function () {
   @keyframes hbBob { 0%,100% { transform:translateY(0) rotate(-4deg); } 50% { transform:translateY(-9px) rotate(4deg); } }
   @keyframes hbBurst { 0% { opacity:1; transform:translate(0,0) scale(.4) rotate(0); } 100% { opacity:0; transform:translate(var(--dx),var(--dy)) scale(1) rotate(140deg); } }
   @keyframes hbChomp { 0%,100% { transform:scale(1); } 30% { transform:scale(1.06,.94); } 60% { transform:scale(.98,1.03); } }
+  @keyframes hbNudge { 0%,100% { transform:scale(1); color:#A99E8C; } 35% { transform:scale(1.05); color:#17140F; } 70% { transform:scale(1); color:#17140F; } }
 
   #hbScrim { position:fixed; inset:0; z-index:9998; background:rgba(23,20,15,.5); opacity:0; pointer-events:none; transition:opacity .3s ease; }
   #hbScrim[data-on] { opacity:1; pointer-events:auto; }
@@ -6026,7 +6027,20 @@ Component.prototype.renderVals = function () {
     returnTo = null;
   }
   document.getElementById('hbNo').addEventListener('click', close);
-  scrim.addEventListener('click', close);
+  // Clicking the scrim deliberately does NOT close it any more: declining has
+  // to be a choice someone makes, not something they do by missing. But a
+  // click that does nothing at all reads as broken, so it points at the way
+  // out instead — animating the decline link rather than shaking the card,
+  // because the card's transform differs between the centred and bottom-sheet
+  // layouts and an animation on it would fight the positioning.
+  scrim.addEventListener('click', function () {
+    var no = document.getElementById('hbNo');
+    if (!no) return;
+    if (reduced) { try { no.focus({ preventScroll: true }); } catch (e) {} return; }
+    no.style.animation = 'none';
+    void no.offsetWidth;
+    no.style.animation = 'hbNudge .55s cubic-bezier(.2,.7,.2,1)';
+  });
 
   document.addEventListener('keydown', function (e) {
     if (!pop.hasAttribute('data-on')) return;
