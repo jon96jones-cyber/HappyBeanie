@@ -655,11 +655,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   @keyframes shLock { 0% { transform: scale(0.6); opacity: 0; } 4% { transform: scale(1.25); opacity: 0.8; } 22% { transform: scale(1); opacity: 0.35; } 46% { opacity: 0; } 100% { opacity: 0; } }
   @keyframes pingRing { 0% { transform: scale(0.7); opacity: 0.9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }
   @keyframes checkPop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-  /* The capture popup. Deliberately not checkPop: that overshoots to 1.08,
-     which reads as playful on a 34px check mark and as a jolt on a 470px card
-     arriving uninvited. A short rise is enough to register as "new". */
-  @keyframes hbPopIn { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: none; } }
-  @keyframes hbPopUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   @keyframes navDrop { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes navItem { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes hbFloatA { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
@@ -869,22 +864,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="rth3"] { font-size: 22px !important; margin-bottom: 6px !important; }
     [data-m~="rtp"] { font-size: 14px !important; line-height: 1.55 !important; }
     [data-m~="modal"] { max-height: 92vh !important; padding: 30px 20px 34px !important; }
-    /* The capture popup becomes a bottom sheet on a phone. A centred modal is
-       the wrong shape here: focusing the email field raises the keyboard, which
-       shrinks the viewport and pushes a vertically-centred card up behind the
-       header — you end up typing into a field you cannot see. Anchored to the
-       bottom, the field sits directly above the keyboard instead.
-       It also stays partial-height and dismissible on purpose: Google treats a
-       full-screen mobile interstitial as intrusive, and these pages are ad
-       landing pages. */
-    [data-m~="popwrap"] { align-items: flex-end !important; padding: 0 !important; }
-    [data-m~="popcard"] { max-width: none !important; border-width: 1px 0 0 !important; border-radius: 14px 14px 0 0 !important; padding: 30px 22px 26px !important; animation: hbPopUp 0.32s cubic-bezier(0.2,0.7,0.2,1) both !important; }
-    [data-m~="popx"] { width: 44px !important; height: 44px !important; right: 8px !important; top: 8px !important; }
-    /* Stacked, because side by side the field is ~150px wide on a 360px phone
-       and the button crowds it out. */
-    [data-m~="popform"] { flex-wrap: wrap !important; }
-    [data-m~="popform"] > input, [data-m~="popform"] > button { flex: 1 1 100% !important; min-height: 48px !important; }
-    [data-m~="poph"] { font-size: 26px !important; }
     [data-m~="barpad"] { padding-bottom: 104px !important; }
     [data-m~="wrapflex"] { flex-wrap: wrap !important; }
     [data-m~="cmp3"] { gap: 10px !important; padding: 15px 16px !important; font-size: 13px !important; }
@@ -1076,8 +1055,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="collage"] { grid-auto-rows: 92px !important; }
     [data-m~="barpad"] { padding-bottom: 84px !important; }
     [data-m~="modal"] { padding: 24px 16px 28px !important; }
-    [data-m~="popcard"] { padding: 26px 18px 22px !important; }
-    [data-m~="poph"] { font-size: 23px !important; }
     [data-m~="tap"]   { min-height: 48px !important; }
     [data-m~="footlinks"] { gap: 0 !important; }
     section[data-m~="herosec"] { padding-top: 30px !important; padding-bottom: 0 !important; }
@@ -3173,36 +3150,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     </div>
   </footer>
 
-  <!-- Email capture. Global on purpose — it sits outside every page's sc-if so
-       one instance serves the whole SPA, and maybePop() decides where it may
-       appear rather than the markup doing it. The copy is deliberately
-       evergreen: no batch number, no launch date, no discount. A popup outlives
-       any one production run, and a stale offer is worse than no offer. If the
-       promise here changes, change api/subscribe.js's tagging with it so the
-       list stays segmentable. -->
-  <sc-if value="{{ popOpen }}" hint-placeholder-val="{{ false }}">
-    <div sc-camel-on-click="{{ popClose }}" data-m="popwrap" style="position: fixed; inset: 0; z-index: 140; background: rgba(23,20,15,0.68); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 32px 20px;">
-      <div role="dialog" aria-modal="true" aria-label="Join the Happy Beanie list" sc-camel-on-click="{{ stop }}" data-m="popcard" style="position: relative; width: 100%; max-width: 470px; background: #FCFAF4; border: 1px solid #17140F; padding: 40px 42px 36px; animation: hbPopIn 0.3s cubic-bezier(0.2,0.7,0.2,1) both;">
-        <button id="hbPopX" sc-camel-on-click="{{ popClose }}" aria-label="Close" data-m="popx" style="position: absolute; right: 14px; top: 14px; width: 34px; height: 34px; border: 1px solid #E0D6C2; background: transparent; color: #17140F; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 14px; line-height: 1; cursor: pointer;" style-hover="background: #17140F; color: #F5F0E6;">×</button>
-        <sc-if value="{{ popIdle }}" hint-placeholder-val="{{ true }}">
-          <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 14px;">—&nbsp; The list</div>
-          <h2 data-m="poph" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 31px; line-height: 1.08; margin: 0 0 14px;">We won’t email you much.</h2>
-          <p style="font-size: 15px; line-height: 1.62; color: #554C40; margin: 0 0 22px;">New formulas, restocks, and the lab results for every lot we make. That is the whole list — no discount codes, no daily send, and we never sell your address.</p>
-          <div data-m="popform" style="display: flex; gap: 8px;">
-            <input id="hbPopEmail" value="{{ popEmail }}" sc-camel-on-change="{{ setPopEmail }}" placeholder="your@email.com" inputmode="email" aria-label="Email address" style="flex: 1; min-width: 0; background: #FFFFFF; border: 1px solid #DDD3C0; border-radius: 2px; padding: 13px 14px; color: #17140F; font-family: 'DM Sans', sans-serif; font-size: 15px;" style-focus="border-color: oklch(0.86 0.14 92); outline: none;">
-            <button sc-camel-on-click="{{ doPop }}" disabled="{{ popBusy }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 13px 20px; border: none; border-radius: 2px; background: {{ popBg }}; color: {{ popFg }}; cursor: {{ popCursor }}; transition: background 0.25s ease;">{{ popLabel }}</button>
-          </div>
-          <div style="display: {{ popErrShow }}; font-size: 13px; line-height: 1.6; color: #8C4630; margin-top: 10px;">{{ popErr }}</div>
-          <p style="font-size: 12px; line-height: 1.6; color: #8A7F6E; margin: 16px 0 0;">Unsubscribe any time. Read our <a href="policies/privacy.html" style="color: #8A7F6E;">privacy policy</a>.</p>
-        </sc-if>
-        <sc-if value="{{ popDone }}" hint-placeholder-val="{{ false }}">
-          <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 14px;">—&nbsp; You are on the list</div>
-          <h2 data-m="poph" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 31px; line-height: 1.08; margin: 0 0 14px;">That is all we needed.</h2>
-          <p style="font-size: 15px; line-height: 1.62; color: #554C40; margin: 0 0 4px;">We will be in touch when there is something worth sending, and not before.</p>
-        </sc-if>
-      </div>
-    </div>
-  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;oklch(0.86 0.14 92)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;oklch(0.86 0.14 92)&quot;,&quot;oklch(0.72 0.08 152)&quot;,&quot;oklch(0.78 0.11 45)&quot;,&quot;oklch(0.8 0.06 250)&quot;],&quot;section&quot;:&quot;Brand&quot;},&quot;basePrice&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:68,&quot;min&quot;:30,&quot;max&quot;:180,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Commerce&quot;}}">
@@ -3236,10 +3183,9 @@ const CHEW_IGS = {
   ]
 };
 
-// Off until the design is signed off. Everything below it is finished and
-// tested; this is the only line that decides whether a visitor ever sees the
-// card. Flip it to true once the final design is in.
-const POP_ON = false;
+// The single switch for whether anyone sees the popup. The card itself is the
+// "feed Summer" component at the end of the body; this only gates it.
+const POP_ON = true;
 // Capture-popup timing, kept in one place so the rules can be read at a glance
 // instead of being reconstructed from three listeners.
 const POP_FLOOR = 15000;   // never within the first 15s, whichever trigger fires
@@ -3257,7 +3203,6 @@ class Component extends DCLogic {
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
     pdpView: 'photo', pdpSel: 0, pdpCut: false, pdpReady: false,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
-    popOpen: false, popEmail: '', popBusy: false, popErr: '', popDone: false,
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
 
@@ -3277,9 +3222,14 @@ class Component extends DCLogic {
   // Every trigger funnels through here so the suppression rules are enforced
   // once rather than copied into three listeners. Silently does nothing when
   // the visitor should not be asked.
+  // The card itself is plain DOM, mounted after this app and driven by
+  // window.HBPop — see the script at the end of the body. It has to stay out
+  // of the framework: the feed gesture writes transforms straight to the bean
+  // on every pointermove, and a reconcile mid-drag would throw them away.
+  // This method stays the single gate that decides whether it may open.
   maybePop(kind) {
     if (!POP_ON) return;
-    if (this._popShown || this.state.popOpen) return;
+    if (!window.HBPop || this._popShown || window.HBPop.isOpen()) return;
     if (!this._popBorn || Date.now() - this._popBorn < POP_FLOOR) return;
     const page = this.state.page || 'home';
     if (POP_NEVER.indexOf(page) !== -1) return;
@@ -3295,70 +3245,8 @@ class Component extends DCLogic {
       if (d && d.at && Date.now() - d.at < POP_QUIET) return;
     } catch (e) {}
     this._popShown = true;
-    this._popReturn = document.activeElement;
-    this.setState({ popOpen: true });
-    // Move focus into the dialog, or a keyboard user is left tabbing through
-    // the page behind it. On a touch device that focus goes to the close
-    // button rather than the field: focusing an input there throws up the
-    // keyboard unasked, which is a genuinely hostile way to greet someone.
-    const fine = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
-    const grab = tries => {
-      const el = document.getElementById(fine ? 'hbPopEmail' : 'hbPopX');
-      if (el) {
-        try { el.focus({ preventScroll: true }); } catch (e) { try { el.focus(); } catch (e2) {} }
-        return;
-      }
-      // The node does not exist until the render this setState schedules has
-      // run, and that timing is the framework's to decide, not ours.
-      if (tries > 0) setTimeout(() => grab(tries - 1), 50);
-    };
-    setTimeout(() => grab(6), 0);
+    window.HBPop.open();
   }
-
-  // why: 'dismiss' parks the popup for POP_QUIET. 'done' does not need to —
-  // hb-list already suppresses it for good.
-  popShut(why) {
-    if (!this.state.popOpen) return;
-    clearTimeout(this._popBye);
-    if (why === 'dismiss') {
-      try { localStorage.setItem('hb-pop', JSON.stringify({ at: Date.now() })); } catch (e) {}
-    }
-    this.setState({ popOpen: false });
-    const back = this._popReturn;
-    this._popReturn = null;
-    if (back && back.focus) { try { back.focus({ preventScroll: true }); } catch (e) {} }
-  }
-
-  // Shared by the button and by Enter in the field, so the two cannot drift.
-  popSubmit() {
-    const email = String(this.state.popEmail || '').trim();
-    if (!/.+@.+\..+/.test(email) || this.state.popBusy || this.state.popDone) return;
-    this.setState({ popBusy: true, popErr: '' });
-    fetch('/api/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, source: 'popup' })
-    }).then(r => r.json().catch(() => ({}))).then(b => {
-      if (b && b.ok) {
-        // Marked before the confirmation renders: if they close the tab while
-        // reading it, the popup still must not come back. `joined` flips the
-        // footer's own form to its success state for the same reason.
-        this.hbListed();
-        this.setState({ popBusy: false, popDone: true, joined: true });
-        this._popBye = setTimeout(() => this.popShut('done'), 3200);
-        return;
-      }
-      this.setState({
-        popBusy: false,
-        popErr: (b && b.error === 'bad_email')
-          ? 'That does not look like an email address.'
-          : 'That did not go through. Try again in a moment, or email hello@happybeanie.com.'
-      });
-    }).catch(() => {
-      this.setState({ popBusy: false, popErr: 'That did not go through. Try again in a moment, or email hello@happybeanie.com.' });
-    });
-  }
-
 
   roomDefs() {
     const steel = 'linear-gradient(140deg,#F6F4EE 0%,#D4D0C6 54%,#E9E5DC 100%)';
@@ -4077,32 +3965,6 @@ class Component extends DCLogic {
       };
       document.addEventListener('mouseout', this.onPopExit);
     }
-    this.onPopKey = e => {
-      if (!this.state.popOpen) return;
-      if (e.key === 'Escape') { e.preventDefault(); this.popShut('dismiss'); return; }
-      // Enter submits from the field. A <form> would give this for free, but
-      // the card is not one: a nested form inside the app's markup can commit
-      // a real page POST if it is submitted mid-hydrate.
-      if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'hbPopEmail') {
-        e.preventDefault();
-        this.popSubmit();
-        return;
-      }
-      // Keep Tab inside the card. Without this, focus walks straight out into
-      // the page behind the backdrop, where a keyboard user is operating a
-      // page they cannot see and cannot click.
-      if (e.key === 'Tab') {
-        const card = document.querySelector('[data-m~="popcard"]');
-        if (!card) return;
-        const f = card.querySelectorAll('a[href], button:not([disabled]), input:not([disabled])');
-        if (!f.length) return;
-        const first = f[0], last = f[f.length - 1];
-        if (!card.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
-        else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-    };
-    document.addEventListener('keydown', this.onPopKey);
     requestAnimationFrame(() => this.startField());
     // Always create the observer. Under reduced-motion we still reveal, but as
     // an opacity-only fade (no transform) — a fade isn't vestibular motion, so
@@ -4442,7 +4304,6 @@ class Component extends DCLogic {
     const allFilled = coKeys.every(k => String(co[k] || '').trim().length > 0);
     const coReady = allFilled && emailOk && zipOk && M.items.length > 0;
     const joinReady = /.+@.+\..+/.test(String(this.state.joinEmail || '').trim());
-    const popReady = /.+@.+\..+/.test(String(this.state.popEmail || '').trim());
     const pages = [
       { key: 'shop', label: 'Shop' },
       { key: 'product', label: 'Products' },
@@ -5009,24 +4870,6 @@ class Component extends DCLogic {
           this.setState({ joinBusy: false, joinErr: 'That did not go through. Try again in a moment, or email hello@happybeanie.com.' });
         });
       },
-      // Capture popup. When and where it may open is maybePop()'s job; these
-      // are only the card's own behaviour once it is on screen.
-      popOpen: !!this.state.popOpen,
-      popIdle: !this.state.popDone,
-      popDone: !!this.state.popDone,
-      popEmail: this.state.popEmail,
-      setPopEmail: e => this.setState({ popEmail: e.target.value }),
-      popBg: popReady ? 'oklch(0.86 0.14 92)' : '#E8E1D2',
-      popFg: popReady ? '#17140F' : '#8A7F6E',
-      popCursor: popReady ? 'pointer' : 'not-allowed',
-      popBusy: !!this.state.popBusy,
-      popLabel: this.state.popBusy ? 'Joining…' : 'Join',
-      popErr: this.state.popErr || '',
-      popErrShow: this.state.popErr ? 'block' : 'none',
-      // Backdrop, × and Esc all mean the same thing, and all of them park the
-      // popup for a month. Closing it is an answer, not an accident.
-      popClose: () => this.popShut('dismiss'),
-      doPop: () => this.popSubmit(),
       orderTotal: this.state.orderTotal || this.money(M.total),
       orderItems: this.state.orderItems,
       isCart: page === 'cart',
@@ -5818,6 +5661,379 @@ const _qzOrigRender = Component.prototype.renderVals;
 Component.prototype.renderVals = function () {
   return { ..._qzOrigRender.call(this), ...this.qzVals() };
 };
+</script>
+
+<!-- ======================================================================
+     "Feed Summer" email capture.
+     Design source: email/popup handoff (Setup_26). Ported here as plain DOM
+     rather than into the app's template language on purpose — the feed gesture
+     writes transforms straight to the bean on every pointermove, and a
+     framework reconcile mid-drag would discard them.
+     WHEN it opens is not decided here: Component.maybePop() owns the trigger
+     and suppression rules and calls window.HBPop.open().
+     ====================================================================== -->
+<style>
+  @keyframes hbPopIn { 0% { opacity:0; transform:translate(-50%,-50%) translateY(14px) scale(.97); } 100% { opacity:1; transform:translate(-50%,-50%); } }
+  @keyframes hbBob { 0%,100% { transform:translateY(0) rotate(-4deg); } 50% { transform:translateY(-9px) rotate(4deg); } }
+  @keyframes hbBurst { 0% { opacity:1; transform:translate(0,0) scale(.4) rotate(0); } 100% { opacity:0; transform:translate(var(--dx),var(--dy)) scale(1) rotate(140deg); } }
+  @keyframes hbChomp { 0%,100% { transform:scale(1); } 30% { transform:scale(1.06,.94); } 60% { transform:scale(.98,1.03); } }
+
+  #hbScrim { position:fixed; inset:0; z-index:9998; background:rgba(23,20,15,.5); opacity:0; pointer-events:none; transition:opacity .3s ease; }
+  #hbScrim[data-on] { opacity:1; pointer-events:auto; }
+  #hbPopup { position:fixed; z-index:9999; left:50%; top:50%; transform:translate(-50%,-50%);
+             width:476px; max-width:calc(100vw - 32px); max-height:calc(100vh - 32px); overflow:auto;
+             background:#FCFAF4; border:1px solid #17140F; border-radius:4px;
+             box-shadow:0 40px 80px -40px rgba(23,20,15,.55); display:none;
+             font-family:'DM Sans', system-ui, sans-serif; color:#17140F; }
+  #hbPopup[data-on] { display:block; animation:hbPopIn .42s cubic-bezier(.2,.7,.2,1); }
+  /* Focus lands on the card itself when it opens, so a screen reader announces
+     the dialog and Tab starts inside it. The card is not a control, so it gets
+     no ring — putting the opening focus on the bean instead drew a box around
+     it that is not in the design and reads as a rendering fault. */
+  #hbPopup:focus { outline:none; }
+  #hbSend:hover:not(:disabled) { background:oklch(.9 .15 92) !important; transform:translateY(-2px); }
+  #hbSend:disabled { opacity:.6; cursor:progress; }
+  #hbNo:hover, #hbAgain:hover { color:#17140F !important; }
+  /* The bean is a real control, not just a draggable image — see the keyboard
+     path in the script. Give it a focus ring that reads on the cream stage. */
+  #hbBean:focus-visible, #hbMouth:focus-visible { outline:3px solid oklch(.44 .07 152); outline-offset:3px; }
+
+  /* A phone: the card fills the width, and the stage gives up height so the
+     email step still fits once the keyboard is up. */
+  @media (max-width: 560px) {
+    #hbPopup { width:auto; left:8px; right:8px; transform:translateY(-50%); max-height:calc(100vh - 16px); }
+    #hbPopup[data-on] { animation:none; }
+    #hbStage { height:246px !important; }
+    #hbPet { width:172px !important; height:246px !important; margin-left:-86px !important; }
+    #hbBean { width:66px !important; left:22px !important; bottom:22px !important; }
+    #hbHint { top:224px !important; }
+    #hbForm { flex-wrap:wrap; }
+    #hbEmail, #hbSend { flex:1 1 100% !important; min-height:48px; }
+    #hbNo { min-height:44px; }
+  }
+  /* Once the email step is showing there is nothing left to drag, so the stage
+     gives its height back to the form. Not gated on viewport height: whether
+     the layout viewport shrinks when the keyboard opens differs by browser, so
+     relying on that would make the field reachable on some phones only. */
+  @media (max-width: 560px) {
+    #hbPopup[data-step-now="email"] #hbStage, #hbPopup[data-step-now="done"] #hbStage { height:186px !important; }
+    #hbPopup[data-step-now="email"] #hbPet, #hbPopup[data-step-now="done"] #hbPet { width:130px !important; height:186px !important; margin-left:-65px !important; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #hbPopup, #hbBean, .hb-spark, #hbPet { animation:none !important; }
+  }
+</style>
+
+<div id="hbScrim"></div>
+
+<div id="hbPopup" role="dialog" aria-modal="true" aria-labelledby="hbTitle" tabindex="-1" data-step-now="feed">
+
+  <div style="display:flex; align-items:center; padding:14px 18px 13px; background:#17140F;">
+    <span style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:oklch(.86 .14 92);">Summer&rsquo;s daily bean</span>
+  </div>
+
+  <div style="padding:26px 28px 20px;">
+    <div data-step="feed">
+      <h2 id="hbTitle" style="margin:0; font-weight:700; letter-spacing:-.038em; font-size:22px; line-height:1.16; text-align:center; color:#17140F; text-wrap:balance;">Feed Summer Her Daily Supplement and We&rsquo;ll Knock 10% Off Your Next Order!</h2>
+    </div>
+    <div data-step="email" style="display:none;">
+      <h2 style="margin:0 0 9px; font-weight:700; letter-spacing:-.04em; font-size:25px; line-height:1.08; text-align:center; color:#17140F; text-wrap:pretty;">You&rsquo;ve made Summer a happy bean!</h2>
+      <p style="margin:0; font-size:15px; line-height:1.55; text-align:center; color:#6A6055; text-wrap:pretty;">Tell us where to send it and the code lands in your inbox before Summer finishes chewing.</p>
+    </div>
+    <div data-step="done" style="display:none;">
+      <h2 style="margin:0 0 9px; font-weight:700; letter-spacing:-.04em; font-size:29px; line-height:1.08; color:#17140F; text-wrap:pretty;" id="hbDoneHead">Saved. Check your inbox.</h2>
+      <p style="margin:0; font-size:15px; line-height:1.55; color:#6A6055; text-wrap:pretty;" id="hbDoneSub">Your code is below and on its way. It works on any box, Summer&rsquo;s formula or not.</p>
+    </div>
+  </div>
+
+  <div id="hbStage" style="position:relative; height:320px; background:linear-gradient(178deg,#F5EFE0,#EFE7D5); overflow:hidden; touch-action:none; user-select:none;">
+    <span aria-hidden="true" style="position:absolute; left:50%; bottom:-84px; width:300px; height:168px; margin-left:-150px; background:radial-gradient(closest-side,rgba(23,20,15,.16),rgba(23,20,15,0)); border-radius:50%;"></span>
+
+    <div id="hbPet" style="position:absolute; left:50%; bottom:0; width:224px; height:320px; margin-left:-112px;">
+      <img id="hbWait" src="assets/img/popup/summer-waiting.webp" width="392" height="560" alt="Summer, a goldendoodle, waiting with her mouth open" style="display:block; width:100%; height:100%; object-fit:contain; object-position:center bottom; transition:opacity .45s ease;">
+      <img id="hbFed" src="assets/img/popup/summer-fed.webp" width="392" height="560" alt="Summer looking into the camera, pleased with her chew" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:center bottom; opacity:0; transition:opacity .45s ease;">
+      <!-- The dashed square is the only cue telling anyone what to do, and it
+           doubles as the tap/click target for people who cannot drag. -->
+      <button id="hbMouth" type="button" aria-label="Feed Summer the bean" style="position:absolute; left:59.2%; top:13.9%; width:74px; height:74px; margin:-37px 0 0 -37px; padding:0; border:1.5px dashed #17140F; border-radius:3px; background:transparent; opacity:.5; cursor:pointer; transition:opacity .25s ease, transform .25s cubic-bezier(.2,1.5,.4,1);"></button>
+      <span id="hbHot" aria-hidden="true" style="position:absolute; left:59.2%; top:13.9%; width:74px; height:74px; margin:-37px 0 0 -37px; background:oklch(.86 .14 92); border-radius:3px; opacity:0; pointer-events:none; transition:opacity .25s ease;"></span>
+      <span id="hbBurst" aria-hidden="true" style="position:absolute; left:59.2%; top:13.9%; width:0; height:0;"></span>
+    </div>
+
+    <img id="hbBean" src="assets/img/popup/chew.webp" alt="A Happy Beanie soft chew" draggable="false"
+         role="button" tabindex="0" aria-label="Drag the bean to Summer's mouth, or press Enter to feed her"
+         style="position:absolute; left:40px; bottom:30px; width:84px; cursor:grab; touch-action:none; -webkit-user-drag:none; user-select:none; filter:drop-shadow(0 14px 18px rgba(23,20,15,.34)); animation:hbBob 2.6s ease-in-out infinite;">
+
+    <span id="hbHint" style="position:absolute; left:9px; top:297px; white-space:nowrap; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#8A7F6E; transition:opacity .3s ease;">drag the bean to her mouth</span>
+  </div>
+
+  <div style="padding:0 28px 28px;">
+    <div data-step="email" style="display:none;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; margin:20px 0 18px; padding:14px 16px; background:#17140F; border-radius:3px;">
+        <span>
+          <span style="display:block; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:oklch(.82 .19 145); margin-bottom:3px;">Unlocked</span>
+          <span style="display:block; font-weight:700; letter-spacing:-.03em; font-size:21px; line-height:1.1; color:#F5F0E6;">off your next box</span>
+        </span>
+        <span style="flex:0 0 auto; font-weight:700; letter-spacing:-.05em; font-size:40px; line-height:.9; color:oklch(.86 .14 92); font-variant-numeric:tabular-nums;">10%</span>
+      </div>
+      <form id="hbForm" style="display:flex; gap:8px;" novalidate>
+        <input id="hbEmail" type="email" placeholder="you@example.com" autocomplete="email" aria-label="Email address"
+               style="flex:1 1 auto; min-width:0; padding:14px; font-family:'DM Sans',sans-serif; font-size:15px; color:#17140F; background:#FFFDF7; border:1.5px solid #E0D6C2; border-radius:3px; outline:none; transition:border-color .2s ease;">
+        <button id="hbSend" type="submit"
+               style="flex:0 0 auto; padding:14px 18px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:10.5px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:#17140F; background:oklch(.86 .14 92); border:1.5px solid #17140F; border-radius:3px; cursor:pointer; transition:background .25s ease, transform .25s cubic-bezier(.2,.7,.2,1);">Send it</button>
+      </form>
+      <p id="hbErr" role="alert" style="display:none; margin:9px 0 0; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.08em; line-height:1.5; color:oklch(.55 .19 25);"></p>
+    </div>
+
+    <div data-step="done" style="display:none;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:20px; padding:15px 16px; background:#FFFDF7; border:1.5px dashed #17140F; border-radius:3px;">
+        <span style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8A7F6E;">10% off</span>
+        <span id="hbCode" style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:19px; font-weight:500; letter-spacing:.1em; color:#17140F;">BEAN10</span>
+      </div>
+      <button id="hbAgain" type="button" style="margin-top:14px; padding:0; background:transparent; border:none; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:#8A7F6E; text-decoration:underline; cursor:pointer;">Feed her again</button>
+    </div>
+
+    <div id="hbDots" style="display:flex; align-items:center; gap:6px; margin-top:22px;"></div>
+
+    <button id="hbNo" type="button" style="display:block; width:100%; margin-top:8px; padding:4px 8px; background:transparent; border:none; font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.4; color:#A99E8C; text-decoration:underline; text-underline-offset:3px; cursor:pointer; transition:color .2s ease;">No thanks, I don&rsquo;t want to save money</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var CATCH = 78;               // px, centre-to-centre — forgiving in every direction
+  var CODE = 'BEAN10';          // display only; the server's value wins on success
+  var DISMISS_KEY = 'hb-pop';   // shared with the app's suppression rules
+  var LIST_KEY = 'hb-list';     // ...and with the footer signup, so nobody is asked twice
+
+  var pop = document.getElementById('hbPopup'), scrim = document.getElementById('hbScrim');
+  var bean = document.getElementById('hbBean'), mouth = document.getElementById('hbMouth');
+  var hot = document.getElementById('hbHot'), hint = document.getElementById('hbHint');
+  var wait = document.getElementById('hbWait'), fed = document.getElementById('hbFed');
+  var pet = document.getElementById('hbPet'), burst = document.getElementById('hbBurst');
+  var dots = document.getElementById('hbDots'), errEl = document.getElementById('hbErr');
+  var input = document.getElementById('hbEmail'), send = document.getElementById('hbSend');
+  var codeEl = document.getElementById('hbCode');
+  var doneHead = document.getElementById('hbDoneHead'), doneSub = document.getElementById('hbDoneSub');
+  var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var step = 'feed', drag = null, busy = false, returnTo = null;
+  var ORDER = ['feed', 'email', 'done'];
+
+  function render() {
+    // Scoped to the card. A document-wide [data-step] query would also match
+    // anything the app happens to label that way.
+    Array.prototype.forEach.call(pop.querySelectorAll('[data-step]'), function (el) {
+      el.style.display = el.getAttribute('data-step') === step ? 'block' : 'none';
+    });
+    pop.setAttribute('data-step-now', step);
+    bean.style.display = step === 'feed' ? 'block' : 'none';
+    mouth.style.display = step === 'feed' ? 'block' : 'none';
+    mouth.style.opacity = step === 'feed' ? '.5' : '0';
+    hint.style.opacity = step === 'feed' ? '1' : '0';
+    wait.style.opacity = step === 'feed' ? '1' : '0';
+    fed.style.opacity = step === 'feed' ? '0' : '1';
+    dots.innerHTML = '';
+    ORDER.forEach(function (s, i) {
+      var at = ORDER.indexOf(step);
+      var d = document.createElement('span');
+      d.style.cssText = 'display:block;height:4px;border-radius:1px;transition:width .4s cubic-bezier(.2,.7,.2,1),background .3s ease;' +
+        'width:' + (i === at ? '26px' : '12px') + ';background:' + (i <= at ? 'oklch(.86 .14 92)' : '#E0D6C2');
+      dots.appendChild(d);
+    });
+    if (step === 'email') setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); } }, 120);
+  }
+
+  function hits(el) {
+    var a = el.getBoundingClientRect(), b = mouth.getBoundingClientRect();
+    var dx = (a.left + a.width / 2) - (b.left + b.width / 2);
+    var dy = (a.top + a.height / 2) - (b.top + b.height / 2);
+    return Math.sqrt(dx * dx + dy * dy) < CATCH;
+  }
+
+  function sparkle() {
+    burst.innerHTML = '';
+    for (var i = 0; i < 7; i++) {
+      var ang = (i / 7) * Math.PI * 2, dist = 46 + (i % 3) * 16;
+      var s = document.createElement('span');
+      s.className = 'hb-spark';
+      s.style.cssText = 'position:absolute;left:0;top:0;width:11px;height:11px;margin:-5px 0 0 -5px;border-radius:2px;' +
+        'background:' + (i % 3 === 0 ? 'oklch(.44 .07 152)' : 'oklch(.86 .14 92)') + ';' +
+        '--dx:' + Math.round(Math.cos(ang) * dist) + 'px;--dy:' + Math.round(Math.sin(ang) * dist - 12) + 'px;' +
+        'animation:hbBurst .72s cubic-bezier(.2,.7,.2,1) ' + (i * 0.035).toFixed(3) + 's forwards';
+      burst.appendChild(s);
+    }
+    setTimeout(function () { burst.innerHTML = ''; }, 900);
+  }
+
+  function feedHer() {
+    if (step !== 'feed') return;
+    if (!reduced) {
+      pet.style.animation = 'hbChomp .5s cubic-bezier(.2,.7,.2,1)';
+      setTimeout(function () { pet.style.animation = ''; }, 520);
+      sparkle();
+    }
+    step = 'email';
+    render();
+  }
+
+  // Native image drag would swallow the pointer stream, so it is cancelled and
+  // the element captures the pointer for the whole gesture.
+  bean.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  bean.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    try { bean.setPointerCapture(e.pointerId); } catch (err) {}
+    bean.style.animation = 'none';
+    bean.style.transition = '';
+    bean.style.cursor = 'grabbing';
+    var m = /translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/.exec(bean.style.transform || '');
+    drag = { x: e.clientX - (m ? +m[1] : 0), y: e.clientY - (m ? +m[2] : 0), moved: 0 };
+  });
+  bean.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    drag.moved = Math.max(drag.moved, Math.abs(dx) + Math.abs(dy));
+    bean.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + (dx * 0.06).toFixed(1) + 'deg)';
+    var near = hits(bean);
+    mouth.style.opacity = near ? '0' : '.5';
+    mouth.style.transform = near ? 'scale(1.16)' : 'scale(1)';
+    hot.style.opacity = near ? '.4' : '0';
+    hint.textContent = near ? 'let go — she’s got it' : 'drag the bean to her mouth';
+  });
+  function release() {
+    if (!drag) return;
+    bean.style.cursor = 'grab';
+    var caught = hits(bean), moved = drag.moved;
+    drag = null;
+    hot.style.opacity = '0';
+    if (caught) { feedHer(); return; }
+    // A tap that never really moved is someone telling us they cannot or will
+    // not drag. Treat it as feeding her rather than as a failed gesture.
+    if (moved < 6) { feedHer(); return; }
+    bean.style.transition = 'transform .42s cubic-bezier(.2,1.3,.4,1)';
+    bean.style.transform = 'translate(0,0) rotate(0)';
+    setTimeout(function () {
+      bean.style.transition = '';
+      if (!reduced) bean.style.animation = 'hbBob 2.6s ease-in-out infinite';
+    }, 440);
+    mouth.style.opacity = '.5';
+    mouth.style.transform = 'scale(1)';
+    hint.textContent = 'drag the bean to her mouth';
+  }
+  bean.addEventListener('pointerup', release);
+  bean.addEventListener('pointercancel', release);
+  // The drag must not be the only way through. Without these, anyone using a
+  // keyboard, a switch, or a screen reader simply cannot reach the offer.
+  bean.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); feedHer(); }
+  });
+  mouth.addEventListener('click', function (e) { e.preventDefault(); feedHer(); });
+
+  document.getElementById('hbForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (busy) return;
+    var v = (input.value || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) {
+      errEl.textContent = 'That address doesn’t look right — check it and try again.';
+      errEl.style.display = 'block';
+      input.style.borderColor = 'oklch(.55 .19 25)';
+      input.focus();
+      return;
+    }
+    errEl.style.display = 'none';
+    input.style.borderColor = '#E0D6C2';
+    busy = true;
+    send.disabled = true;
+    send.textContent = 'Sending';
+    // The handoff advanced to "Saved. Check your inbox." without asking anyone.
+    // Nothing is saved and no inbox is involved until the server says so.
+    fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: v, source: 'popup' })
+    }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (b) {
+      busy = false; send.disabled = false; send.textContent = 'Send it';
+      if (b && b.ok) {
+        try { localStorage.setItem(LIST_KEY, '1'); } catch (err) {}
+        if (b.code) { CODE = b.code; codeEl.textContent = b.code; }
+        // Shopify took the address but Resend did not take the email. The code
+        // on screen is still good, so say that instead of promising an inbox.
+        if (b.emailed === false) {
+          doneHead.textContent = 'Saved. Here’s your code.';
+          doneSub.textContent = 'Write it down — the email didn’t go through, so this is the copy that counts. It works on any box, Summer’s formula or not.';
+        }
+        step = 'done';
+        render();
+        return;
+      }
+      errEl.textContent = (b && b.error === 'bad_email')
+        ? 'That address doesn’t look right — check it and try again.'
+        : 'That didn’t go through. Try again in a moment, or email hello@happybeanie.com.';
+      errEl.style.display = 'block';
+    }).catch(function () {
+      busy = false; send.disabled = false; send.textContent = 'Send it';
+      errEl.textContent = 'That didn’t go through. Try again in a moment, or email hello@happybeanie.com.';
+      errEl.style.display = 'block';
+    });
+  });
+
+  document.getElementById('hbAgain').addEventListener('click', function () {
+    step = 'feed'; input.value = ''; bean.style.transform = '';
+    if (!reduced) bean.style.animation = 'hbBob 2.6s ease-in-out infinite';
+    render();
+    try { bean.focus({ preventScroll: true }); } catch (e) {}
+  });
+
+  function close() {
+    if (!pop.hasAttribute('data-on')) return;
+    pop.removeAttribute('data-on');
+    scrim.removeAttribute('data-on');
+    // Parked for the app's 30-day quiet period, in the shape maybePop() reads.
+    try { localStorage.setItem(DISMISS_KEY, JSON.stringify({ at: Date.now() })); } catch (e) {}
+    if (returnTo && returnTo.focus) { try { returnTo.focus({ preventScroll: true }); } catch (e) {} }
+    returnTo = null;
+  }
+  document.getElementById('hbNo').addEventListener('click', close);
+  scrim.addEventListener('click', close);
+
+  document.addEventListener('keydown', function (e) {
+    if (!pop.hasAttribute('data-on')) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+    // Keep Tab inside the card. Without this, focus walks out into a page the
+    // scrim has made unclickable — operable but invisible.
+    if (e.key === 'Tab') {
+      var f = Array.prototype.filter.call(
+        pop.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex="0"]'),
+        function (el) { return el.offsetParent !== null; });
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (!pop.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  function open() {
+    if (pop.hasAttribute('data-on')) return;
+    returnTo = document.activeElement;
+    step = 'feed'; input.value = ''; bean.style.transform = '';
+    errEl.style.display = 'none';
+    render();
+    pop.setAttribute('data-on', '');
+    scrim.setAttribute('data-on', '');
+    // Focus the card, not a control inside it: a screen reader announces the
+    // dialog and its title, Tab starts on the mouth target, and nothing gets a
+    // focus ring the design did not ask for.
+    setTimeout(function () { try { pop.focus({ preventScroll: true }); } catch (e) {} }, 60);
+  }
+
+  window.HBPop = {
+    open: open,
+    close: close,
+    isOpen: function () { return pop.hasAttribute('data-on'); }
+  };
+
+  render();
+})();
 </script>
 
 </body></html>

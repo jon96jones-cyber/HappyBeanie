@@ -30,6 +30,30 @@ const EMAIL_RE = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
 // from whatever the client happened to post.
 const SOURCES = ['footer', 'waitlist', 'quiz', 'shop', 'popup'];
 
+// The popup hands out a discount code, so a popup signup owes the subscriber
+// an email carrying it. Env-configurable because the code has to match a real
+// Shopify discount — changing the promotion should not need a deploy, and the
+// popup reads the same value so the two cannot drift.
+const POPUP_CODE = process.env.POPUP_DISCOUNT_CODE || 'BEAN10';
+const mailer = require('./_lib/mailer.js');
+const codeEmail = require('./_lib/code-email.js');
+
+// Sends the code and says whether it actually went. The caller reports this
+// back to the browser rather than swallowing it: the popup's confirmation says
+// "check your inbox", and it should not say that when nothing was sent.
+async function sendCode(email) {
+  const unsubUrl = mailer.unsubUrl(email, 'marketing');
+  const r = await mailer.send({
+    to: email,
+    subject: 'Your 10% off — ' + POPUP_CODE,
+    html: codeEmail({ code: POPUP_CODE, unsubUrl: unsubUrl }),
+    text: codeEmail.text({ code: POPUP_CODE, unsubUrl: unsubUrl }),
+    unsubUrl: unsubUrl
+  });
+  if (!r.ok) console.error('[subscribe] code email:', r.error, r.status || '');
+  return !!r.ok;
+}
+
 async function admin(token, query, variables) {
   const res = await fetch('https://' + STORE_DOMAIN + '/admin/api/' + API_VERSION + '/graphql.json', {
     method: 'POST',
@@ -108,7 +132,8 @@ module.exports = async function handler(req, res) {
       // tagsAdd, never CustomerInput.tags — the latter replaces the whole set
       // and would strip a wholesale or ambassador tag off a real customer.
       await admin(token, TAG_ADD, { id: existing.id, tags: ['newsletter', 'newsletter-' + source] });
-      return res.status(200).json({ ok: true, created: false });
+      const sent = source === 'popup' ? await sendCode(email) : null;
+      return res.status(200).json({ ok: true, created: false, code: source === 'popup' ? POPUP_CODE : undefined, emailed: sent });
     }
 
     const made = await admin(token, CREATE, {
@@ -118,11 +143,15 @@ module.exports = async function handler(req, res) {
     if (cmsg) {
       // A race — two submissions of the same address at once. The other one
       // won, which is the outcome we wanted anyway.
-      if (/taken|already/i.test(cmsg)) return res.status(200).json({ ok: true, created: false });
+      if (/taken|already/i.test(cmsg)) {
+        const raced = source === 'popup' ? await sendCode(email) : null;
+        return res.status(200).json({ ok: true, created: false, code: source === 'popup' ? POPUP_CODE : undefined, emailed: raced });
+      }
       console.error('[subscribe] create:', cmsg);
       return res.status(502).json({ ok: false, error: 'upstream' });
     }
-    return res.status(200).json({ ok: true, created: true });
+    const sent = source === 'popup' ? await sendCode(email) : null;
+    return res.status(200).json({ ok: true, created: true, code: source === 'popup' ? POPUP_CODE : undefined, emailed: sent });
   } catch (err) {
     console.error('[subscribe]', err && err.message);
     return res.status(502).json({ ok: false, error: 'upstream' });
