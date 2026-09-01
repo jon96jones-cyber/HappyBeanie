@@ -3188,8 +3188,8 @@ const CHEW_IGS = {
 const POP_ON = true;
 // Capture-popup timing, kept in one place so the rules can be read at a glance
 // instead of being reconstructed from three listeners.
-const POP_FLOOR = 15000;   // never within the first 15s, whichever trigger fires
-const POP_DWELL = 25000;   // engaged-by-time
+const POP_FLOOR = 5000;    // scroll and exit-intent hold off this long after load
+const POP_DWELL = 5000;    // ...and on its own, it opens at this mark
 const POP_SCROLL = 40;     // engaged-by-depth, percent of the page
 // The product page's own threshold, for touch only — see maybePop(). Deeper
 // than POP_SCROLL because it has to mean "finished reading", not "engaged".
@@ -3233,7 +3233,11 @@ class Component extends DCLogic {
   maybePop(kind) {
     if (!POP_ON) return;
     if (!window.HBPop || this._popShown || window.HBPop.isOpen()) return;
-    if (!this._popBorn || Date.now() - this._popBorn < POP_FLOOR) return;
+    // The floor is there to stop a fast scroll or a stray cursor firing this
+    // the instant the page paints. The dwell timer is already a time gate, so
+    // it is exempt — otherwise the two are set to the same mark and a
+    // millisecond of timer jitter silently drops the one-shot dwell trigger.
+    if (kind !== 'dwell' && (!this._popBorn || Date.now() - this._popBorn < POP_FLOOR)) return;
     const page = this.state.page || 'home';
     if (POP_NEVER.indexOf(page) !== -1) return;
     // The product page is where someone is closest to buying, so it only fires
