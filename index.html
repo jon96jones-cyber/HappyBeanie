@@ -3192,6 +3192,8 @@ const POP_FLOOR = 5000;    // scroll and exit-intent hold off this long after lo
 const POP_DWELL = 5000;    // ...and on its own, it opens at this mark
 const POP_SCROLL = 40;     // engaged-by-depth, percent of the page
 const POP_QUIET = 30 * 24 * 60 * 60 * 1000;  // a dismissal is honoured for a month
+// How long the gate will wait on the signed-in probe before opening anyway.
+const POP_AUTH_WAIT = 9000;
 // Pages the popup must never interrupt. Two of them are converting; the quiz
 // already asks for the address itself, and asking twice reads as a shakedown.
 const POP_NEVER = ['cart', 'checkout', 'quiz'];
@@ -3255,6 +3257,16 @@ class Component extends DCLogic {
     // any other page that is not a checkout step.
     // Someone with an account is already reachable; asking them to "join" is
     // asking for something we have.
+    // "Signed in" is the answer to a fetch, and at a five-second dwell that
+    // fetch can still be in flight — the check would then pass by default and
+    // show the popup to someone who already has an account. Wait for it, but
+    // not forever: if the probe never answers, showing the popup is the better
+    // failure than never showing it.
+    if (!this._authKnown && this._popBorn && Date.now() - this._popBorn < POP_AUTH_WAIT) {
+      clearTimeout(this._popRetry);
+      this._popRetry = setTimeout(() => this.maybePop(kind), 250);
+      return;
+    }
     if (this.state.signedIn) return no('you are signed in');
     try {
       if (localStorage.getItem('hb-list') === '1') return no('this browser is already on the list');
@@ -3939,7 +3951,9 @@ class Component extends DCLogic {
         // one-time (their plan picker offers nothing else).
         ...(j.wholesale ? { plan: 0 } : {})
       });
-    }).catch(() => {});
+      // The popup's gate waits on this — see maybePop().
+      this._authKnown = true;
+    }).catch(() => { this._authKnown = true; });
     // Restore the cart from localStorage so a page refresh keeps items.
     try {
       const saved = JSON.parse(localStorage.getItem('hbCart') || 'null');
@@ -5782,7 +5796,6 @@ Component.prototype.renderVals = function () {
     #hbOffer { margin:10px 0 10px !important; padding:9px 14px !important; }
     #hbOfferPct { font-size:28px !important; }
     #hbOfferLbl { font-size:16px !important; }
-    #hbDots { margin-top:10px !important; }
   }
   /* There was a rule here that hid the stage entirely below 700px of viewport
      height, on the theory that only small phones are that short. They are not:
@@ -5863,9 +5876,7 @@ Component.prototype.renderVals = function () {
       <button id="hbAgain" type="button" style="margin-top:14px; padding:0; background:transparent; border:none; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:#8A7F6E; text-decoration:underline; cursor:pointer;">Feed her again</button>
     </div>
 
-    <div id="hbDots" style="display:flex; align-items:center; gap:6px; margin-top:22px;"></div>
-
-    <button id="hbNo" type="button" style="display:block; width:100%; margin-top:8px; padding:4px 8px; background:transparent; border:none; font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.4; color:#A99E8C; text-decoration:underline; text-underline-offset:3px; cursor:pointer; transition:color .2s ease;">No thanks, I don&rsquo;t want to save money</button>
+    <button id="hbNo" type="button" style="display:block; width:100%; margin-top:24px; padding:4px 8px; background:transparent; border:none; font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.4; color:#A99E8C; text-decoration:underline; text-underline-offset:3px; cursor:pointer; transition:color .2s ease;">No thanks, I don&rsquo;t want to save money</button>
   </div>
 </div>
 
@@ -5881,14 +5892,13 @@ Component.prototype.renderVals = function () {
   var hot = document.getElementById('hbHot'), hint = document.getElementById('hbHint');
   var wait = document.getElementById('hbWait'), fed = document.getElementById('hbFed');
   var pet = document.getElementById('hbPet'), burst = document.getElementById('hbBurst');
-  var dots = document.getElementById('hbDots'), errEl = document.getElementById('hbErr');
+  var errEl = document.getElementById('hbErr');
   var input = document.getElementById('hbEmail'), send = document.getElementById('hbSend');
   var codeEl = document.getElementById('hbCode');
   var doneHead = document.getElementById('hbDoneHead'), doneSub = document.getElementById('hbDoneSub');
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var step = 'feed', drag = null, busy = false, returnTo = null;
-  var ORDER = ['feed', 'email', 'done'];
 
   function render() {
     // Scoped to the card. A document-wide [data-step] query would also match
@@ -5903,14 +5913,6 @@ Component.prototype.renderVals = function () {
     hint.style.opacity = step === 'feed' ? '1' : '0';
     wait.style.opacity = step === 'feed' ? '1' : '0';
     fed.style.opacity = step === 'feed' ? '0' : '1';
-    dots.innerHTML = '';
-    ORDER.forEach(function (s, i) {
-      var at = ORDER.indexOf(step);
-      var d = document.createElement('span');
-      d.style.cssText = 'display:block;height:4px;border-radius:1px;transition:width .4s cubic-bezier(.2,.7,.2,1),background .3s ease;' +
-        'width:' + (i === at ? '26px' : '12px') + ';background:' + (i <= at ? 'oklch(.86 .14 92)' : '#E0D6C2');
-      dots.appendChild(d);
-    });
     if (step === 'email') setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); } }, 120);
   }
 
