@@ -5732,26 +5732,60 @@ Component.prototype.renderVals = function () {
      path in the script. Give it a focus ring that reads on the cream stage. */
   #hbBean:focus-visible, #hbMouth:focus-visible { outline:3px solid oklch(.44 .07 152); outline-offset:3px; }
 
-  /* A phone: the card fills the width, and the stage gives up height so the
-     email step still fits once the keyboard is up. */
+  /* A phone. This used to pin the card with left:8px/right:8px, which the base
+     rule's max-width:calc(100vw - 32px) then fought: the width was capped at
+     100vw-32 but the box stayed pinned to the left edge, so every leftover
+     pixel piled up on the right and the card sat visibly off-centre. It is
+     centred the same way the desktop card is now, and capped, so it reads as a
+     dialog on a large phone rather than a sheet stretched to the bezels. */
   @media (max-width: 560px) {
-    #hbPopup { width:auto; left:8px; right:8px; transform:translateY(-50%); max-height:calc(100vh - 16px); }
-    #hbPopup[data-on] { animation:none; }
-    #hbStage { height:246px !important; }
-    #hbPet { width:172px !important; height:246px !important; margin-left:-86px !important; }
-    #hbBean { width:66px !important; left:22px !important; bottom:22px !important; }
-    #hbHint { top:224px !important; }
+    #hbPopup {
+      left:50%; right:auto;
+      width:calc(100vw - 40px); max-width:400px;
+      transform:translate(-50%,-50%);
+      max-height:calc(100vh - 28px);
+    }
+    /* Everything below is a size pass: the card was over half the screen on a
+       phone, mostly headline and stage. */
+    #hbHead { padding:20px 20px 14px !important; }
+    #hbFoot { padding:0 20px 20px !important; }
+    #hbPopup h2 { font-size:19.5px !important; line-height:1.14 !important; }
+    #hbHead p, #hbFoot p:not(#hbErr) { font-size:13.5px !important; }
+    #hbStage { height:196px !important; }
+    #hbPet { width:137px !important; height:196px !important; margin-left:-68px !important; }
+    #hbBean { width:56px !important; left:16px !important; bottom:16px !important; }
+    /* The target is a fixed 74px against a dog that is now 137px wide instead
+       of 224, so it overflowed the top of the stage and got clipped. Scaled to
+       hold the same proportion of her head. The catch radius in the script is
+       deliberately left alone — being forgiving costs nothing here. */
+    #hbMouth, #hbHot { width:48px !important; height:48px !important; margin:-24px 0 0 -24px !important; }
+    #hbHint { top:178px !important; font-size:8.5px !important; }
     #hbForm { flex-wrap:wrap; }
     #hbEmail, #hbSend { flex:1 1 100% !important; min-height:48px; }
-    #hbNo { min-height:44px; }
+    #hbNo { min-height:44px; font-size:12.5px !important; }
   }
   /* Once the email step is showing there is nothing left to drag, so the stage
      gives its height back to the form. Not gated on viewport height: whether
      the layout viewport shrinks when the keyboard opens differs by browser, so
      relying on that would make the field reachable on some phones only. */
   @media (max-width: 560px) {
-    #hbPopup[data-step-now="email"] #hbStage, #hbPopup[data-step-now="done"] #hbStage { height:186px !important; }
-    #hbPopup[data-step-now="email"] #hbPet, #hbPopup[data-step-now="done"] #hbPet { width:130px !important; height:186px !important; margin-left:-65px !important; }
+    #hbPopup[data-step-now="email"] #hbStage, #hbPopup[data-step-now="done"] #hbStage { height:118px !important; }
+    #hbPopup[data-step-now="email"] #hbPet, #hbPopup[data-step-now="done"] #hbPet { width:83px !important; height:118px !important; margin-left:-41px !important; }
+    /* The offer bar is the other big block on this step. Measured at 96% of a
+       360x640 screen before the keyboard is even up, which leaves the field
+       nowhere to go. */
+    #hbOffer { margin:12px 0 12px !important; padding:10px 14px !important; }
+    #hbOfferPct { font-size:30px !important; }
+    #hbOfferLbl { font-size:17px !important; }
+    #hbDots { margin-top:14px !important; }
+  }
+  /* On a short phone the stage goes altogether once she has been fed. On the
+     feed step it is the interaction and has to stay; on the email and done
+     steps it is a reward the chomp animation has already delivered, and it is
+     the difference between a card that fills the screen and one that leaves
+     room for the keyboard. */
+  @media (max-width: 560px) and (max-height: 700px) {
+    #hbPopup[data-step-now="email"] #hbStage, #hbPopup[data-step-now="done"] #hbStage { display:none !important; }
   }
   @media (prefers-reduced-motion: reduce) {
     #hbPopup, #hbBean, .hb-spark, #hbPet { animation:none !important; }
@@ -5766,7 +5800,7 @@ Component.prototype.renderVals = function () {
     <span style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:oklch(.86 .14 92);">Summer&rsquo;s daily bean</span>
   </div>
 
-  <div style="padding:26px 28px 20px;">
+  <div id="hbHead" style="padding:26px 28px 20px;">
     <div data-step="feed">
       <h2 id="hbTitle" style="margin:0; font-weight:700; letter-spacing:-.038em; font-size:22px; line-height:1.16; text-align:center; color:#17140F; text-wrap:balance;">Feed Summer Her Daily Supplement and We&rsquo;ll Knock 10% Off Your Next Order!</h2>
     </div>
@@ -5800,14 +5834,14 @@ Component.prototype.renderVals = function () {
     <span id="hbHint" style="position:absolute; left:9px; top:297px; white-space:nowrap; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#8A7F6E; transition:opacity .3s ease;">drag the bean to her mouth</span>
   </div>
 
-  <div style="padding:0 28px 28px;">
+  <div id="hbFoot" style="padding:0 28px 28px;">
     <div data-step="email" style="display:none;">
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; margin:20px 0 18px; padding:14px 16px; background:#17140F; border-radius:3px;">
+      <div id="hbOffer" style="display:flex; align-items:center; justify-content:space-between; gap:14px; margin:20px 0 18px; padding:14px 16px; background:#17140F; border-radius:3px;">
         <span>
           <span style="display:block; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:oklch(.82 .19 145); margin-bottom:3px;">Unlocked</span>
-          <span style="display:block; font-weight:700; letter-spacing:-.03em; font-size:21px; line-height:1.1; color:#F5F0E6;">off your next box</span>
+          <span id="hbOfferLbl" style="display:block; font-weight:700; letter-spacing:-.03em; font-size:21px; line-height:1.1; color:#F5F0E6;">off your next box</span>
         </span>
-        <span style="flex:0 0 auto; font-weight:700; letter-spacing:-.05em; font-size:40px; line-height:.9; color:oklch(.86 .14 92); font-variant-numeric:tabular-nums;">10%</span>
+        <span id="hbOfferPct" style="flex:0 0 auto; font-weight:700; letter-spacing:-.05em; font-size:40px; line-height:.9; color:oklch(.86 .14 92); font-variant-numeric:tabular-nums;">10%</span>
       </div>
       <form id="hbForm" style="display:flex; gap:8px;" novalidate>
         <input id="hbEmail" type="email" placeholder="you@example.com" autocomplete="email" aria-label="Email address"
