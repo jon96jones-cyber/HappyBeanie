@@ -3236,6 +3236,10 @@ const CHEW_IGS = {
   ]
 };
 
+// Off until the design is signed off. Everything below it is finished and
+// tested; this is the only line that decides whether a visitor ever sees the
+// card. Flip it to true once the final design is in.
+const POP_ON = false;
 // Capture-popup timing, kept in one place so the rules can be read at a glance
 // instead of being reconstructed from three listeners.
 const POP_FLOOR = 15000;   // never within the first 15s, whichever trigger fires
@@ -3274,6 +3278,7 @@ class Component extends DCLogic {
   // once rather than copied into three listeners. Silently does nothing when
   // the visitor should not be asked.
   maybePop(kind) {
+    if (!POP_ON) return;
     if (this._popShown || this.state.popOpen) return;
     if (!this._popBorn || Date.now() - this._popBorn < POP_FLOOR) return;
     const page = this.state.page || 'home';
