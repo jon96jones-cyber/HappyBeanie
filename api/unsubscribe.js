@@ -35,17 +35,35 @@ module.exports = async function handler(req, res) {
     if (!email || tok !== recover.unsubToken(email)) {
       return res.status(400).send(page('That link didn’t check out', 'The unsubscribe link looks incomplete — try the link in your email again, or just reply to the email and we’ll take you off by hand.'));
     }
+    // Which list they are leaving. The token signs the address only, so old
+    // links carry no purpose at all — those are cart reminders, which is what
+    // they have always meant, and they keep working untouched.
+    const marketing = String(q.p || '') === 'marketing';
+
     const token = process.env.SHOPIFY_ADMIN_TOKEN;
     if (token) {
       const cj = await admin(token, 'query Find($q: String!) { customers(first: 1, query: $q) { nodes { id } } }', { q: 'email:' + email });
       const node = (((((cj || {}).data || {}).customers) || {}).nodes || [])[0];
       if (node && node.id) {
         await admin(token, 'mutation Tag($id: ID!, $t: [String!]!) { tagsAdd(id: $id, tags: $t) { userErrors { message } } }',
-          { id: node.id, t: ['no-recovery-email'] });
+          { id: node.id, t: [marketing ? 'no-marketing-email' : 'no-recovery-email'] });
+        // A tag is our own bookkeeping; the consent field is the record that
+        // counts. Marketing opt-out has to write it, or Shopify still believes
+        // they are subscribed and any other tool would mail them again.
+        if (marketing) {
+          await admin(token,
+            'mutation Consent($input: CustomerEmailMarketingConsentUpdateInput!) { ' +
+            'customerEmailMarketingConsentUpdate(input: $input) { userErrors { message } } }',
+            { input: { customerId: node.id, emailMarketingConsent: {
+              marketingState: 'UNSUBSCRIBED', consentUpdatedAt: new Date().toISOString() } } });
+        }
       }
     }
-    return res.status(200).send(page('You’re all set', 'No more cart reminders for ' + email.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '. Order emails — confirmations, shipping, lot certificates — still arrive as normal.'));
+    const safe = email.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    return res.status(200).send(marketing
+      ? page('You’re all set', 'No more marketing email for ' + safe + '. Order emails — confirmations, shipping, lot certificates — still arrive as normal.')
+      : page('You’re all set', 'No more cart reminders for ' + safe + '. Order emails — confirmations, shipping, lot certificates — still arrive as normal.'));
   } catch (e) {
-    return res.status(200).send(page('You’re all set', 'No more cart reminders. If one slips through, reply to it and a person will sort it.'));
+    return res.status(200).send(page('You’re all set', 'You have been taken off that list. If one slips through, reply to it and a person will sort it.'));
   }
 };

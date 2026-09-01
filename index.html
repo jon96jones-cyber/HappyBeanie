@@ -3126,8 +3126,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <sc-if value="{{ joinOpen }}" hint-placeholder-val="{{ true }}">
           <div style="display: flex; gap: 8px;">
             <input value="{{ joinEmail }}" sc-camel-on-change="{{ setJoinEmail }}" placeholder="Email" inputmode="email" style="flex: 1; min-width: 0; background: transparent; border: 1px solid rgba(245,240,230,0.28); border-radius: 2px; padding: 12px 14px; color: #F5F0E6; font-family: 'DM Sans', sans-serif; font-size: 14px;" style-focus="border-color: oklch(0.86 0.14 92); outline: none;">
-            <button sc-camel-on-click="{{ doJoin }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 12px 16px; border: none; border-radius: 2px; background: {{ joinBg }}; color: {{ joinFg }}; cursor: {{ joinCursor }}; transition: background 0.25s ease;">Join</button>
+            <button sc-camel-on-click="{{ doJoin }}" disabled="{{ joinBusy }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 12px 16px; border: none; border-radius: 2px; background: {{ joinBg }}; color: {{ joinFg }}; cursor: {{ joinCursor }}; transition: background 0.25s ease;">{{ joinLabel }}</button>
           </div>
+          <div style="display: {{ joinErrShow }}; font-size: 13px; line-height: 1.6; color: #E2A18C; margin-top: 10px;">{{ joinErr }}</div>
         </sc-if>
         <sc-if value="{{ joined }}" hint-placeholder-val="{{ false }}">
           <div style="display: flex; align-items: center; gap: 11px; padding: 12px 14px; border: 1px solid oklch(0.72 0.08 152 / 0.5); border-radius: 2px; background: rgba(245,240,230,0.05);">
@@ -4773,7 +4774,33 @@ class Component extends DCLogic {
       joinBg: joinReady ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.18)',
       joinFg: joinReady ? '#17140F' : '#8A7F6E',
       joinCursor: joinReady ? 'pointer' : 'not-allowed',
-      doJoin: () => { if (joinReady) this.setState({ joined: true }); },
+      joinBusy: !!this.state.joinBusy,
+      joinLabel: this.state.joinBusy ? 'Joining…' : 'Join',
+      joinErr: this.state.joinErr || '',
+      joinErrShow: this.state.joinErr ? 'block' : 'none',
+      // This used to flip `joined` and stop there — the address was shown a
+      // success state and then discarded. It goes to the list now, and the
+      // success state waits for the server to say so.
+      doJoin: () => {
+        if (!joinReady || this.state.joinBusy) return;
+        const email = String(this.state.joinEmail || '').trim();
+        this.setState({ joinBusy: true, joinErr: '' });
+        fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, source: 'footer' })
+        }).then(r => r.json().catch(() => ({}))).then(b => {
+          if (b && b.ok) { this.setState({ joinBusy: false, joined: true }); return; }
+          this.setState({
+            joinBusy: false,
+            joinErr: (b && b.error === 'bad_email')
+              ? 'That does not look like an email address.'
+              : 'That did not go through. Try again in a moment, or email hello@happybeanie.com.'
+          });
+        }).catch(() => {
+          this.setState({ joinBusy: false, joinErr: 'That did not go through. Try again in a moment, or email hello@happybeanie.com.' });
+        });
+      },
       orderTotal: this.state.orderTotal || this.money(M.total),
       orderItems: this.state.orderItems,
       isCart: page === 'cart',

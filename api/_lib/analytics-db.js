@@ -139,7 +139,24 @@ async function ensureSchema() {
           on quiz_reminders (email, reason)`;
   await q`create index if not exists quiz_reminders_due_idx
           on quiz_reminders (remind_on) where sent_at is null and cancelled_at is null`;
-  return 13;
+
+  // What has already gone out, so a sequence can be re-run without emailing
+  // anyone twice. The recovery cron gets away with no state by only ever
+  // looking at a one-hour window; a multi-step flow cannot, because step 2 has
+  // to know step 1 happened. The unique index is the guarantee — a second
+  // attempt at the same step collides rather than sending.
+  await q`create table if not exists email_sends (
+     id         bigserial primary key,
+     email      text not null,
+     flow       text not null,
+     step       text not null,
+     sent_at    timestamptz not null default now(),
+     provider_id text
+   )`;
+  await q`create unique index if not exists email_sends_once_idx
+          on email_sends (email, flow, step)`;
+  await q`create index if not exists email_sends_flow_idx on email_sends (flow, sent_at desc)`;
+  return 14;
 }
 
 // Run a query, and if it fails only because the schema is behind the code,
