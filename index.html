@@ -5833,6 +5833,12 @@ Component.prototype.renderVals = function () {
     }
     /* Everything below is a size pass: the card was over half the screen on a
        phone, mostly headline and stage. */
+    /* Centred on a phone, where the card is narrow enough that a lone label
+       pinned left reads as a mistake. The .2em nudge is the tracking's trailing
+       space on the last letter, which would otherwise sit the text a couple of
+       pixels left of true centre. */
+    #hbBar { justify-content:center !important; }
+    #hbBarLbl { margin-left:.2em; }
     #hbHead { padding:16px 20px 12px !important; }
     #hbFoot { padding:0 20px 16px !important; }
     #hbPopup h2 { font-size:19.5px !important; line-height:1.14 !important; }
@@ -5895,8 +5901,8 @@ Component.prototype.renderVals = function () {
 
 <div id="hbPopup" role="dialog" aria-modal="true" aria-labelledby="hbTitle" tabindex="-1" data-step-now="feed">
 
-  <div style="display:flex; align-items:center; padding:14px 18px 13px; background:#17140F;">
-    <span style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:oklch(.86 .14 92);">Summer&rsquo;s daily bean</span>
+  <div id="hbBar" style="display:flex; align-items:center; padding:14px 18px 13px; background:#17140F;">
+    <span id="hbBarLbl" style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:oklch(.86 .14 92);">Summer&rsquo;s daily bean</span>
   </div>
 
   <div id="hbHead" style="padding:26px 28px 20px;">
