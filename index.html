@@ -5841,13 +5841,21 @@ Component.prototype.renderVals = function () {
        offer bar and the form under her — still fits an iOS Safari viewport. */
     #hbStage { height:176px !important; }
     #hbPet { width:123px !important; height:176px !important; margin-left:-62px !important; }
-    #hbBean { width:52px !important; left:14px !important; bottom:14px !important; }
+    /* Lifted clear of the hint, which is two lines here rather than one. */
+    #hbBean { width:52px !important; left:14px !important; bottom:46px !important; }
     /* The target is a fixed 74px against a dog that is now 137px wide instead
        of 224, so it overflowed the top of the stage and got clipped. Scaled to
        hold the same proportion of her head. The catch radius in the script is
        deliberately left alone — being forgiving costs nothing here. */
     #hbMouth, #hbHot { width:44px !important; height:44px !important; margin:-22px 0 0 -22px !important; }
-    #hbHint { top:158px !important; font-size:8.5px !important; }
+    /* Two lines instead of one long thin one. Set on a width rather than with a
+       <br> so the break is the browser's to place — at 9px the line box is the
+       same either way, and a hard break would strand a word on a wider phone.
+       The nowrap on the base rule has to be undone explicitly. */
+    #hbHint {
+      top:138px !important; font-size:9px !important;
+      white-space:normal !important; max-width:132px; line-height:1.32;
+    }
     /* Side by side rather than stacked. Stacking cost 56px of height on the one
        step that has none to spare, and the card is ~313px of inner width even
        on a 360px phone — plenty for both. flex-basis on the field means they
