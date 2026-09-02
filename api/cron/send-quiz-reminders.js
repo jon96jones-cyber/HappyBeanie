@@ -15,6 +15,7 @@
 const db = require('../_lib/analytics-db.js');
 const remind = require('../quiz-remind.js');
 const buildEmail = require('../_lib/quiz-reminder-email.js');
+const lifecycle = require('../_lib/lifecycle-email.js');
 const mailer = require('../_lib/mailer.js');
 
 const SITE = 'https://www.happybeanie.com';
@@ -22,9 +23,41 @@ const FROM = process.env.RESEND_FROM || 'Happy Beanie <hello@happybeanie.com>';
 const BATCH = 50;
 const MAX_ATTEMPTS = 3;
 
+// "Sep 2025" — the form the recheck design sets the then/now columns in.
+function monthYear(d) {
+  const dt = d ? new Date(d) : null;
+  if (!dt || isNaN(dt)) return '';
+  return dt.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
 async function send(row) {
   const cancelUrl = remind.cancelUrl(row.email);
   const quizUrl = SITE + '/quiz?utm_source=email&utm_medium=lifecycle&utm_campaign=screener_reminder';
+
+  // The redesign covers the age case only — its copy is about a puppy crossing
+  // twelve months, in a then/now table. A pet deferred for spay or neuter
+  // recovery is a different message, so that reason keeps the email it has
+  // rather than being sent one that describes something that did not happen.
+  if (row.reason === 'age') {
+    const out = await mailer.send({
+      from: FROM,
+      to: row.email,
+      flow: 'quiz-reminder',
+      step: 'age',
+      subject: lifecycle.subject('screener-recheck'),
+      html: lifecycle('screener-recheck', {
+        screened_at: monthYear(row.created_at),
+        today: monthYear(new Date()),
+        screener_url: quizUrl,
+        forget_url: cancelUrl
+      }),
+      text: lifecycle.text('screener-recheck', { screener_url: quizUrl }),
+      unsubUrl: cancelUrl
+    });
+    if (!out.ok) throw new Error(out.message || (out.error + ' ' + (out.status || '')));
+    return out.id || null;
+  }
+
   // Through the shared mailer, so this lands on the campaign desk. The throw
   // on failure is kept — the caller counts on it to mark the row unsent and
   // retry tomorrow rather than silently dropping the reminder.
@@ -58,7 +91,7 @@ module.exports = async function handler(req, res) {
   const sql = db.sql();
   let due;
   try {
-    due = await sql`select id, email, reason, species
+    due = await sql`select id, email, reason, species, created_at
                       from quiz_reminders
                      where sent_at is null
                        and cancelled_at is null

@@ -31,7 +31,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
 const SOURCES = ['footer', 'waitlist', 'quiz', 'shop', 'popup'];
 
 const mailer = require('./_lib/mailer.js');
-const codeEmail = require('./_lib/code-email.js');
+const lifecycle = require('./_lib/lifecycle-email.js');
 const discount = require('./_lib/discount.js');
 const db = require('./_lib/analytics-db.js');
 
@@ -111,17 +111,26 @@ async function grantCode(email) {
   }
 
   const unsubUrl = mailer.unsubUrl(email, 'marketing');
-  const pct = Math.round(discount.PCT * 100);
-  const t = { code: code, expiresLabel: expiresLabel, pct: pct, unsubUrl: unsubUrl };
+  const SITE = 'https://www.happybeanie.com';
+  const utm = '?utm_source=email&utm_medium=lifecycle&utm_campaign=welcome_code';
+  const t = {
+    discount_code: code,
+    discount_expires_at: expiresLabel || '',
+    shop_url: SITE + '/product' + utm,
+    // /screener does not exist — the SPA's VALID_PAGES has no such page, and
+    // the link would land on the homepage.
+    screener_url: SITE + '/quiz' + utm,
+    unsubscribe_url: unsubUrl
+  };
   const r = await mailer.send({
     to: email,
     // Names the campaign for the desk. One step, because this fires once on
     // signup rather than as part of a sequence.
     flow: 'popup-code',
     step: 'code',
-    subject: 'Your ' + pct + '% off — ' + code,
-    html: codeEmail(t),
-    text: codeEmail.text(t),
+    subject: lifecycle.subject('welcome-code'),
+    html: lifecycle('welcome-code', t),
+    text: lifecycle.text('welcome-code', t),
     unsubUrl: unsubUrl
   });
   if (!r.ok) console.error('[subscribe] code email:', r.error, r.status || '', r.message || '');

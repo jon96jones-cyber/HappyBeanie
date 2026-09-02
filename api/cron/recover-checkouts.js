@@ -1,5 +1,5 @@
 // Abandoned-checkout recovery cron — replaces Shopify Messaging's automation
-// so the email can be fully custom (api/_lib/recovery-email.js via Resend).
+// so the email can be fully custom (api/_lib/lifecycle-email.js via Resend).
 //
 // Runs hourly (vercel.json crons). Each run emails checkouts abandoned
 // 2–3 hours ago — a one-hour window per run, so every checkout is emailed
@@ -14,7 +14,7 @@
 // Env: SHOPIFY_ADMIN_TOKEN, RESEND_API_KEY, CRON_SECRET.
 // Optional: RECOVERY_FROM (default 'Happy Beanie <hello@happybeanie.com>').
 
-const buildEmail = require('../_lib/recovery-email.js');
+const lifecycle = require('../_lib/lifecycle-email.js');
 const mailer = require('../_lib/mailer.js');
 
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
@@ -39,7 +39,7 @@ const CHECKOUTS_Q = `query Recover($q: String!) {
       customer { email firstName tags }
       lineItems(first: 20) {
         nodes {
-          title quantity
+          title quantity variantTitle
           image { url }
           originalTotalPriceSet { shopMoney { amount } }
         }
@@ -50,6 +50,15 @@ const CHECKOUTS_Q = `query Recover($q: String!) {
 
 function usd(n) {
   return '$' + (Math.round((n || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// Shopify gives every line a variantTitle, and for a product with one variant
+// that string is the literal "Default Title". Printing it would be worse than
+// printing nothing.
+function variantOf(li) {
+  const v = String((li && li.variantTitle) || '').trim();
+  if (!v || /^default title$/i.test(v)) return 'One box';
+  return v;
 }
 
 // Delegated so there is one signing scheme rather than a copy per caller —
@@ -102,18 +111,24 @@ module.exports = Object.assign(async function handler(req, res) {
       const items = (((c.lineItems || {}).nodes) || []).map(function (li) {
         return {
           title: li.title,
+          // The design shows a variant line under each title. Shopify's
+          // variantTitle is "Default Title" for a single-variant product,
+          // which is not something to print at anyone — fall back to the
+          // quantity's own unit instead of an empty gap.
+          variant: variantOf(li),
           quantity: li.quantity,
-          price: usd(parseFloat((((li.originalTotalPriceSet || {}).shopMoney) || {}).amount || '0')),
-          image: ((li.image || {}).url) || null
+          line_total: usd(parseFloat((((li.originalTotalPriceSet || {}).shopMoney) || {}).amount || '0'))
         };
       });
-      const subtotal = usd(parseFloat((((c.totalPriceSet || {}).shopMoney) || {}).amount || '0'));
+      const unsubUrl = SITE + '/api/unsubscribe?e=' + encodeURIComponent(email) + '&t=' + unsubToken(email);
       const t = {
-        firstName: (c.customer || {}).firstName || '',
+        // The design uses the name in the headline, so a blank one reads
+        // oddly — the handoff asks for a fallback and this is it.
+        first_name: ((c.customer || {}).firstName || '').trim() || 'there',
         items: items,
-        subtotal: subtotal,
-        url: c.abandonedCheckoutUrl,
-        unsubUrl: SITE + '/api/unsubscribe?e=' + encodeURIComponent(email) + '&t=' + unsubToken(email)
+        cart_subtotal: usd(parseFloat((((c.totalPriceSet || {}).shopMoney) || {}).amount || '0')),
+        checkout_url: c.abandonedCheckoutUrl,
+        cart_optout_url: unsubUrl
       };
 
       // Through the shared mailer rather than its own fetch: one place that
@@ -124,10 +139,10 @@ module.exports = Object.assign(async function handler(req, res) {
         to: email,
         flow: 'cart-recovery',
         step: '1',
-        subject: 'Your bean’s box is still here',
-        html: buildEmail(t),
-        text: buildEmail.text(t),
-        unsubUrl: t.unsubUrl
+        subject: lifecycle.subject('cart-recovery'),
+        html: lifecycle('cart-recovery', t),
+        text: lifecycle.text('cart-recovery', t),
+        unsubUrl: unsubUrl
       });
       if (sj.ok) { sent++; report.push({ email: email, resend: sj.id }); }
       else {

@@ -1,0 +1,104 @@
+{
+  "brand": "Happy Beanie",
+  "generated": "2026-09-02",
+  "width_px": 600,
+  "note": "Three independent lifecycle emails. Each belongs to a DIFFERENT campaign/flow — do not bundle them into one sequence.",
+  "emails": [
+    {
+      "id": "screener-recheck",
+      "file": "01-screener-recheck.html",
+      "campaign": "Eligibility screener — age recheck",
+      "flow_type": "triggered, one-shot",
+      "placement": "Standalone flow. Entry: contact asked to be reminded after a screener result of 'too young'. Send once, then exit.",
+      "trigger": "screener_result == 'declined_age' AND pet_age >= 12 months",
+      "delay": "fires when the pet crosses 12 months (evaluate daily)",
+      "send_limit": "exactly one send per contact, ever",
+      "subject": "Your bean is old enough now",
+      "preheader": "You screened a puppy and we said not yet. Twelve months on, it is worth running again.",
+      "primary_cta": {
+        "label": "Run the screener again",
+        "url_var": "screener_url"
+      },
+      "merge_vars": [
+        "screened_at",
+        "today",
+        "screener_url",
+        "forget_url"
+      ],
+      "suppression": "exclude anyone who has since placed an order or re-run the screener"
+    },
+    {
+      "id": "cart-recovery",
+      "file": "02-cart-recovery.html",
+      "campaign": "Abandoned checkout",
+      "flow_type": "triggered, one-shot",
+      "placement": "First and only email of the abandoned-checkout flow. If the client wants a second touch, duplicate and change the subject only.",
+      "trigger": "checkout started, not completed",
+      "delay": "4 hours after abandonment",
+      "send_limit": "one per abandoned checkout, max one per contact per 14 days",
+      "subject": "Your box is still packed",
+      "preheader": "Your cart is saved and checkout picks up exactly where you stopped.",
+      "primary_cta": {
+        "label": "Finish checking out",
+        "url_var": "checkout_url"
+      },
+      "merge_vars": [
+        "first_name",
+        "item.title",
+        "item.variant",
+        "item.quantity",
+        "item.line_total",
+        "cart_subtotal",
+        "checkout_url",
+        "cart_optout_url"
+      ],
+      "line_items": "The row marked <!-- REPEAT this row per line item --> loops over cart items; the subtotal row stays outside the loop.",
+      "suppression": "exit immediately on order placed"
+    },
+    {
+      "id": "welcome-code",
+      "file": "03-welcome-code.html",
+      "campaign": "Welcome / popup signup",
+      "flow_type": "triggered, transactional-adjacent",
+      "placement": "Email 1 of the welcome flow — the code delivery. Existing emails/01-welcome.html through 04-ready.html follow as the education series; this one replaces nothing, it precedes them.",
+      "trigger": "hb:subscribe event from the Email Capture Popup (see popup_handoff/)",
+      "delay": "immediate — the user is waiting for this code",
+      "send_limit": "one per signup; resend on request",
+      "subject": "Here’s your 10% off",
+      "preheader": "Your code works on any box, subscription or one-time order.",
+      "primary_cta": {
+        "label": "Pick your box",
+        "url_var": "shop_url"
+      },
+      "merge_vars": [
+        "discount_code",
+        "discount_expires_at",
+        "shop_url",
+        "screener_url",
+        "unsubscribe_url"
+      ],
+      "requirements": "discount_code must be unique per contact, single-use, 10% off, no product restriction, valid on subscriptions"
+    }
+  ],
+  "tokens": {
+    "ink": "#17140F",
+    "paper": "#FAF8F1",
+    "page": "#DED5C4",
+    "footer_bg": "#F2EEE3",
+    "panel_bg": "#F4EFE2",
+    "hairline": "#E0D6C3",
+    "yellow": "#F0C64B",
+    "yellow_hover": "#E9B72E",
+    "green": "#43684E",
+    "rust": "#A4442F",
+    "body_text": "#4A4237",
+    "muted": "#8A7F6E"
+  },
+  "type": {
+    "headline": "DM Sans 700, 38-40px / 40-42px, letter-spacing -0.042em",
+    "body": "DM Sans 400, 15.5-16px / 25-26px",
+    "label": "DM Mono 400-500, 9.5-11px, letter-spacing 0.16-0.22em, uppercase",
+    "button": "DM Mono 500, 12.5px, letter-spacing 0.2em, uppercase",
+    "fallbacks": "DM Sans -> Arial/Helvetica; DM Mono -> Courier New. Outlook is forced to Arial via an mso conditional."
+  }
+}
