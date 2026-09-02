@@ -75,6 +75,14 @@ input:focus { outline:none; border-color:#F0C64B; }
       what:'Visitors right now, traffic, funnel and where they came from.',
       hand:function (k) { mergePrefs('hb_stats_prefs', k); } },
 
+    // Shares the Live desk's key on purpose — same concern, and a second
+    // secret is a second thing to lose. Its own storage slot, though, because
+    // the two pages remember different things.
+    { id:'campaigns',   name:'Campaigns',    page:'/admin/campaigns',
+      api:'/api/admin/campaigns', header:'x-analytics-key',
+      what:'Every email sent, grouped by campaign, and who received it.',
+      hand:function (k) { setItem('hb_ckey', k); } },
+
     { id:'fulfillment', name:'Fulfillment',  page:'/admin/fulfillment',
       api:'/api/admin/fulfillment', header:'x-fulfillment-key',
       what:'Orders to pack, labels and shipment status.',
