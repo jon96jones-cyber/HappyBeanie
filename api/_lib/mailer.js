@@ -89,7 +89,17 @@ async function send(opts) {
   if (opts.text) body.text = opts.text;
   // One-click opt-out in the client chrome, not only in the footer. Gmail and
   // Apple Mail surface this, and its absence is itself a spam signal.
-  if (opts.unsubUrl) body.headers = { 'List-Unsubscribe': '<' + opts.unsubUrl + '>' };
+  // One-click opt-out in the client chrome. Gmail's bulk-sender rules ask for
+  // the -Post header alongside the link, and its absence counts against
+  // placement even below their volume threshold. api/unsubscribe.js has no
+  // method check and reads only the query string, so it answers the POST that
+  // this advertises exactly as it answers the click.
+  if (opts.unsubUrl) {
+    body.headers = {
+      'List-Unsubscribe': '<' + opts.unsubUrl + '>',
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+    };
+  }
 
   try {
     const res = await fetch('https://api.resend.com/emails', {

@@ -30,11 +30,9 @@ module.exports = function build(t) {
   '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background:#fcfaf4; border:1px solid #e0d6c2; border-radius:10px; overflow:hidden;">\n' +
   '<tr><td style="background:#17140f; padding:22px 30px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>' +
     '<td align="left"><img src="' + SITE + '/assets/email-logo-2.png" width="133" height="38" alt="happy beanie" style="display:block; border:0; ' + SANS + ' font-size:20px; font-weight:700; letter-spacing:-0.5px; color:#f5f0e6;"></td>' +
-    '<td align="right" style="' + MONO + ' font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Summer&rsquo;s&nbsp;daily&nbsp;bean</td>' +
   '</tr></table></td></tr>\n' +
   '<tr><td style="height:3px; background:#f2ce59; font-size:0; line-height:0;">&nbsp;</td></tr>\n' +
   '<tr><td style="padding:38px 34px 8px;">\n' +
-    '<p style="margin:0 0 14px; ' + MONO + ' font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">&mdash; &nbsp;You fed her</p>' +
     '<h1 style="margin:0 0 14px; ' + SANS + ' font-size:27px; line-height:1.1; letter-spacing:-1px; font-weight:700; color:#17140f;">Here&rsquo;s your ' + pct + '% off.</h1>' +
     '<p style="margin:0 0 26px; ' + SANS + ' font-size:15.5px; line-height:1.62; color:#554c40;">Enter it at checkout. It works on any box &mdash; Summer&rsquo;s formula or the cat one &mdash; and on a subscription as well as a one-time order.' +
       (by ? ' It is yours alone, good for a single order, and expires on <b style="color:#17140f;">' + by + '</b>.' : ' It is yours alone and good for a single order.') +
