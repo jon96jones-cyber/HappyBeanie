@@ -6301,27 +6301,66 @@ Component.prototype.renderVals = function () {
   // animating, which stops the card moving. The scroll offset is carried on
   // body.top so the page does not jump to the top on open, and is handed back
   // on close.
-  var lockedAt = 0, locked = false;
+  // Taking the body out of flow with position:fixed is the usual recipe and it
+  // is wrong here. It collapses the document to viewport height, and a page
+  // that suddenly has nothing to scroll makes iOS re-expand the browser chrome
+  // — the very thing whose animation was moving the card. It also leaves blank
+  // space below the fold for as long as the card is open.
+  //
+  // So the layout is left completely alone. overflow:hidden handles desktop and
+  // Android; iOS ignores it, which is what the touchmove blocker is for. The
+  // page keeps its height, the chrome has no reason to animate, and the card
+  // stays where it was put.
+  // Not a single style is touched, deliberately. Both of the usual recipes
+  // change the layout and both make this bug worse:
+  //
+  //   body { position: fixed }  collapses the document to viewport height, and
+  //     a page that suddenly has nothing to scroll makes iOS re-expand its
+  //     chrome — the very animation that was moving the card — while leaving
+  //     blank space below the fold.
+  //   html { overflow: hidden } collapses the height too AND throws the scroll
+  //     position away, so the page is at the top when the card closes.
+  //
+  // Blocking the gestures instead leaves the page exactly as it was: same
+  // height, same offset, nothing for the chrome to react to.
+  //
+  // Deliberately not blocked: a scrollbar drag on desktop, and the scroll iOS
+  // performs to reveal a focused input. The first is a rounding error next to
+  // collapsing the document; the second has to keep working or the email field
+  // ends up under the keyboard.
+  var locked = false;
+  var SCROLL_KEYS = { ' ': 1, PageUp: 1, PageDown: 1, End: 1, Home: 1, ArrowUp: 1, ArrowDown: 1 };
+  function onTouchMove(e) {
+    // The card scrolls its own content when there is more of it than fits.
+    // Everything else is the page, and the page is not going anywhere.
+    if (pop.contains(e.target) && pop.scrollHeight > pop.clientHeight + 1) return;
+    if (e.cancelable) e.preventDefault();
+  }
+  function onWheel(e) {
+    if (pop.contains(e.target) && pop.scrollHeight > pop.clientHeight + 1) return;
+    if (e.cancelable) e.preventDefault();
+  }
+  function onScrollKey(e) {
+    if (!SCROLL_KEYS[e.key]) return;
+    var t = e.target;
+    // Space belongs to whatever is focused — a button, or the bean.
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'BUTTON')) return;
+    if (e.key === ' ' && pop.contains(t)) return;
+    e.preventDefault();
+  }
   function lockScroll() {
     if (locked) return;
-    lockedAt = window.pageYOffset || document.documentElement.scrollTop || 0;
-    var s = document.body.style;
-    s.position = 'fixed';
-    s.top = -lockedAt + 'px';
-    s.left = '0';
-    s.right = '0';
-    s.width = '100%';
-    s.overflow = 'hidden';
     locked = true;
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+    document.addEventListener('wheel', onWheel, { passive: false });
+    document.addEventListener('keydown', onScrollKey, false);
   }
   function unlockScroll() {
     if (!locked) return;
-    var s = document.body.style;
-    s.position = ''; s.top = ''; s.left = ''; s.right = ''; s.width = ''; s.overflow = '';
     locked = false;
-    // Instant, not smooth: this is restoring where they already were, and
-    // animating it would read as the page moving on its own.
-    window.scrollTo(0, lockedAt);
+    document.removeEventListener('touchmove', onTouchMove, { passive: false });
+    document.removeEventListener('wheel', onWheel, { passive: false });
+    document.removeEventListener('keydown', onScrollKey, false);
   }
 
   function open() {
