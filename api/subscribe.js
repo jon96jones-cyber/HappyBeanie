@@ -30,28 +30,36 @@ const EMAIL_RE = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
 // from whatever the client happened to post.
 const SOURCES = ['footer', 'waitlist', 'quiz', 'shop', 'popup'];
 
-// The popup hands out a discount code, so a popup signup owes the subscriber
-// an email carrying it. Env-configurable because the code has to match a real
-// Shopify discount — changing the promotion should not need a deploy, and the
-// popup reads the same value so the two cannot drift.
-const POPUP_CODE = process.env.POPUP_DISCOUNT_CODE || 'BEAN10';
 const mailer = require('./_lib/mailer.js');
 const codeEmail = require('./_lib/code-email.js');
+const discount = require('./_lib/discount.js');
 
-// Sends the code and says whether it actually went. The caller reports this
-// back to the browser rather than swallowing it: the popup's confirmation says
-// "check your inbox", and it should not say that when nothing was sent.
-async function sendCode(email) {
+// A popup signup gets its own single-use code, minted now and dead once
+// redeemed — see _lib/discount.js for why it is one discount per code.
+//
+// Returns what the browser needs to be honest on the confirmation screen:
+// the code if there is one, and whether the email carrying it actually went.
+// Deliberately never throws. The address is the thing that cannot be recovered
+// if this fails, so the subscribe succeeds either way and the caller degrades
+// its wording instead of its outcome.
+async function grantCode(email) {
+  const minted = await discount.mint(email);
+  if (!minted.ok) {
+    console.error('[subscribe] mint failed:', minted.error, minted.message || '');
+    return { code: null, emailed: false, expires: null };
+  }
   const unsubUrl = mailer.unsubUrl(email, 'marketing');
+  const pct = Math.round(discount.PCT * 100);
+  const t = { code: minted.code, expiresLabel: minted.expiresLabel, pct: pct, unsubUrl: unsubUrl };
   const r = await mailer.send({
     to: email,
-    subject: 'Your 10% off — ' + POPUP_CODE,
-    html: codeEmail({ code: POPUP_CODE, unsubUrl: unsubUrl }),
-    text: codeEmail.text({ code: POPUP_CODE, unsubUrl: unsubUrl }),
+    subject: 'Your ' + pct + '% off — ' + minted.code,
+    html: codeEmail(t),
+    text: codeEmail.text(t),
     unsubUrl: unsubUrl
   });
   if (!r.ok) console.error('[subscribe] code email:', r.error, r.status || '');
-  return !!r.ok;
+  return { code: minted.code, emailed: !!r.ok, expires: minted.expiresLabel };
 }
 
 async function admin(token, query, variables) {
@@ -132,8 +140,8 @@ module.exports = async function handler(req, res) {
       // tagsAdd, never CustomerInput.tags — the latter replaces the whole set
       // and would strip a wholesale or ambassador tag off a real customer.
       await admin(token, TAG_ADD, { id: existing.id, tags: ['newsletter', 'newsletter-' + source] });
-      const sent = source === 'popup' ? await sendCode(email) : null;
-      return res.status(200).json({ ok: true, created: false, code: source === 'popup' ? POPUP_CODE : undefined, emailed: sent });
+      const g = source === 'popup' ? await grantCode(email) : null;
+      return res.status(200).json({ ok: true, created: false, ...(g || {}) });
     }
 
     const made = await admin(token, CREATE, {
@@ -144,14 +152,14 @@ module.exports = async function handler(req, res) {
       // A race — two submissions of the same address at once. The other one
       // won, which is the outcome we wanted anyway.
       if (/taken|already/i.test(cmsg)) {
-        const raced = source === 'popup' ? await sendCode(email) : null;
-        return res.status(200).json({ ok: true, created: false, code: source === 'popup' ? POPUP_CODE : undefined, emailed: raced });
+        const raced = source === 'popup' ? await grantCode(email) : null;
+        return res.status(200).json({ ok: true, created: false, ...(raced || {}) });
       }
       console.error('[subscribe] create:', cmsg);
       return res.status(502).json({ ok: false, error: 'upstream' });
     }
-    const sent = source === 'popup' ? await sendCode(email) : null;
-    return res.status(200).json({ ok: true, created: true, code: source === 'popup' ? POPUP_CODE : undefined, emailed: sent });
+    const g = source === 'popup' ? await grantCode(email) : null;
+    return res.status(200).json({ ok: true, created: true, ...(g || {}) });
   } catch (err) {
     console.error('[subscribe]', err && err.message);
     return res.status(502).json({ ok: false, error: 'upstream' });

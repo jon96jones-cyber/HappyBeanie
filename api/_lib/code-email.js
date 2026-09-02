@@ -20,6 +20,10 @@ function esc(s) {
 module.exports = function build(t) {
   const code = esc((t && t.code) || '');
   const unsub = esc((t && t.unsubUrl) || '');
+  const pct = esc(String((t && t.pct) || 10));
+  // An undated code is a support email waiting to happen — every "is this still
+  // good?" is one a person has to answer by hand.
+  const by = (t && t.expiresLabel) ? esc(t.expiresLabel) : '';
   return '<!doctype html>\n<html lang="en">\n<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>Your code</title></head>\n<body style="margin:0; padding:0; background:#e7decb;">\n' +
   '<div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#e7decb; font-size:1px; line-height:1px;">' + code + ' — 10% off your next box, from Summer.</div>\n' +
   '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e7decb;"><tr><td align="center" style="padding:28px 12px;">\n' +
@@ -31,10 +35,12 @@ module.exports = function build(t) {
   '<tr><td style="height:3px; background:#f2ce59; font-size:0; line-height:0;">&nbsp;</td></tr>\n' +
   '<tr><td style="padding:38px 34px 8px;">\n' +
     '<p style="margin:0 0 14px; ' + MONO + ' font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">&mdash; &nbsp;You fed her</p>' +
-    '<h1 style="margin:0 0 14px; ' + SANS + ' font-size:27px; line-height:1.1; letter-spacing:-1px; font-weight:700; color:#17140f;">Here&rsquo;s your 10% off.</h1>' +
-    '<p style="margin:0 0 26px; ' + SANS + ' font-size:15.5px; line-height:1.62; color:#554c40;">Enter it at checkout. It works on any box &mdash; Summer&rsquo;s formula or the cat one &mdash; and on a subscription as well as a one-time order.</p>\n' +
+    '<h1 style="margin:0 0 14px; ' + SANS + ' font-size:27px; line-height:1.1; letter-spacing:-1px; font-weight:700; color:#17140f;">Here&rsquo;s your ' + pct + '% off.</h1>' +
+    '<p style="margin:0 0 26px; ' + SANS + ' font-size:15.5px; line-height:1.62; color:#554c40;">Enter it at checkout. It works on any box &mdash; Summer&rsquo;s formula or the cat one &mdash; and on a subscription as well as a one-time order.' +
+      (by ? ' It is yours alone, good for a single order, and expires on <b style="color:#17140f;">' + by + '</b>.' : ' It is yours alone and good for a single order.') +
+    '</p>\n' +
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fffdf7; border:2px dashed #17140f; border-radius:4px;"><tr>' +
-      '<td style="padding:18px 20px; ' + MONO + ' font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">10% off</td>' +
+      '<td style="padding:18px 20px; ' + MONO + ' font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">' + pct + '% off' + (by ? '<br><span style="letter-spacing:1px; text-transform:none;">one order, until ' + by + '</span>' : '') + '</td>' +
       '<td align="right" style="padding:18px 20px; ' + MONO + ' font-size:23px; font-weight:500; letter-spacing:3px; color:#17140f;">' + code + '</td>' +
     '</tr></table>\n' +
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 8px;"><tr><td align="center" bgcolor="#f2ce59" style="border-radius:999px;">' +
@@ -53,12 +59,15 @@ module.exports = function build(t) {
 module.exports.text = function buildText(t) {
   const code = (t && t.code) || '';
   return [
-    'Here is your 10% off.',
+    'Here is your ' + ((t && t.pct) || 10) + '% off.',
     '',
     '    ' + code,
     '',
     'Enter it at checkout. It works on any box - Summer\'s formula or the cat',
     'one - and on a subscription as well as a one-time order.',
+    (t && t.expiresLabel)
+      ? 'It is yours alone, good for a single order, and expires on ' + t.expiresLabel + '.'
+      : 'It is yours alone and good for a single order.',
     '',
     'Pick your box: ' + SITE + '/product',
     '',

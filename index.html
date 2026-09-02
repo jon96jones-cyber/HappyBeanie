@@ -5784,6 +5784,9 @@ Component.prototype.renderVals = function () {
     #hbEmail { flex:1 1 150px !important; min-height:48px; }
     #hbSend { flex:0 0 auto !important; min-height:48px; padding:14px 15px !important; }
     #hbNo { min-height:44px; font-size:12.5px !important; }
+    /* A minted code is ~13 characters, not 6. */
+    #hbTicket { padding:13px 14px !important; }
+    #hbCode { font-size:15px !important; letter-spacing:.04em !important; }
   }
   /* The stage is ONE size across all three steps, exactly as it is on desktop.
      The two photographs are aligned to each other pixel for pixel — same frame,
@@ -5869,9 +5872,9 @@ Component.prototype.renderVals = function () {
     </div>
 
     <div data-step="done" style="display:none;">
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:20px; padding:15px 16px; background:#FFFDF7; border:1.5px dashed #17140F; border-radius:3px;">
+      <div id="hbTicket" style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:20px; padding:15px 16px; background:#FFFDF7; border:1.5px dashed #17140F; border-radius:3px;">
         <span style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8A7F6E;">10% off</span>
-        <span id="hbCode" style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:19px; font-weight:500; letter-spacing:.1em; color:#17140F;">BEAN10</span>
+        <span id="hbCode" style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:17px; font-weight:500; letter-spacing:.06em; color:#17140F; word-break:break-all; text-align:right;">BEAN10</span>
       </div>
       <button id="hbAgain" type="button" style="margin-top:14px; padding:0; background:transparent; border:none; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:#8A7F6E; text-decoration:underline; cursor:pointer;">Feed her again</button>
     </div>
@@ -5894,7 +5897,7 @@ Component.prototype.renderVals = function () {
   var pet = document.getElementById('hbPet'), burst = document.getElementById('hbBurst');
   var errEl = document.getElementById('hbErr');
   var input = document.getElementById('hbEmail'), send = document.getElementById('hbSend');
-  var codeEl = document.getElementById('hbCode');
+  var codeEl = document.getElementById('hbCode'), codeTicket = document.getElementById('hbTicket');
   var doneHead = document.getElementById('hbDoneHead'), doneSub = document.getElementById('hbDoneSub');
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -6027,12 +6030,25 @@ Component.prototype.renderVals = function () {
       busy = false; send.disabled = false; send.textContent = 'Send it';
       if (b && b.ok) {
         try { localStorage.setItem(LIST_KEY, '1'); } catch (err) {}
-        if (b.code) { CODE = b.code; codeEl.textContent = b.code; }
-        // Shopify took the address but Resend did not take the email. The code
-        // on screen is still good, so say that instead of promising an inbox.
-        if (b.emailed === false) {
-          doneHead.textContent = 'Saved. Here’s your code.';
-          doneSub.textContent = 'Write it down — the email didn’t go through, so this is the copy that counts. It works on any box, Summer’s formula or not.';
+        var by = b.expires ? ' It’s yours alone, good for one order, and expires ' + b.expires + '.' : '';
+        if (b.code) {
+          CODE = b.code;
+          codeEl.textContent = b.code;
+          if (b.emailed === false) {
+            // Shopify took the address but Resend did not take the email. The
+            // code on screen is still good, so say that rather than pointing at
+            // an inbox nothing was sent to.
+            doneHead.textContent = 'Saved. Here’s your code.';
+            doneSub.textContent = 'Write this one down — the email didn’t go through, so the code above is the only copy.' + by;
+          } else if (by) {
+            doneSub.textContent = 'Your code is below and on its way.' + by;
+          }
+        } else {
+          // The address is safe but the code could not be minted. Promising an
+          // inbox here would be a lie, and showing a blank ticket is worse.
+          codeTicket.style.display = 'none';
+          doneHead.textContent = 'You’re on the list.';
+          doneSub.textContent = 'Your code didn’t generate — email hello@happybeanie.com and we’ll send one over.';
         }
         step = 'done';
         render();
