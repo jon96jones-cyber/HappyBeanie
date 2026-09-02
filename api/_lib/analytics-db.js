@@ -156,7 +156,18 @@ async function ensureSchema() {
   await q`create unique index if not exists email_sends_once_idx
           on email_sends (email, flow, step)`;
   await q`create index if not exists email_sends_flow_idx on email_sends (flow, sent_at desc)`;
-  return 14;
+
+  // Added for the campaign desk. A failed send is the row that matters most —
+  // "they never got it" is otherwise indistinguishable from "we never tried" —
+  // so status and error are recorded alongside the successes. `sends` counts
+  // repeats, because the unique index above deliberately keeps one row per
+  // person per step and a resend would otherwise be invisible.
+  await q`alter table email_sends add column if not exists status  text not null default 'sent'`;
+  await q`alter table email_sends add column if not exists error   text`;
+  await q`alter table email_sends add column if not exists subject text`;
+  await q`alter table email_sends add column if not exists sends   integer not null default 1`;
+  await q`create index if not exists email_sends_status_idx on email_sends (flow, status)`;
+  return 15;
 }
 
 // Run a query, and if it fails only because the schema is behind the code,

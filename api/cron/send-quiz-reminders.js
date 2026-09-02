@@ -15,6 +15,7 @@
 const db = require('../_lib/analytics-db.js');
 const remind = require('../quiz-remind.js');
 const buildEmail = require('../_lib/quiz-reminder-email.js');
+const mailer = require('../_lib/mailer.js');
 
 const SITE = 'https://www.happybeanie.com';
 const FROM = process.env.RESEND_FROM || 'Happy Beanie <hello@happybeanie.com>';
@@ -24,24 +25,23 @@ const MAX_ATTEMPTS = 3;
 async function send(row) {
   const cancelUrl = remind.cancelUrl(row.email);
   const quizUrl = SITE + '/quiz?utm_source=email&utm_medium=lifecycle&utm_campaign=screener_reminder';
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + process.env.RESEND_API_KEY
-    },
-    body: JSON.stringify({
-      from: FROM,
-      to: [row.email],
-      subject: buildEmail.subject(row.reason),
-      html: buildEmail({ reason: row.reason, species: row.species, quizUrl: quizUrl, cancelUrl: cancelUrl }),
-      text: buildEmail.text({ reason: row.reason, species: row.species, quizUrl: quizUrl, cancelUrl: cancelUrl }),
-      headers: { 'List-Unsubscribe': '<' + cancelUrl + '>' }
-    })
+  // Through the shared mailer, so this lands on the campaign desk. The throw
+  // on failure is kept — the caller counts on it to mark the row unsent and
+  // retry tomorrow rather than silently dropping the reminder.
+  const out = await mailer.send({
+    from: FROM,
+    to: row.email,
+    flow: 'quiz-reminder',
+    // The reason IS the step here: a blocked screener and an age-gated one are
+    // different emails, and the desk should not merge them into one line.
+    step: String(row.reason || '1'),
+    subject: buildEmail.subject(row.reason),
+    html: buildEmail({ reason: row.reason, species: row.species, quizUrl: quizUrl, cancelUrl: cancelUrl }),
+    text: buildEmail.text({ reason: row.reason, species: row.species, quizUrl: quizUrl, cancelUrl: cancelUrl }),
+    unsubUrl: cancelUrl
   });
-  const body = await res.json().catch(function () { return {}; });
-  if (!res.ok) throw new Error((body && body.message) || ('resend ' + res.status));
-  return body.id || null;
+  if (!out.ok) throw new Error(out.message || (out.error + ' ' + (out.status || '')));
+  return out.id || null;
 }
 
 module.exports = async function handler(req, res) {

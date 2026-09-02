@@ -116,20 +116,22 @@ module.exports = Object.assign(async function handler(req, res) {
         unsubUrl: SITE + '/api/unsubscribe?e=' + encodeURIComponent(email) + '&t=' + unsubToken(email)
       };
 
-      const sr = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + process.env.RESEND_API_KEY },
-        body: JSON.stringify({
-          from: FROM, to: [email], reply_to: 'hello@happybeanie.com',
-          subject: 'Your bean’s box is still here',
-          html: buildEmail(t), text: buildEmail.text(t),
-          headers: { 'List-Unsubscribe': '<' + t.unsubUrl + '>' }
-        })
+      // Through the shared mailer rather than its own fetch: one place that
+      // talks to Resend, and naming the flow is what puts this on the campaign
+      // desk alongside everything else.
+      const sj = await mailer.send({
+        from: FROM,
+        to: email,
+        flow: 'cart-recovery',
+        step: '1',
+        subject: 'Your bean’s box is still here',
+        html: buildEmail(t),
+        text: buildEmail.text(t),
+        unsubUrl: t.unsubUrl
       });
-      const sj = await sr.json().catch(function () { return {}; });
-      if (sr.ok && sj.id) { sent++; report.push({ email: email, resend: sj.id }); }
+      if (sj.ok) { sent++; report.push({ email: email, resend: sj.id }); }
       else {
-        console.error('[recover-checkouts] resend:', sr.status, JSON.stringify(sj));
+        console.error('[recover-checkouts] resend:', sj.status || '', sj.error, sj.message || '');
         report.push({ email: email, error: 'send_failed' });
       }
     }

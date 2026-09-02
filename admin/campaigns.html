@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Campaigns — Happy Beanie</title>
+<link rel="icon" type="image/png" href="/favicon.png?v=4">
+<script src="/assets/nodrag.js" defer></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#17140F; color:#F5F0E6; font-family:'DM Sans',-apple-system,'Segoe UI',sans-serif; font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+.mono { font-family:'DM Mono',ui-monospace,monospace; }
+.shell { max-width:1180px; margin:0 auto; padding:0 24px 80px; }
+a { color:#F0C64B; }
+
+header.bar { border-bottom:1px solid rgba(245,240,230,0.12); background:rgba(23,20,15,0.92); position:sticky; top:0; z-index:20; }
+header.bar .in { max-width:1180px; margin:0 auto; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+header.bar b { font-size:20px; letter-spacing:-0.03em; }
+header.bar .sub { font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.tools { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+
+button { font-family:'DM Mono',ui-monospace,monospace; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; padding:9px 15px; border-radius:3px; border:1px solid rgba(245,240,230,0.24); background:transparent; color:#F5F0E6; cursor:pointer; }
+button:hover { border-color:#F0C64B; color:#F0C64B; }
+button.primary { background:#F0C64B; border-color:#F0C64B; color:#17140F; font-weight:700; }
+button.primary:hover { background:#f4d268; }
+button:disabled { opacity:.45; cursor:default; }
+button:disabled:hover { border-color:rgba(245,240,230,0.24); color:#F5F0E6; }
+
+#gate { max-width:420px; margin:14vh auto; padding:0 24px; }
+#gate h1 { font-size:26px; letter-spacing:-0.03em; margin-bottom:8px; }
+#gate p { color:#B9AF9C; font-size:14px; margin-bottom:20px; }
+input[type=password], input[type=search] { width:100%; background:rgba(245,240,230,0.06); border:1px solid rgba(245,240,230,0.24); border-radius:3px; color:#F5F0E6; padding:12px 14px; font-size:15px; }
+input:focus { outline:none; border-color:#F0C64B; }
+label.remember { display:flex; align-items:center; gap:7px; font-size:13px; color:#8A7F6E; margin:12px 0 16px; cursor:pointer; }
+.err { color:#E0A48F; font-size:13.5px; margin-top:12px; }
+.note { color:#8A7F6E; font-size:13.5px; }
+
+.tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin:26px 0 22px; }
+.tile { border:1px solid rgba(245,240,230,0.14); border-radius:6px; background:rgba(245,240,230,0.04); padding:16px 18px 18px; }
+.tile .k { font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; margin-bottom:9px; }
+.tile .v { font-size:32px; font-weight:700; letter-spacing:-0.04em; line-height:1; }
+.tile.bad { border-color:rgba(224,164,143,0.45); background:rgba(224,164,143,0.07); }
+.tile.bad .v { color:#E0A48F; }
+
+table { width:100%; border-collapse:collapse; margin-top:6px; }
+th { font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; text-align:left; padding:0 12px 10px; font-weight:400; white-space:nowrap; }
+th.num, td.num { text-align:right; }
+td { padding:13px 12px; border-top:1px solid rgba(245,240,230,0.10); vertical-align:top; }
+tr.click { cursor:pointer; }
+tr.click:hover td { background:rgba(245,240,230,0.045); }
+.name { font-weight:700; letter-spacing:-0.02em; }
+.dim { color:#8A7F6E; font-size:13px; }
+.pill { display:inline-block; font-family:'DM Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; padding:3px 8px; border-radius:2px; border:1px solid rgba(245,240,230,0.2); color:#B9AF9C; }
+.pill.ok { border-color:rgba(143,211,166,0.45); color:#8FD3A6; }
+.pill.bad { border-color:rgba(224,164,143,0.5); color:#E0A48F; }
+.why { color:#E0A48F; font-size:12.5px; margin-top:4px; word-break:break-word; }
+.empty { border:1px dashed rgba(245,240,230,0.2); border-radius:6px; padding:34px 24px; text-align:center; color:#8A7F6E; margin-top:20px; }
+.empty b { color:#F5F0E6; display:block; margin-bottom:6px; font-size:16px; }
+.searchrow { display:flex; gap:10px; align-items:center; margin:18px 0 4px; }
+.searchrow input { max-width:320px; }
+.pager { display:flex; gap:10px; align-items:center; justify-content:center; margin-top:22px; }
+.crumb { display:flex; align-items:center; gap:10px; margin:24px 0 0; }
+.crumb .flow { font-size:24px; font-weight:700; letter-spacing:-0.03em; }
+@media (max-width:640px) {
+  th.hide, td.hide { display:none; }
+  .shell { padding:0 14px 60px; }
+}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h1>Campaigns</h1>
+  <p>Every email this site has sent, grouped by campaign.</p>
+  <input type="password" id="key" placeholder="Desk key" autocomplete="current-password">
+  <label class="remember"><input type="checkbox" id="rememberKey"> Remember on this device</label>
+  <button class="primary" id="unlock" style="width:100%">Unlock</button>
+  <div id="gateErr"></div>
+</div>
+
+<div id="desk" style="display:none">
+  <header class="bar"><div class="in">
+    <div><b>Campaigns</b> <span class="sub" id="scope">all</span></div>
+    <div class="tools">
+      <button id="back" style="display:none">← All campaigns</button>
+      <button id="refresh">Refresh</button>
+    </div>
+  </div></header>
+  <div class="shell" id="body"></div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var key = '';
+  var view = { flow: null, offset: 0, q: '' };
+
+  function api(params) {
+    var qs = Object.keys(params).filter(function (k) { return params[k] !== '' && params[k] != null; })
+      .map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+    return fetch('/api/admin/campaigns' + (qs ? '?' + qs : ''), { headers: { 'x-analytics-key': key } })
+      .then(function (r) { return r.json().catch(function () { return { ok: false, error: 'bad_response' }; }); })
+      .catch(function () { return { ok: false, error: 'unreachable' }; });
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function when(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso), now = Date.now(), diff = (now - d.getTime()) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.round(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.round(diff / 3600) + 'h ago';
+    if (diff < 7 * 86400) return Math.round(diff / 86400) + 'd ago';
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  // popup-code -> Popup code. The flow key is what the code uses; the desk
+  // should read like English without a second name to keep in sync.
+  function title(flow) {
+    return String(flow).replace(/[-_]/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); });
+  }
+
+  function renderList(b) {
+    $('scope').textContent = 'all';
+    $('back').style.display = 'none';
+    if (!b.campaigns.length) {
+      $('body').innerHTML = '<div class="empty"><b>Nothing sent yet</b>' +
+        'Campaigns appear here the first time an email goes out. The popup code email is the one that fires today; ' +
+        'cart recovery and screener reminders only fire when there is something to recover or remind about.</div>';
+      return;
+    }
+    var rows = b.campaigns.map(function (c) {
+      return '<tr class="click" data-flow="' + esc(c.flow) + '">' +
+        '<td><div class="name">' + esc(title(c.flow)) + '</div>' +
+          '<div class="dim mono">' + esc(c.flow) + '</div></td>' +
+        '<td class="num">' + c.people + '</td>' +
+        '<td class="num hide">' + c.steps + '</td>' +
+        '<td class="num">' + (c.failed ? '<span class="pill bad">' + c.failed + ' failed</span>' : '<span class="pill ok">all sent</span>') + '</td>' +
+        '<td class="num dim">' + esc(when(c.last_at)) + '</td>' +
+      '</tr>';
+    }).join('');
+    $('body').innerHTML = '<table><thead><tr>' +
+      '<th>Campaign</th><th class="num">People</th><th class="num hide">Emails</th>' +
+      '<th class="num">Status</th><th class="num">Last sent</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<p class="note" style="margin-top:18px">One row per person per email. A resend updates that row rather than adding one.</p>';
+    Array.prototype.forEach.call(document.querySelectorAll('tr.click'), function (tr) {
+      tr.addEventListener('click', function () { open(tr.getAttribute('data-flow')); });
+    });
+  }
+
+  function renderFlow(b) {
+    $('scope').textContent = b.flow;
+    $('back').style.display = '';
+    var steps = b.steps.map(function (s) {
+      return '<div class="tile' + (s.failed ? ' bad' : '') + '"><div class="k">' + esc(s.step) + '</div>' +
+        '<div class="v">' + s.people + '</div>' +
+        '<div class="dim" style="margin-top:6px">' + (s.failed ? s.failed + ' failed · ' : '') + esc(when(s.last_at)) + '</div></div>';
+    }).join('');
+
+    var rows = b.sends.map(function (s) {
+      return '<tr>' +
+        '<td>' + esc(s.email) + (s.sends > 1 ? ' <span class="pill">sent ' + s.sends + '×</span>' : '') +
+          (s.status === 'failed' && s.error ? '<div class="why">' + esc(s.error) + '</div>' : '') + '</td>' +
+        '<td class="mono dim">' + esc(s.step) + '</td>' +
+        '<td class="hide dim">' + esc(s.subject || '—') + '</td>' +
+        '<td>' + (s.status === 'failed' ? '<span class="pill bad">failed</span>' : '<span class="pill ok">sent</span>') + '</td>' +
+        '<td class="num dim">' + esc(when(s.sent_at)) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    $('body').innerHTML =
+      '<div class="crumb"><span class="flow">' + esc(title(b.flow)) + '</span>' +
+        '<span class="pill">' + b.total + ' recipient' + (b.total === 1 ? '' : 's') + '</span>' +
+        (b.failed ? '<span class="pill bad">' + b.failed + ' failed</span>' : '') + '</div>' +
+      '<div class="tiles">' + steps + '</div>' +
+      '<div class="searchrow"><input type="search" id="q" placeholder="Filter by email address" value="' + esc(view.q) + '">' +
+        '<button id="doSearch">Search</button>' + (view.q ? '<button id="clearSearch">Clear</button>' : '') + '</div>' +
+      (b.sends.length
+        ? '<table><thead><tr><th>Recipient</th><th>Step</th><th class="hide">Subject</th><th>Status</th><th class="num">Sent</th></tr></thead><tbody>' + rows + '</tbody></table>'
+        : '<div class="empty"><b>No matches</b>Nothing in this campaign matches that address.</div>') +
+      '<div class="pager">' +
+        '<button id="prev"' + (view.offset ? '' : ' disabled') + '>← Newer</button>' +
+        '<span class="dim mono">' + (b.total ? (view.offset + 1) + '–' + (view.offset + b.sends.length) + ' of ' + b.total : '0') + '</span>' +
+        '<button id="next"' + (b.more ? '' : ' disabled') + '>Older →</button>' +
+      '</div>';
+
+    $('doSearch').addEventListener('click', function () { view.q = $('q').value.trim(); view.offset = 0; load(); });
+    $('q').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('doSearch').click(); });
+    if ($('clearSearch')) $('clearSearch').addEventListener('click', function () { view.q = ''; view.offset = 0; load(); });
+    $('prev').addEventListener('click', function () { view.offset = Math.max(0, view.offset - b.pageSize); load(); });
+    $('next').addEventListener('click', function () { view.offset += b.pageSize; load(); });
+  }
+
+  function open(flow) { view = { flow: flow, offset: 0, q: '' }; load(); }
+
+  function load() {
+    $('body').innerHTML = '<p class="note" style="margin-top:30px">Loading…</p>';
+    api({ flow: view.flow || '', offset: view.offset || '', q: view.q || '' }).then(function (b) {
+      if (!b.ok) {
+        $('body').innerHTML = '<div class="empty"><b>Could not load</b>' +
+          esc(b.message || b.error || 'unknown') + '</div>';
+        return;
+      }
+      if (view.flow) renderFlow(b); else renderList(b);
+    });
+  }
+
+  $('unlock').addEventListener('click', function () {
+    key = $('key').value.trim();
+    if (!key) return;
+    $('gateErr').innerHTML = '';
+    api({}).then(function (b) {
+      if (!b.ok) {
+        if (b.error === 'unauthorized') { try { localStorage.removeItem('hb_ckey'); } catch (e) {} }
+        $('gateErr').innerHTML = '<div class="err">' +
+          (b.error === 'unauthorized' ? 'That key was not accepted.'
+           : b.error === 'not_configured' ? esc(b.message || 'This deployment is missing DATABASE_URL or ANALYTICS_KEY.')
+           : b.error === 'unreachable' ? 'No backend here — this page only works on the deployed site.'
+           : esc(b.message || 'Could not reach the desk.')) + '</div>';
+        return;
+      }
+      try {
+        if ($('rememberKey').checked) localStorage.setItem('hb_ckey', key);
+        else localStorage.removeItem('hb_ckey');
+      } catch (e) {}
+      $('gate').style.display = 'none';
+      $('desk').style.display = 'block';
+      renderList(b);
+    });
+  });
+  $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('unlock').click(); });
+  $('back').addEventListener('click', function () { view = { flow: null, offset: 0, q: '' }; load(); });
+  $('refresh').addEventListener('click', load);
+
+  (function () {
+    var saved = '';
+    try { saved = localStorage.getItem('hb_ckey') || ''; } catch (e) {}
+    if (saved) { $('key').value = saved; $('rememberKey').checked = true; $('unlock').click(); }
+  })();
+})();
+</script>
+</body></html>

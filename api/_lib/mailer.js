@@ -69,6 +69,43 @@ function unsubUrl(email, purpose) {
     '&t=' + unsubToken(email) + (purpose ? '&p=' + encodeURIComponent(purpose) : '');
 }
 
+// Writes the attempt to email_sends, so the campaign desk can show what went
+// where. Only when the caller names a flow — transactional one-offs are not
+// campaigns and do not belong in that log.
+//
+// Swallows everything. A marketing email must not fail because a logging table
+// is unreachable, and the send has already happened by the time this runs.
+// Awaited rather than fired and forgotten: on a serverless runtime, work left
+// pending when the response returns is killed, so an unawaited insert is a
+// silently empty desk.
+async function record(opts, result) {
+  if (!opts || !opts.flow) return;
+  try {
+    const db = require('./analytics-db.js');
+    if (!db.isConfigured()) return;
+    const q = db.sql();
+    const step = String(opts.step || '1');
+    const status = result.ok ? 'sent' : 'failed';
+    const err = result.ok ? null : [result.error, result.status, result.message].filter(Boolean).join(' ').slice(0, 300);
+    await db.withSchema(function () {
+      // One row per person per step, by the unique index. A repeat updates it
+      // and bumps the counter rather than adding a row the index would reject.
+      return q`insert into email_sends (email, flow, step, provider_id, status, error, subject)
+               values (${String(opts.to).toLowerCase()}, ${String(opts.flow)}, ${step},
+                       ${result.id || null}, ${status}, ${err}, ${String(opts.subject || '').slice(0, 300)})
+               on conflict (email, flow, step) do update set
+                 sent_at = now(),
+                 sends = email_sends.sends + 1,
+                 provider_id = excluded.provider_id,
+                 status = excluded.status,
+                 error = excluded.error,
+                 subject = excluded.subject`;
+    });
+  } catch (e) {
+    console.error('[mailer] could not record send:', e && e.message);
+  }
+}
+
 // Marketing mail carries a campaign; transactional mail does not. Anything
 // with a campaign gets tagged so Resend's own reporting can separate them.
 async function send(opts) {
@@ -76,7 +113,9 @@ async function send(opts) {
   if (!to) return { ok: false, error: 'no_recipient' };
   if (!process.env.RESEND_API_KEY) {
     console.error('[mailer] RESEND_API_KEY is not set.');
-    return { ok: false, error: 'not_configured' };
+    const bad = { ok: false, error: 'not_configured' };
+    await record(opts, bad);
+    return bad;
   }
 
   const body = {
@@ -108,12 +147,20 @@ async function send(opts) {
       body: JSON.stringify(body)
     });
     const json = await res.json().catch(function () { return {}; });
-    if (res.ok && json.id) return { ok: true, id: json.id };
+    if (res.ok && json.id) {
+      const out = { ok: true, id: json.id };
+      await record(opts, out);
+      return out;
+    }
     console.error('[mailer]', res.status, JSON.stringify(json).slice(0, 300));
-    return { ok: false, error: 'send_failed', status: res.status, message: (json && json.message) || null };
+    const bad = { ok: false, error: 'send_failed', status: res.status, message: (json && json.message) || null };
+    await record(opts, bad);
+    return bad;
   } catch (err) {
     console.error('[mailer]', err && err.message);
-    return { ok: false, error: 'unreachable', message: err && err.message };
+    const bad = { ok: false, error: 'unreachable', message: err && err.message };
+    await record(opts, bad);
+    return bad;
   }
 }
 

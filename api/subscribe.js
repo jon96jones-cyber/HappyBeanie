@@ -53,6 +53,10 @@ async function grantCode(email) {
   const t = { code: minted.code, expiresLabel: minted.expiresLabel, pct: pct, unsubUrl: unsubUrl };
   const r = await mailer.send({
     to: email,
+    // Names the campaign for the desk. One step, because this fires once on
+    // signup rather than as part of a sequence.
+    flow: 'popup-code',
+    step: 'code',
     subject: 'Your ' + pct + '% off — ' + minted.code,
     html: codeEmail(t),
     text: codeEmail.text(t),
