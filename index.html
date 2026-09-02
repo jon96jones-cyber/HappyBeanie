@@ -5808,7 +5808,12 @@ Component.prototype.renderVals = function () {
   #hbPopup:focus { outline:none; }
   #hbSend:hover:not(:disabled) { background:oklch(.9 .15 92) !important; transform:translateY(-2px); }
   #hbSend:disabled { opacity:.6; cursor:progress; }
-  #hbNo:hover, #hbAgain:hover { color:#17140F !important; }
+  #hbNo:hover { color:#17140F !important; }
+  #hbCopy:hover { background:#F2ECDD !important; }
+  #hbCopy .hb-copy-ok { display:none; }
+  #hbCopy[data-copied] { background:oklch(.86 .14 92) !important; }
+  #hbCopy[data-copied] .hb-copy-idle { display:none; }
+  #hbCopy[data-copied] .hb-copy-ok { display:block; }
   /* The bean is a real control, not just a draggable image — see the keyboard
      path in the script. Give it a focus ring that reads on the cream stage. */
   #hbBean:focus-visible, #hbMouth:focus-visible { outline:3px solid oklch(.44 .07 152); outline-offset:3px; }
@@ -5939,11 +5944,15 @@ Component.prototype.renderVals = function () {
     </div>
 
     <div data-step="done" style="display:none;">
-      <div id="hbTicket" style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:20px; padding:15px 16px; background:#FFFDF7; border:1.5px dashed #17140F; border-radius:3px;">
-        <span style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8A7F6E;">10% off</span>
-        <span id="hbCode" style="font-family:'HB Mono Figures','DM Mono',monospace; font-size:17px; font-weight:500; letter-spacing:.06em; color:#17140F; word-break:break-all; text-align:right;">BEAN10</span>
+      <div id="hbTicket" style="display:flex; align-items:center; gap:10px; margin-top:20px; padding:13px 14px; background:#FFFDF7; border:1.5px dashed #17140F; border-radius:3px;">
+        <span style="flex:0 0 auto; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8A7F6E;">10% off</span>
+        <span id="hbCode" style="flex:1 1 auto; font-family:'HB Mono Figures','DM Mono',monospace; font-size:17px; font-weight:500; letter-spacing:.06em; color:#17140F; word-break:break-all; text-align:right;">BEAN10</span>
+        <button id="hbCopy" type="button" aria-label="Copy discount code" style="flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; padding:0; border:1.5px solid #17140F; border-radius:3px; background:#FCFAF4; color:#17140F; cursor:pointer; transition:background .2s ease;">
+          <svg class="hb-copy-idle" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
+          <svg class="hb-copy-ok" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"></path></svg>
+        </button>
       </div>
-      <button id="hbAgain" type="button" style="margin-top:14px; padding:0; background:transparent; border:none; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:#8A7F6E; text-decoration:underline; cursor:pointer;">Feed her again</button>
+      <p id="hbCopyNote" role="status" aria-live="polite" style="margin:9px 0 0; height:14px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:oklch(.44 .07 152);"></p>
     </div>
 
     <button id="hbNo" type="button" style="display:block; width:100%; margin-top:24px; padding:4px 8px; background:transparent; border:none; font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.4; color:#A99E8C; text-decoration:underline; text-underline-offset:3px; cursor:pointer; transition:color .2s ease;">No thanks, I don&rsquo;t want to save money</button>
@@ -5965,6 +5974,9 @@ Component.prototype.renderVals = function () {
   var errEl = document.getElementById('hbErr');
   var input = document.getElementById('hbEmail'), send = document.getElementById('hbSend');
   var codeEl = document.getElementById('hbCode'), codeTicket = document.getElementById('hbTicket');
+  var copyBtn = document.getElementById('hbCopy'), copyNote = document.getElementById('hbCopyNote');
+  var noBtn = document.getElementById('hbNo');
+  var copyTimer = null;
   var doneHead = document.getElementById('hbDoneHead'), doneSub = document.getElementById('hbDoneSub');
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -5983,6 +5995,8 @@ Component.prototype.renderVals = function () {
     hint.style.opacity = step === 'feed' ? '1' : '0';
     wait.style.opacity = step === 'feed' ? '1' : '0';
     fed.style.opacity = step === 'feed' ? '0' : '1';
+    noBtn.textContent = step === 'done' ? 'I\u2019ve saved my code' : 'No thanks, I don\u2019t want to save money';
+    if (step === 'done') { copyNote.textContent = ''; copyBtn.removeAttribute('data-copied'); }
     if (step === 'email') setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); } }, 120);
   }
 
@@ -6132,11 +6146,47 @@ Component.prototype.renderVals = function () {
     });
   });
 
-  document.getElementById('hbAgain').addEventListener('click', function () {
-    step = 'feed'; input.value = ''; bean.style.transform = '';
-    if (!reduced) bean.style.animation = 'hbBob 2.6s ease-in-out infinite';
-    render();
-    try { bean.focus({ preventScroll: true }); } catch (e) {}
+  // Codes get read off a screen and typed into a checkout by hand, which is
+  // where they get mistyped. One tap removes that entirely.
+  copyBtn.addEventListener('click', function () {
+    var text = (codeEl.textContent || '').trim();
+    if (!text) return;
+    function done() {
+      copyBtn.setAttribute('data-copied', '');
+      copyBtn.setAttribute('aria-label', 'Code copied');
+      copyNote.textContent = 'Copied to your clipboard';
+      clearTimeout(copyTimer);
+      copyTimer = setTimeout(function () {
+        copyBtn.removeAttribute('data-copied');
+        copyBtn.setAttribute('aria-label', 'Copy discount code');
+        copyNote.textContent = '';
+      }, 2600);
+      try { copyBtn.focus({ preventScroll: true }); } catch (e) {}
+    }
+    // execCommand is deprecated but still the only path on an insecure origin
+    // or an older browser, and a code that will not copy is worse than ugly.
+    function legacy() {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:absolute; left:-9999px; top:0; opacity:0;';
+        // Inside the card, so the focus trap is not broken for the instant it exists.
+        pop.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+        pop.removeChild(ta);
+        done();
+      } catch (e) {
+        copyNote.textContent = 'Select the code above to copy it';
+      }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, legacy);
+    } else {
+      legacy();
+    }
   });
 
   function close() {
