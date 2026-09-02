@@ -19,6 +19,102 @@ const db = require('../_lib/analytics-db.js');
 
 const PAGE = 100;
 
+// Every campaign the site knows how to send, whether or not it has ever sent.
+//
+// email_sends is a log, so on its own this desk can only show history — a
+// campaign that is wired and waiting looks identical to one that does not
+// exist. That is the wrong answer to "what campaigns do I have", so the list
+// is this catalogue with the log joined onto it, not the log alone.
+//
+// Kept by hand, next to nothing that enforces it, so it can drift: a flow
+// found in the log but missing here is reported as 'unlisted' rather than
+// dropped, which is the failure that would actually lose data.
+//
+//   live   — wired to a trigger and sending
+//   draft  — the emails exist, nothing calls them yet
+const CATALOG = [
+  {
+    flow: 'popup-code',
+    name: 'Popup code',
+    status: 'live',
+    what: 'The discount code, sent the moment someone feeds Summer her bean.',
+    trigger: 'On signup, from the site popup'
+  },
+  {
+    flow: 'cart-recovery',
+    name: 'Cart recovery',
+    status: 'live',
+    what: 'One nudge to anyone who reached checkout and left without paying.',
+    // The handler emails a one-hour slice (abandoned 2–3h ago) because it was
+    // written for an hourly schedule; vercel.json runs it once a day. Said
+    // plainly here rather than quietly — the desk should not imply coverage
+    // the schedule does not give.
+    trigger: 'Daily 17:00 UTC — catches checkouts abandoned 2–3h before that run'
+  },
+  {
+    flow: 'quiz-reminder',
+    name: 'Screener reminder',
+    status: 'live',
+    what: 'Nudges people who started the screener and did not finish it.',
+    trigger: 'Daily 16:00 UTC'
+  },
+  {
+    flow: 'waitlist',
+    name: 'Waitlist sequence',
+    status: 'draft',
+    what: 'Four emails — welcome, formula, screener, ready. Written and built, but nothing sends them.',
+    trigger: 'Not wired yet'
+  }
+];
+
+function catalogOf(flow) {
+  for (let i = 0; i < CATALOG.length; i++) if (CATALOG[i].flow === flow) return CATALOG[i];
+  return null;
+}
+
+// Catalogue first, log joined on. Sorted so the ones doing something are at
+// the top: anything that has sent, most recent first, then live-but-quiet,
+// then drafts.
+function merge(rows) {
+  const stats = {};
+  rows.forEach(function (r) { stats[r.flow] = r; });
+
+  const listed = CATALOG.map(function (c) {
+    const s = stats[c.flow];
+    delete stats[c.flow];
+    return {
+      flow: c.flow, name: c.name, status: c.status, what: c.what, trigger: c.trigger,
+      people: s ? s.people : 0,
+      attempts: s ? s.attempts : 0,
+      delivered: s ? s.delivered : 0,
+      failed: s ? s.failed : 0,
+      steps: s ? s.steps : 0,
+      first_at: s ? s.first_at : null,
+      last_at: s ? s.last_at : null
+    };
+  });
+
+  // Anything in the log we forgot to catalogue still has to appear.
+  const extra = Object.keys(stats).map(function (f) {
+    const s = stats[f];
+    return {
+      flow: f, name: null, status: 'unlisted', what: null,
+      trigger: 'Sending, but not listed in the desk catalogue',
+      people: s.people, attempts: s.attempts, delivered: s.delivered, failed: s.failed,
+      steps: s.steps, first_at: s.first_at, last_at: s.last_at
+    };
+  });
+
+  // 1-based on purpose: `rank[s] || 9` would read a legitimate 0 as missing
+  // and sort live campaigns last.
+  const rank = { live: 1, unlisted: 2, draft: 3 };
+  return listed.concat(extra).sort(function (a, b) {
+    if (!!a.last_at !== !!b.last_at) return a.last_at ? -1 : 1;
+    if (a.last_at && b.last_at) return new Date(b.last_at) - new Date(a.last_at);
+    return (rank[a.status] || 9) - (rank[b.status] || 9);
+  });
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'private, no-store');
 
@@ -59,7 +155,7 @@ module.exports = async function handler(req, res) {
           group by flow
           order by max(sent_at) desc`;
       });
-      return res.status(200).json({ ok: true, campaigns: rows });
+      return res.status(200).json({ ok: true, campaigns: merge(rows), recorded: rows.length });
     }
 
     // -------------------------------------------------------- one campaign
@@ -88,9 +184,17 @@ module.exports = async function handler(req, res) {
     });
 
     const total = (totals[0] || {}).people || 0;
+    const meta = catalogOf(flow);
     return res.status(200).json({
       ok: true,
       flow: flow,
+      // So the drill-in reads the same as the row that was clicked, including
+      // for a campaign that has not sent anything yet.
+      name: meta ? meta.name : null,
+      status: meta ? meta.status : 'unlisted',
+      what: meta ? meta.what : null,
+      trigger: meta ? meta.trigger : null,
+      searching: !!search,
       steps: steps,
       total: total,
       failed: (totals[0] || {}).failed || 0,
