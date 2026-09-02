@@ -178,7 +178,27 @@ async function ensureSchema() {
      expires_at timestamptz,
      created_at timestamptz not null default now()
    )`;
-  return 16;
+
+  // One row per abandoned checkout, because the recovery ladder has three
+  // rungs and rung two has to know rung one happened. The old cron got away
+  // with no state by only ever looking at a single one-hour window; three
+  // touches over two days cannot.
+  //
+  // Keyed on the checkout rather than the address: the same person abandoning
+  // a second cart next month is a new cart and starts the ladder again.
+  await q`create table if not exists cart_recovery (
+     checkout_id  text primary key,
+     email        text not null,
+     abandoned_at timestamptz not null,
+     step         integer not null default 0,
+     last_sent_at timestamptz,
+     done_at      timestamptz,
+     done_reason  text,
+     first_seen   timestamptz not null default now()
+   )`;
+  await q`create index if not exists cart_recovery_open_idx
+          on cart_recovery (abandoned_at) where done_at is null`;
+  return 17;
 }
 
 // Run a query, and if it fails only because the schema is behind the code,

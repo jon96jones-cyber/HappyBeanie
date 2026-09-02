@@ -44,12 +44,11 @@ const CATALOG = [
     flow: 'cart-recovery',
     name: 'Cart recovery',
     status: 'live',
-    what: 'One nudge to anyone who reached checkout and left without paying.',
-    // The handler emails a one-hour slice (abandoned 2–3h ago) because it was
-    // written for an hourly schedule; vercel.json runs it once a day. Said
-    // plainly here rather than quietly — the desk should not imply coverage
-    // the schedule does not give.
-    trigger: 'Daily 17:00 UTC — catches checkouts abandoned 2–3h before that run'
+    what: 'Three nudges to anyone who reached checkout and left without paying — at 45 minutes, 24 hours and 48 hours.',
+    // The rungs are only as punctual as the schedule that checks for them, so
+    // the desk names the interval rather than the intent. Change this line
+    // whenever vercel.json's cron changes.
+    trigger: 'Steps 1–3 at 45 min, 24 h and 48 h — as punctual as the cron interval allows'
   },
   {
     flow: 'quiz-reminder',
