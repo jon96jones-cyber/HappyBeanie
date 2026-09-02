@@ -5913,10 +5913,16 @@ Component.prototype.renderVals = function () {
     </div>
   </div>
 
-  <div id="hbStage" style="position:relative; height:320px; background:linear-gradient(178deg,#F5EFE0,#EFE7D5); overflow:hidden; touch-action:none; user-select:none;">
+  <!-- translateZ(0) makes the stage its own compositing root. Without it iOS
+       Safari repaints the bean's drop-shadow into the stage's tiles and leaves
+       pale rectangles behind as it moves — see the layer note on #hbBean. -->
+  <div id="hbStage" style="position:relative; height:320px; background:linear-gradient(178deg,#F5EFE0,#EFE7D5); overflow:hidden; touch-action:none; user-select:none; transform:translateZ(0);">
     <span aria-hidden="true" style="position:absolute; left:50%; bottom:-84px; width:300px; height:168px; margin-left:-150px; background:radial-gradient(closest-side,rgba(23,20,15,.16),rgba(23,20,15,0)); border-radius:50%;"></span>
 
-    <div id="hbPet" style="position:absolute; left:50%; bottom:0; width:224px; height:320px; margin-left:-112px;">
+    <!-- Her own layer, so the bean moving above her cannot invalidate the
+         photographs. will-change rather than a transform: hbChomp sets
+         transform on feed and would overwrite one. -->
+    <div id="hbPet" style="position:absolute; left:50%; bottom:0; width:224px; height:320px; margin-left:-112px; will-change:transform;">
       <img id="hbWait" draggable="false" src="assets/img/popup/summer-waiting.webp" width="392" height="560" alt="Summer, a goldendoodle, waiting with her mouth open" style="display:block; width:100%; height:100%; object-fit:contain; object-position:center bottom; transition:opacity .45s ease;">
       <img id="hbFed" draggable="false" src="assets/img/popup/summer-fed.webp" width="392" height="560" alt="Summer looking into the camera, pleased with her chew" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:center bottom; opacity:0; transition:opacity .45s ease;">
       <!-- The dashed square is the only cue telling anyone what to do, and it
@@ -5928,7 +5934,7 @@ Component.prototype.renderVals = function () {
 
     <img id="hbBean" src="assets/img/popup/chew.webp" alt="A Happy Beanie soft chew" draggable="false"
          role="button" tabindex="0" aria-label="Drag the bean to Summer's mouth, or press Enter to feed her"
-         style="position:absolute; left:40px; bottom:30px; width:84px; cursor:grab; touch-action:none; -webkit-user-drag:none; user-select:none; filter:drop-shadow(0 14px 18px rgba(23,20,15,.34)); animation:hbBob 2.6s ease-in-out infinite;">
+         style="position:absolute; left:40px; bottom:30px; width:84px; cursor:grab; touch-action:none; -webkit-user-drag:none; user-select:none; filter:drop-shadow(0 14px 18px rgba(23,20,15,.34)); animation:hbBob 2.6s ease-in-out infinite; will-change:transform; backface-visibility:hidden; -webkit-backface-visibility:hidden;">
 
     <span id="hbHint" style="position:absolute; left:9px; top:297px; white-space:nowrap; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#8A7F6E; transition:opacity .3s ease;">drag the bean to her mouth</span>
   </div>
@@ -5989,6 +5995,10 @@ Component.prototype.renderVals = function () {
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var step = 'feed', drag = null, busy = false, returnTo = null;
+  // Where the bean is relative to its resting spot. Tracked rather than parsed
+  // back out of the inline transform, which broke the moment the transform
+  // stopped being a plain translate().
+  var beanAt = { x: 0, y: 0 };
   // /?pop=1 is the switch the app already uses to force the popup open; the
   // component reads it too, so a test run can show what a visitor must not.
   var TESTING = false;
@@ -6054,14 +6064,17 @@ Component.prototype.renderVals = function () {
     bean.style.animation = 'none';
     bean.style.transition = '';
     bean.style.cursor = 'grabbing';
-    var m = /translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/.exec(bean.style.transform || '');
-    drag = { x: e.clientX - (m ? +m[1] : 0), y: e.clientY - (m ? +m[2] : 0), moved: 0 };
+    drag = { x: e.clientX - beanAt.x, y: e.clientY - beanAt.y, moved: 0 };
   });
   bean.addEventListener('pointermove', function (e) {
     if (!drag) return;
     var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     drag.moved = Math.max(drag.moved, Math.abs(dx) + Math.abs(dy));
-    bean.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + (dx * 0.06).toFixed(1) + 'deg)';
+    beanAt.x = dx; beanAt.y = dy;
+    // translate3d, not translate: it keeps her on the GPU layer the styles ask
+    // for. A 2D translate lets iOS Safari fall back to painting into the
+    // stage's tiles, which is what smeared the drop-shadow across the photo.
+    bean.style.transform = 'translate3d(' + dx + 'px,' + dy + 'px,0) rotate(' + (dx * 0.06).toFixed(1) + 'deg)';
     var near = hits(bean);
     mouth.style.opacity = near ? '0' : '.5';
     mouth.style.transform = near ? 'scale(1.16)' : 'scale(1)';
@@ -6078,8 +6091,9 @@ Component.prototype.renderVals = function () {
     // A tap that never really moved is someone telling us they cannot or will
     // not drag. Treat it as feeding her rather than as a failed gesture.
     if (moved < 6) { feedHer(); return; }
+    beanAt.x = 0; beanAt.y = 0;
     bean.style.transition = 'transform .42s cubic-bezier(.2,1.3,.4,1)';
-    bean.style.transform = 'translate(0,0) rotate(0)';
+    bean.style.transform = 'translate3d(0,0,0) rotate(0deg)';
     setTimeout(function () {
       bean.style.transition = '';
       if (!reduced) bean.style.animation = 'hbBob 2.6s ease-in-out infinite';
