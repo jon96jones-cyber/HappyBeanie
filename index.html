@@ -458,6 +458,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
      and nothing is fetched until the shopper opens the 3D tab. -->
 <style>hb-chew-stage:not(:defined), three-d-stage:not(:defined) { visibility: hidden; }</style>
 
+<script src="/assets/nodrag.js" defer></script>
 </head>
 <body>
 <x-dc>
@@ -5903,8 +5904,8 @@ Component.prototype.renderVals = function () {
     <span aria-hidden="true" style="position:absolute; left:50%; bottom:-84px; width:300px; height:168px; margin-left:-150px; background:radial-gradient(closest-side,rgba(23,20,15,.16),rgba(23,20,15,0)); border-radius:50%;"></span>
 
     <div id="hbPet" style="position:absolute; left:50%; bottom:0; width:224px; height:320px; margin-left:-112px;">
-      <img id="hbWait" src="assets/img/popup/summer-waiting.webp" width="392" height="560" alt="Summer, a goldendoodle, waiting with her mouth open" style="display:block; width:100%; height:100%; object-fit:contain; object-position:center bottom; transition:opacity .45s ease;">
-      <img id="hbFed" src="assets/img/popup/summer-fed.webp" width="392" height="560" alt="Summer looking into the camera, pleased with her chew" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:center bottom; opacity:0; transition:opacity .45s ease;">
+      <img id="hbWait" draggable="false" src="assets/img/popup/summer-waiting.webp" width="392" height="560" alt="Summer, a goldendoodle, waiting with her mouth open" style="display:block; width:100%; height:100%; object-fit:contain; object-position:center bottom; transition:opacity .45s ease;">
+      <img id="hbFed" draggable="false" src="assets/img/popup/summer-fed.webp" width="392" height="560" alt="Summer looking into the camera, pleased with her chew" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:center bottom; opacity:0; transition:opacity .45s ease;">
       <!-- The dashed square is the only cue telling anyone what to do, and it
            doubles as the tap/click target for people who cannot drag. -->
       <button id="hbMouth" type="button" aria-label="Feed Summer the bean" style="position:absolute; left:59.2%; top:13.9%; width:74px; height:74px; margin:-37px 0 0 -37px; padding:0; border:1.5px dashed #17140F; border-radius:3px; background:transparent; opacity:.5; cursor:pointer; transition:opacity .25s ease, transform .25s cubic-bezier(.2,1.5,.4,1);"></button>
