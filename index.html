@@ -5795,8 +5795,13 @@ Component.prototype.renderVals = function () {
 
   #hbScrim { position:fixed; inset:0; z-index:9998; background:rgba(23,20,15,.5); opacity:0; pointer-events:none; transition:opacity .3s ease; }
   #hbScrim[data-on] { opacity:1; pointer-events:auto; }
+  /* dvh after vh, not instead of it: the second declaration is ignored by
+     anything that does not know the unit. vh on iOS is the TALL viewport, so a
+     card sized by it can sit taller than the space actually on screen. */
   #hbPopup { position:fixed; z-index:9999; left:50%; top:50%; transform:translate(-50%,-50%);
-             width:476px; max-width:calc(100vw - 32px); max-height:calc(100vh - 32px); overflow:auto;
+             width:476px; max-width:calc(100vw - 32px);
+             max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px);
+             overflow:auto; overscroll-behavior:contain;
              background:#FCFAF4; border:1px solid #17140F; border-radius:4px;
              box-shadow:0 40px 80px -40px rgba(23,20,15,.55); display:none;
              font-family:'DM Sans', system-ui, sans-serif; color:#17140F; }
@@ -5830,6 +5835,7 @@ Component.prototype.renderVals = function () {
       width:calc(100vw - 40px); max-width:400px;
       transform:translate(-50%,-50%);
       max-height:calc(100vh - 28px);
+      max-height:calc(100dvh - 28px);
     }
     /* Everything below is a size pass: the card was over half the screen on a
        phone, mostly headline and stage. */
@@ -6233,6 +6239,9 @@ Component.prototype.renderVals = function () {
     if (!pop.hasAttribute('data-on')) return;
     pop.removeAttribute('data-on');
     scrim.removeAttribute('data-on');
+    // Before focus is handed back, so the page is scrollable again at the
+    // moment the old element is refocused rather than a frame later.
+    unlockScroll();
     // Count the dismissals, so the gate can widen the gap each time rather
     // than treating every no as the first. `fed` records whether they got as
     // far as the offer before declining, which earns a shorter ladder.
@@ -6281,9 +6290,44 @@ Component.prototype.renderVals = function () {
     }
   });
 
+  // While the card is open the page behind it must not scroll. Politeness is
+  // the smaller half of the reason. The larger half: on iOS — and worst of all
+  // in the Facebook and Instagram in-app browsers — scrolling collapses and
+  // re-expands the browser chrome, which changes the viewport height. The card
+  // is centred with top:50%, so every one of those changes re-centres it and
+  // it visibly slides up and down while the page moves behind it.
+  //
+  // Fixing the body in place stops the scroll, which stops the chrome
+  // animating, which stops the card moving. The scroll offset is carried on
+  // body.top so the page does not jump to the top on open, and is handed back
+  // on close.
+  var lockedAt = 0, locked = false;
+  function lockScroll() {
+    if (locked) return;
+    lockedAt = window.pageYOffset || document.documentElement.scrollTop || 0;
+    var s = document.body.style;
+    s.position = 'fixed';
+    s.top = -lockedAt + 'px';
+    s.left = '0';
+    s.right = '0';
+    s.width = '100%';
+    s.overflow = 'hidden';
+    locked = true;
+  }
+  function unlockScroll() {
+    if (!locked) return;
+    var s = document.body.style;
+    s.position = ''; s.top = ''; s.left = ''; s.right = ''; s.width = ''; s.overflow = '';
+    locked = false;
+    // Instant, not smooth: this is restoring where they already were, and
+    // animating it would read as the page moving on its own.
+    window.scrollTo(0, lockedAt);
+  }
+
   function open() {
     if (pop.hasAttribute('data-on')) return;
     returnTo = document.activeElement;
+    lockScroll();
     step = 'feed'; input.value = ''; bean.style.transform = '';
     errEl.style.display = 'none';
     render();
