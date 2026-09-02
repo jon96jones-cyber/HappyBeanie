@@ -3191,7 +3191,17 @@ const POP_ON = true;
 const POP_FLOOR = 5000;    // scroll and exit-intent hold off this long after load
 const POP_DWELL = 5000;    // ...and on its own, it opens at this mark
 const POP_SCROLL = 40;     // engaged-by-depth, percent of the page
-const POP_QUIET = 30 * 24 * 60 * 60 * 1000;  // a dismissal is honoured for a month
+// Quiet period after each dismissal, in days — one rung per time they have
+// said no. A flat interval treats a first "not now" the same as a fourth,
+// which is both too pushy late and needlessly patient early. The last rung
+// repeats rather than stopping: the goal is an address eventually, not a
+// conversion today, so it keeps asking — just rarely enough to stay civil.
+const POP_BACKOFF = [3, 10, 30, 90, 180];
+// A shorter ladder for someone who fed Summer and then declined at the email
+// step. They played the thing before saying no, which is a warmer signal than
+// closing it on sight — and it is the group most likely to have simply been
+// interrupted rather than genuinely uninterested.
+const POP_BACKOFF_FED = [2, 7, 21, 60, 180];
 // How long the gate will wait on the signed-in probe before opening anyway.
 const POP_AUTH_WAIT = 9000;
 // Pages the popup must never interrupt. Two of them are converting; the quiz
@@ -3271,8 +3281,17 @@ class Component extends DCLogic {
     try {
       if (localStorage.getItem('hb-list') === '1') return no('this browser is already on the list');
       const d = JSON.parse(localStorage.getItem('hb-pop') || 'null');
-      if (d && d.at && Date.now() - d.at < POP_QUIET) {
-        return no('dismissed ' + Math.round((Date.now() - d.at) / 86400000) + ' day(s) ago, quiet for 30');
+      if (d && d.at) {
+        // Records written before the ladder existed carry no count; they
+        // represent exactly one dismissal, so they start on the first rung.
+        const n = Math.max(1, d.n || 1);
+        const ladder = d.fed ? POP_BACKOFF_FED : POP_BACKOFF;
+        const days = ladder[Math.min(n - 1, ladder.length - 1)];
+        const waited = Date.now() - d.at;
+        if (waited < days * 86400000) {
+          return no('dismissed ' + n + '×' + (d.fed ? ' (after feeding her)' : '') +
+            ', last ' + Math.round(waited / 86400000) + 'd ago, quiet for ' + days + 'd');
+        }
       }
     } catch (e) {}
     this._popShown = true;
@@ -6076,8 +6095,18 @@ Component.prototype.renderVals = function () {
     if (!pop.hasAttribute('data-on')) return;
     pop.removeAttribute('data-on');
     scrim.removeAttribute('data-on');
-    // Parked for the app's 30-day quiet period, in the shape maybePop() reads.
-    try { localStorage.setItem(DISMISS_KEY, JSON.stringify({ at: Date.now() })); } catch (e) {}
+    // Count the dismissals, so the gate can widen the gap each time rather
+    // than treating every no as the first. `fed` records whether they got as
+    // far as the offer before declining, which earns a shorter ladder.
+    // Closing the confirmation is not a dismissal — they already subscribed,
+    // and hb-list suppresses this for good anyway.
+    if (step !== 'done') {
+      try {
+        var prev = JSON.parse(localStorage.getItem(DISMISS_KEY) || 'null');
+        var n = prev ? (prev.n || 1) + 1 : 1;
+        localStorage.setItem(DISMISS_KEY, JSON.stringify({ at: Date.now(), n: n, fed: step !== 'feed' }));
+      } catch (e) {}
+    }
     if (returnTo && returnTo.focus) { try { returnTo.focus({ preventScroll: true }); } catch (e) {} }
     returnTo = null;
   }
