@@ -3318,15 +3318,29 @@ class Component extends DCLogic {
   // from componentDidUpdate on every page change.
   popPageChanged(page) {
     if (page !== 'product') return;
-    // Only a bounce off the product page itself is held back. Someone who
-    // declined on the homepage and clicked straight through to the product is
-    // exactly who this rule is for, so they are not caught by it.
-    if (this._popLastPage === 'product' && Date.now() - (this._popLastOpen || 0) < POP_PRODUCT_GAP) return;
+    let delay = POP_DWELL;
+    // Only a bounce off the product page itself is held back at all — someone
+    // who declined on the homepage and clicked straight through to the product
+    // is exactly who this rule is for, and is never caught by it.
+    //
+    // Even then the return is DEFERRED, not dropped. Dropping it meant a
+    // too-early return cancelled the popup for that entire visit, which is
+    // stricter than "ask every time they come back": they came back, so they
+    // get asked — just once the floor has passed rather than instantly.
+    const since = Date.now() - (this._popLastOpen || 0);
+    if (this._popLastPage === 'product' && since < POP_PRODUCT_GAP) {
+      delay = POP_PRODUCT_GAP - since;
+    }
     this._popShown = false;
     this._popBorn = Date.now();
     this._popSaid = false;
     clearTimeout(this._popTimer);
-    this._popTimer = setTimeout(() => this.maybePop('dwell'), POP_DWELL);
+    // This timer belongs to the product page. If they have wandered off by the
+    // time it fires, it is not theirs to act on — the pages they moved to have
+    // their own rules, and the backoff governs them.
+    this._popTimer = setTimeout(() => {
+      if ((this.state.page || 'home') === 'product') this.maybePop('dwell');
+    }, delay);
   }
 
   roomDefs() {
