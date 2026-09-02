@@ -91,7 +91,7 @@
   "crons": [
     {
       "path": "/api/cron/recover-checkouts",
-      "schedule": "0 17 * * *"
+      "schedule": "*/15 * * * *"
     },
     {
       "path": "/api/cron/send-quiz-reminders",
