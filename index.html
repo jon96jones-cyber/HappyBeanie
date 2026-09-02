@@ -5981,6 +5981,10 @@ Component.prototype.renderVals = function () {
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var step = 'feed', drag = null, busy = false, returnTo = null;
+  // /?pop=1 is the switch the app already uses to force the popup open; the
+  // component reads it too, so a test run can show what a visitor must not.
+  var TESTING = false;
+  try { TESTING = new URLSearchParams(location.search).get('pop') === '1'; } catch (e) {}
 
   function render() {
     // Scoped to the card. A document-wide [data-step] query would also match
@@ -6110,6 +6114,14 @@ Component.prototype.renderVals = function () {
     }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (b) {
       busy = false; send.disabled = false; send.textContent = 'Send it';
       if (b && b.ok) {
+        // Says out loud why an email did not go, so this is diagnosable from
+        // the console rather than from the absence of a message in an inbox.
+        if (b.emailed === false) {
+          console.warn('[hb popup] the code email did NOT send. Reason from the server: ' +
+            (b.why || 'not reported') + '. The subscriber is saved either way.');
+        } else if (b.emailed === true) {
+          console.info('[hb popup] code email accepted by the provider for delivery.');
+        }
         try { localStorage.setItem(LIST_KEY, '1'); } catch (err) {}
         var by = b.expires ? ' It’s yours alone, good for one order, and expires ' + b.expires + '.' : '';
         if (b.code) {

@@ -46,7 +46,7 @@ async function grantCode(email) {
   const minted = await discount.mint(email);
   if (!minted.ok) {
     console.error('[subscribe] mint failed:', minted.error, minted.message || '');
-    return { code: null, emailed: false, expires: null };
+    return { code: null, emailed: false, expires: null, why: 'mint:' + minted.error };
   }
   const unsubUrl = mailer.unsubUrl(email, 'marketing');
   const pct = Math.round(discount.PCT * 100);
@@ -58,8 +58,17 @@ async function grantCode(email) {
     text: codeEmail.text(t),
     unsubUrl: unsubUrl
   });
-  if (!r.ok) console.error('[subscribe] code email:', r.error, r.status || '');
-  return { code: minted.code, emailed: !!r.ok, expires: minted.expiresLabel };
+  if (!r.ok) console.error('[subscribe] code email:', r.error, r.status || '', r.message || '');
+  // The reason travels back to the browser. Not for the visitor — nothing here
+  // is shown to them — but so "I didn't get the email" is answerable from the
+  // console in one attempt instead of a tour of four dashboards. These are
+  // provider error codes and messages, never credentials.
+  return {
+    code: minted.code,
+    emailed: !!r.ok,
+    expires: minted.expiresLabel,
+    why: r.ok ? null : ('send:' + r.error + (r.status ? ':' + r.status : '') + (r.message ? ' — ' + r.message : ''))
+  };
 }
 
 async function admin(token, query, variables) {
