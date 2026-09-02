@@ -119,4 +119,4 @@ async function mint(email) {
   }
 }
 
-module.exports = { mint: mint, PCT: PCT, DAYS: DAYS, PREFIX: PREFIX };
+module.exports = { mint: mint, expiryLabel: expiryLabel, PCT: PCT, DAYS: DAYS, PREFIX: PREFIX };

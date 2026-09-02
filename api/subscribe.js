@@ -33,9 +33,54 @@ const SOURCES = ['footer', 'waitlist', 'quiz', 'shop', 'popup'];
 const mailer = require('./_lib/mailer.js');
 const codeEmail = require('./_lib/code-email.js');
 const discount = require('./_lib/discount.js');
+const db = require('./_lib/analytics-db.js');
 
-// A popup signup gets its own single-use code, minted now and dead once
-// redeemed — see _lib/discount.js for why it is one discount per code.
+// Which signups get a code. The footer was the quiet half of the list: tagged
+// in Shopify, consent recorded, and never emailed anything at all. It promises
+// "exclusive deals", so it gets the same offer the popup does — and because a
+// grant is now one per address, taking both forms still yields one code.
+const CODE_SOURCES = ['popup', 'footer'];
+
+// The code this address already holds, or null. Never throws: a database that
+// is down must not stop someone joining the list, so the caller falls back to
+// minting, which is the old behaviour.
+async function existingGrant(email) {
+  if (!db.isConfigured()) return null;
+  try {
+    const sql = db.sql();
+    const rows = await db.withSchema(function () {
+      return sql`select code, expires_at from discount_grants where email = ${email}`;
+    });
+    const g = rows[0];
+    if (!g) return null;
+    // An expired grant is no use to them — mint a fresh one rather than resend
+    // a code the checkout will refuse.
+    if (g.expires_at && new Date(g.expires_at).getTime() < Date.now()) return null;
+    return g;
+  } catch (err) {
+    console.error('[subscribe] grant lookup:', err && err.message);
+    return null;
+  }
+}
+
+async function rememberGrant(email, code, expiresIso) {
+  if (!db.isConfigured()) return;
+  try {
+    const sql = db.sql();
+    await db.withSchema(function () {
+      return sql`insert into discount_grants (email, code, expires_at)
+                 values (${email}, ${code}, ${expiresIso || null})
+                 on conflict (email) do update
+                   set code = excluded.code, expires_at = excluded.expires_at, created_at = now()`;
+    });
+  } catch (err) {
+    console.error('[subscribe] grant save:', err && err.message);
+  }
+}
+
+// A signup from the popup or the footer gets one single-use code, dead once
+// redeemed — see _lib/discount.js for why it is one discount per code. One per
+// address for life, so signing up again returns the code they already have.
 //
 // Returns what the browser needs to be honest on the confirmation screen:
 // the code if there is one, and whether the email carrying it actually went.
@@ -43,21 +88,38 @@ const discount = require('./_lib/discount.js');
 // if this fails, so the subscribe succeeds either way and the caller degrades
 // its wording instead of its outcome.
 async function grantCode(email) {
-  const minted = await discount.mint(email);
-  if (!minted.ok) {
-    console.error('[subscribe] mint failed:', minted.error, minted.message || '');
-    return { code: null, emailed: false, expires: null, why: 'mint:' + minted.error };
+  // A code they already hold comes back as-is. Minting a second one for the
+  // same address turns the signup form into a discount dispenser: every code
+  // is single-use, but nothing stopped one person collecting a hundred of them.
+  let code, expiresIso, expiresLabel, reused = false;
+  const held = await existingGrant(email);
+  if (held) {
+    code = held.code;
+    expiresIso = held.expires_at ? new Date(held.expires_at).toISOString() : null;
+    expiresLabel = held.expires_at ? discount.expiryLabel(new Date(held.expires_at)) : null;
+    reused = true;
+  } else {
+    const minted = await discount.mint(email);
+    if (!minted.ok) {
+      console.error('[subscribe] mint failed:', minted.error, minted.message || '');
+      return { code: null, emailed: false, expires: null, why: 'mint:' + minted.error };
+    }
+    code = minted.code;
+    expiresIso = minted.expires;
+    expiresLabel = minted.expiresLabel;
+    await rememberGrant(email, code, expiresIso);
   }
+
   const unsubUrl = mailer.unsubUrl(email, 'marketing');
   const pct = Math.round(discount.PCT * 100);
-  const t = { code: minted.code, expiresLabel: minted.expiresLabel, pct: pct, unsubUrl: unsubUrl };
+  const t = { code: code, expiresLabel: expiresLabel, pct: pct, unsubUrl: unsubUrl };
   const r = await mailer.send({
     to: email,
     // Names the campaign for the desk. One step, because this fires once on
     // signup rather than as part of a sequence.
     flow: 'popup-code',
     step: 'code',
-    subject: 'Your ' + pct + '% off — ' + minted.code,
+    subject: 'Your ' + pct + '% off — ' + code,
     html: codeEmail(t),
     text: codeEmail.text(t),
     unsubUrl: unsubUrl
@@ -68,9 +130,13 @@ async function grantCode(email) {
   // console in one attempt instead of a tour of four dashboards. These are
   // provider error codes and messages, never credentials.
   return {
-    code: minted.code,
+    code: code,
     emailed: !!r.ok,
-    expires: minted.expiresLabel,
+    expires: expiresLabel,
+    // True when they had already been given this code. The popup does not say
+    // anything different, but it makes a repeat visible in the console and in
+    // the send count on the campaign desk.
+    reused: reused,
     why: r.ok ? null : ('send:' + r.error + (r.status ? ':' + r.status : '') + (r.message ? ' — ' + r.message : ''))
   };
 }
@@ -153,7 +219,7 @@ module.exports = async function handler(req, res) {
       // tagsAdd, never CustomerInput.tags — the latter replaces the whole set
       // and would strip a wholesale or ambassador tag off a real customer.
       await admin(token, TAG_ADD, { id: existing.id, tags: ['newsletter', 'newsletter-' + source] });
-      const g = source === 'popup' ? await grantCode(email) : null;
+      const g = CODE_SOURCES.indexOf(source) !== -1 ? await grantCode(email) : null;
       return res.status(200).json({ ok: true, created: false, ...(g || {}) });
     }
 
@@ -165,13 +231,13 @@ module.exports = async function handler(req, res) {
       // A race — two submissions of the same address at once. The other one
       // won, which is the outcome we wanted anyway.
       if (/taken|already/i.test(cmsg)) {
-        const raced = source === 'popup' ? await grantCode(email) : null;
+        const raced = CODE_SOURCES.indexOf(source) !== -1 ? await grantCode(email) : null;
         return res.status(200).json({ ok: true, created: false, ...(raced || {}) });
       }
       console.error('[subscribe] create:', cmsg);
       return res.status(502).json({ ok: false, error: 'upstream' });
     }
-    const g = source === 'popup' ? await grantCode(email) : null;
+    const g = CODE_SOURCES.indexOf(source) !== -1 ? await grantCode(email) : null;
     return res.status(200).json({ ok: true, created: true, ...(g || {}) });
   } catch (err) {
     console.error('[subscribe]', err && err.message);

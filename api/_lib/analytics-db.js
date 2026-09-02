@@ -167,7 +167,18 @@ async function ensureSchema() {
   await q`alter table email_sends add column if not exists subject text`;
   await q`alter table email_sends add column if not exists sends   integer not null default 1`;
   await q`create index if not exists email_sends_status_idx on email_sends (flow, status)`;
-  return 15;
+
+  // One discount per address, remembered. Without this, signing up twice mints
+  // a second single-use code, and the form is open to anyone who wants an
+  // unlimited supply of them. Storing the code also means someone who lost the
+  // email gets the same one back rather than another live discount.
+  await q`create table if not exists discount_grants (
+     email      text primary key,
+     code       text not null,
+     expires_at timestamptz,
+     created_at timestamptz not null default now()
+   )`;
+  return 16;
 }
 
 // Run a query, and if it fails only because the schema is behind the code,

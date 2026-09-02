@@ -37,8 +37,8 @@ const CATALOG = [
     flow: 'popup-code',
     name: 'Popup code',
     status: 'live',
-    what: 'The discount code, sent the moment someone feeds Summer her bean.',
-    trigger: 'On signup, from the site popup'
+    what: 'The discount code, sent the moment someone joins the list. One code per address, for life.',
+    trigger: 'On signup, from the popup or the footer'
   },
   {
     flow: 'cart-recovery',
