@@ -3197,6 +3197,11 @@ const POP_SCROLL = 40;     // engaged-by-depth, percent of the page
 // repeats rather than stopping: the goal is an address eventually, not a
 // conversion today, so it keeps asking — just rarely enough to stay civil.
 const POP_BACKOFF = [3, 10, 30, 90, 180];
+// Guards the product page's every-arrival rule against a bounce loop: leaving
+// the product page and coming straight back must not reopen it. It applies
+// ONLY to returning to product after it was shown there — arriving from
+// another page always asks, which is the whole point of the rule.
+const POP_PRODUCT_GAP = 20000;
 // A shorter ladder for someone who fed Summer and then declined at the email
 // step. They played the thing before saying no, which is a warmer signal than
 // closing it on sight — and it is the group most likely to have simply been
@@ -3281,6 +3286,13 @@ class Component extends DCLogic {
     try {
       if (localStorage.getItem('hb-list') === '1') return no('this browser is already on the list');
       const d = JSON.parse(localStorage.getItem('hb-pop') || 'null');
+      // The product page is exempt from the ladder. Someone who declined and
+      // then came back to the product itself has not lost interest in the
+      // product — they are still shopping, and that is the one page where
+      // asking again on every visit is worth the friction. Everywhere else the
+      // backoff still holds, so this stays one insistent page rather than an
+      // insistent site.
+      if (page === 'product' && d && d.at) d.at = 0;
       if (d && d.at) {
         // Records written before the ladder existed carry no count; they
         // represent exactly one dismissal, so they start on the first rung.
@@ -3295,7 +3307,26 @@ class Component extends DCLogic {
       }
     } catch (e) {}
     this._popShown = true;
+    this._popLastOpen = Date.now();
+    this._popLastPage = page;
     window.HBPop.open();
+  }
+
+  // Arriving at the product page re-arms the popup. Navigation here is
+  // pushState, so going shop -> product is not a page load and the once-per-
+  // load guard would otherwise mean it never asks again in a session. Called
+  // from componentDidUpdate on every page change.
+  popPageChanged(page) {
+    if (page !== 'product') return;
+    // Only a bounce off the product page itself is held back. Someone who
+    // declined on the homepage and clicked straight through to the product is
+    // exactly who this rule is for, so they are not caught by it.
+    if (this._popLastPage === 'product' && Date.now() - (this._popLastOpen || 0) < POP_PRODUCT_GAP) return;
+    this._popShown = false;
+    this._popBorn = Date.now();
+    this._popSaid = false;
+    clearTimeout(this._popTimer);
+    this._popTimer = setTimeout(() => this.maybePop('dwell'), POP_DWELL);
   }
 
   roomDefs() {
@@ -4096,6 +4127,8 @@ class Component extends DCLogic {
 
   componentDidUpdate() {
     requestAnimationFrame(() => this.scan());
+    const _pg = this.state.page || 'home';
+    if (this._popPage !== _pg) { this._popPage = _pg; this.popPageChanged(_pg); }
     // The catch section mounts and unmounts with the product page.
     try { if (window.hbCatchTick) window.hbCatchTick(); } catch (e) {}
     try { if (window.hbRateScan) window.hbRateScan(); } catch (e) {}
