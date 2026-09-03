@@ -23,6 +23,10 @@
 
 const SITE = 'https://www.happybeanie.com';
 const WORDMARK = SITE + '/assets/email/lifecycle/hb-wordmark.png';
+// Step 2 is not built here at all: a designed screener email already existed
+// in the waitlist series, and a design in hand beats copy written to fill its
+// place. The generator de-waitlists it; this module only personalises it.
+const screener = require('./welcome-screener-email.js');
 
 const INK = '#17140F', PAPER = '#FAF8F1', PAGE = '#DED5C4', GOLD = '#F0C64B',
       BODY = '#4A4237', MUTED = '#8A7F6E', HAIR = '#E0D6C3', FOOT_BG = '#F2EEE3';
@@ -59,7 +63,7 @@ const STEPS = {
     ]
   },
   '2': {
-    subject: 'Worth two minutes before you order',
+    subject: 'Worth checking first',
     preheader: 'Not every pet should take this. The screener will tell you plainly.',
     eyebrow: 'Before you order',
     title: 'We&rsquo;d rather tell you no.',
@@ -117,6 +121,11 @@ function codeRow(t, step) {
 function build(step, t) {
   const s = pick(step);
   const unsub = esc((t && t.unsubUrl) || SITE + '/api/unsubscribe');
+  // The designed email, exactly as drawn — no code strip; the screener email
+  // should ask for two minutes and nothing else.
+  if (String(step) === '2') {
+    return screener.html.split(screener.UNSUB_MARK).join(unsub);
+  }
   return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
     '<meta name="color-scheme" content="light"><title>' + s.subject + '</title></head>' +
