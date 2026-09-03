@@ -1159,12 +1159,9 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     var box = document.getElementById('ambRulesBox');
     if (!box) return;
     var rules = [
-      ['Always disclose', 'Every post using your code or link carries a clear disclosure — #ad, #happybeaniepartner, or the platform’s paid-partnership tool.'],
       ['No health claims we don’t make', 'Share your own pet’s story, but never claim Happy Beanie treats, cures or prevents any disease.'],
       ['Keep your code off coupon sites', 'Your code is for your audience. Posting it to deal aggregators ends the partnership.'],
-      ['No brand-term ads', 'No paid ads on “Happy Beanie” or our misspellings, and no impersonating the brand in handles or domains.'],
-      ['No self-commission', 'Your code works for your audience, not on your own orders.'],
-      ['Either side can end it', 'Anytime, no hard feelings — earned commissions are always paid on the next cycle.']
+      ['No self-commission', 'Your code works for your audience, not on your own orders.']
     ];
     box.innerHTML =
       (pct ? '<div style="font-size:12.5px; line-height:1.6; color:#B9AF9C; margin-bottom:10px;">You earn <b style="color:#F5F0E6;">' + pct + '%</b> of net sales, paid monthly ($25 minimum) to the payout method saved in your ambassador panel.</div>' : '') +
