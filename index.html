@@ -5699,8 +5699,13 @@ Component.prototype.renderVals = function () {
 
   /* pan-y, not none: a thumb swiping over the pile is scrolling the page,
      and the section must never confiscate that. Drags are mouse-only now —
-     see the pointerType gate in the pile script. */
-  .hb-ev__stage { position: relative; height: 590px; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; }
+     see the pointerType gate in the pile script.
+     The height here is only the pre-script placeholder: every sheet is
+     absolutely positioned so the stage cannot size itself, and the handoff's
+     fixed heights were tuned to 620px-wide sheets — on a phone the sheets
+     shrink and the leftover stage read as a field of empty desk. settle()
+     measures the real pile and sets the height inline. */
+  .hb-ev__stage { position: relative; height: 590px; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; transition: height 0.45s cubic-bezier(0.2,0.7,0.2,1); }
 
   .hb-paper {
     position: absolute; left: 50%; top: 0; width: 620px; max-width: 100%;
@@ -5741,6 +5746,7 @@ Component.prototype.renderVals = function () {
   @media (prefers-reduced-motion: reduce) {
     .hb-paper { transition: none !important; }
     .hb-paper__mark { transition: none !important; }
+    .hb-ev__stage { transition: none !important; }
   }
 </style>
 
@@ -6465,6 +6471,13 @@ Component.prototype.renderVals = function () {
     this.species = null;
     this.drag = null;
     window.addEventListener('resize', this.settle.bind(this, false));
+    // The stage height is measured from the sheets, and the sheets change
+    // height when the webfonts land. Without this, a slow font load leaves
+    // the stage sized to the fallback face's metrics.
+    var self = this;
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { self.settle(false); });
+    }
   }
 
   Pile.prototype.setSpecies = function (species) {
@@ -6577,6 +6590,7 @@ Component.prototype.renderVals = function () {
     // reads as a pile of paper without costing any words. Recomputed here so
     // a rotation or resize re-decides it — settle is already bound to resize.
     this._xs = this.stage && this.stage.clientWidth < 700 ? 0 : 1;
+    var deepest = 0;
     this.order.forEach(function (i) {
       var n = self.nodes[i];
       if (!n) return;
@@ -6587,7 +6601,16 @@ Component.prototype.renderVals = function () {
       n.style.boxShadow = d === 0 ? SHADOW_FRONT : SHADOW_BACK;
       n.setAttribute('aria-current', d === 0 ? 'true' : 'false');
       self.mark(i, d === 0 ? 1 : 0, animate);
+      // transform-origin is 50% 0, so a sheet's rendered bottom edge is its
+      // pose offset plus its scaled height.
+      deepest = Math.max(deepest, p.y + n.offsetHeight * p.s);
     });
+    // The stage sizes itself to the pile it actually holds. The handoff fixes
+    // it at 590/640px because absolutely-positioned sheets cannot size their
+    // parent — but those numbers were tuned to 620px-wide sheets, and on a
+    // phone the narrower pile left a field of empty desk between the front
+    // sheet and the trust note. Measured, it is right at every width.
+    if (deepest > 0) this.stage.style.height = Math.ceil(deepest + 26) + 'px';
   };
 
   Pile.prototype.mark = function (i, t, animate) {
