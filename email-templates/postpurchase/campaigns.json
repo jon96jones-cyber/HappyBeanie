@@ -1,0 +1,121 @@
+{
+  "brand": "Happy Beanie",
+  "generated": "2026-09-03",
+  "width_px": 600,
+  "note": "Four independent lifecycle emails. Each belongs to a DIFFERENT campaign/flow — do not bundle them into one sequence. File numbers 04-07 match the design prototype's numbering; there is no 01-03 in this handoff.",
+  "emails": [
+    {
+      "id": "day7-checkin",
+      "file": "04-day7-checkin.html",
+      "campaign": "Post-purchase check-in — day 7",
+      "flow_type": "triggered, one-shot",
+      "placement": "Email 1 of the post-purchase education flow. Follows the existing emails/04-ready.html shipping series.",
+      "trigger": "first order fulfilled (or delivered, if delivery events are available)",
+      "delay": "7 days after fulfilment",
+      "send_limit": "one per contact on their FIRST order only — do not send on repeat orders",
+      "subject": "One week in",
+      "preheader": "Week one is the habit. The rest of it takes longer — here is the honest timeline.",
+      "primary_cta": {
+        "label": "Read the research",
+        "url_var": "research_url"
+      },
+      "merge_vars": [
+        "research_url",
+        "unsubscribe_url"
+      ],
+      "notes": "The dark hero is a two-column table: copy left, pre-composited dog-on-ink PNG right. The right cell is hidden under 620px (.sm-hide) — the copy must read on its own. Reply-to must land in a monitored inbox; the footer promises a same-day human reply.",
+      "suppression": "exit on refund or cancellation before day 7"
+    },
+    {
+      "id": "halfway-jar",
+      "file": "05-halfway-jar.html",
+      "campaign": "One-time buyer → subscription conversion",
+      "flow_type": "triggered, one-shot",
+      "placement": "Standalone conversion flow. Only for contacts on a ONE-TIME box, never for active subscribers.",
+      "trigger": "one-time 30-day box fulfilled AND no active subscription",
+      "delay": "21 days after fulfilment",
+      "send_limit": "one per one-time order; max one per contact per 60 days",
+      "subject": "About halfway through the jar",
+      "preheader": "A 30 day box goes quicker than it sounds. Subscribe and the next one lands before this runs out.",
+      "primary_cta": {
+        "label": "Switch to Subscribe & Save",
+        "url_var": "subscribe_url"
+      },
+      "merge_vars": [
+        "chews_remaining",
+        "chews_total",
+        "one_time_price",
+        "subscribe_price",
+        "subscribe_url",
+        "box_optout_url"
+      ],
+      "notes": "img/jar-counter.png is a FIXED artwork showing 15 of 30 taken. The count text above it is dynamic; if you send at a day other than 21 the artwork will disagree with the number — either keep the 21-day delay or commission additional counter frames. Prices are merge vars so they follow the live price list (design shows $115 struck through / $99).",
+      "suppression": "exit immediately on subscription created"
+    },
+    {
+      "id": "second-order",
+      "file": "06-second-order.html",
+      "campaign": "Second-order milestone / review request",
+      "flow_type": "triggered, one-shot",
+      "placement": "Standalone loyalty flow. This is the only review ask in the lifecycle — do not stack another.",
+      "trigger": "second order placed (order_count == 2)",
+      "delay": "immediately on the second order being fulfilled",
+      "send_limit": "exactly one send per contact, ever",
+      "subject": "Two boxes in — a small favor",
+      "preheader": "A second box is the only endorsement that counts. Thank you.",
+      "primary_cta": {
+        "label": "Share your bean",
+        "url_var": "share_url"
+      },
+      "merge_vars": [
+        "share_url",
+        "unsubscribe_url"
+      ],
+      "notes": "share_url should deep-link to the review/UGC form with the contact and order pre-filled. Hero is pre-cropped to 600x254 — email clients ignore object-fit, so do not substitute an uncropped photo.",
+      "suppression": "exclude contacts who already submitted a review"
+    },
+    {
+      "id": "cancellation-confirmed",
+      "file": "07-cancellation-confirmed.html",
+      "campaign": "Subscription cancellation confirmation",
+      "flow_type": "transactional",
+      "placement": "Standalone transactional send. Fires regardless of marketing consent; it confirms an action the customer took.",
+      "trigger": "subscription cancelled (by customer or support)",
+      "delay": "immediate",
+      "send_limit": "one per cancellation",
+      "subject": "Cancelled, as asked",
+      "preheader": "Your Subscribe & Save is off. Nothing else will ship, and the door stays open.",
+      "primary_cta": {
+        "label": "Start it back up",
+        "url_var": "restart_url"
+      },
+      "merge_vars": [
+        "restart_url",
+        "unsubscribe_url"
+      ],
+      "notes": "Only email in the set with an OUTLINED CTA and a dark footer — the tone is deliberately quiet, keep it. The paw watermark is pre-flattened onto paper (#FAF8F1) as img/paw-watermark.png because email clients support neither opacity nor rotate; its cell is hidden under 620px. restart_url must resume the same plan at the same price with no re-onboarding, as the copy promises.",
+      "suppression": "none — transactional. Send even to unsubscribed contacts."
+    }
+  ],
+  "tokens": {
+    "ink": "#17140F",
+    "paper": "#FAF8F1",
+    "page": "#DED5C4",
+    "footer_bg": "#F2EEE3",
+    "panel_bg": "#F4EFE2",
+    "hairline": "#E0D6C3",
+    "yellow": "#F0C64B",
+    "yellow_hover": "#E9B72E",
+    "green": "#43684E",
+    "rust": "#A4442F",
+    "body_text": "#4A4237",
+    "muted": "#8A7F6E"
+  },
+  "type": {
+    "headline": "DM Sans 700, 38-40px / 40-42px, letter-spacing -0.042em",
+    "body": "DM Sans 400, 15.5-16px / 25-26px",
+    "label": "DM Mono 400-500, 9.5-11px, letter-spacing 0.16-0.22em, uppercase",
+    "button": "DM Mono 500, 12.5px, letter-spacing 0.2em, uppercase",
+    "fallbacks": "DM Sans -> Arial/Helvetica; DM Mono -> Courier New. Outlook is forced to Arial via an mso conditional."
+  }
+}

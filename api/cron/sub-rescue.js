@@ -1,9 +1,14 @@
-// The subscription rescue — one graceful email when a Subscribe & Save is
+// The cancellation confirmation — one quiet email when a Subscribe & Save is
 // cancelled. See the 'rescue' step in api/_lib/postpurchase-email.js.
+//
+// TRANSACTIONAL, per the Setup_29 handoff: it confirms an action the
+// customer took, so it sends regardless of marketing consent — no consent
+// gate, no tag gate. The 90-day cap below is what stops a twitchy contract
+// record from repeating it.
 //
 // Cancellations only, on purpose. Failed renewal payments are Shopify's to
 // chase: its native subscription dunning already emails those, and that is
-// the transactional side of the line — piling ours on top would duplicate it.
+// its side of the transactional line — piling ours on top would duplicate it.
 //
 // Shopify has no "cancelled since" filter on contracts, so this pages the
 // contract list and keeps the ones whose status is CANCELLED and whose
@@ -41,10 +46,7 @@ const CONTRACTS_Q = `query Rescue($after: String) {
     pageInfo { hasNextPage endCursor }
     nodes {
       status updatedAt
-      customer {
-        email tags
-        emailMarketingConsent { marketingState }
-      }
+      customer { email }
     }
   }
 }`;
@@ -78,13 +80,9 @@ module.exports = async function handler(req, res) {
       (c.nodes || []).forEach(function (n) {
         if (n.status !== 'CANCELLED') return;
         if (new Date(n.updatedAt).getTime() < now - LOOKBACK) return;
-        const cust = n.customer;
-        const email = String((cust && cust.email) || '').toLowerCase();
+        // Transactional: the only gate is having an address to confirm to.
+        const email = String(((n.customer || {}).email) || '').toLowerCase();
         if (!email) return;
-        const consent = cust.emailMarketingConsent;
-        if (!consent || consent.marketingState !== 'SUBSCRIBED') return;
-        const tags = (cust.tags || []).map(function (t) { return String(t).toLowerCase(); });
-        if (tags.indexOf('wholesale') !== -1 || tags.indexOf('no-marketing-email') !== -1) return;
         dueSet[email] = true;
       });
       if (!c.pageInfo || !c.pageInfo.hasNextPage) break;

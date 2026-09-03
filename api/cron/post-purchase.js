@@ -2,8 +2,11 @@
 // See api/_lib/postpurchase-email.js for what they say.
 //
 //   checkin   · order aged 7–10 days,  first order        · once ever
-//   milestone · order aged 7–10 days,  second-plus order  · once ever
+//   milestone · order aged 1–4 days,   second-plus order  · once ever
 //   halfway   · order aged 21–24 days                     · once ever
+//
+// milestone fires on the first morning after the second order — the Setup_29
+// handoff wants the thank-you close to the reorder, not a week later.
 //
 // Ages are calendar days on Scottsdale's clock, same as the welcome cron.
 // The windows are a few days wide so a failed send retries; past the window
@@ -112,15 +115,21 @@ module.exports = async function handler(req, res) {
 
       const age = calDays(new Date(o.createdAt).getTime(), now);
       const nOrders = parseInt(c.numberOfOrders, 10) || 0;
-      let step = null;
-      if (age >= 7 && age <= 10) step = nOrders >= 2 ? 'milestone' : 'checkin';
+      let step = null, chews = null;
+      if (age >= 1 && age <= 4 && nOrders >= 2) step = 'milestone';
+      else if (age >= 7 && age <= 10 && nOrders <= 1) step = 'checkin';
       else if (age >= 21 && age <= 24) {
         const subtotal = parseFloat((((o.currentSubtotalPriceSet || {}).shopMoney || {}).amount) || '0');
         const hasSub = ((c.subscriptionContracts || {}).nodes || []).some(function (s) { return s.status === 'ACTIVE'; });
-        if (subtotal < BUNDLE_FLOOR && !hasSub) step = 'halfway';
+        if (subtotal < BUNDLE_FLOOR && !hasSub) {
+          step = 'halfway';
+          // The design's jar counter: 30 chews minus the days since the box
+          // arrived (~5 transit days after the order), never below 1.
+          chews = Math.max(1, Math.min(30, 30 - (age - 5)));
+        }
       }
       if (!step) return;
-      if (!dueOf[email] || RANK[step] < RANK[dueOf[email]]) dueOf[email] = step;
+      if (!dueOf[email] || RANK[step] < RANK[dueOf[email]]) dueOf[email] = { step: step, chews: chews };
     });
 
     const emails = Object.keys(dueOf);
@@ -136,17 +145,18 @@ module.exports = async function handler(req, res) {
 
     let sent = 0, skipped = 0, failed = 0;
     for (const email of emails.slice(0, BATCH)) {
-      const step = dueOf[email];
+      const step = dueOf[email].step;
       if (already[email + '|' + step]) { skipped++; continue; }
       const unsubUrl = mailer.unsubUrl(email, 'marketing');
+      const t = { unsubUrl: unsubUrl, chewsRemaining: dueOf[email].chews };
       const out = await mailer.send({
         from: FROM,
         to: email,
         flow: 'post-purchase',
         step: step,
         subject: pp.subject(step),
-        html: pp(step, { unsubUrl: unsubUrl }),
-        text: pp.text(step, { unsubUrl: unsubUrl }),
+        html: pp(step, t),
+        text: pp.text(step, t),
         unsubUrl: unsubUrl
       });
       if (out.ok) sent++;
