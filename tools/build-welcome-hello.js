@@ -6,9 +6,9 @@
 // The design predates the store opening: it was drawn as the waitlist's
 // confirmation email, built around a batch-production countdown. The batch
 // framing is dead ("this wont matter in a couple of weeks"), so every line of
-// it is rewritten on the way through — but the design itself carries over
-// whole: the hero, the dark four-column strip, the gold pill, the numbered
-// list. The strip that tracked the batch now walks the daily routine.
+// it is rewritten on the way through — but the design itself carries over:
+// the hero, the gold pill, the numbered list. The dark strip that tracked
+// the batch is removed outright.
 //
 // Two markers are left in the output for send-time personalisation:
 //   __HB_UNSUB__     the per-recipient unsubscribe link
@@ -28,6 +28,18 @@ const CODEROW_MARK = '__HB_CODEROW__';
 
 let html = fs.readFileSync(SRC, 'utf8');
 
+// The dark four-column strip goes entirely — it existed to track the batch,
+// and its routine rewrite was cut on review ("remove the daily routine
+// section"). Anchor on its header, walk out to the enclosing row.
+const stripHdr = 'Batch 0072 &middot; where it is now';
+const stripAt = html.indexOf(stripHdr);
+if (stripAt === -1) throw new Error('routine-strip anchor not found: ' + stripHdr);
+const stripStart = html.lastIndexOf('<tr><td class="sm-pad"', stripAt);
+const stripEndSeq = '</table>\n  </td></tr>';
+const stripEnd = html.indexOf(stripEndSeq, stripAt);
+if (stripStart === -1 || stripEnd === -1) throw new Error('routine-strip row bounds not found');
+html = html.slice(0, stripStart) + html.slice(stripEnd + stripEndSeq.length);
+
 const swaps = [
   ['<title>You&rsquo;re on the list</title>', '<title>One chew, once a day</title>'],
   ['Batch 0072 is in production and ships in about four weeks. Here is what happens next.',
@@ -36,19 +48,6 @@ const swaps = [
   ['You&rsquo;re on the list, Jordan.', 'One chew, once a day. That&rsquo;s the whole routine.'],
   ['Happy Beanie is a daily supplement for hormone and joint health, blended in small runs in our own lab in Scottsdale. Batch 0072 is in production now and ships in about four weeks. You&rsquo;ll hear from us two or three times before then, and on the day it ships.',
     'Happy Beanie is a peptide-infused daily chew &mdash; one formulation for dogs, one for cats &mdash; compounded in Scottsdale and third-party tested, with every certificate published. It works like a treat, not a treatment: one chew after food, before the walk.'],
-  // The four-column strip: batch progress → the daily routine. Column two
-  // keeps the template's highlight; the two unlit bars light up gold because
-  // a routine has no "not yet" stages.
-  ['Batch 0072 &middot; where it is now', 'The daily routine &middot; how it goes'],
-  ['>Formulated</p>', '>After food</p>'],
-  ['>Recipe locked</p>', '>Meal first, then bean</p>'],
-  ['>Blending</p>', '>One chew</p>'],
-  ['>Happening now</p>', '>Once a day</p>'],
-  ['>Testing</p>', '>Scored</p>'],
-  ['>Third party</p>', '>Half dose is exact</p>'],
-  ['>Ships</p>', '>One box</p>'],
-  ['>~4 weeks</p>', '>30 days</p>'],
-  [/#3A342A/g, '#F0C64B'],
   ['<strong style="color:#17140F;">Made to order</strong> &mdash; we blend a run at a time rather than warehousing it, so a box is mixed close to when it ships.',
     '<strong style="color:#17140F;">Works like a treat</strong> &mdash; most beans take it on the first try. No mixing, no measuring, no pill pocket.'],
   ['<strong style="color:#17140F;">Every lot third-party tested</strong> &mdash; the certificate for a batch is published before that batch ships. They are all at happybeanie.com/certificates.',
