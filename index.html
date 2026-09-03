@@ -5697,7 +5697,10 @@ Component.prototype.renderVals = function () {
   .hb-ev__scope { display: flex; align-items: center; gap: 9px; padding-bottom: 8px; font-family: var(--hb-mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hb-muted-dark); white-space: nowrap; }
   .hb-ev__scope span:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--hb-green-dot); }
 
-  .hb-ev__stage { position: relative; height: 590px; touch-action: none; user-select: none; -webkit-user-select: none; }
+  /* pan-y, not none: a thumb swiping over the pile is scrolling the page,
+     and the section must never confiscate that. Drags are mouse-only now —
+     see the pointerType gate in the pile script. */
+  .hb-ev__stage { position: relative; height: 590px; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; }
 
   .hb-paper {
     position: absolute; left: 50%; top: 0; width: 620px; max-width: 100%;
@@ -6530,6 +6533,16 @@ Component.prototype.renderVals = function () {
       paper.appendChild(el('span', 'hb-paper__fold'));
 
       paper.addEventListener('pointerdown', function (e) { self.onDown(i, e); });
+      // The touch path: promotion by tap. A browser only fires click when the
+      // gesture was not a scroll, so — unlike the drag this replaces on touch
+      // — it cannot eat the swipe that carries the page past the section.
+      // Also the mouse path after a short pull: onUp marks that a real drag
+      // just ended so its trailing click does not promote what the spring-back
+      // just declined.
+      paper.addEventListener('click', function () {
+        if (self._dragJustEnded) { self._dragJustEnded = false; return; }
+        if (self.depthOf(i) !== 0) self.promote(i);
+      });
       // Keyboard path: a back paper can be brought forward with Enter/Space.
       paper.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -6558,12 +6571,18 @@ Component.prototype.renderVals = function () {
   Pile.prototype.settle = function (animate) {
     var self = this;
     if (!this.nodes) return;
+    // On a phone the fanned x-offsets pushed the back sheets past the left
+    // edge of the screen and clipped their journal lines mid-word. Below
+    // 700px the pile stacks centred; the slight rotation stays, which still
+    // reads as a pile of paper without costing any words. Recomputed here so
+    // a rotation or resize re-decides it — settle is already bound to resize.
+    this._xs = this.stage && this.stage.clientWidth < 700 ? 0 : 1;
     this.order.forEach(function (i) {
       var n = self.nodes[i];
       if (!n) return;
       var p = self.poseOf(i), d = self.depthOf(i);
       n.style.transition = animate === false ? 'none' : EASE;
-      n.style.transform = 'translate(-50%, ' + p.y + 'px) translateX(' + p.x + 'px) rotate(' + p.r + 'deg) scale(' + p.s + ')';
+      n.style.transform = 'translate(-50%, ' + p.y + 'px) translateX(' + (p.x * self._xs) + 'px) rotate(' + p.r + 'deg) scale(' + p.s + ')';
       n.style.zIndex = String(20 - d);
       n.style.boxShadow = d === 0 ? SHADOW_FRONT : SHADOW_BACK;
       n.setAttribute('aria-current', d === 0 ? 'true' : 'false');
@@ -6588,6 +6607,12 @@ Component.prototype.renderVals = function () {
   };
 
   Pile.prototype.onDown = function (i, e) {
+    // Touch scrolls; it does not drag. On a phone the sheet was capturing the
+    // pointer and a swipe meant to carry the page past the section went into
+    // moving paper instead — the page simply refused to scroll. Touch keeps
+    // the tap (the click handler below), which the handoff already treats as
+    // the touch path; the drag stays as a mouse pleasure.
+    if (e.pointerType === 'touch') return;
     if (e.button !== undefined && e.button !== 0) return;
     var n = this.nodes[i];
     if (!n) return;
@@ -6611,7 +6636,8 @@ Component.prototype.renderVals = function () {
     // The pile holds on a little, and the sheet swings as it comes free.
     function resist(v) { return v * (1 - Math.min(0.42, Math.abs(v) / 1400)); }
     var lift = Math.min(1, Math.max(0, dy) / PULL);
-    n.style.transform = 'translate(-50%, ' + (p.y + resist(dy)) + 'px) translateX(' + (p.x + resist(dx)) + 'px) rotate(' + (p.r + dx * 0.014 - p.r * lift) + 'deg) scale(' + (p.s + (1 - p.s) * lift) + ')';
+    var xs = this._xs == null ? 1 : this._xs;
+    n.style.transform = 'translate(-50%, ' + (p.y + resist(dy)) + 'px) translateX(' + (p.x * xs + resist(dx)) + 'px) rotate(' + (p.r + dx * 0.014 - p.r * lift) + 'deg) scale(' + (p.s + (1 - p.s) * lift) + ')';
     n.style.zIndex = '30';
     if (!d.front) this.mark(d.i, lift, false);
   };
@@ -6626,6 +6652,9 @@ Component.prototype.renderVals = function () {
     n.removeEventListener('pointercancel', this._up);
     this.drag = null;
     var dy = e.clientY - d.y0, dx = e.clientX - d.x0;
+    // The trailing click after a real drag must not re-promote — the click
+    // handler checks this flag and stands down once.
+    this._dragJustEnded = d.moved;
     // A tap counts: !moved promotes, so this works without a pointer drag.
     if (!d.front && (dy > PULL || Math.abs(dx) > SWIPE || !d.moved)) this.promote(d.i);
     else this.settle(true);
