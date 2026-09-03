@@ -1,12 +1,19 @@
 // The post-purchase emails' scheduler — daily, right after the welcome run.
 // See api/_lib/postpurchase-email.js for what they say.
 //
-//   checkin   · order aged 7–10 days,  first order        · once ever
-//   milestone · order aged 1–4 days,   second-plus order  · once ever
-//   halfway   · order aged 21–24 days                     · once ever
+//   checkin     · order aged 7–10 days,  first order        · once ever
+//   milestone   · order aged 1–4 days,   second-plus order  · once ever
+//   halfway     · order aged 21–24 days, no subscription    · once ever
+//   halfway-sub · order aged 21–24 days, active subscriber  · once ever
 //
 // milestone fires on the first morning after the second order — the Setup_29
 // handoff wants the thank-you close to the reorder, not a week later.
+//
+// halfway splits on subscription state: the pitch for one-time buyers, the
+// same design re-cut as reassurance (next jar scheduled, next billing date
+// shown) for people already on Subscribe & Save. Once ever means the
+// subscriber version lands in their first month only — it explains how the
+// schedule works, it is not a monthly newsletter.
 //
 // Ages are calendar days on Scottsdale's clock, same as the welcome cron.
 // The windows are a few days wide so a failed send retries; past the window
@@ -57,7 +64,7 @@ const ORDERS_Q = `query PostPurchase($q: String!, $after: String) {
       customer {
         email tags numberOfOrders
         emailMarketingConsent { marketingState }
-        subscriptionContracts(first: 3) { nodes { status } }
+        subscriptionContracts(first: 3) { nodes { status nextBillingDate } }
       }
     }
   }
@@ -101,8 +108,8 @@ module.exports = async function handler(req, res) {
     }
 
     // Classify: which step, if any, does each order put its buyer in line for.
-    // Priority: milestone (they reordered) > checkin > halfway (the pitch).
-    const RANK = { milestone: 1, checkin: 2, halfway: 3 };
+    // Priority: milestone (they reordered) > checkin > the halfway pair.
+    const RANK = { milestone: 1, checkin: 2, halfway: 3, 'halfway-sub': 3 };
     const dueOf = {};
     orders.forEach(function (o) {
       const c = o.customer;
@@ -115,21 +122,26 @@ module.exports = async function handler(req, res) {
 
       const age = calDays(new Date(o.createdAt).getTime(), now);
       const nOrders = parseInt(c.numberOfOrders, 10) || 0;
-      let step = null, chews = null;
+      let step = null, chews = null, renews = null;
       if (age >= 1 && age <= 4 && nOrders >= 2) step = 'milestone';
       else if (age >= 7 && age <= 10 && nOrders <= 1) step = 'checkin';
       else if (age >= 21 && age <= 24) {
         const subtotal = parseFloat((((o.currentSubtotalPriceSet || {}).shopMoney || {}).amount) || '0');
-        const hasSub = ((c.subscriptionContracts || {}).nodes || []).some(function (s) { return s.status === 'ACTIVE'; });
-        if (subtotal < BUNDLE_FLOOR && !hasSub) {
-          step = 'halfway';
+        const active = ((c.subscriptionContracts || {}).nodes || []).filter(function (s) { return s.status === 'ACTIVE'; });
+        if (subtotal < BUNDLE_FLOOR) {
+          step = active.length ? 'halfway-sub' : 'halfway';
           // The design's jar counter: 30 chews minus the days since the box
           // arrived (~5 transit days after the order), never below 1.
           chews = Math.max(1, Math.min(30, 30 - (age - 5)));
+          const next = active.map(function (s) { return s.nextBillingDate; })
+            .filter(Boolean).sort()[0];
+          if (next) {
+            renews = new Date(next).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/Phoenix' });
+          }
         }
       }
       if (!step) return;
-      if (!dueOf[email] || RANK[step] < RANK[dueOf[email]]) dueOf[email] = { step: step, chews: chews };
+      if (!dueOf[email] || RANK[step] < dueOf[email].rank) dueOf[email] = { step: step, chews: chews, renews: renews, rank: RANK[step] };
     });
 
     const emails = Object.keys(dueOf);
@@ -148,7 +160,7 @@ module.exports = async function handler(req, res) {
       const step = dueOf[email].step;
       if (already[email + '|' + step]) { skipped++; continue; }
       const unsubUrl = mailer.unsubUrl(email, 'marketing');
-      const t = { unsubUrl: unsubUrl, chewsRemaining: dueOf[email].chews };
+      const t = { unsubUrl: unsubUrl, chewsRemaining: dueOf[email].chews, renewsOn: dueOf[email].renews };
       const out = await mailer.send({
         from: FROM,
         to: email,

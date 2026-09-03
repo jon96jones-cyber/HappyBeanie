@@ -75,8 +75,8 @@ const CATALOG = [
     flow: 'post-purchase',
     name: 'Post-purchase',
     status: 'live',
-    what: 'Three emails to buyers: the week-one check-in, the halfway Subscribe & Save pitch, and the review ask right after a second order. Each once ever.',
-    trigger: 'Milestone at order age 1–4 days (second order), check-in at 7–10 (first), halfway at 21–24 · daily 15:30 UTC'
+    what: 'Buyer emails: the week-one check-in, the halfway email (Subscribe & Save pitch for one-timers, next-jar reassurance for subscribers), and the review ask right after a second order. Each once ever.',
+    trigger: 'Milestone at order age 1–4 days (second order), check-in at 7–10 (first), halfway pair at 21–24 · daily 15:30 UTC'
   },
   {
     flow: 'sub-rescue',

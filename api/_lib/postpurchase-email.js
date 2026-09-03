@@ -1,10 +1,11 @@
 // The post-purchase emails — sent to people who have actually bought, which
 // makes them the highest-stakes copy in the system: a buyer's inbox is earned.
 //
-//   checkin   · ~day 7 after a first order   · the honest timeline
-//   halfway   · ~day 21 into a 30-day box    · the Subscribe & Save pitch
-//   milestone · just after a second order    · the review / photo ask
-//   rescue    · a cancelled subscription     · the confirmation, door open
+//   checkin     · ~day 7 after a first order  · the honest timeline
+//   halfway     · ~day 21 into a 30-day box   · the Subscribe & Save pitch
+//   halfway-sub · same day, for subscribers   · the next jar is scheduled
+//   milestone   · just after a second order   · the review / photo ask
+//   rescue      · a cancelled subscription    · the confirmation, door open
 //
 // The HTML is the DESIGNED set from the Setup_29 handoff, embedded by
 // tools/build-postpurchase-emails.js — edit email-templates/postpurchase/
@@ -16,7 +17,8 @@
 // Failed RENEWAL PAYMENTS stay absent on purpose: Shopify's native
 // subscription dunning already emails those.
 //
-// build(step, t) → html   with t = { unsubUrl, chewsRemaining (halfway) }
+// build(step, t) → html   with t = { unsubUrl, chewsRemaining (halfway*),
+//                                    renewsOn (halfway-sub) }
 // build.text(step, t)     the plain-text alternate
 // build.subject(step)     subject line
 
@@ -65,6 +67,20 @@ const STEPS = {
       'Switch to Subscribe & Save: ' + utm('pp_halfway')
     ]
   },
+  'halfway-sub': {
+    subject: 'Halfway through — the next jar is scheduled',
+    text: [
+      'Halfway through the box already.',
+      '',
+      'A 30 day box goes quicker than it sounds, and right about now is when',
+      'consistency starts to pay. You’re on Subscribe & Save, so there’s',
+      'nothing to do - the next jar is already scheduled, and it lands',
+      'before this one runs out.',
+      '',
+      'Need to pause, skip, or move the date? It’s all in your account:',
+      SITE + '/account'
+    ]
+  },
   milestone: {
     subject: 'Two boxes in — a small favor',
     text: [
@@ -103,9 +119,14 @@ function build(step, t) {
   pick(step);
   const unsub = esc((t && t.unsubUrl) || SITE + '/api/unsubscribe');
   let h = designs.html[String(step)].split(designs.UNSUB_MARK).join(unsub);
-  if (String(step) === 'halfway') {
+  if (String(step) === 'halfway' || String(step) === 'halfway-sub') {
     const n = parseInt(t && t.chewsRemaining, 10);
     h = h.split(designs.CHEWS_MARK).join(String(Number.isFinite(n) && n > 0 ? n : 15));
+  }
+  if (String(step) === 'halfway-sub') {
+    // The next billing date from Shopify; when it is missing the panel still
+    // has to say something true.
+    h = h.split(designs.RENEWS_MARK).join(esc((t && t.renewsOn) || 'On schedule'));
   }
   return h;
 }
@@ -117,6 +138,6 @@ build.text = function (step, t) {
 };
 
 build.subject = function (step) { return pick(step).subject; };
-build.STEPS = ['checkin', 'halfway', 'milestone', 'rescue'];
+build.STEPS = ['checkin', 'halfway', 'halfway-sub', 'milestone', 'rescue'];
 
 module.exports = build;
