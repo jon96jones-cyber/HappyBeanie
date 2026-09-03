@@ -2066,54 +2066,25 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
       </div>
       <div data-pre-hide style="max-width: 1180px; margin: 14px auto 0; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; color: #8A7F6E;">Bandanas ship free with every first order. One discount per household.</div>
 
-      <div data-m="evsec" style="position: relative; max-width: 980px; margin: 92px auto 0;">
-        <div data-m="evhead" style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; margin-bottom: 26px;">
-          <div>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 16px;">The evidence</div>
-            <h2 data-m="evh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(20px, 2.35vw, 33px); line-height: 1.06; margin: 0; max-width: none; white-space: nowrap;">Three active ingredients. <span style="color: oklch(0.44 0.07 152);">Three published studies.</span></h2>
+      <!-- The evidence pile. Replaces the tabbed record card that stood here.
+           Only the shell is templated: the papers are built imperatively by
+           the pile script at the end of this file, because the drag writes
+           transforms straight to the nodes on pointermove and a framework
+           re-render between frames is exactly what makes a drag stutter.
+           The script refills the stage if this subtree is ever rebuilt. -->
+      <section class="hb-ev" data-m="evsec" id="hbEvidence">
+        <div class="hb-ev__inner">
+          <div class="hb-ev__head">
+            <div>
+              <div class="hb-ev__eyebrow">The evidence</div>
+              <h2 class="hb-ev__h2">We did the research <em>so you didn&rsquo;t have to.</em></h2>
+            </div>
+            <div class="hb-ev__scope"><span></span><span data-hb-scope>Dog formula &middot; 3 studies</span></div>
           </div>
-          <div data-m="evtag" style="display: flex; align-items: center; gap: 9px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055; white-space: nowrap; padding-bottom: 5px;">
-            <span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152);"></span>
-            <span>{{ evScope }}</span>
-          </div>
+          <div class="hb-ev__stage" data-hb-stage></div>
+          <p class="hb-ev__note">Happy Beanie funded none of these studies and none of them tested our chew.</p>
         </div>
-
-        <div data-m="evtabs" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-bottom: 0;">
-          <sc-for list="{{ evidence }}" as="ev" hint-placeholder-count="3">
-            <button sc-camel-on-click="{{ ev.pick }}" data-m="evtab" style="{{ ev.tabStyle }}">
-              <span style="{{ ev.kickerStyle }}">Active ingredient {{ ev.n }}</span>
-              <span data-m="evtabname" style="{{ ev.nameStyle }}">{{ ev.active }}</span>
-            </button>
-          </sc-for>
-        </div>
-
-        <div data-m="evcard" key="{{ evOne.key }}" style="position: relative; border: 1px solid #17140F; border-radius: 0 0 5px 5px; background: #FCFAF4; padding: 34px 36px 32px; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.3);">
-          <div data-m="evfoundlab" style="display: flex; align-items: center; gap: 11px; margin-bottom: 16px; animation: hbEvUp 0.45s 0.05s cubic-bezier(0.2,0.7,0.2,1) both;">
-            <span style="width: 20px; height: 2px; background: oklch(0.44 0.07 152);"></span>
-            <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">What it found</span>
-          </div>
-          <p data-m="evresult" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 24px; line-height: 1.42; letter-spacing: -0.024em; color: #17140F; margin: 0; max-width: 28em; text-wrap: pretty; animation: hbEvUp 0.5s 0.12s cubic-bezier(0.2,0.7,0.2,1) both;">{{ evOne.pre }}<mark style="background: none; color: inherit; background-image: linear-gradient(oklch(0.86 0.14 92 / 0.55), oklch(0.86 0.14 92 / 0.55)); background-repeat: no-repeat; background-size: 0% 0.45em; background-position: 0 86%; animation: hbEvMark 0.7s 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards;">{{ evOne.hl }}</mark>{{ evOne.post }}</p>
-
-          <div data-m="evstats" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #E4DBC9; border: 1px solid #E4DBC9; border-radius: 4px; overflow: hidden; margin-top: 28px; animation: hbEvUp 0.5s 0.22s cubic-bezier(0.2,0.7,0.2,1) both;">
-            <sc-for list="{{ evOne.stats }}" as="st3" hint-placeholder-count="3">
-              <div style="background: #F7F2E5; padding: 13px 16px 14px;">
-                <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">{{ st3.k }}</div>
-                <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 14.5px; color: #17140F;">{{ st3.v }}</div>
-              </div>
-            </sc-for>
-          </div>
-
-          <div data-m="evfoot" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #E4DBC9; animation: hbEvUp 0.5s 0.3s cubic-bezier(0.2,0.7,0.2,1) both;">
-            <a href="{{ evOne.url }}" target="_blank" rel="noopener noreferrer" data-m="evlink" style="display: inline-flex; align-items: center; gap: 11px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #F5F0E6; background: #17140F; border: 1px solid #17140F; border-radius: 3px; padding: 12px 18px; text-decoration: none; transition: background 0.25s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: oklch(0.44 0.07 152); border-color: oklch(0.44 0.07 152); transform: translateY(-2px);">
-              <span>Read the study</span>
-              <span aria-hidden="true">&#8599;</span>
-            </a>
-            <span data-m="evcite" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E;">{{ evOne.cite }}</span>
-          </div>
-        </div>
-
-        <p data-m="evnote" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.7; text-transform: uppercase; color: #8A7F6E; margin: 18px 0 0;">Published research on an ingredient is not a claim about this product.</p>
-      </div>
+      </section>
 
       <div data-m="stack gap" style="display: none; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; max-width: 1180px; margin: 88px auto 0;">
         <div data-m="auto" style="height: 520px; border-radius: 5px; overflow: hidden; box-shadow: 0 34px 60px -38px rgba(23,20,15,0.5);"><image-slot id="hbv2-pdp-story" placeholder="Beanie, the dog this began with" style="width: 100%; height: 100%;"></image-slot></div>
@@ -3969,6 +3940,11 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.heroVideo(0);
+    // Landing straight on /product renders once and may never update, so the
+    // pile needs building here as well as in componentDidUpdate.
+    requestAnimationFrame(() => {
+      try { if (window.HBEvidence) window.HBEvidence.sync(this.state.sp); } catch (e) {}
+    });
     // Stamped first: onScroll runs before this method returns, and the popup's
     // 15-second floor is measured from here. Left unset, the floor comparison
     // is NaN — which is false, so the floor would not hold.
@@ -4147,6 +4123,10 @@ class Component extends DCLogic {
     // The catch section mounts and unmounts with the product page.
     try { if (window.hbCatchTick) window.hbCatchTick(); } catch (e) {}
     try { if (window.hbRateScan) window.hbRateScan(); } catch (e) {}
+    // Same idea for the evidence pile: it builds its papers imperatively, so
+    // it has to be told when the product page has been rendered and when the
+    // species has changed under it. sync() is cheap when neither has.
+    try { if (window.HBEvidence) window.HBEvidence.sync(this.state.sp); } catch (e) {}
     // Persist the cart whenever it changes (guarded so scroll updates don't rewrite it).
     try {
       const s = this.state;
@@ -4245,131 +4225,6 @@ class Component extends DCLogic {
     };
   }
 
-  // Product-page ingredient-evidence tabs: study data + per-tab derived
-  // styling (from the design handoff). Species set is a pure function of
-  // isDog; state.evSel is the local tab index (0-2, valid for both sets).
-  evList(isDog) {
-    const evSel = this.state.evSel || 0;
-    return (isDog ? [
-        {
-          active: 'Mushroom extract blend',
-          source: 'IVC Journal',
-          design: 'Randomised, dose-escalation',
-          title: 'A mushroom extract, used alone, slowed cancer spread in dogs',
-          result: 'Dogs given the mushroom extract alone — no chemotherapy — survived longer and their cancer spread more slowly, with the highest dose performing best.',
-          hl: 'survived longer and their cancer spread more slowly',
-          cite: 'Brown & Reetz · IVC Journal · “Single-agent polysaccharopeptide delays metastases and improves survival in naturally occurring canine hemangiosarcoma”',
-          url: 'https://ivcjournal.com/single-agent-polysaccharopeptide-delays-metastases-and-improves-survival-in-naturally-occurring-hemangiosarcoma/'
-        },
-        {
-          active: 'Elk blend',
-          source: 'Research in Veterinary Science',
-          sourceShort: 'Res. Vet. Sci.',
-          design: 'Placebo-controlled trial',
-          title: 'Elk velvet antler supplementation in dogs with osteoarthritis',
-          result: 'Dogs on elk velvet antler put more weight on their affected limbs and moved better than dogs on placebo, with no adverse effects across the trial.',
-          hl: 'put more weight on their affected limbs and moved better',
-          cite: 'Research in Veterinary Science · 2014',
-          url: 'https://www.sciencedirect.com/science/article/abs/pii/S0034528814002483'
-        },
-        {
-          active: 'Proprietary peptide blend',
-          source: 'PubMed Central',
-          title: 'Collagen peptides and the repair signalling pathways behind joint and connective tissue',
-          result: 'Collagen peptides taken by mouth survived digestion, reached connective tissue, and measurably shifted cells toward rebuilding it rather than breaking it down.',
-          hl: 'rebuilding it rather than breaking it down',
-          cite: 'PubMed Central · PMC6789547',
-          url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6789547/'
-        }
-      ] : [
-        {
-          active: 'Green-lipped mussel',
-          source: 'Journal of Veterinary Internal Medicine',
-          sourceShort: 'JVIM',
-          design: 'Randomised, controlled, masked',
-          title: 'Evaluation of a therapeutic diet for feline degenerative joint disease',
-          result: 'Cats fed green-lipped mussel and omega-3s were measurably more active than cats on the control diet, tracked by device rather than owner opinion.',
-          hl: 'measurably more active',
-          cite: 'Lascelles et al. · 2010',
-          url: 'https://www.researchgate.net/publication/42588045_Evaluation_of_a_Therapeutic_Diet_for_Feline_Degenerative_Joint_Disease'
-        },
-        {
-          active: 'Taurine & salmon blend',
-          source: 'Science',
-          design: 'Controlled feeding trial',
-          title: 'Myocardial failure in cats associated with low plasma taurine: a reversible cardiomyopathy',
-          result: 'Cats in heart failure from low taurine recovered normal heart function once taurine was restored — the damage reversed, and taurine became mandatory in cat food.',
-          hl: 'recovered normal heart function',
-          cite: 'Pion et al. · Science · 1987',
-          url: 'https://www.science.org/doi/10.1126/science.3616607'
-        },
-        {
-          active: 'Proprietary peptide blend',
-          source: 'Peer-reviewed',
-          design: 'Clinical trial',
-          title: 'Undenatured type II collagen in cats with degenerative joint disease',
-          result: 'Cats with degenerative joint disease improved in mobility and daily activity on undenatured type II collagen, confirming the mechanism works in cats and not only dogs.',
-          hl: 'improved in mobility and daily activity',
-          cite: 'ResearchGate · 381552574',
-          url: 'https://www.researchgate.net/publication/381552574_UNDENATURED_TYPE_II_COLLAGEN_IN_CATS_WITH_DEGENERATIVE_JOINT_DISEASE'
-        }
-      ]).map((e, i) => {
-        // The marker highlight is a text split, not innerHTML: interpolation
-        // escapes markup, so pre/hl/post render as three sibling text nodes
-        // with the <mark> living in the template.
-        const at = e.hl ? e.result.indexOf(e.hl) : -1;
-        return {
-        ...e,
-        pre: at === -1 ? e.result : e.result.slice(0, at),
-        hl: at === -1 ? '' : e.hl,
-        post: at === -1 ? '' : e.result.slice(at + e.hl.length),
-        stats: [
-          { k: 'In Happy Beans', v: (isDog ? 'Dog' : 'Cat') + ' formula · every chew' },
-          { k: 'Study design', v: e.design },
-          { k: 'Published in', v: e.sourceShort || e.source }
-        ],
-        n: '0' + (i + 1),
-        key: (isDog ? 'd' : 'c') + i,
-        pick: () => this.setState({ evSel: i }),
-        tabStyle: {
-          position: 'relative',
-          zIndex: i === evSel ? 2 : 1,
-          marginBottom: '-1px',
-          display: 'grid',
-          gap: '5px',
-          textAlign: 'left',
-          cursor: 'pointer',
-          padding: '15px 17px 16px',
-          borderTop: '1px solid ' + (i === evSel ? '#17140F' : '#E0D6C2'),
-          borderLeft: '1px solid ' + (i === evSel ? '#17140F' : '#E0D6C2'),
-          borderRight: '1px solid ' + (i === evSel ? '#17140F' : '#E0D6C2'),
-          borderBottom: '1px solid ' + (i === evSel ? '#FCFAF4' : '#E0D6C2'),
-          borderRadius: 0,
-          marginLeft: i === 0 ? 0 : '-1px',
-          background: i === evSel ? '#FCFAF4' : 'rgba(23,20,15,0.032)',
-          transition: 'background 0.28s ease, border-color 0.28s ease'
-        },
-        kickerStyle: {
-          fontFamily: "'HB Mono Figures', 'DM Mono', monospace",
-          fontSize: '8.5px',
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          color: i === evSel ? 'oklch(0.44 0.07 152)' : '#8A7F6E',
-          transition: 'color 0.28s ease'
-        },
-        nameStyle: {
-          fontFamily: "'DM Sans', sans-serif",
-          fontWeight: 700,
-          letterSpacing: '-0.028em',
-          fontSize: '15.5px',
-          lineHeight: 1.2,
-          color: i === evSel ? '#17140F' : '#554C40',
-          transition: 'color 0.28s ease'
-        },
-        nameShown: true
-      };
-      });
-  }
   evRecs() {
     return [
         { year: '2022', title: 'One dog', body: 'Jon, our owner, began giving his goldendoodle Summer a wide range of vitamins that would eventually turn into our proprietary Happy Beanie formula.',
@@ -5211,15 +5066,6 @@ class Component extends DCLogic {
         { code: '3', name: 'Green-lipped mussel', dose: 'Joint support', role: 'Whole New Zealand green-lipped mussel — natural glucosamine, chondroitin and rare omega-3s for joints.' }
       ]),
       pdpInsideLabel: isDog ? 'For dogs' : 'For cats',
-      // state.evSel picks the open record (0-2 valid for both species).
-      ...(() => {
-        const list = this.evList(isDog);
-        return {
-          evidence: list,
-          evOne: list[this.state.evSel || 0] || list[0],
-          evScope: (isDog ? 'Dog' : 'Cat') + ' formula · 3 studies'
-        };
-      })(),
       benefits: [
         'Supports brain, heart & joint health',
         'Cellular antioxidant defense',
@@ -5786,6 +5632,105 @@ Component.prototype.renderVals = function () {
      WHEN it opens is not decided here: Component.maybePop() owns the trigger
      and suppression rules and calls window.HBPop.open().
      ====================================================================== -->
+<!-- =======================================================================
+     THE EVIDENCE PILE — product page
+     Three study papers stacked on a desk. Drag one down and the highlighter
+     on its key finding fills in proportion to how far it has been pulled.
+     Ported from the Setup_28 handoff. Tokens scoped to .hb-ev rather than
+     :root as the handoff has them: the site already owns the global custom
+     property namespace and these only ever apply inside the section.
+     The @font-face rules are dropped — the site loads DM Sans and DM Mono
+     already, and a second copy would be a second download.
+     ====================================================================== -->
+<style>
+  .hb-ev {
+    --hb-ink: #17140F;
+    --hb-page: #F5F0E6;
+    --hb-desk: #EBE3D1;
+    --hb-hairline: #DDD3C0;
+    --hb-body: #554C40;
+    --hb-muted: #8A7F6E;
+    --hb-muted-dark: #6A6055;
+    --hb-green: oklch(0.44 0.07 152);
+    --hb-green-dot: oklch(0.62 0.11 152);
+    --hb-marker: oklch(0.86 0.14 92 / 0.62);
+    --hb-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+    --hb-mono: 'HB Mono Figures', 'DM Mono', ui-monospace, monospace;
+
+    position: relative;
+    padding: 78px 44px 62px;
+    background: var(--hb-desk);
+    border-top: 1px solid var(--hb-hairline);
+    border-bottom: 1px solid var(--hb-hairline);
+    font-family: var(--hb-sans);
+    color: var(--hb-ink);
+    /* Full bleed. The handoff leaves this out because it depends on the
+       parent; here the parent is a max-width column, so it goes back in. */
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
+  .hb-ev *, .hb-ev *::before, .hb-ev *::after { box-sizing: border-box; }
+  /* Blueprint grid + a pool of light under the pile. Both decorative. */
+  .hb-ev::before, .hb-ev::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+  .hb-ev::before {
+    background-image:
+      repeating-linear-gradient(90deg, rgba(23,20,15,0.045) 0 1px, transparent 1px 88px),
+      repeating-linear-gradient(0deg, rgba(23,20,15,0.045) 0 1px, transparent 1px 88px);
+  }
+  .hb-ev::after { background: radial-gradient(62% 52% at 50% 42%, rgba(255,253,247,0.72), transparent 76%); }
+  .hb-ev__inner { position: relative; max-width: 1180px; margin: 0 auto; }
+
+  .hb-ev__head { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; margin-bottom: 34px; }
+  .hb-ev__eyebrow { font-family: var(--hb-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--hb-green); margin-bottom: 18px; }
+  .hb-ev__h2 { font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.04; margin: 0; max-width: 20em; }
+  .hb-ev__h2 em { font-style: normal; color: var(--hb-green); }
+  .hb-ev__scope { display: flex; align-items: center; gap: 9px; padding-bottom: 8px; font-family: var(--hb-mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hb-muted-dark); white-space: nowrap; }
+  .hb-ev__scope span:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--hb-green-dot); }
+
+  .hb-ev__stage { position: relative; height: 590px; touch-action: none; user-select: none; -webkit-user-select: none; }
+
+  .hb-paper {
+    position: absolute; left: 50%; top: 0; width: 620px; max-width: 100%;
+    transform-origin: 50% 0; cursor: grab;
+    background: linear-gradient(178deg, #FFFDF7 0%, #FBF7EA 64%, #F6F0DF 100%);
+    border: 1px solid rgba(23,20,15,0.07); border-radius: 2px;
+    box-shadow: 0 18px 30px -20px rgba(23,20,15,0.42), 0 2px 4px rgba(23,20,15,0.12);
+    will-change: transform;
+  }
+  .hb-paper.is-dragging { cursor: grabbing; }
+  .hb-paper__tear { position: absolute; left: 0; right: 0; top: 0; height: 5px; background: repeating-linear-gradient(90deg, rgba(23,20,15,0.13) 0 3px, transparent 3px 7px); }
+  .hb-paper__fold { position: absolute; right: 0; bottom: 0; width: 30px; height: 30px; background: linear-gradient(135deg, transparent 50%, rgba(23,20,15,0.09) 50%, rgba(23,20,15,0.03) 62%, transparent 63%); }
+  .hb-paper__meta { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 30px 0; }
+  .hb-paper__journal { font-family: var(--hb-mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--hb-muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hb-paper__design { font-family: var(--hb-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #55503F; white-space: nowrap; border: 1px solid rgba(23,20,15,0.2); border-radius: 2px; padding: 5px 9px; }
+  .hb-paper__body { padding: 16px 30px 0; }
+  .hb-paper__title { font-weight: 700; letter-spacing: -0.032em; font-size: 25px; line-height: 1.14; margin: 0 0 14px; max-width: 22em; text-wrap: pretty; }
+  .hb-paper__result { font-weight: 500; font-size: 18.5px; line-height: 1.52; letter-spacing: -0.018em; margin: 0 0 18px; text-wrap: pretty; }
+  /* The marker fills as the sheet is pulled forward — width is set by JS. */
+  .hb-paper__mark { background-image: linear-gradient(var(--hb-marker), var(--hb-marker)); background-repeat: no-repeat; background-position: 0 88%; background-size: 0% 0.5em; padding-bottom: 0.06em; }
+  .hb-paper__foot { margin: 0 30px; padding: 16px 0 22px; border-top: 1px solid rgba(23,20,15,0.12); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+  .hb-paper__cite { font-family: var(--hb-mono); font-size: 9.5px; letter-spacing: 0.06em; line-height: 1.6; color: var(--hb-muted); max-width: 30em; }
+  .hb-paper__link { display: inline-flex; align-items: center; gap: 9px; font-family: var(--hb-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--hb-ink); text-decoration: none; border: 1px solid rgba(23,20,15,0.28); border-radius: 2px; padding: 11px 15px; white-space: nowrap; transition: background 0.22s ease, color 0.22s ease; }
+  .hb-paper__link:hover { background: var(--hb-ink); color: var(--hb-page); }
+
+  .hb-ev__note { border-top: 1px solid var(--hb-hairline); padding-top: 18px; font-family: var(--hb-mono); font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.75; text-transform: uppercase; color: var(--hb-muted); margin: 0; max-width: 40em; }
+
+  @media (max-width: 900px) {
+    .hb-ev { padding: 56px 22px 42px; }
+    .hb-ev__head { grid-template-columns: 1fr; align-items: start; gap: 14px; }
+    .hb-ev__scope { padding-bottom: 0; }
+    .hb-ev__stage { height: 640px; }
+    .hb-paper__meta, .hb-paper__body { padding-left: 22px; padding-right: 22px; }
+    .hb-paper__foot { margin: 0 22px; }
+    .hb-paper__title { font-size: 21px; }
+    .hb-paper__result { font-size: 16.5px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hb-paper { transition: none !important; }
+    .hb-paper__mark { transition: none !important; }
+  }
+</style>
+
 <style>
   @keyframes hbPopIn { 0% { opacity:0; transform:translate(-50%,-50%) translateY(14px) scale(.97); } 100% { opacity:1; transform:translate(-50%,-50%); } }
   @keyframes hbBob { 0%,100% { transform:translateY(0) rotate(-4deg); } 50% { transform:translateY(-9px) rotate(4deg); } }
@@ -6385,6 +6330,319 @@ Component.prototype.renderVals = function () {
   };
 
   render();
+})();
+</script>
+
+<!-- =======================================================================
+     THE EVIDENCE PILE — behaviour
+     Ported from the Setup_28 handoff. Two departures from the file as given,
+     both forced by this being a single-page app rather than a static page:
+       · it does not boot itself on load, because the product page does not
+         exist yet at that point and is rebuilt on every navigation. The app
+         calls HBEvidence.sync() from componentDidMount / componentDidUpdate.
+       · the demo dog/cat switch is gone. state.sp drives the species, which
+         is what the handoff asks for.
+     Everything else — poses, thresholds, easing, the resistance curve — is
+     the handoff's, unchanged.
+     ====================================================================== -->
+<script>
+(function () {
+  'use strict';
+
+  // `mark` MUST be an exact substring of `result` — it is what the highlighter
+  // fills. A miss degrades to an unhighlighted sentence, so it is checked once
+  // at boot rather than being left to be noticed on the page.
+  var STUDIES = {
+    dog: [
+      {
+        active: 'Mushroom blend',
+        journal: 'IVC Journal',
+        design: 'Randomised, dose-escalation',
+        result: 'Dogs given the mushroom compound alone — no chemotherapy — survived longer and their cancer spread more slowly, with the highest dose performing best.',
+        mark: 'survived longer and their cancer spread more slowly',
+        cite: 'Brown & Reetz · IVC Journal',
+        url: 'https://ivcjournal.com/single-agent-polysaccharopeptide-delays-metastases-and-improves-survival-in-naturally-occurring-hemangiosarcoma/'
+      },
+      {
+        active: 'Elk blend',
+        journal: 'Res. Vet. Sci.',
+        design: 'Placebo-controlled trial',
+        result: 'Dogs on elk velvet antler put more weight on their affected limbs and moved better than dogs on placebo, with no adverse effects across the trial.',
+        mark: 'put more weight on their affected limbs and moved better',
+        cite: 'Research in Veterinary Science · 2014',
+        url: 'https://www.sciencedirect.com/science/article/abs/pii/S0034528814002483'
+      },
+      {
+        active: 'Peptide blend',
+        journal: 'PubMed Central',
+        design: 'Mechanistic review',
+        result: 'Collagen peptides taken by mouth survived digestion, reached connective tissue, and measurably shifted cells toward rebuilding it rather than breaking it down.',
+        mark: 'rebuilding it rather than breaking it down',
+        cite: 'PubMed Central · PMC6789547',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6789547/'
+      }
+    ],
+    cat: [
+      {
+        active: 'Green-lipped mussel',
+        journal: 'JVIM',
+        design: 'Randomised, controlled, masked',
+        result: 'Cats fed green-lipped mussel and omega-3s were measurably more active than cats on the control diet, tracked by device rather than owner opinion.',
+        mark: 'measurably more active',
+        cite: 'Lascelles et al. · 2010',
+        url: 'https://www.researchgate.net/publication/42588045_Evaluation_of_a_Therapeutic_Diet_for_Feline_Degenerative_Joint_Disease'
+      },
+      {
+        active: 'Taurine & salmon blend',
+        journal: 'Science',
+        design: 'Controlled feeding trial',
+        result: 'Cats in heart failure from low taurine recovered normal heart function once taurine was restored — the damage reversed, and taurine became mandatory in cat food.',
+        mark: 'recovered normal heart function',
+        cite: 'Pion et al. · Science · 1987',
+        url: 'https://www.science.org/doi/10.1126/science.3616607'
+      },
+      {
+        active: 'Peptide blend',
+        journal: 'ResearchGate',
+        design: 'Clinical trial',
+        result: 'Cats with degenerative joint disease improved in mobility and daily activity on undenatured type II collagen, confirming the mechanism works in cats and not only dogs.',
+        mark: 'improved in mobility and daily activity',
+        cite: 'ResearchGate · 381552574',
+        url: 'https://www.researchgate.net/publication/381552574_UNDENATURED_TYPE_II_COLLAGEN_IN_CATS_WITH_DEGENERATIVE_JOINT_DISEASE'
+      }
+    ]
+  };
+
+  // Said out loud at boot rather than silently losing the payoff of the
+  // interaction. Costs one pass over six strings.
+  Object.keys(STUDIES).forEach(function (sp) {
+    STUDIES[sp].forEach(function (s) {
+      if (s.mark && s.result.indexOf(s.mark) === -1) {
+        console.warn('[hb evidence] ' + sp + '/' + s.active + ': mark is not a substring of result — that study will render without a highlight.');
+      }
+    });
+  });
+
+  // Which study leads the pile per species: the mushroom trial for dogs, the
+  // taurine paper for cats.
+  var LEAD = { dog: 0, cat: 1 };
+
+  // Rest pose by depth from the front. Sheets sit lower and squarer as they
+  // come forward, so the stack reads as paper seen from slightly above.
+  var POSE = [
+    { x: 0,   y: 210, r: 0,    s: 1     },
+    { x: -22, y: 108, r: -2.2, s: 0.972 },
+    { x: -44, y: 18,  r: -4.4, s: 0.944 },
+    { x: -62, y: -56, r: -6.2, s: 0.916 }
+  ];
+
+  var PULL = 118;   // px of downward drag that commits a promotion
+  var SWIPE = 168;  // px of sideways drag that also commits
+
+  var SHADOW_FRONT = '0 26px 44px -22px rgba(23,20,15,0.46), 0 4px 10px rgba(23,20,15,0.16)';
+  var SHADOW_BACK  = '0 18px 30px -20px rgba(23,20,15,0.42), 0 2px 4px rgba(23,20,15,0.12)';
+  var EASE = 'transform 0.62s cubic-bezier(0.16, 0.84, 0.24, 1), box-shadow 0.4s ease';
+
+  function el(tag, cls) { var n = document.createElement(tag); if (cls) n.className = cls; return n; }
+
+  function Pile(root) {
+    this.root = root;
+    this.stage = root.querySelector('[data-hb-stage]');
+    this.scope = root.querySelector('[data-hb-scope]');
+    this.species = null;
+    this.drag = null;
+    window.addEventListener('resize', this.settle.bind(this, false));
+  }
+
+  Pile.prototype.setSpecies = function (species) {
+    if (!STUDIES[species]) return;
+    this.species = species;
+    this.data = STUDIES[species];
+    var lead = LEAD[species];
+    // order: back → front, so the lead paper is last
+    this.order = this.data.map(function (_, i) { return i; })
+      .filter(function (i) { return i !== lead; }).concat([lead]);
+    if (this.scope) {
+      this.scope.textContent = (species === 'dog' ? 'Dog formula' : 'Cat formula') +
+        ' · ' + this.data.length + ' studies';
+    }
+    this.build();
+  };
+
+  Pile.prototype.build = function () {
+    var self = this;
+    this.stage.textContent = '';
+    this.nodes = [];
+    this.marks = [];
+
+    this.data.forEach(function (s, i) {
+      var paper = el('article', 'hb-paper');
+      paper.setAttribute('tabindex', '0');
+      paper.setAttribute('aria-label', s.active + ' — ' + s.journal);
+
+      paper.appendChild(el('span', 'hb-paper__tear'));
+
+      var meta = el('div', 'hb-paper__meta');
+      var journal = el('span', 'hb-paper__journal'); journal.textContent = s.journal;
+      var design = el('span', 'hb-paper__design'); design.textContent = s.design;
+      meta.appendChild(journal); meta.appendChild(design);
+      paper.appendChild(meta);
+
+      var body = el('div', 'hb-paper__body');
+      var h3 = el('h3', 'hb-paper__title'); h3.textContent = s.active;
+      body.appendChild(h3);
+
+      var p = el('p', 'hb-paper__result');
+      var at = s.mark ? s.result.indexOf(s.mark) : -1;
+      var mark = null;
+      if (at < 0) {
+        p.textContent = s.result;
+      } else {
+        p.appendChild(document.createTextNode(s.result.slice(0, at)));
+        mark = el('span', 'hb-paper__mark');
+        mark.textContent = s.mark;
+        p.appendChild(mark);
+        p.appendChild(document.createTextNode(s.result.slice(at + s.mark.length)));
+      }
+      body.appendChild(p);
+      paper.appendChild(body);
+
+      var foot = el('div', 'hb-paper__foot');
+      var cite = el('span', 'hb-paper__cite'); cite.textContent = s.cite;
+      var link = el('a', 'hb-paper__link');
+      link.href = s.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      link.innerHTML = '<span>Read the study</span><span aria-hidden="true">↗</span>';
+      // Let the link be a link, not the start of a drag.
+      link.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+      foot.appendChild(cite); foot.appendChild(link);
+      paper.appendChild(foot);
+
+      paper.appendChild(el('span', 'hb-paper__fold'));
+
+      paper.addEventListener('pointerdown', function (e) { self.onDown(i, e); });
+      // Keyboard path: a back paper can be brought forward with Enter/Space.
+      paper.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (self.depthOf(i) !== 0) { e.preventDefault(); self.promote(i); }
+        }
+      });
+
+      self.nodes[i] = paper;
+      self.marks[i] = mark;
+      self.stage.appendChild(paper);
+    });
+
+    this.settle(false);
+  };
+
+  Pile.prototype.depthOf = function (i) {
+    return this.order.length - 1 - this.order.indexOf(i);
+  };
+
+  Pile.prototype.poseOf = function (i) {
+    return POSE[Math.min(this.depthOf(i), POSE.length - 1)];
+  };
+
+  // Transforms are written straight to the node. Never re-render on
+  // pointermove — that is what makes a drag like this stutter.
+  Pile.prototype.settle = function (animate) {
+    var self = this;
+    if (!this.nodes) return;
+    this.order.forEach(function (i) {
+      var n = self.nodes[i];
+      if (!n) return;
+      var p = self.poseOf(i), d = self.depthOf(i);
+      n.style.transition = animate === false ? 'none' : EASE;
+      n.style.transform = 'translate(-50%, ' + p.y + 'px) translateX(' + p.x + 'px) rotate(' + p.r + 'deg) scale(' + p.s + ')';
+      n.style.zIndex = String(20 - d);
+      n.style.boxShadow = d === 0 ? SHADOW_FRONT : SHADOW_BACK;
+      n.setAttribute('aria-current', d === 0 ? 'true' : 'false');
+      self.mark(i, d === 0 ? 1 : 0, animate);
+    });
+  };
+
+  Pile.prototype.mark = function (i, t, animate) {
+    var m = this.marks && this.marks[i];
+    if (!m) return;
+    m.style.transition = animate === false ? 'none' : 'background-size 0.7s cubic-bezier(0.2,0.7,0.2,1)';
+    m.style.backgroundSize = Math.round(Math.max(0, Math.min(1, t)) * 100) + '% 0.5em';
+  };
+
+  Pile.prototype.promote = function (i) {
+    this.order = this.order.filter(function (k) { return k !== i; }).concat([i]);
+    this.settle(true);
+    this.root.dispatchEvent(new CustomEvent('hb:evidence-open', {
+      bubbles: true,
+      detail: { species: this.species, index: i, study: this.data[i] }
+    }));
+  };
+
+  Pile.prototype.onDown = function (i, e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    var n = this.nodes[i];
+    if (!n) return;
+    this.drag = { i: i, x0: e.clientX, y0: e.clientY, front: this.depthOf(i) === 0, moved: false };
+    n.style.transition = 'none';
+    n.classList.add('is-dragging');
+    if (n.setPointerCapture) { try { n.setPointerCapture(e.pointerId); } catch (err) {} }
+    this._move = this.onMove.bind(this);
+    this._up = this.onUp.bind(this);
+    n.addEventListener('pointermove', this._move);
+    n.addEventListener('pointerup', this._up);
+    n.addEventListener('pointercancel', this._up);
+  };
+
+  Pile.prototype.onMove = function (e) {
+    var d = this.drag;
+    if (!d) return;
+    var dx = e.clientX - d.x0, dy = e.clientY - d.y0;
+    if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true;
+    var n = this.nodes[d.i], p = this.poseOf(d.i);
+    // The pile holds on a little, and the sheet swings as it comes free.
+    function resist(v) { return v * (1 - Math.min(0.42, Math.abs(v) / 1400)); }
+    var lift = Math.min(1, Math.max(0, dy) / PULL);
+    n.style.transform = 'translate(-50%, ' + (p.y + resist(dy)) + 'px) translateX(' + (p.x + resist(dx)) + 'px) rotate(' + (p.r + dx * 0.014 - p.r * lift) + 'deg) scale(' + (p.s + (1 - p.s) * lift) + ')';
+    n.style.zIndex = '30';
+    if (!d.front) this.mark(d.i, lift, false);
+  };
+
+  Pile.prototype.onUp = function (e) {
+    var d = this.drag;
+    if (!d) return;
+    var n = this.nodes[d.i];
+    n.classList.remove('is-dragging');
+    n.removeEventListener('pointermove', this._move);
+    n.removeEventListener('pointerup', this._up);
+    n.removeEventListener('pointercancel', this._up);
+    this.drag = null;
+    var dy = e.clientY - d.y0, dx = e.clientX - d.x0;
+    // A tap counts: !moved promotes, so this works without a pointer drag.
+    if (!d.front && (dy > PULL || Math.abs(dx) > SWIPE || !d.moved)) this.promote(d.i);
+    else this.settle(true);
+  };
+
+  // ── the app's handle on it ───────────────────────────────────────────────
+  // sync() is safe to call on every render. It builds only when there is a
+  // section with an empty stage — which covers the first visit to the product
+  // page and any navigation that rebuilds the subtree — and otherwise only
+  // reacts to the species actually changing.
+  var pile = null, host = null;
+  window.HBEvidence = {
+    sync: function (species) {
+      var root = document.getElementById('hbEvidence');
+      if (!root) { pile = null; host = null; return; }
+      var sp = STUDIES[species] ? species : 'dog';
+      var stage = root.querySelector('[data-hb-stage]');
+      if (root !== host || !pile || !stage || !stage.firstChild) {
+        host = root;
+        pile = new Pile(root);
+        pile.setSpecies(sp);
+        return;
+      }
+      if (pile.species !== sp) pile.setSpecies(sp);
+    },
+    get pile() { return pile; }
+  };
 })();
 </script>
 
