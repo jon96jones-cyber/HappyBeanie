@@ -5668,10 +5668,20 @@ Component.prototype.renderVals = function () {
        parent; here the parent is a max-width column, so it goes back in. */
     width: 100vw;
     margin-left: calc(50% - 50vw);
+    /* The papers z-index up to 30 while dragging. Contained here so they can
+       never rise above the site's own sticky chrome. */
+    isolation: isolate;
   }
   .hb-ev *, .hb-ev *::before, .hb-ev *::after { box-sizing: border-box; }
-  /* Blueprint grid + a pool of light under the pile. Both decorative. */
-  .hb-ev::before, .hb-ev::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+  /* Blueprint grid + a pool of light under the pile. Both decorative — and
+     both pinned BELOW the content by explicit z-index. In the standalone
+     handoff the papers' own z-indexes lifted them past the ::after veil; here
+     the site's scroll-reveal stamps will-change on .hb-ev__inner, which is a
+     stacking context, which traps those z-indexes inside it — and the pool of
+     light painted over every sheet as a white haze. Layering the veil at 0 and
+     the content at 1 holds no matter what contexts appear inside. */
+  .hb-ev::before, .hb-ev::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .hb-ev__inner { z-index: 1; }
   .hb-ev::before {
     background-image:
       repeating-linear-gradient(90deg, rgba(23,20,15,0.045) 0 1px, transparent 1px 88px),
