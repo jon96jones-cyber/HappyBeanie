@@ -62,7 +62,7 @@ const CATALOG = [
     name: 'Welcome sequence',
     status: 'live',
     what: 'Three emails after consent — the ritual, the screener, the research. Reaches every consented subscriber, checkout opt-ins included.',
-    trigger: 'Steps 1–3 in windows at days 2–4, 5–11 and 12–18 · daily 15:00 UTC'
+    trigger: 'Steps 1–3 in windows at days 1–4, 5–11 and 12–18 · daily 15:00 UTC'
   },
   {
     flow: 'cart-nudge',

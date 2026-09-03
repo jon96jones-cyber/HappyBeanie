@@ -3,7 +3,7 @@
 // one was written for a pre-launch list with no discount in hand and leaned
 // on the production batch; this one assumes the store is simply open.
 //
-//   1 · day 2  · the designed welcome — what the chew is, the daily routine
+//   1 · day 1  · the designed welcome — what the chew is, the daily routine
 //   2 · day 5  · the screener — the least salesy email we can send
 //   3 · day 12 · the research, pointing at the evidence pile
 //

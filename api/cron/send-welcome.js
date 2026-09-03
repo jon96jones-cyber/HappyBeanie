@@ -7,9 +7,12 @@
 // checkout gets the same welcome as a popup signup, with no separate flow.
 // Excluded: wholesale accounts, anyone tagged no-marketing-email.
 //
-// TIMING: windows keyed to when consent was given, not a ladder.
+// TIMING: windows keyed to when consent was given, not a ladder. Days are
+// CALENDAR days in Scottsdale (UTC-7, no DST), not elapsed 24-hour blocks —
+// so step 1 goes out on the 8am run the morning after signup, whether the
+// signup was yesterday at 7am or yesterday at 11pm.
 //
-//   step 1 · days 2–4     step 2 · days 5–11     step 3 · days 12–18
+//   step 1 · days 1–4     step 2 · days 5–11     step 3 · days 12–18
 //
 // A missed window is skipped forever rather than sent late — nobody five
 // weeks in should get "welcome!", and the first run after this deploys must
@@ -31,9 +34,12 @@ const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 const FROM = process.env.RESEND_FROM || 'Happy Beanie <hello@happybeanie.com>';
 
 const DAY = 24 * 60 * 60 * 1000;
+// Scottsdale's clock, which never moves for DST — calendar days are counted
+// against it so "day 1" is literally the morning after signup.
+const TZ_OFFSET = 7 * 60 * 60 * 1000;
 // [step, first day, last day] — inclusive of first, exclusive after last.
 const WINDOWS = [
-  ['1', 2, 4],
+  ['1', 1, 4],
   ['2', 5, 11],
   ['3', 12, 18]
 ];
@@ -61,7 +67,7 @@ const CUSTOMERS_Q = `query Welcome($q: String!, $after: String) {
 }`;
 
 function stepDue(consentAt, now) {
-  const days = Math.floor((now - consentAt) / DAY);
+  const days = Math.floor((now - TZ_OFFSET) / DAY) - Math.floor((consentAt - TZ_OFFSET) / DAY);
   for (const w of WINDOWS) {
     if (days >= w[1] && days <= w[2]) return w[0];
   }
