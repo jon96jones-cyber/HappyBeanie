@@ -58,11 +58,18 @@ const CATALOG = [
     trigger: 'Daily 16:00 UTC'
   },
   {
-    flow: 'waitlist',
-    name: 'Waitlist sequence',
-    status: 'draft',
-    what: 'Four emails — welcome, formula, screener, ready. Written and built, but nothing sends them.',
-    trigger: 'Not wired yet'
+    flow: 'welcome',
+    name: 'Welcome sequence',
+    status: 'live',
+    what: 'Three emails after consent — the ritual, the screener, the research. Reaches every consented subscriber, checkout opt-ins included.',
+    trigger: 'Steps 1–3 in windows at days 2–4, 5–11 and 12–18 · daily 15:00 UTC'
+  },
+  {
+    flow: 'cart-nudge',
+    name: 'Cart nudge',
+    status: 'live',
+    what: 'One reminder when a known subscriber parks a cart on the site and never reaches checkout — the cart Shopify cannot see.',
+    trigger: 'Cart quiet 3h · hourly · max one per address per 14 days'
   }
 ];
 

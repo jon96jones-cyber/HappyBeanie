@@ -198,7 +198,28 @@ async function ensureSchema() {
    )`;
   await q`create index if not exists cart_recovery_open_idx
           on cart_recovery (abandoned_at) where done_at is null`;
-  return 17;
+
+  // The on-site cart, parked. Shopify never sees this cart — it lives in the
+  // page and only becomes a Shopify object at the checkout click — so cart
+  // abandonment before checkout is ours to notice or nobody's. One row per
+  // address (the site has two products; counts and plans are the whole cart),
+  // written by /api/cart-note whenever the cart changes and the visitor's
+  // email is known, read by the nudge cron.
+  await q`create table if not exists open_carts (
+     email       text primary key,
+     dog         integer not null default 0,
+     cat         integer not null default 0,
+     plan_dog    integer not null default 0,
+     plan_cat    integer not null default 0,
+     updated_at  timestamptz not null default now(),
+     emailed_at  timestamptz,
+     closed_at   timestamptz,
+     closed_why  text,
+     created_at  timestamptz not null default now()
+   )`;
+  await q`create index if not exists open_carts_due_idx
+          on open_carts (updated_at) where closed_at is null`;
+  return 18;
 }
 
 // Run a query, and if it fails only because the schema is behind the code,

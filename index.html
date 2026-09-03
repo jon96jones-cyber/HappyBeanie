@@ -3204,8 +3204,39 @@ class Component extends DCLogic {
 
   // One flag for "this browser is already on the list", written by whichever
   // ask won — popup or footer. Both read it, so nobody gets asked twice.
-  hbListed() {
-    try { localStorage.setItem('hb-list', '1'); } catch (e) {}
+  // The address itself is kept too: it is what lets the cart be parked for
+  // the nudge cron, which can only email people we already know.
+  hbListed(email) {
+    try {
+      localStorage.setItem('hb-list', '1');
+      if (email) localStorage.setItem('hb-email', String(email).trim().toLowerCase());
+    } catch (e) {}
+  }
+
+  // Parks the cart server-side for the abandonment nudge — the flow Shopify
+  // cannot run, because this cart lives in the page and only becomes a
+  // Shopify object at the checkout click. Debounced: mid-shop a cart changes
+  // in bursts, and the row only needs the shape it settles into. Quietly does
+  // nothing when the visitor's email is unknown — there is nobody to nudge.
+  parkCart() {
+    let email = null;
+    try { email = localStorage.getItem('hb-email'); } catch (e) {}
+    if (!email) return;
+    clearTimeout(this._parkTimer);
+    this._parkTimer = setTimeout(() => {
+      const s = this.state;
+      try {
+        fetch('/api/cart-note', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            dog: s.cartDog || 0, cat: s.cartCat || 0,
+            planDog: s.cartPlanDog || 0, planCat: s.cartPlanCat || 0
+          })
+        }).catch(() => {});
+      } catch (e) {}
+    }, 12000);
   }
 
   // Every trigger funnels through here so the suppression rules are enforced
@@ -3961,6 +3992,7 @@ class Component extends DCLogic {
       if (q === '1' || q === '0') {
         localStorage.removeItem('hb-pop');
         localStorage.removeItem('hb-list');
+        localStorage.removeItem('hb-email');
         this._popForce = q === '1';
       }
     } catch (e) {}
@@ -4131,7 +4163,7 @@ class Component extends DCLogic {
     try {
       const s = this.state;
       const cart = JSON.stringify({ cartDog: s.cartDog, cartCat: s.cartCat, cartPlanDog: s.cartPlanDog, cartPlanCat: s.cartPlanCat });
-      if (cart !== this._lastCart) { this._lastCart = cart; localStorage.setItem('hbCart', cart); }
+      if (cart !== this._lastCart) { this._lastCart = cart; localStorage.setItem('hbCart', cart); this.parkCart(); }
     } catch (e) {}
     // Meta pixel SPA events — the base snippet fired the first PageView, so
     // only page CHANGES track here. Cart-count increases fire AddToCart no
@@ -4828,7 +4860,7 @@ class Component extends DCLogic {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email, source: 'footer' })
         }).then(r => r.json().catch(() => ({}))).then(b => {
-          if (b && b.ok) { this.hbListed(); this.setState({ joinBusy: false, joined: true }); return; }
+          if (b && b.ok) { this.hbListed(email); this.setState({ joinBusy: false, joined: true }); return; }
           this.setState({
             joinBusy: false,
             joinErr: (b && b.error === 'bad_email')
@@ -6120,7 +6152,10 @@ Component.prototype.renderVals = function () {
         } else if (b.emailed === true) {
           console.info('[hb popup] code email accepted by the provider for delivery.');
         }
-        try { localStorage.setItem(LIST_KEY, '1'); } catch (err) {}
+        try {
+          localStorage.setItem(LIST_KEY, '1');
+          localStorage.setItem('hb-email', v.toLowerCase());
+        } catch (err) {}
         var by = b.expires ? ' It’s yours alone, good for one order, and expires ' + b.expires + '.' : '';
         if (b.code) {
           CODE = b.code;
