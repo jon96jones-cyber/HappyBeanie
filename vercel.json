@@ -103,7 +103,7 @@
     },
     {
       "path": "/api/cron/nudge-carts",
-      "schedule": "20 * * * *"
+      "schedule": "7,22,37,52 * * * *"
     },
     {
       "path": "/api/cron/post-purchase",

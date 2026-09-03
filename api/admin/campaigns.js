@@ -69,7 +69,7 @@ const CATALOG = [
     name: 'Cart nudge',
     status: 'live',
     what: 'One reminder when a known subscriber parks a cart on the site and never reaches checkout — the cart Shopify cannot see.',
-    trigger: 'Cart quiet 3h · hourly · max one per address per 14 days'
+    trigger: 'Left at 30 min idle, email an hour later · checked every 15 min · max one per address per 14 days'
   },
   {
     flow: 'post-purchase',

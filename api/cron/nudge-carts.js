@@ -2,9 +2,11 @@
 // store. Its "abandoned cart" automation watches carts inside Shopify, and
 // this site's cart lives in the page until the checkout click. /api/cart-note
 // parks the cart whenever it changes and the email is known; this cron,
-// hourly, nudges the ones that went quiet.
+// every 15 minutes, nudges the ones that went quiet.
 //
-//   quiet for 3 hours  →  one email, the cart-recovery design, linking to /cart
+//   30 minutes of inactivity tags the cart as left; the email goes out an
+//   hour after that tag — one send, the cart-recovery design, linking to
+//   /cart. The cron's 15-minute cadence is what keeps the hour honest.
 //
 // One nudge per parked cart. A later cart CHANGE re-arms it, but never more
 // than one nudge per address per 14 days — the cap the design handoff set for
@@ -31,8 +33,8 @@ const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 const FROM = process.env.RECOVERY_FROM || 'Happy Beanie <hello@happybeanie.com>';
 const SITE = 'https://www.happybeanie.com';
 
-const HOUR = 3600 * 1000, DAY = 24 * HOUR;
-const QUIET = 3 * HOUR;      // untouched this long → due
+const MIN = 60 * 1000, HOUR = 60 * MIN, DAY = 24 * HOUR;
+const QUIET = 90 * MIN;      // 30 min idle = left, email an hour after the tag
 const TOO_OLD = 5 * DAY;     // a cart parked longer than this is stale, not warm
 const CONTACT_GAP = 14 * DAY;// max one nudge per address in this span
 const BATCH = 30;
@@ -122,7 +124,7 @@ module.exports = async function handler(req, res) {
       const out = await admin(token, GATE_Q, { q: 'email:' + c.email });
       if (out.errors && out.errors.length) {
         console.error('[nudge-carts] shopify:', JSON.stringify(out.errors));
-        skipped++; continue;   // transient — retry next hour
+        skipped++; continue;   // transient — the next run retries
       }
       const cust = ((((out || {}).data || {}).customers || {}).nodes || [])[0];
       const consent = cust && cust.emailMarketingConsent;
@@ -168,7 +170,7 @@ module.exports = async function handler(req, res) {
           return sql`update open_carts set emailed_at = now() where email = ${c.email}`;
         });
       } else {
-        skipped++;   // left open; next hour retries
+        skipped++;   // left open; the next run retries
         console.error('[nudge-carts] resend:', sj.status || '', sj.error, sj.message || '');
       }
     }
