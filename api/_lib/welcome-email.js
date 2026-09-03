@@ -3,7 +3,7 @@
 // one was written for a pre-launch list with no discount in hand and leaned
 // on the production batch; this one assumes the store is simply open.
 //
-//   1 · day 2  · what the chew is and how it is used
+//   1 · day 2  · the designed welcome — what the chew is, the daily routine
 //   2 · day 5  · the screener — the least salesy email we can send
 //   3 · day 12 · the research, pointing at the evidence pile
 //
@@ -23,9 +23,11 @@
 
 const SITE = 'https://www.happybeanie.com';
 const WORDMARK = SITE + '/assets/email/lifecycle/hb-wordmark.png';
-// Step 2 is not built here at all: a designed screener email already existed
-// in the waitlist series, and a design in hand beats copy written to fill its
-// place. The generator de-waitlists it; this module only personalises it.
+// Steps 1 and 2 are not built here at all: designed emails already existed in
+// the waitlist series, and a design in hand beats copy written to fill its
+// place. Generators de-waitlist them; this module only personalises them.
+// (Step 1's STEPS entry below still supplies its subject and text alternate.)
+const hello = require('./welcome-hello-email.js');
 const screener = require('./welcome-screener-email.js');
 
 const INK = '#17140F', PAPER = '#FAF8F1', PAGE = '#DED5C4', GOLD = '#F0C64B',
@@ -118,11 +120,29 @@ function codeRow(t, step) {
     '</td></tr></table></td></tr>';
 }
 
+// The code strip in the designed welcome's own rhythm — 44px gutters, the
+// sm-pad mobile class — slotted at its marker only when a code exists.
+function helloCodeRow(t) {
+  if (!t || !t.code) return '';
+  return '<tr><td class="sm-pad" style="padding:30px 44px 0 44px;">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1.5px dashed ' + INK + '; border-radius:3px;">' +
+    '<tr><td style="padding:14px 18px; font-family:' + MONO + '; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:' + MUTED + ';">' +
+    'Your 10% code &middot; one order' + (t.expiresLabel ? ' &middot; until ' + esc(t.expiresLabel) : '') +
+    '<span style="float:right; font-family:' + MONO + '; font-size:15px; letter-spacing:0.08em; color:' + INK + ';">' + esc(t.code) + '</span>' +
+    '</td></tr></table></td></tr>';
+}
+
 function build(step, t) {
   const s = pick(step);
   const unsub = esc((t && t.unsubUrl) || SITE + '/api/unsubscribe');
-  // The designed email, exactly as drawn — no code strip; the screener email
-  // should ask for two minutes and nothing else.
+  // The designed welcome, with its two markers filled per recipient.
+  if (String(step) === '1') {
+    return hello.html
+      .split(hello.UNSUB_MARK).join(unsub)
+      .split(hello.CODEROW_MARK).join(helloCodeRow(t));
+  }
+  // The designed screener, exactly as drawn — no code strip; it should ask
+  // for two minutes and nothing else.
   if (String(step) === '2') {
     return screener.html.split(screener.UNSUB_MARK).join(unsub);
   }
