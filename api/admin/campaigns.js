@@ -70,6 +70,20 @@ const CATALOG = [
     status: 'live',
     what: 'One reminder when a known subscriber parks a cart on the site and never reaches checkout — the cart Shopify cannot see.',
     trigger: 'Cart quiet 3h · hourly · max one per address per 14 days'
+  },
+  {
+    flow: 'post-purchase',
+    name: 'Post-purchase',
+    status: 'live',
+    what: 'Three emails to buyers: the week-one check-in, the halfway Subscribe & Save pitch, and the review ask after a second order. Each once ever.',
+    trigger: 'Order aged 7–10 days (check-in / milestone) or 21–24 days (halfway) · daily 15:30 UTC'
+  },
+  {
+    flow: 'sub-rescue',
+    name: 'Subscription rescue',
+    status: 'live',
+    what: 'One graceful email when a Subscribe & Save is cancelled — the door left open, no retention theatre. Failed payments stay with Shopify’s own dunning.',
+    trigger: 'Contract cancelled within 3 days · daily 15:45 UTC · max one per address per 90 days'
   }
 ];
 
