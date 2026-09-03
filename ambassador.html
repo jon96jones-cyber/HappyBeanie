@@ -114,17 +114,6 @@ h1 em { font-style:normal; color:#F0C64B; }
   .step p { font-size:11.5px; line-height:1.45; }
 }
 
-/* rules */
-.rules-sec { padding:92px 0 96px; position:relative; }
-.rules-sec h2 { font-family:'DM Sans',sans-serif; font-weight:700; letter-spacing:-0.042em; font-size:clamp(28px,3.4vw,44px); line-height:1.05; }
-.rules-sec h2 em { font-style:normal; color:#F0C64B; }
-.rules-sec .sub { color:#B9AF9C; font-size:15.5px; max-width:38em; margin:14px 0 38px; }
-.rules { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-@media (max-width:760px){ .rules { grid-template-columns:1fr; } }
-.rule { display:flex; gap:14px; border:1px solid rgba(245,240,230,0.13); border-radius:4px; background:rgba(245,240,230,0.03); padding:18px 20px; }
-.rule .tick { flex:0 0 auto; width:20px; height:20px; margin-top:3px; border-radius:50%; background:rgba(240,198,75,0.16); color:#F0C64B; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
-.rule div { font-size:14px; color:#DED5C4; line-height:1.6; }
-.rule b { color:#F5F0E6; }
 
 /* apply */
 .apply { padding:0 0 110px; }
@@ -200,7 +189,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
   .hero { padding-top:44px; }
   h1 { font-size:clamp(30px,8.4vw,42px); }
   .lede { font-size:15.5px; margin:18px 0 28px; }
-  .band, .rules-sec { padding:52px 0 56px; }
+  .band { padding:52px 0 56px; }
 }
 </style>
 <script src="/assets/nodrag.js" defer></script>
@@ -256,22 +245,6 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
 </section>
 
 
-<section class="rules-sec">
-  <div class="shell">
-    <div class="kicker rv">The rules</div>
-    <h2 class="rv d1">Play it straight. <em>That's the whole rulebook.</em></h2>
-    <p class="sub rv d2">Happy Beanie is a supplement brand — what you say about it matters legally, for you and for us. These aren't fine print; they're conditions of the program.</p>
-    <div class="rules">
-      <div class="rule rv"><span class="tick">✓</span><div><b>Always disclose.</b> Every post that uses your code or link carries a clear disclosure — #ad, #happybeaniepartner, or the platform's paid-partnership tool.</div></div>
-      <div class="rule rv d1"><span class="tick">✓</span><div><b>No health claims we don't make.</b> Share your own pet's story, but never claim Happy Beanie treats, cures or prevents any disease.</div></div>
-      <div class="rule rv"><span class="tick">✓</span><div><b>Keep your code off coupon sites.</b> Your code is for your audience. Posting it to deal aggregators or coupon sites ends the partnership.</div></div>
-      <div class="rule rv d1"><span class="tick">✓</span><div><b>No brand-term ads.</b> Don't run paid ads on "Happy Beanie" or our misspellings, and don't impersonate the brand in handles or domains.</div></div>
-      <div class="rule rv"><span class="tick">✓</span><div><b>No self-commission.</b> Your code works for your audience, not on your own orders — ask us for your personal ambassador discount instead.</div></div>
-      <div class="rule rv d1"><span class="tick">✓</span><div><b>We can part ways.</b> Either side can end the partnership anytime; earned commissions are always paid out on the next cycle.</div></div>
-    </div>
-  </div>
-</section>
-
 <section class="apply" id="apply">
   <div class="shell">
     <div class="apply-grid">
@@ -304,7 +277,7 @@ footer.site a:hover { color:#F0C64B; border-bottom:none; }
             </div>
             <div class="field"><label for="why">Why Happy Beanie? <span class="req">*</span></label><textarea id="why" name="why" required placeholder="Tell us about your pet, your audience, and why this partnership fits."></textarea></div>
             <div class="hp" aria-hidden="true"><label for="hb_extra">Leave this empty</label><input id="hb_extra" name="hb_extra" type="text" tabindex="-1" autocomplete="off"></div>
-            <label class="consent"><input type="checkbox" id="consent" name="consent" required><span>I agree to the program rules above, including always disclosing the partnership, and to be contacted about this application. See our <a href="/policies/privacy.html">Privacy Policy</a>.</span></label>
+            <label class="consent"><input type="checkbox" id="consent" name="consent" required><span>I agree to the ambassador program terms — shared in your portal on approval — and to be contacted about this application. See our <a href="/policies/privacy.html">Privacy Policy</a>.</span></label>
             <button type="submit" class="submit" id="submitBtn">Submit application</button>
             <p class="formnote">Already an ambassador? <a href="/account">Your affiliate dashboard lives in your account</a>.</p>
           </form>
