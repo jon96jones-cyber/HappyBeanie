@@ -5841,6 +5841,85 @@ Component.prototype.renderVals = function () {
   /* dvh after vh, not instead of it: the second declaration is ignored by
      anything that does not know the unit. vh on iOS is the TALL viewport, so a
      card sized by it can sit taller than the space actually on screen. */
+
+  /* The research popup — the designer's card (Happy_Beanie_Research_Popup
+     handoff), tokens scoped here so the site's own --hb-* vars stay clean.
+     hbPopIn already exists; the card leans on the shell's entrance. */
+  .hb-research {
+    --hb-r-ink: #17140F; --hb-r-ink-2: #241F17; --hb-r-ink-3: #3A3328;
+    --hb-r-cream: #FCFAF4; --hb-r-text: #F5F0E6;
+    --hb-r-muted: #B8AE9C; --hb-r-muted-2: #8A7F6E; --hb-r-muted-3: #6A6055;
+    --hb-r-yellow: oklch(0.86 0.14 92); --hb-r-yellow-hover: oklch(0.9 0.15 92);
+    --hb-r-green: oklch(0.82 0.19 145); --hb-r-red: oklch(0.7 0.17 25);
+    position: relative; width: 100%; box-sizing: border-box;
+    padding: 34px 30px 30px; overflow: hidden;
+    background: var(--hb-r-ink); border-radius: 4px;
+    color: var(--hb-r-text); font-family: 'DM Sans', system-ui, sans-serif;
+  }
+  .hb-research * { box-sizing: border-box; }
+  #hbPopup[data-mode="research"] { background: var(--hb-r-ink, #17140F); border-color: oklch(0.86 0.14 92); }
+  .hb-research__glow { position: absolute; right: -120px; top: -120px; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(closest-side, oklch(0.86 0.14 92 / 0.35), transparent); pointer-events: none; }
+  .hb-research__bean { position: absolute; pointer-events: none; filter: drop-shadow(0 14px 16px rgba(0,0,0,0.6)); }
+  .hb-research__bean--a { right: 26px; top: 26px; width: 92px; animation: hbRBeanA 3s ease-in-out infinite; }
+  .hb-research__bean--b { right: 120px; top: 92px; width: 54px; animation: hbRBeanB 3.8s ease-in-out infinite 0.4s; }
+  .hb-research__bean--c { right: 18px; top: 150px; width: 44px; animation: hbRBeanC 3.4s ease-in-out infinite 0.9s; }
+  .hb-research__step { position: relative; }
+  .hb-research__step[hidden] { display: none; }
+  .hb-research__live { display: flex; align-items: center; gap: 8px; margin-bottom: 26px; }
+  .hb-research__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hb-r-green); animation: hbRBlink 1.6s ease-in-out infinite; }
+  .hb-research__label { font-family: 'HB Mono Figures','DM Mono',monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--hb-r-muted-2); }
+  .hb-research__counter { display: flex; gap: 4px; margin-bottom: 18px; }
+  .hb-research__digits { display: flex; gap: 4px; perspective: 600px; }
+  .hb-research__digit {
+    display: block; min-width: 44px; padding: 8px 10px; text-align: center;
+    font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 72px; line-height: 0.9; letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums; color: var(--hb-r-ink); background: var(--hb-r-cream); border-radius: 4px;
+    transform-origin: 50% 0%; backface-visibility: hidden; will-change: transform;
+  }
+  .hb-research__digit:last-child { background: var(--hb-r-yellow); }
+  .hb-research__digit.is-flipping { animation: hbRFlip var(--flip, 70ms) cubic-bezier(0.3, 0.6, 0.3, 1) both; }
+  .hb-research__plus { align-self: flex-start; font-weight: 700; font-size: 34px; line-height: 1; color: var(--hb-r-yellow); margin-left: 4px; }
+  .hb-research__title { margin: 0 0 12px; font-weight: 700; letter-spacing: -0.045em; font-size: 34px; line-height: 1.02; color: var(--hb-r-text); text-wrap: balance; max-width: 360px; }
+  .hb-research__body { margin: 0 0 22px; font-size: 15px; line-height: 1.5; color: var(--hb-r-muted); text-wrap: pretty; max-width: 380px; }
+  .hb-research__form { display: flex; flex-direction: column; gap: 8px; }
+  .hb-research__input {
+    display: block; width: 100%; padding: 15px 14px; font-family: 'DM Sans', sans-serif; font-size: 15px;
+    color: var(--hb-r-text); background: var(--hb-r-ink-2); border: 1.5px solid var(--hb-r-ink-3); border-radius: 3px; outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .hb-research__input::placeholder { color: var(--hb-r-muted-2); }
+  .hb-research__input:focus { border-color: var(--hb-r-yellow); }
+  .hb-research__input.is-invalid { border-color: var(--hb-r-red); }
+  .hb-research__submit {
+    display: block; width: 100%; padding: 17px 18px; cursor: pointer;
+    font-family: 'HB Mono Figures','DM Mono',monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--hb-r-ink); background: var(--hb-r-yellow); border: 1.5px solid var(--hb-r-yellow); border-radius: 999px;
+    transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .hb-research__submit:hover { background: var(--hb-r-yellow-hover); transform: translateY(-2px); }
+  .hb-research__error { margin: 10px 0 0; font-family: 'HB Mono Figures','DM Mono',monospace; font-size: 9.5px; letter-spacing: 0.08em; line-height: 1.5; color: var(--hb-r-red); }
+  .hb-research__error[hidden] { display: none; }
+  .hb-research__fine { margin: 12px 0 0; text-align: center; font-family: 'HB Mono Figures','DM Mono',monospace; font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.6; text-transform: uppercase; color: var(--hb-r-muted-3); }
+  .hb-research__fine[hidden] { display: none; }
+  .hb-research__sent { animation: hbRRise 0.4s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .hb-research__sent .hb-research__label { display: block; color: var(--hb-r-green); margin-bottom: 14px; }
+  .hb-research__sent .hb-research__body { margin-bottom: 0; }
+  .hb-research__close {
+    position: relative; display: block; width: 100%; margin-top: 16px; padding: 4px 8px; cursor: pointer;
+    background: transparent; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.4;
+    color: var(--hb-r-muted-2); text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s ease;
+  }
+  .hb-research__close:hover { color: var(--hb-r-text); }
+  @keyframes hbRRise { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: none; } }
+  @keyframes hbRFlip { 0% { transform: rotateX(-90deg); filter: brightness(0.7); } 100% { transform: rotateX(0deg); filter: brightness(1); } }
+  @keyframes hbRBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+  @keyframes hbRBeanA { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-10px) rotate(4deg); } }
+  @keyframes hbRBeanB { 0%, 100% { transform: translateY(0) rotate(12deg); } 50% { transform: translateY(-14px) rotate(20deg); } }
+  @keyframes hbRBeanC { 0%, 100% { transform: translateY(0) rotate(-18deg); } 50% { transform: translateY(-7px) rotate(-10deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .hb-research__bean, .hb-research__dot, .hb-research__digit, .hb-research__sent { animation: none !important; }
+  }
+
   #hbPopup { position:fixed; z-index:9999; left:50%; top:50%; transform:translate(-50%,-50%);
              width:476px; max-width:calc(100vw - 32px);
              max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px);
@@ -5966,14 +6045,6 @@ Component.prototype.renderVals = function () {
       <h2 style="margin:0 0 9px; font-weight:700; letter-spacing:-.04em; font-size:29px; line-height:1.08; color:#17140F; text-wrap:pretty;" id="hbDoneHead">Saved. Check your inbox.</h2>
       <p style="margin:0; font-size:15px; line-height:1.55; color:#6A6055; text-wrap:pretty;" id="hbDoneSub">Your code is below and on its way. It works on any box, Summer&rsquo;s formula or not.</p>
     </div>
-    <div data-step="research" style="display:none;">
-      <h2 style="margin:0 0 9px; font-weight:700; letter-spacing:-.04em; font-size:24px; line-height:1.12; text-align:center; color:#17140F; text-wrap:balance;">Why over 1,200 pet owners chose <span style="color:oklch(.44 .07 152);">Happy Beanie</span></h2>
-      <p style="margin:0; font-size:14.5px; line-height:1.55; text-align:center; color:#6A6055; text-wrap:pretty;">Happy Beanie is built on published research we didn&rsquo;t fund. We&rsquo;ll send you the research for free. Two minutes of reading, straight to your email.</p>
-    </div>
-    <div data-step="rdone" style="display:none;">
-      <h2 style="margin:0 0 9px; font-weight:700; letter-spacing:-.04em; font-size:27px; line-height:1.08; color:#17140F; text-wrap:pretty;">Sent. Check your inbox.</h2>
-      <p style="margin:0; font-size:15px; line-height:1.55; color:#6A6055; text-wrap:pretty;">Six studies &mdash; three on dogs, three on cats &mdash; in plain English, with a link to every paper. None of them funded by us.</p>
-    </div>
   </div>
 
   <!-- translateZ(0) makes the stage its own compositing root. Without it iOS
@@ -5999,11 +6070,6 @@ Component.prototype.renderVals = function () {
          role="button" tabindex="0" aria-label="Drag the bean to Summer's mouth, or press Enter to feed her"
          style="position:absolute; left:40px; bottom:30px; width:84px; cursor:grab; touch-action:none; -webkit-user-drag:none; user-select:none; filter:drop-shadow(0 14px 18px rgba(23,20,15,.34)); animation:hbBob 2.6s ease-in-out infinite; will-change:transform; backface-visibility:hidden; -webkit-backface-visibility:hidden;">
 
-    <div id="hbChips" style="display:none; position:absolute; left:12px; top:14px; z-index:2; gap:6px;">
-      <span style="display:block; width:max-content; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:3px; padding:5px 9px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:#554C40; box-shadow:0 6px 14px -8px rgba(23,20,15,.4);"><b style="color:oklch(.44 .07 152);">2022</b> &middot; Mushroom compounds &middot; survival &uarr;</span>
-      <span style="display:block; width:max-content; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:3px; padding:5px 9px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:#554C40; box-shadow:0 6px 14px -8px rgba(23,20,15,.4);"><b style="color:oklch(.44 .07 152);">1987</b> &middot; Taurine &middot; feline heart function</span>
-      <span style="display:block; width:max-content; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:3px; padding:5px 9px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:#554C40; box-shadow:0 6px 14px -8px rgba(23,20,15,.4);"><b style="color:oklch(.44 .07 152);">2014</b> &middot; Elk velvet &middot; mobility</span>
-    </div>
     <span id="hbHint" style="position:absolute; left:9px; top:297px; white-space:nowrap; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#8A7F6E; transition:opacity .3s ease;">drag the bean to her mouth</span>
   </div>
 
@@ -6025,17 +6091,6 @@ Component.prototype.renderVals = function () {
       <p id="hbErr" role="alert" style="display:none; margin:9px 0 0; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.08em; line-height:1.5; color:oklch(.55 .19 25);"></p>
     </div>
 
-    <div data-step="research" style="display:none;">
-      <form id="hbRForm" style="display:flex; gap:8px; margin-top:18px;" novalidate>
-        <input id="hbREmail" type="email" placeholder="you@example.com" autocomplete="email" aria-label="Email address"
-               style="flex:1 1 auto; min-width:0; padding:14px; font-family:'DM Sans',sans-serif; font-size:15px; color:#17140F; background:#FFFDF7; border:1.5px solid #E0D6C2; border-radius:3px; outline:none; transition:border-color .2s ease;">
-        <button id="hbRSend" type="submit"
-               style="flex:0 0 auto; padding:14px 16px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:10.5px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:#17140F; background:oklch(.86 .14 92); border:1.5px solid #17140F; border-radius:3px; cursor:pointer; transition:background .25s ease, transform .25s cubic-bezier(.2,.7,.2,1);">Send me the research</button>
-      </form>
-      <p id="hbRErr" role="alert" style="display:none; margin:9px 0 0; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.08em; line-height:1.5; color:oklch(.55 .19 25);"></p>
-      <p style="margin:10px 0 0; text-align:center; font-family:'HB Mono Figures','DM Mono',monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:#8A7F6E;">Free &middot; no spam &middot; unsubscribe anytime</p>
-    </div>
-
     <div data-step="done" style="display:none;">
       <div id="hbTicket" style="display:flex; align-items:center; gap:10px; margin-top:20px; padding:13px 14px; background:#FFFDF7; border:1.5px dashed #17140F; border-radius:3px;">
         <span style="flex:0 0 auto; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8A7F6E;">10% off</span>
@@ -6049,6 +6104,44 @@ Component.prototype.renderVals = function () {
     </div>
 
     <button id="hbNo" type="button" style="display:block; width:100%; margin-top:24px; padding:4px 8px; background:transparent; border:none; font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.4; color:#A99E8C; text-decoration:underline; text-underline-offset:3px; cursor:pointer; transition:color .2s ease;">No thanks, I don&rsquo;t want to save money</button>
+  </div>
+
+  <div id="hbResearch" class="hb-research" style="display:none;">
+    <span class="hb-research__glow" aria-hidden="true"></span>
+    <img class="hb-research__bean hb-research__bean--a" src="assets/img/popup/research-bean-a.webp" alt="">
+    <img class="hb-research__bean hb-research__bean--b" src="assets/img/popup/research-bean-b.webp" alt="">
+    <img class="hb-research__bean hb-research__bean--c" src="assets/img/popup/research-bean-c.webp" alt="">
+
+    <div class="hb-research__step" data-rstep="form">
+      <div class="hb-research__live">
+        <span class="hb-research__dot" aria-hidden="true"></span>
+        <span class="hb-research__label">Live &middot; owners on the formula</span>
+      </div>
+      <div class="hb-research__counter" aria-label="1,200 plus pet owners">
+        <span class="hb-research__digits" data-rdigits aria-hidden="true">
+          <span class="hb-research__digit">0</span><span class="hb-research__digit">0</span><span class="hb-research__digit">0</span><span class="hb-research__digit">0</span>
+        </span>
+        <span class="hb-research__plus" aria-hidden="true">+</span>
+      </div>
+      <h2 class="hb-research__title">Why over 1,200 pet owners chose Happy Beanie</h2>
+      <p class="hb-research__body">Happy Beanie is built on published research we didn&rsquo;t fund. We&rsquo;ll send you the research for free. Two minutes of reading, straight to your email.</p>
+      <form class="hb-research__form" id="hbRForm" novalidate>
+        <input class="hb-research__input" id="hbREmail" type="email" name="email" placeholder="you@email.com" autocomplete="email" aria-label="Email address">
+        <button class="hb-research__submit" id="hbRSend" type="submit">Send me the research &rarr;</button>
+      </form>
+      <p class="hb-research__error" id="hbRErr" role="alert" hidden></p>
+      <p class="hb-research__fine" id="hbRFine">Unsubscribe anytime &middot; We never sell your address</p>
+    </div>
+
+    <div class="hb-research__step" data-rstep="done" hidden>
+      <div class="hb-research__sent">
+        <span class="hb-research__label">Sent</span>
+        <h2 class="hb-research__title">The research is on its way.</h2>
+        <p class="hb-research__body">Check your inbox. Read it, question it, and decide for yourself.</p>
+      </div>
+    </div>
+
+    <button class="hb-research__close" id="hbRNo" type="button">No thanks, I&rsquo;ll take your word for it</button>
   </div>
 </div>
 
@@ -6071,10 +6164,14 @@ Component.prototype.renderVals = function () {
   var noBtn = document.getElementById('hbNo');
   var copyTimer = null;
   var doneHead = document.getElementById('hbDoneHead'), doneSub = document.getElementById('hbDoneSub');
-  var stage = document.getElementById('hbStage'), chips = document.getElementById('hbChips');
-  var barLbl = document.getElementById('hbBarLbl');
+  var rRoot = document.getElementById('hbResearch');
   var rForm = document.getElementById('hbRForm'), rInput = document.getElementById('hbREmail');
   var rSend = document.getElementById('hbRSend'), rErr = document.getElementById('hbRErr');
+  var rFine = document.getElementById('hbRFine'), rNo = document.getElementById('hbRNo');
+  var rDigits = rRoot.querySelectorAll('[data-rdigits] .hb-research__digit');
+  var rStepForm = rRoot.querySelector('[data-rstep="form"]'), rStepDone = rRoot.querySelector('[data-rstep="done"]');
+  var mainParts = ['hbBar', 'hbHead', 'hbStage', 'hbFoot'].map(function (id) { return document.getElementById(id); });
+  var rMode = false, rDone = false, rTimers = [];
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var step = 'feed', drag = null, busy = false, returnTo = null;
@@ -6094,22 +6191,18 @@ Component.prototype.renderVals = function () {
       el.style.display = el.getAttribute('data-step') === step ? 'block' : 'none';
     });
     pop.setAttribute('data-step-now', step);
-    // The research mode borrows the stage as a hero: Summer waiting, the study
-    // chips floating, no bean and nothing to drag.
-    var research = step === 'research' || step === 'rdone';
-    stage.style.height = research ? '200px' : '320px';
-    chips.style.display = step === 'research' ? 'grid' : 'none';
+    // Two skins share the shell: the designer's research card, or the bean.
+    // The research card manages its own two steps with data-rstep.
+    if (rMode) pop.setAttribute('data-mode', 'research'); else pop.removeAttribute('data-mode');
+    mainParts.forEach(function (el) { el.style.display = rMode ? 'none' : ''; });
+    rRoot.style.display = rMode ? 'block' : 'none';
     bean.style.display = step === 'feed' ? 'block' : 'none';
     mouth.style.display = step === 'feed' ? 'block' : 'none';
     mouth.style.opacity = step === 'feed' ? '.5' : '0';
     hint.style.opacity = step === 'feed' ? '1' : '0';
-    wait.style.opacity = (step === 'feed' || step === 'research') ? '1' : '0';
-    fed.style.opacity = (step === 'feed' || step === 'research') ? '0' : '1';
-    barLbl.textContent = research ? 'Happy Beanie \u00b7 the research' : 'Summer\u2019s daily bean';
-    noBtn.textContent = step === 'done' ? 'I\u2019ve saved my code'
-      : step === 'rdone' ? 'Back to browsing'
-      : step === 'research' ? 'No thanks, I\u2019ll browse'
-      : 'No thanks, I don\u2019t want to save money';
+    wait.style.opacity = step === 'feed' ? '1' : '0';
+    fed.style.opacity = step === 'feed' ? '0' : '1';
+    noBtn.textContent = step === 'done' ? 'I\u2019ve saved my code' : 'No thanks, I don\u2019t want to save money';
     if (step === 'done') { copyNote.textContent = ''; copyBtn.removeAttribute('data-copied'); }
     if (step === 'email') setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); } }, 120);
   }
@@ -6204,20 +6297,58 @@ Component.prototype.renderVals = function () {
   });
   mouth.addEventListener('click', function (e) { e.preventDefault(); feedHer(); });
 
-  // The research form: same contract as the bean's, different deliverable.
+  // ---- The research card (designer's handoff, wired to the house plumbing).
+  function rShowError(msg) {
+    rErr.textContent = msg; rErr.hidden = false; rFine.hidden = true;
+    rInput.classList.add('is-invalid');
+  }
+  function rClearError() {
+    rErr.hidden = true; rFine.hidden = false; rInput.classList.remove('is-invalid');
+  }
+  rInput.addEventListener('input', rClearError);
+
+  // The flip counter: only digits that changed replay the flip.
+  function rSet(n, flipMs) {
+    var str = String(n);
+    while (str.length < 4) str = '0' + str;
+    for (var i = 0; i < 4; i++) {
+      var el = rDigits[i];
+      if (el.textContent === str[i]) continue;
+      el.textContent = str[i];
+      if (reduced) continue;
+      el.style.setProperty('--flip', flipMs + 'ms');
+      el.classList.remove('is-flipping');
+      void el.offsetWidth;
+      el.classList.add('is-flipping');
+    }
+  }
+  // Even metronome to 1197, then 1198 / 1199 / 1200 land one at a time.
+  function rTick() {
+    rTimers.forEach(clearTimeout); rTimers = [];
+    if (reduced) { rSet(1200, 0); return; }
+    var tick = 70, steps = 26, gap = 560, i = 0;
+    rSet(0, tick);
+    function run() {
+      i++;
+      rSet(Math.round((1197 * i) / steps), tick);
+      if (i < steps) { rTimers.push(setTimeout(run, tick)); return; }
+      [1198, 1199, 1200].forEach(function (v, k) {
+        rTimers.push(setTimeout(function () { rSet(v, 320); }, gap * (k + 1)));
+      });
+    }
+    rTimers.push(setTimeout(run, tick));
+  }
+
   rForm.addEventListener('submit', function (e) {
     e.preventDefault();
     if (busy) return;
     var v = (rInput.value || '').trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) {
-      rErr.textContent = 'That address doesn\u2019t look right \u2014 check it and try again.';
-      rErr.style.display = 'block';
-      rInput.style.borderColor = 'oklch(.55 .19 25)';
+      rShowError('That address doesn\u2019t look right \u2014 check it and try again.');
       rInput.focus();
       return;
     }
-    rErr.style.display = 'none';
-    rInput.style.borderColor = '#E0D6C2';
+    rClearError();
     busy = true;
     rSend.disabled = true;
     rSend.textContent = 'Sending';
@@ -6226,7 +6357,7 @@ Component.prototype.renderVals = function () {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: v, source: 'research' })
     }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (b) {
-      busy = false; rSend.disabled = false; rSend.textContent = 'Send me the research';
+      busy = false; rSend.disabled = false; rSend.textContent = 'Send me the research \u2192';
       if (b && b.ok) {
         if (b.emailed === false) {
           console.warn('[hb popup] the research email did NOT send. Reason from the server: ' +
@@ -6236,21 +6367,21 @@ Component.prototype.renderVals = function () {
           localStorage.setItem(LIST_KEY, '1');
           localStorage.setItem('hb-email', v.toLowerCase());
         } catch (err) {}
-        step = 'rdone';
+        rDone = true;
+        rStepForm.hidden = true; rStepDone.hidden = false;
+        rNo.textContent = 'Close';
         try { if (window.hbTrack) window.hbTrack('popup_subscribed', { species: 'research' }); } catch (err) {}
-        render();
         return;
       }
-      rErr.textContent = (b && b.error === 'bad_email')
+      rShowError((b && b.error === 'bad_email')
         ? 'That address doesn\u2019t look right \u2014 check it and try again.'
-        : 'That didn\u2019t go through. Try again in a moment, or email hello@happybeanie.com.';
-      rErr.style.display = 'block';
+        : 'That didn\u2019t go through. Try again in a moment, or email hello@happybeanie.com.');
     }).catch(function () {
-      busy = false; rSend.disabled = false; rSend.textContent = 'Send me the research';
-      rErr.textContent = 'That didn\u2019t go through. Try again in a moment, or email hello@happybeanie.com.';
-      rErr.style.display = 'block';
+      busy = false; rSend.disabled = false; rSend.textContent = 'Send me the research \u2192';
+      rShowError('That didn\u2019t go through. Try again in a moment, or email hello@happybeanie.com.');
     });
   });
+  rNo.addEventListener('click', close);
 
   document.getElementById('hbForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -6380,14 +6511,17 @@ Component.prototype.renderVals = function () {
     // far as the offer before declining, which earns a shorter ladder.
     // Closing the confirmation is not a dismissal — they already subscribed,
     // and hb-list suppresses this for good anyway.
-    if (step !== 'done' && step !== 'rdone') {
+    rTimers.forEach(clearTimeout); rTimers = [];
+    var subscribed = rMode ? rDone : step === 'done';
+    if (!subscribed) {
       try {
         var prev = JSON.parse(localStorage.getItem(DISMISS_KEY) || 'null');
         var n = prev ? (prev.n || 1) + 1 : 1;
         localStorage.setItem(DISMISS_KEY, JSON.stringify({ at: Date.now(), n: n, fed: step !== 'feed' }));
       } catch (e) {}
-      // species carries WHERE they bailed: at the bean, or at the email ask.
-      try { if (window.hbTrack) window.hbTrack('popup_declined', { species: step }); } catch (e) {}
+      // species carries WHERE they bailed: the research card, the bean, or
+      // the email ask after feeding her.
+      try { if (window.hbTrack) window.hbTrack('popup_declined', { species: rMode ? 'research' : step }); } catch (e) {}
     }
     if (returnTo && returnTo.focus) { try { returnTo.focus({ preventScroll: true }); } catch (e) {} }
     returnTo = null;
@@ -6513,8 +6647,15 @@ Component.prototype.renderVals = function () {
     try { localStorage.setItem('hb-seen', '1'); } catch (e) {}
     // The desk's popup funnel starts here: shown → fed → captured/declined.
     try { if (window.hbTrack) window.hbTrack('popup_shown', { species: mode }); } catch (e) {}
-    step = mode === 'research' ? 'research' : 'feed';
-    input.value = ''; rInput.value = ''; rErr.style.display = 'none'; bean.style.transform = '';
+    rMode = mode === 'research'; rDone = false;
+    step = 'feed';
+    if (rMode) {
+      rStepForm.hidden = false; rStepDone.hidden = true;
+      rNo.textContent = 'No thanks, I\u2019ll take your word for it';
+      rInput.value = ''; rClearError();
+      rTick();
+    }
+    input.value = ''; bean.style.transform = '';
     errEl.style.display = 'none';
     render();
     pop.setAttribute('data-on', '');
