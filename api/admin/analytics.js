@@ -74,7 +74,7 @@ module.exports = async function handler(req, res) {
     // ?internal=1 puts it back, so a test can still be seen to have landed.
     const inc = q.internal === '1';
 
-    const [live, today, series, topPages, topSources, funnel, recent] = await db.withSchema(() => Promise.all([
+    const [live, today, series, topPages, topSources, funnel, recent, popup] = await db.withSchema(() => Promise.all([
       sql`select
             count(*) filter (where last_seen > now() - interval '5 minutes')                      as visitors_now,
             count(*) filter (where last_seen > now() - interval '5 minutes' and added_to_cart)    as active_carts,
@@ -134,7 +134,18 @@ module.exports = async function handler(req, res) {
       sql`select to_char(ts, 'HH24:MI') as at, name, path, species, value
           from events
           where name <> 'heartbeat' and (${inc} or not internal)
-          order by ts desc limit 25`
+          order by ts desc limit 25`,
+
+      sql`select
+            count(distinct session_id) filter (where name = 'popup_shown')      as shown,
+            count(distinct session_id) filter (where name = 'popup_fed')        as fed,
+            count(distinct session_id) filter (where name = 'popup_subscribed') as subscribed,
+            count(distinct session_id) filter (where name = 'popup_declined' and species = 'feed')  as declined_feed,
+            count(distinct session_id) filter (where name = 'popup_declined' and species = 'email') as declined_email
+          from events
+          where name like 'popup%' and ts >= ${since}::timestamptz
+            and (${until}::timestamptz is null or ts < ${until}::timestamptz)
+            and (${inc} or not internal)`
     ]));
 
     const l = live[0] || {}, t = today[0] || {}, f = funnel[0] || {};
@@ -162,6 +173,10 @@ module.exports = async function handler(req, res) {
       funnel: {
         visits: n(f.visits), product: n(f.product), cart: n(f.cart), checkout: n(f.checkout)
       },
+      popup: (function (p) {
+        return { shown: n(p.shown), fed: n(p.fed), subscribed: n(p.subscribed),
+                 declinedFeed: n(p.declined_feed), declinedEmail: n(p.declined_email) };
+      })(popup[0] || {}),
       recent: recent.map(function (r) {
         return { at: r.at, name: r.name, path: r.path, species: r.species, value: r.value };
       })
