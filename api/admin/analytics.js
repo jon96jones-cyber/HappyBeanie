@@ -205,12 +205,14 @@ module.exports = async function handler(req, res) {
       })(popup[0] || {}),
       geo: (function () {
         // US rows keep their state; everything else rolls up to its country.
+        // A US row with no state — sessions collected before the region column
+        // existed — counts as unplaced rather than posing as a foreign country.
         const states = [], other = {};
         let unknown = 0;
         geo.forEach(function (r) {
           const c = n(r.sessions);
           if (r.country === 'US' && r.region) states.push({ state: r.region, sessions: c });
-          else if (r.country) other[r.country] = (other[r.country] || 0) + c;
+          else if (r.country && r.country !== 'US') other[r.country] = (other[r.country] || 0) + c;
           else unknown += c;
         });
         return {
