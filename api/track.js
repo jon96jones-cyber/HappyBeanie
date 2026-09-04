@@ -23,6 +23,10 @@ const NAMES = [
   'begin_checkout',
   'quiz_start',
   'quiz_verdict',
+  'popup_shown',
+  'popup_fed',
+  'popup_subscribed',
+  'popup_declined',
   'heartbeat'
 ];
 

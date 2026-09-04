@@ -319,7 +319,7 @@ tr:last-child td { border-bottom:none; }
       ? b.topSources.map(function (r) { return '<tr><td>' + esc(r.source) + '</td><td class="num">' + r.sessions + '</td><td class="num">' + r.carts + '</td></tr>'; }).join('')
       : '<tr><td colspan="3" class="empty">Nothing yet.</td></tr>';
 
-    var LABEL = { pageview:'viewed', view_product:'product page', add_to_cart:'added to cart', begin_checkout:'started checkout', quiz_start:'started the quiz', quiz_verdict:'quiz result' };
+    var LABEL = { pageview:'viewed', view_product:'product page', add_to_cart:'added to cart', begin_checkout:'started checkout', quiz_start:'started the quiz', quiz_verdict:'quiz result', popup_shown:'popup shown', popup_fed:'fed the bean', popup_subscribed:'popup email captured', popup_declined:'popup declined' };
     $('feed').innerHTML = b.recent.length
       ? b.recent.map(function (e) {
           var cls = e.name === 'add_to_cart' ? 'cart' : (e.name === 'begin_checkout' ? 'co' : '');

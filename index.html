@@ -3206,7 +3206,7 @@ const POP_ON = true;
 // Capture-popup timing, kept in one place so the rules can be read at a glance
 // instead of being reconstructed from three listeners.
 const POP_FLOOR = 5000;    // scroll and exit-intent hold off this long after load
-const POP_DWELL = 5000;    // ...and on its own, it opens at this mark
+const POP_DWELL = 12000;   // ...and on its own, it opens at this mark
 const POP_SCROLL = 40;     // engaged-by-depth, percent of the page
 // Quiet period after each dismissal, in days — one rung per time they have
 // said no. A flat interval treats a first "not now" the same as a fourth,
@@ -3314,13 +3314,13 @@ class Component extends DCLogic {
     const page = this.state.page || 'home';
     if (POP_NEVER.indexOf(page) !== -1) return no('the ' + page + ' page is never interrupted');
     // The product page used to be held back to exit-intent, and then to a 70%
-    // scroll on touch. Both are gone: at a five-second dwell the timer wins
+    // scroll on touch. Both are gone: the dwell timer does the work,
     // every time, so those branches were unreachable, and an unreachable rule
     // reads as a promise the code is not keeping. The product page is now like
     // any other page that is not a checkout step.
     // Someone with an account is already reachable; asking them to "join" is
     // asking for something we have.
-    // "Signed in" is the answer to a fetch, and at a five-second dwell that
+    // "Signed in" is the answer to a fetch, and at dwell time that
     // fetch can still be in flight — the check would then pass by default and
     // show the popup to someone who already has an account. Wait for it, but
     // not forever: if the probe never answers, showing the popup is the better
@@ -6107,6 +6107,7 @@ Component.prototype.renderVals = function () {
       sparkle();
     }
     step = 'email';
+    try { if (window.hbTrack) window.hbTrack('popup_fed'); } catch (e) {}
     render();
   }
 
@@ -6224,6 +6225,7 @@ Component.prototype.renderVals = function () {
           doneSub.textContent = 'Your code didn’t generate — email hello@happybeanie.com and we’ll send one over.';
         }
         step = 'done';
+        try { if (window.hbTrack) window.hbTrack('popup_subscribed'); } catch (err) {}
         render();
         return;
       }
@@ -6299,6 +6301,8 @@ Component.prototype.renderVals = function () {
         var n = prev ? (prev.n || 1) + 1 : 1;
         localStorage.setItem(DISMISS_KEY, JSON.stringify({ at: Date.now(), n: n, fed: step !== 'feed' }));
       } catch (e) {}
+      // species carries WHERE they bailed: at the bean, or at the email ask.
+      try { if (window.hbTrack) window.hbTrack('popup_declined', { species: step }); } catch (e) {}
     }
     if (returnTo && returnTo.focus) { try { returnTo.focus({ preventScroll: true }); } catch (e) {} }
     returnTo = null;
@@ -6413,6 +6417,8 @@ Component.prototype.renderVals = function () {
     if (pop.hasAttribute('data-on')) return;
     returnTo = document.activeElement;
     lockScroll();
+    // The desk's popup funnel starts here: shown → fed → captured/declined.
+    try { if (window.hbTrack) window.hbTrack('popup_shown'); } catch (e) {}
     step = 'feed'; input.value = ''; bean.style.transform = '';
     errEl.style.display = 'none';
     render();
