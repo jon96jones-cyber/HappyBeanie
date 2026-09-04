@@ -266,8 +266,12 @@ tr:last-child td { border-bottom:none; }
   };
   $('applyRange').onclick = function () {
     var p = prefs();
-    p.days = 'custom'; p.from = $('dFrom').value; p.to = $('dTo').value;
-    if (!customWindow(p)) { $('stamp').textContent = 'Pick a start and end date (start first).'; return; }
+    var from = $('dFrom').value, to = $('dTo').value;
+    // One filled field means that single day — no need to type it twice.
+    if (from && !to) { to = from; $('dTo').value = to; }
+    if (to && !from) { from = to; $('dFrom').value = from; }
+    p.days = 'custom'; p.from = from; p.to = to;
+    if (!customWindow(p)) { $('stamp').textContent = 'Pick a date — or two, start first.'; return; }
     savePrefs(p); load();
   };
   // Off by default: the desk should read as customers unless asked otherwise.
