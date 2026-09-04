@@ -66,7 +66,9 @@ module.exports = async function handler(req, res) {
     // viewer's own timezone, so "today" means their calendar day rather than
     // UTC's — in Arizona those differ by seven hours. Falls back to the
     // server's own reckoning if the params are missing or implausible.
+    // A custom range also sends `until` (exclusive); absent means "now".
     const since = isoWithin(q.since, 400) || new Date(Date.now() - days * 86400000).toISOString();
+    const until = isoWithin(q.until, 400) || null;
     const dayStart = isoWithin(q.dayStart, 2);
     // Our own testing is labelled at collection and hidden here by default.
     // ?internal=1 puts it back, so a test can still be seen to have landed.
@@ -95,12 +97,16 @@ module.exports = async function handler(req, res) {
                  coalesce(sum(pageviews), 0)            as pageviews,
                  count(*) filter (where added_to_cart)  as carts
           from sessions
-          where first_seen >= ${since}::timestamptz and (${inc} or not internal)
+          where first_seen >= ${since}::timestamptz
+            and (${until}::timestamptz is null or first_seen < ${until}::timestamptz)
+            and (${inc} or not internal)
           group by 1 order by 1`,
 
       sql`select coalesce(path, '(unknown)') as path, count(*) as views
           from events
-          where name = 'pageview' and ts >= ${since}::timestamptz and (${inc} or not internal)
+          where name = 'pageview' and ts >= ${since}::timestamptz
+            and (${until}::timestamptz is null or ts < ${until}::timestamptz)
+            and (${inc} or not internal)
           group by 1 order by views desc limit 10`,
 
       sql`select
@@ -110,7 +116,9 @@ module.exports = async function handler(req, res) {
             count(*) as sessions,
             count(*) filter (where added_to_cart) as carts
           from sessions
-          where first_seen >= ${since}::timestamptz and (${inc} or not internal)
+          where first_seen >= ${since}::timestamptz
+            and (${until}::timestamptz is null or first_seen < ${until}::timestamptz)
+            and (${inc} or not internal)
           group by 1 order by sessions desc limit 10`,
 
       sql`select
@@ -119,7 +127,9 @@ module.exports = async function handler(req, res) {
             count(*) filter (where added_to_cart)   as cart,
             count(*) filter (where began_checkout)  as checkout
           from sessions
-          where first_seen >= ${since}::timestamptz and (${inc} or not internal)`,
+          where first_seen >= ${since}::timestamptz
+            and (${until}::timestamptz is null or first_seen < ${until}::timestamptz)
+            and (${inc} or not internal)`,
 
       sql`select to_char(ts, 'HH24:MI') as at, name, path, species, value
           from events
@@ -132,6 +142,7 @@ module.exports = async function handler(req, res) {
       ok: true,
       days: days,
       since: since,
+      until: until,
       live: {
         visitorsNow: n(l.visitors_now),
         activeCarts: n(l.active_carts),

@@ -21,6 +21,8 @@ button:hover, select:hover { border-color:#F0C64B; color:#F0C64B; }
 button.primary { background:#F0C64B; border-color:#F0C64B; color:#17140F; font-weight:700; }
 button.primary:hover { background:#f4d268; color:#17140F; }
 select { text-transform:none; letter-spacing:0.04em; }
+input[type=date] { font-family:'DM Mono',ui-monospace,monospace; font-size:11px; padding:7px 9px; border-radius:3px; border:1px solid rgba(245,240,230,0.24); background:transparent; color:#F5F0E6; color-scheme:dark; }
+input[type=date]:focus { outline:none; border-color:#F0C64B; }
 
 /* gate */
 #gate { max-width:420px; margin:14vh auto; padding:0 24px; }
@@ -101,7 +103,14 @@ tr:last-child td { border-bottom:none; }
         <option value="7">Last 7 days</option>
         <option value="30">Last 30 days</option>
         <option value="90">Last 90 days</option>
+        <option value="custom">Custom range…</option>
       </select>
+      <span id="customRange" style="display:none; align-items:center; gap:6px;">
+        <input type="date" id="dFrom">
+        <span class="sub">→</span>
+        <input type="date" id="dTo">
+        <button id="applyRange">Apply</button>
+      </span>
       <label class="mine"><input type="checkbox" id="mine"> Show my own traffic</label>
       <button id="refresh">Refresh</button>
     </div>
@@ -160,15 +169,31 @@ tr:last-child td { border-bottom:none; }
     if (!days) return dayStart();
     var d = new Date(); d.setDate(d.getDate() - days); return d.toISOString();
   }
+  // A yyyy-mm-dd from the date inputs → local midnight of that day (plus an
+  // optional day, for the exclusive end of an inclusive range).
+  function localDay(ymd, plusDays) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd || '');
+    if (!m) return null;
+    var d = new Date(+m[1], +m[2] - 1, +m[3] + (plusDays || 0), 0, 0, 0, 0);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  }
+  function customWindow(p) {
+    if (p.days !== 'custom') return null;
+    var since = localDay(p.from), until = localDay(p.to, 1);
+    if (!since || !until || since >= until) return null;
+    return { since: since, until: until };
+  }
   function api(opts) {
     var p = prefs();
+    var cw = customWindow(p);
     var days = p.days === 0 ? 0 : (p.days || 7);
     opts = opts || {};
     opts.headers = Object.assign({ 'x-analytics-key': p.key || '', 'Content-Type': 'application/json' }, opts.headers || {});
-    var qs = '?days=' + encodeURIComponent(days || 7) +
-             '&since=' + encodeURIComponent(windowStart(days)) +
-             '&dayStart=' + encodeURIComponent(dayStart()) +
-             (p.mine ? '&internal=1' : '');
+    var qs = cw
+      ? '?days=90&since=' + encodeURIComponent(cw.since) + '&until=' + encodeURIComponent(cw.until)
+      : '?days=' + encodeURIComponent(days === 'custom' ? 7 : (days || 7)) +
+        '&since=' + encodeURIComponent(windowStart(days === 'custom' ? 7 : days));
+    qs += '&dayStart=' + encodeURIComponent(dayStart()) + (p.mine ? '&internal=1' : '');
     return fetch('/api/admin/analytics' + qs, opts).then(function (r) {
       return r.json().catch(function () { return { ok: false, error: 'bad_response' }; });
     }).catch(function () { return { ok: false, error: 'unreachable' }; });
@@ -216,13 +241,35 @@ tr:last-child td { border-bottom:none; }
     var p = prefs();
     $('days').value = String(p.days == null ? 7 : p.days);
     $('mine').checked = !!p.mine;
+    syncCustom(p);
     draw(b);
     if (timer) clearInterval(timer);
     timer = setInterval(load, 10000);
   }
   function load() { api({}).then(function (b) { if (b.ok) draw(b); }); }
   $('refresh').onclick = load;
-  $('days').onchange = function () { var p = prefs(); p.days = parseInt(this.value, 10); if (isNaN(p.days)) p.days = 7; savePrefs(p); load(); };
+  function syncCustom(p) {
+    var on = p.days === 'custom';
+    $('customRange').style.display = on ? 'inline-flex' : 'none';
+    if (on) { if (p.from) $('dFrom').value = p.from; if (p.to) $('dTo').value = p.to; }
+  }
+  $('days').onchange = function () {
+    var p = prefs();
+    if (this.value === 'custom') {
+      p.days = 'custom'; savePrefs(p); syncCustom(p);
+      // Nothing reloads until Apply — an empty range would just be noise.
+      if (customWindow(p)) load();
+      return;
+    }
+    p.days = parseInt(this.value, 10); if (isNaN(p.days)) p.days = 7;
+    savePrefs(p); syncCustom(p); load();
+  };
+  $('applyRange').onclick = function () {
+    var p = prefs();
+    p.days = 'custom'; p.from = $('dFrom').value; p.to = $('dTo').value;
+    if (!customWindow(p)) { $('stamp').textContent = 'Pick a start and end date (start first).'; return; }
+    savePrefs(p); load();
+  };
   // Off by default: the desk should read as customers unless asked otherwise.
   $('mine').onchange = function () { var p = prefs(); p.mine = this.checked; savePrefs(p); load(); };
 
@@ -233,7 +280,10 @@ tr:last-child td { border-bottom:none; }
     $('vSess').textContent = b.today.sessions;
     $('vPv').textContent = b.today.pageviews;
     $('stamp').textContent = 'Updated ' + new Date().toLocaleTimeString();
-    $('funWin').textContent = (prefs().days === 0) ? 'today' : ('last ' + b.days + ' days');
+    var pp = prefs();
+    $('funWin').textContent = pp.days === 0 ? 'today'
+      : (pp.days === 'custom' && customWindow(pp)) ? (pp.from + ' → ' + pp.to)
+      : ('last ' + b.days + ' days');
 
     // Funnel — each step also shows what share of the visits above it survived.
     var f = b.funnel, top = Math.max(1, f.visits);
