@@ -71,9 +71,13 @@ tr:last-child td { border-bottom:none; }
 /* where they are */
 .geo { display:grid; grid-template-columns:1.7fr 1fr; gap:24px; align-items:start; }
 @media (max-width:820px){ .geo { grid-template-columns:1fr; } }
+.mapwrap { position:relative; }
 .usmap { width:100%; height:auto; display:block; }
 .usmap path { fill:rgba(245,240,230,0.06); stroke:#17140F; stroke-width:7; transition:fill .4s; }
 .usmap path:hover { stroke:#F0C64B; stroke-width:10; }
+.maptip { position:absolute; z-index:5; pointer-events:none; background:#0E0C08; border:1px solid rgba(245,240,230,0.22); border-radius:3px; padding:6px 9px; font-family:'DM Mono',ui-monospace,monospace; font-size:11px; line-height:1.5; white-space:nowrap; }
+.maptip b { color:#F0C64B; font-weight:500; }
+.maptip .lv { color:#8FD3A6; }
 .usmap .ldot { fill:#6FBF8B; stroke:rgba(111,191,139,0.35); pointer-events:none; animation:geoPulse 2s infinite; }
 @keyframes geoPulse { 0%,100%{stroke-width:0;} 50%{stroke-width:70;} }
 @media (prefers-reduced-motion: reduce) { .usmap .ldot { animation:none; } }
@@ -139,8 +143,9 @@ tr:last-child td { border-bottom:none; }
     <h2 class="sec">Where they are · <span id="geoWin">last 7 days</span></h2>
     <div class="card">
       <div class="geo">
-        <div>
+        <div class="mapwrap">
           <svg class="usmap" id="usmap" viewBox="0 0 9600 5000" role="img" aria-label="Sessions by US state"></svg>
+          <div class="maptip" id="maptip" hidden></div>
           <div class="fnote" id="geoOther" style="margin-top:10px;"></div>
         </div>
         <div>
@@ -306,18 +311,37 @@ tr:last-child td { border-bottom:none; }
   // pre-projected Albers-USA paths, so no map library and no network fetch.
   // Built once; every refresh only recolours fills and moves the live dots.
   var SVGNS = 'http://www.w3.org/2000/svg';
-  var mapBuilt = false, mapTitles = {}, mapPaths = {};
+  var mapBuilt = false, mapPaths = {};
   function buildMap() {
     if (mapBuilt || typeof HB_US_PATHS === 'undefined') return;
     var svg = $('usmap');
     Object.keys(HB_US_PATHS).forEach(function (st) {
       var p = document.createElementNS(SVGNS, 'path');
       p.setAttribute('d', HB_US_PATHS[st]);
-      var t = document.createElementNS(SVGNS, 'title');
-      p.appendChild(t);
+      p.setAttribute('data-state', st);
       svg.appendChild(p);
-      mapPaths[st] = p; mapTitles[st] = t;
+      mapPaths[st] = p;
     });
+    // The tooltip follows the cursor — instant, unlike the browser's own,
+    // which wants a second of stillness before it deigns to appear.
+    var tip = $('maptip');
+    svg.addEventListener('mousemove', function (ev) {
+      var st = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-state');
+      if (!st) { tip.hidden = true; return; }
+      var pth = mapPaths[st];
+      var n = +(pth.dataset.n || 0), lv = +(pth.dataset.live || 0);
+      tip.innerHTML = '<b>' + esc(HB_US_NAMES[st] || st) + '</b> · ' + n + (n === 1 ? ' session' : ' sessions') +
+        (lv ? ' <span class="lv">· ' + lv + ' here now</span>' : '');
+      var box = svg.parentNode.getBoundingClientRect();
+      tip.hidden = false;
+      var x = ev.clientX - box.left + 14, y = ev.clientY - box.top + 14;
+      // keep it inside the card near the right and bottom edges
+      if (x + tip.offsetWidth > box.width - 4) x = ev.clientX - box.left - tip.offsetWidth - 10;
+      if (y + tip.offsetHeight > box.height - 4) y = ev.clientY - box.top - tip.offsetHeight - 10;
+      tip.style.left = x + 'px';
+      tip.style.top = y + 'px';
+    });
+    svg.addEventListener('mouseleave', function () { tip.hidden = true; });
     mapBuilt = true;
   }
   // 'GB' → 'United Kingdom', falling back to the code itself.
@@ -340,8 +364,8 @@ tr:last-child td { border-bottom:none; }
     Object.keys(mapPaths).forEach(function (st) {
       var v = byState[st] || 0;
       mapPaths[st].style.fill = v ? 'rgba(240,198,75,' + (0.16 + 0.72 * (v / max)).toFixed(2) + ')' : '';
-      mapTitles[st].textContent = HB_US_NAMES[st] + ' — ' + v + (v === 1 ? ' session' : ' sessions') +
-        (liveByState[st] ? ' · ' + liveByState[st] + ' here now' : '');
+      mapPaths[st].dataset.n = v;
+      mapPaths[st].dataset.live = liveByState[st] || 0;
     });
     // Live dots ride above the fills, sized by how many are there.
     var svg = $('usmap');
@@ -374,8 +398,10 @@ tr:last-child td { border-bottom:none; }
     var bits = other.slice(0, 6).map(function (r) { return esc(regionName(r.country)) + ' ' + r.sessions; });
     var more = other.length > 6 ? other.slice(6).reduce(function (s, r) { return s + r.sessions; }, 0) : 0;
     if (more) bits.push('elsewhere ' + more);
-    if (g.unknown) bits.push(g.unknown + ' unplaced');
-    $('geoOther').textContent = bits.length ? 'Outside the US — ' + bits.join(' · ') : '';
+    var geoTxt = bits.length ? 'Outside the US — ' + bits.join(' · ') : '';
+    // Unplaced ≠ foreign: mostly sessions from before location tracking began.
+    if (g.unknown) geoTxt += (geoTxt ? ' · ' : '') + g.unknown + ' unplaced (before location tracking)';
+    $('geoOther').textContent = geoTxt;
   }
 
   function draw(b) {
