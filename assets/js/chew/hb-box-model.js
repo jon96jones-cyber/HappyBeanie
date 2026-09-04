@@ -358,9 +358,11 @@ export function buildBean(THREE) {
   beanShape.bezierCurveTo(-0.05, 0.22, 0.05, 0.22, 0.16, 0.34);
   beanShape.bezierCurveTo(0.52, 0.72, 1.18, 0.42, 1.00, -0.30);
   beanShape.bezierCurveTo(0.86, -0.86, -0.86, -0.86, -1.00, -0.30);
+  // A fat bevel over a thin extrusion, so nearly the whole profile is curve —
+  // the pillowy look of the product renders rather than a flat-topped slab.
   const geo = new THREE.ExtrudeGeometry(beanShape, {
-    depth: 0.30, bevelEnabled: true, bevelSegments: 10,
-    bevelSize: 0.09, bevelThickness: 0.13, curveSegments: 48
+    depth: 0.09, bevelEnabled: true, bevelSegments: 18,
+    bevelSize: 0.21, bevelThickness: 0.32, curveSegments: 48
   });
   geo.rotateX(-Math.PI / 2);
   geo.rotateY(Math.PI);
