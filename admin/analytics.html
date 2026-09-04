@@ -132,8 +132,8 @@ tr:last-child td { border-bottom:none; }
       <div class="tile hot"><div class="k"><span class="dot"></span>Visitors right now</div><div class="v" id="vNow">0</div></div>
       <div class="tile"><div class="k">Active carts</div><div class="v" id="vCarts">0</div></div>
       <div class="tile"><div class="k">Checking out</div><div class="v" id="vCo">0</div></div>
-      <div class="tile"><div class="k">Sessions today</div><div class="v" id="vSess">0</div></div>
-      <div class="tile"><div class="k">Pageviews today</div><div class="v" id="vPv">0</div></div>
+      <div class="tile"><div class="k" id="kSess">Sessions today</div><div class="v" id="vSess">0</div></div>
+      <div class="tile"><div class="k" id="kPv">Pageviews today</div><div class="v" id="vPv">0</div></div>
     </div>
 
     <h2 class="sec">Where they are · <span id="geoWin">last 7 days</span></h2>
@@ -382,13 +382,22 @@ tr:last-child td { border-bottom:none; }
     $('vNow').textContent = b.live.visitorsNow;
     $('vCarts').textContent = b.live.activeCarts;
     $('vCo').textContent = b.live.checkingOut;
-    $('vSess').textContent = b.today.sessions;
-    $('vPv').textContent = b.today.pageviews;
     $('stamp').textContent = 'Updated ' + new Date().toLocaleTimeString();
     var pp = prefs();
     $('funWin').textContent = pp.days === 0 ? 'today'
       : (pp.days === 'custom' && customWindow(pp)) ? (pp.from + ' → ' + pp.to)
       : ('last ' + b.days + ' days');
+
+    // The totals tiles follow the selected window like everything below them.
+    // Sessions come from the funnel query (same count over the same window);
+    // pageviews sum the daily series, which is bounded by the same edges.
+    var tileWin = pp.days === 0 ? 'today'
+      : pp.days === 'custom' ? '· range'
+      : '· ' + b.days + ' days';
+    $('kSess').textContent = 'Sessions ' + tileWin;
+    $('kPv').textContent = 'Pageviews ' + tileWin;
+    $('vSess').textContent = b.funnel.visits;
+    $('vPv').textContent = b.series.reduce(function (s, d) { return s + d.pageviews; }, 0);
 
     // Funnel — each step also shows what share of the visits above it survived.
     // The popup rides in the same card on the same scale, so its exposure and
