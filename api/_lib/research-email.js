@@ -14,13 +14,12 @@
 // the wordmark, 3px gold rule, one gold pill CTA.
 
 const SITE = 'https://www.happybeanie.com';
-const WORDMARK = SITE + '/assets/email/lifecycle/hb-wordmark.png';
-
-const INK = '#17140F', PAPER = '#FAF8F1', PAGE = '#DED5C4', GOLD = '#F0C64B',
-      BODY = '#4A4237', MUTED = '#8A7F6E', HAIR = '#E0D6C3', FOOT_BG = '#F2EEE3',
-      GREEN = '#43684E';
-const SANS = "'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif";
-const MONO = "'DM Mono', 'Courier New', Courier, monospace";
+// The html is the DESIGNED email from the Setup_30 handoff, embedded by
+// tools/build-research-email.js — edit email-templates/research/ and re-run
+// the generator, never the strings here. This module personalises the
+// unsubscribe marker and keeps the subject and text alternate; STUDIES
+// below feeds the text version and stays in step with the design's cards.
+const designed = require('./research-designed.js');
 
 const SUBJECT = 'The research, in plain English';
 
@@ -53,47 +52,7 @@ function esc(s) {
 
 function build(t) {
   const unsub = esc((t && t.unsubUrl) || SITE + '/api/unsubscribe');
-  const cta = SITE + '/product?utm_source=email&utm_medium=lifecycle&utm_campaign=research_pack';
-
-  const rows = STUDIES.map(function (s) {
-    return '<tr><td style="padding:0 40px 22px;">' +
-      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ' + HAIR + '; border-radius:4px; background-color:#FFFDF7;">' +
-      '<tr><td style="padding:16px 18px 17px;">' +
-      '<p style="margin:0 0 7px; font-family:' + MONO + '; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:' + GREEN + ';">' + esc(s.sp) + ' &middot; ' + esc(s.active) + '</p>' +
-      '<p style="margin:0 0 10px; font-family:' + SANS + '; font-size:14.5px; line-height:23px; color:' + BODY + ';">' + esc(s.result) + '</p>' +
-      '<a href="' + esc(s.url) + '" style="font-family:' + MONO + '; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:' + INK + ';">' + esc(s.cite) + ' &rarr;</a>' +
-      '</td></tr></table></td></tr>';
-  }).join('');
-
-  return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
-    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-    '<meta name="color-scheme" content="light"><title>' + SUBJECT + '</title></head>' +
-    '<body style="margin:0; padding:0; width:100%; background-color:' + PAGE + ';">' +
-    '<div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; color:' + PAGE + ';">Six published studies, none funded by us, decoded into two minutes of reading.</div>' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:' + PAGE + ';"><tr><td align="center" style="padding:28px 12px;">' +
-    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px; background-color:' + PAPER + '; border-radius:4px; overflow:hidden;">' +
-
-    '<tr><td style="background-color:' + INK + '; padding:22px 40px 19px; border-bottom:3px solid ' + GOLD + ';">' +
-    '<img src="' + WORDMARK + '" width="159" height="26" alt="happy beanie" style="display:block; border:0;"></td></tr>' +
-
-    '<tr><td style="padding:36px 40px 6px; font-family:' + MONO + '; font-size:10.5px; letter-spacing:0.2em; text-transform:uppercase; color:' + GREEN + ';">As requested</td></tr>' +
-    '<tr><td style="padding:0 40px 14px; font-family:' + SANS + '; font-weight:bold; font-size:31px; line-height:36px; letter-spacing:-1px; color:' + INK + ';">The research, in plain English.</td></tr>' +
-    '<tr><td style="padding:0 40px 22px; font-family:' + SANS + '; font-size:16px; line-height:26px; letter-spacing:-0.2px; color:' + BODY + ';">' +
-    'Six published studies &mdash; three on dogs, three on cats &mdash; behind what goes into Happy Beanie. We funded none of them, and none of them tested our chew. That is exactly why they are worth your two minutes: the evidence stands on its own.</td></tr>' +
-
-    rows +
-
-    '<tr><td style="padding:6px 40px 30px;">' +
-    '<a href="' + cta + '" style="display:inline-block; background-color:' + GOLD + '; color:' + INK + '; font-family:' + MONO + '; font-size:12.5px; letter-spacing:0.2em; text-transform:uppercase; text-decoration:none; padding:17px 30px; border-radius:999px;">See the full evidence pile &rarr;</a>' +
-    '</td></tr>' +
-
-    '<tr><td style="background-color:' + FOOT_BG + '; border-top:1px solid ' + HAIR + '; padding:22px 40px 26px;">' +
-    '<p style="margin:0 0 8px; font-family:' + MONO + '; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:' + MUTED + ';">Formulated fresh &middot; Scottsdale, AZ</p>' +
-    '<p style="margin:0; font-family:' + SANS + '; font-size:12px; line-height:19px; color:' + MUTED + ';">You&rsquo;re getting this because you asked for the research at happybeanie.com.<br>' +
-    '<a href="' + unsub + '" style="color:' + MUTED + ';">Unsubscribe</a> &middot; hello@happybeanie.com &middot; &copy; 2026 Happy Beanie &middot; 7180 E Main St, Scottsdale, AZ 85251</p>' +
-    '</td></tr>' +
-
-    '</table></td></tr></table></body></html>';
+  return designed.html.split(designed.UNSUB_MARK).join(unsub);
 }
 
 build.text = function (t) {
