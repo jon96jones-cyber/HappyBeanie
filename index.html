@@ -6536,6 +6536,7 @@ Component.prototype.renderVals = function () {
     }
     if (returnTo && returnTo.focus) { try { returnTo.focus({ preventScroll: true }); } catch (e) {} }
     returnTo = null;
+    if (trap) { trap = false; try { history.back(); } catch (e) {} }
   }
   document.getElementById('hbNo').addEventListener('click', close);
   // Clicking the scrim deliberately does NOT close it any more: declining has
@@ -6643,10 +6644,19 @@ Component.prototype.renderVals = function () {
     document.removeEventListener('keydown', onScrollKey, false);
   }
 
+  // One spare history entry while the card is open, so the phone's back
+  // gesture closes the popup instead of navigating the page underneath —
+  // the swipe that used to land people back on the homepage mid-ask.
+  var trap = false;
+  window.addEventListener('popstate', function () {
+    if (pop.hasAttribute('data-on')) { trap = false; close(); }
+  });
+
   function open() {
     if (pop.hasAttribute('data-on')) return;
     returnTo = document.activeElement;
     lockScroll();
+    try { history.pushState({ hbPopTrap: 1 }, '', location.href); trap = true; } catch (e) {}
     // First touch gets the research ask; anyone this browser has popped at
     // before gets the bean and the code — the two-offer ladder. hb-seen is
     // the marker; pre-existing hb-pop records count as seen too, so nobody
