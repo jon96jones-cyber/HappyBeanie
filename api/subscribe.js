@@ -28,11 +28,12 @@ const EMAIL_RE = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
 // segmentable by where the address was given. Keep this list closed — an
 // unrecognised source falls back to 'footer' rather than minting a new tag
 // from whatever the client happened to post.
-const SOURCES = ['footer', 'waitlist', 'quiz', 'shop', 'popup'];
+const SOURCES = ['footer', 'waitlist', 'quiz', 'shop', 'popup', 'research'];
 
 const mailer = require('./_lib/mailer.js');
 const lifecycle = require('./_lib/lifecycle-email.js');
 const discount = require('./_lib/discount.js');
+const research = require('./_lib/research-email.js');
 const db = require('./_lib/analytics-db.js');
 
 // Which signups get a code. The footer was the quiet half of the list: tagged
@@ -150,6 +151,35 @@ async function grantCode(email) {
   };
 }
 
+// The research popup promises studies, not a discount — no code is minted for
+// it, and the first email is the research pack itself. Same honesty contract
+// as grantCode: never throws, reports whether the email actually went.
+async function sendResearchPack(email) {
+  const unsubUrl = mailer.unsubUrl(email, 'marketing');
+  const t = { unsubUrl: unsubUrl };
+  const r = await mailer.send({
+    to: email,
+    flow: 'research-pack',
+    step: '1',
+    subject: research.subject(),
+    html: research(t),
+    text: research.text(t),
+    unsubUrl: unsubUrl
+  });
+  if (!r.ok) console.error('[subscribe] research email:', r.error, r.status || '', r.message || '');
+  return {
+    emailed: !!r.ok,
+    why: r.ok ? null : ('send:' + r.error + (r.status ? ':' + r.status : '') + (r.message ? ' — ' + r.message : ''))
+  };
+}
+
+// What the signup earns, by source: a code, the research pack, or nothing.
+function perk(email, source) {
+  if (source === 'research') return sendResearchPack(email);
+  if (CODE_SOURCES.indexOf(source) !== -1) return grantCode(email);
+  return Promise.resolve(null);
+}
+
 async function admin(token, query, variables) {
   const res = await fetch('https://' + STORE_DOMAIN + '/admin/api/' + API_VERSION + '/graphql.json', {
     method: 'POST',
@@ -228,7 +258,7 @@ module.exports = async function handler(req, res) {
       // tagsAdd, never CustomerInput.tags — the latter replaces the whole set
       // and would strip a wholesale or ambassador tag off a real customer.
       await admin(token, TAG_ADD, { id: existing.id, tags: ['newsletter', 'newsletter-' + source] });
-      const g = CODE_SOURCES.indexOf(source) !== -1 ? await grantCode(email) : null;
+      const g = await perk(email, source);
       return res.status(200).json({ ok: true, created: false, ...(g || {}) });
     }
 
@@ -240,13 +270,13 @@ module.exports = async function handler(req, res) {
       // A race — two submissions of the same address at once. The other one
       // won, which is the outcome we wanted anyway.
       if (/taken|already/i.test(cmsg)) {
-        const raced = CODE_SOURCES.indexOf(source) !== -1 ? await grantCode(email) : null;
+        const raced = await perk(email, source);
         return res.status(200).json({ ok: true, created: false, ...(raced || {}) });
       }
       console.error('[subscribe] create:', cmsg);
       return res.status(502).json({ ok: false, error: 'upstream' });
     }
-    const g = CODE_SOURCES.indexOf(source) !== -1 ? await grantCode(email) : null;
+    const g = await perk(email, source);
     return res.status(200).json({ ok: true, created: true, ...(g || {}) });
   } catch (err) {
     console.error('[subscribe]', err && err.message);

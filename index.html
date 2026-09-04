@@ -5966,6 +5966,14 @@ Component.prototype.renderVals = function () {
       <h2 style="margin:0 0 9px; font-weight:700; letter-spacing:-.04em; font-size:29px; line-height:1.08; color:#17140F; text-wrap:pretty;" id="hbDoneHead">Saved. Check your inbox.</h2>
       <p style="margin:0; font-size:15px; line-height:1.55; color:#6A6055; text-wrap:pretty;" id="hbDoneSub">Your code is below and on its way. It works on any box, Summer&rsquo;s formula or not.</p>
     </div>
+    <div data-step="research" style="display:none;">
+      <h2 style="margin:0 0 9px; font-weight:700; letter-spacing:-.04em; font-size:24px; line-height:1.12; text-align:center; color:#17140F; text-wrap:balance;">Why over 1,200 pet owners chose <span style="color:oklch(.44 .07 152);">Happy Beanie</span></h2>
+      <p style="margin:0; font-size:14.5px; line-height:1.55; text-align:center; color:#6A6055; text-wrap:pretty;">Happy Beanie is built on published research we didn&rsquo;t fund. We&rsquo;ll send you the research for free. Two minutes of reading, straight to your email.</p>
+    </div>
+    <div data-step="rdone" style="display:none;">
+      <h2 style="margin:0 0 9px; font-weight:700; letter-spacing:-.04em; font-size:27px; line-height:1.08; color:#17140F; text-wrap:pretty;">Sent. Check your inbox.</h2>
+      <p style="margin:0; font-size:15px; line-height:1.55; color:#6A6055; text-wrap:pretty;">Six studies &mdash; three on dogs, three on cats &mdash; in plain English, with a link to every paper. None of them funded by us.</p>
+    </div>
   </div>
 
   <!-- translateZ(0) makes the stage its own compositing root. Without it iOS
@@ -5991,6 +5999,11 @@ Component.prototype.renderVals = function () {
          role="button" tabindex="0" aria-label="Drag the bean to Summer's mouth, or press Enter to feed her"
          style="position:absolute; left:40px; bottom:30px; width:84px; cursor:grab; touch-action:none; -webkit-user-drag:none; user-select:none; filter:drop-shadow(0 14px 18px rgba(23,20,15,.34)); animation:hbBob 2.6s ease-in-out infinite; will-change:transform; backface-visibility:hidden; -webkit-backface-visibility:hidden;">
 
+    <div id="hbChips" style="display:none; position:absolute; left:12px; top:14px; z-index:2; gap:6px;">
+      <span style="display:block; width:max-content; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:3px; padding:5px 9px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:#554C40; box-shadow:0 6px 14px -8px rgba(23,20,15,.4);"><b style="color:oklch(.44 .07 152);">2022</b> &middot; Mushroom compounds &middot; survival &uarr;</span>
+      <span style="display:block; width:max-content; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:3px; padding:5px 9px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:#554C40; box-shadow:0 6px 14px -8px rgba(23,20,15,.4);"><b style="color:oklch(.44 .07 152);">1987</b> &middot; Taurine &middot; feline heart function</span>
+      <span style="display:block; width:max-content; background:#FCFAF4; border:1px solid #E0D6C2; border-radius:3px; padding:5px 9px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:#554C40; box-shadow:0 6px 14px -8px rgba(23,20,15,.4);"><b style="color:oklch(.44 .07 152);">2014</b> &middot; Elk velvet &middot; mobility</span>
+    </div>
     <span id="hbHint" style="position:absolute; left:9px; top:297px; white-space:nowrap; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#8A7F6E; transition:opacity .3s ease;">drag the bean to her mouth</span>
   </div>
 
@@ -6010,6 +6023,17 @@ Component.prototype.renderVals = function () {
                style="flex:0 0 auto; padding:14px 18px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:10.5px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:#17140F; background:oklch(.86 .14 92); border:1.5px solid #17140F; border-radius:3px; cursor:pointer; transition:background .25s ease, transform .25s cubic-bezier(.2,.7,.2,1);">Send it</button>
       </form>
       <p id="hbErr" role="alert" style="display:none; margin:9px 0 0; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.08em; line-height:1.5; color:oklch(.55 .19 25);"></p>
+    </div>
+
+    <div data-step="research" style="display:none;">
+      <form id="hbRForm" style="display:flex; gap:8px; margin-top:18px;" novalidate>
+        <input id="hbREmail" type="email" placeholder="you@example.com" autocomplete="email" aria-label="Email address"
+               style="flex:1 1 auto; min-width:0; padding:14px; font-family:'DM Sans',sans-serif; font-size:15px; color:#17140F; background:#FFFDF7; border:1.5px solid #E0D6C2; border-radius:3px; outline:none; transition:border-color .2s ease;">
+        <button id="hbRSend" type="submit"
+               style="flex:0 0 auto; padding:14px 16px; font-family:'HB Mono Figures','DM Mono',monospace; font-size:10.5px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:#17140F; background:oklch(.86 .14 92); border:1.5px solid #17140F; border-radius:3px; cursor:pointer; transition:background .25s ease, transform .25s cubic-bezier(.2,.7,.2,1);">Send me the research</button>
+      </form>
+      <p id="hbRErr" role="alert" style="display:none; margin:9px 0 0; font-family:'HB Mono Figures','DM Mono',monospace; font-size:9.5px; letter-spacing:.08em; line-height:1.5; color:oklch(.55 .19 25);"></p>
+      <p style="margin:10px 0 0; text-align:center; font-family:'HB Mono Figures','DM Mono',monospace; font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:#8A7F6E;">Free &middot; no spam &middot; unsubscribe anytime</p>
     </div>
 
     <div data-step="done" style="display:none;">
@@ -6047,6 +6071,10 @@ Component.prototype.renderVals = function () {
   var noBtn = document.getElementById('hbNo');
   var copyTimer = null;
   var doneHead = document.getElementById('hbDoneHead'), doneSub = document.getElementById('hbDoneSub');
+  var stage = document.getElementById('hbStage'), chips = document.getElementById('hbChips');
+  var barLbl = document.getElementById('hbBarLbl');
+  var rForm = document.getElementById('hbRForm'), rInput = document.getElementById('hbREmail');
+  var rSend = document.getElementById('hbRSend'), rErr = document.getElementById('hbRErr');
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var step = 'feed', drag = null, busy = false, returnTo = null;
@@ -6066,13 +6094,22 @@ Component.prototype.renderVals = function () {
       el.style.display = el.getAttribute('data-step') === step ? 'block' : 'none';
     });
     pop.setAttribute('data-step-now', step);
+    // The research mode borrows the stage as a hero: Summer waiting, the study
+    // chips floating, no bean and nothing to drag.
+    var research = step === 'research' || step === 'rdone';
+    stage.style.height = research ? '200px' : '320px';
+    chips.style.display = step === 'research' ? 'grid' : 'none';
     bean.style.display = step === 'feed' ? 'block' : 'none';
     mouth.style.display = step === 'feed' ? 'block' : 'none';
     mouth.style.opacity = step === 'feed' ? '.5' : '0';
     hint.style.opacity = step === 'feed' ? '1' : '0';
-    wait.style.opacity = step === 'feed' ? '1' : '0';
-    fed.style.opacity = step === 'feed' ? '0' : '1';
-    noBtn.textContent = step === 'done' ? 'I\u2019ve saved my code' : 'No thanks, I don\u2019t want to save money';
+    wait.style.opacity = (step === 'feed' || step === 'research') ? '1' : '0';
+    fed.style.opacity = (step === 'feed' || step === 'research') ? '0' : '1';
+    barLbl.textContent = research ? 'Happy Beanie \u00b7 the research' : 'Summer\u2019s daily bean';
+    noBtn.textContent = step === 'done' ? 'I\u2019ve saved my code'
+      : step === 'rdone' ? 'Back to browsing'
+      : step === 'research' ? 'No thanks, I\u2019ll browse'
+      : 'No thanks, I don\u2019t want to save money';
     if (step === 'done') { copyNote.textContent = ''; copyBtn.removeAttribute('data-copied'); }
     if (step === 'email') setTimeout(function () { try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); } }, 120);
   }
@@ -6166,6 +6203,54 @@ Component.prototype.renderVals = function () {
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); feedHer(); }
   });
   mouth.addEventListener('click', function (e) { e.preventDefault(); feedHer(); });
+
+  // The research form: same contract as the bean's, different deliverable.
+  rForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (busy) return;
+    var v = (rInput.value || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) {
+      rErr.textContent = 'That address doesn\u2019t look right \u2014 check it and try again.';
+      rErr.style.display = 'block';
+      rInput.style.borderColor = 'oklch(.55 .19 25)';
+      rInput.focus();
+      return;
+    }
+    rErr.style.display = 'none';
+    rInput.style.borderColor = '#E0D6C2';
+    busy = true;
+    rSend.disabled = true;
+    rSend.textContent = 'Sending';
+    fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: v, source: 'research' })
+    }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (b) {
+      busy = false; rSend.disabled = false; rSend.textContent = 'Send me the research';
+      if (b && b.ok) {
+        if (b.emailed === false) {
+          console.warn('[hb popup] the research email did NOT send. Reason from the server: ' +
+            (b.why || 'not reported') + '. The subscriber is saved either way.');
+        }
+        try {
+          localStorage.setItem(LIST_KEY, '1');
+          localStorage.setItem('hb-email', v.toLowerCase());
+        } catch (err) {}
+        step = 'rdone';
+        try { if (window.hbTrack) window.hbTrack('popup_subscribed', { species: 'research' }); } catch (err) {}
+        render();
+        return;
+      }
+      rErr.textContent = (b && b.error === 'bad_email')
+        ? 'That address doesn\u2019t look right \u2014 check it and try again.'
+        : 'That didn\u2019t go through. Try again in a moment, or email hello@happybeanie.com.';
+      rErr.style.display = 'block';
+    }).catch(function () {
+      busy = false; rSend.disabled = false; rSend.textContent = 'Send me the research';
+      rErr.textContent = 'That didn\u2019t go through. Try again in a moment, or email hello@happybeanie.com.';
+      rErr.style.display = 'block';
+    });
+  });
 
   document.getElementById('hbForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -6295,7 +6380,7 @@ Component.prototype.renderVals = function () {
     // far as the offer before declining, which earns a shorter ladder.
     // Closing the confirmation is not a dismissal — they already subscribed,
     // and hb-list suppresses this for good anyway.
-    if (step !== 'done') {
+    if (step !== 'done' && step !== 'rdone') {
       try {
         var prev = JSON.parse(localStorage.getItem(DISMISS_KEY) || 'null');
         var n = prev ? (prev.n || 1) + 1 : 1;
@@ -6417,9 +6502,19 @@ Component.prototype.renderVals = function () {
     if (pop.hasAttribute('data-on')) return;
     returnTo = document.activeElement;
     lockScroll();
+    // First touch gets the research ask; anyone this browser has popped at
+    // before gets the bean and the code — the two-offer ladder. hb-seen is
+    // the marker; pre-existing hb-pop records count as seen too, so nobody
+    // who already met the bean is greeted like a stranger.
+    var seen = null;
+    try { seen = localStorage.getItem('hb-seen') || localStorage.getItem(DISMISS_KEY); } catch (e) {}
+    var mode = seen ? 'bean' : 'research';
+    try { var q = new URLSearchParams(location.search).get('popmode'); if (q === 'bean' || q === 'research') mode = q; } catch (e) {}
+    try { localStorage.setItem('hb-seen', '1'); } catch (e) {}
     // The desk's popup funnel starts here: shown → fed → captured/declined.
-    try { if (window.hbTrack) window.hbTrack('popup_shown'); } catch (e) {}
-    step = 'feed'; input.value = ''; bean.style.transform = '';
+    try { if (window.hbTrack) window.hbTrack('popup_shown', { species: mode }); } catch (e) {}
+    step = mode === 'research' ? 'research' : 'feed';
+    input.value = ''; rInput.value = ''; rErr.style.display = 'none'; bean.style.transform = '';
     errEl.style.display = 'none';
     render();
     pop.setAttribute('data-on', '');

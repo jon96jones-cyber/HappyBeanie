@@ -72,6 +72,13 @@ const CATALOG = [
     trigger: 'Left at 30 min idle, email an hour later · checked every 15 min · max one per address per 14 days'
   },
   {
+    flow: 'research-pack',
+    name: 'Research pack',
+    status: 'live',
+    what: 'Six published studies in plain English, sent to anyone who asks for the research — the first-touch popup’s offer. No code attached.',
+    trigger: 'On signup from the research popup, instantly'
+  },
+  {
     flow: 'post-purchase',
     name: 'Post-purchase',
     status: 'live',
