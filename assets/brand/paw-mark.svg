@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- The Happy Beanie paw mark, recovered as true vector geometry from the
+       profile raster: five ellipses, the gold toe tucked behind the pad.
+       Colours match the raster asset exactly. -->
+  <rect width="512" height="512" fill="#17140F"/>
+  <ellipse cx="362.8" cy="218" rx="45.9" ry="37.15" fill="#E8B93E" transform="rotate(108 362.8 218)"/>
+  <ellipse cx="255.5" cy="304.75" rx="119.25" ry="94.5" fill="#EFEAE1"/>
+  <ellipse cx="220.75" cy="165" rx="39" ry="49.25" fill="#EFEAE1" transform="rotate(-7 220.75 165)"/>
+  <ellipse cx="290.25" cy="165" rx="39" ry="49.25" fill="#EFEAE1" transform="rotate(7 290.25 165)"/>
+  <ellipse cx="148.85" cy="218.6" rx="46.5" ry="37.3" fill="#EFEAE1" transform="rotate(69.7 148.85 218.6)"/>
+</svg>
