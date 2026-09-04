@@ -61,6 +61,11 @@ module.exports = async function handler(req, res) {
     const vid = db.visitorId(req);
     const path = str(b.path, 255);
     const country = str(req.headers['x-vercel-ip-country'], 8);
+    // State and city as Vercel's edge derived them from the IP — the derived
+    // place is stored, the address never is. The city arrives URI-encoded.
+    const region = str(req.headers['x-vercel-ip-country-region'], 8);
+    let city = str(req.headers['x-vercel-ip-city'], 120);
+    try { if (city) city = decodeURIComponent(city); } catch (e) {}
     // Our own traffic, from either signal: the server recognising the address,
     // or the page telling us (opted-out browser, or a preview deployment).
     // Labelled, never dropped — so a test still proves it registered.
@@ -80,11 +85,11 @@ module.exports = async function handler(req, res) {
     await db.withSchema(() => sql`
       insert into sessions (
         session_id, visitor_id, landing_path, referrer,
-        utm_source, utm_medium, utm_campaign, ref_code, device, country, pageviews, internal
+        utm_source, utm_medium, utm_campaign, ref_code, device, country, region, city, pageviews, internal
       ) values (
         ${sid}, ${vid}, ${path}, ${str(b.ref, 255)},
         ${str(utm.source, 120)}, ${str(utm.medium, 120)}, ${str(utm.campaign, 120)},
-        ${str(b.refCode, 40)}, ${db.deviceOf(req.headers['user-agent'])}, ${country},
+        ${str(b.refCode, 40)}, ${db.deviceOf(req.headers['user-agent'])}, ${country}, ${region}, ${city},
         ${name === 'pageview' ? 1 : 0}, ${internal}
       )
       on conflict (session_id) do update set

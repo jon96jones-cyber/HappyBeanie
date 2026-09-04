@@ -1,10 +1,13 @@
 // /api/admin/analytics — the numbers behind the analytics desk.
 //
-// GET  → { ok, live, today, series, topPages, topSources, funnel, recent }
+// GET  → { ok, live, today, series, topPages, topSources, funnel, geo, recent }
 //        live:   visitors in the last 5 minutes, and what they are doing
 //        today:  sessions / pageviews / product views / carts / checkouts
 //        series: daily rollup for the requested window (?days=7|30|90)
 //        funnel: visit → product → cart → checkout for that window
+//        geo:    sessions by US state (plus other countries) for the window,
+//                and who is on the site right now by city — all from Vercel's
+//                IP-derived edge headers; the IP itself is never stored
 //
 // POST { action: 'init' } → creates the tables. Safe to run repeatedly.
 //
@@ -74,7 +77,7 @@ module.exports = async function handler(req, res) {
     // ?internal=1 puts it back, so a test can still be seen to have landed.
     const inc = q.internal === '1';
 
-    const [live, today, series, topPages, topSources, funnel, recent, popup] = await db.withSchema(() => Promise.all([
+    const [live, today, series, topPages, topSources, funnel, recent, popup, geo, geoLive] = await db.withSchema(() => Promise.all([
       sql`select
             count(*) filter (where last_seen > now() - interval '5 minutes')                      as visitors_now,
             count(*) filter (where last_seen > now() - interval '5 minutes' and added_to_cart)    as active_carts,
@@ -148,7 +151,24 @@ module.exports = async function handler(req, res) {
           from events
           where name like 'popup%' and ts >= ${since}::timestamptz
             and (${until}::timestamptz is null or ts < ${until}::timestamptz)
-            and (${inc} or not internal)`
+            and (${inc} or not internal)`,
+
+      // Where the window's sessions were — states inside the US, whole
+      // countries elsewhere. The place is Vercel's IP-derived edge geo,
+      // written once per session at first beacon; the IP itself never lands.
+      sql`select country, region, count(*) as sessions
+          from sessions
+          where first_seen >= ${since}::timestamptz
+            and (${until}::timestamptz is null or first_seen < ${until}::timestamptz)
+            and (${inc} or not internal)
+          group by 1, 2 order by sessions desc limit 80`,
+
+      // Who is on the site right now, down to the city Vercel reported.
+      sql`select country, region, city, count(*) as visitors
+          from sessions
+          where last_seen > now() - interval '5 minutes'
+            and (${inc} or not internal)
+          group by 1, 2, 3 order by visitors desc limit 20`
     ]));
 
     const l = live[0] || {}, t = today[0] || {}, f = funnel[0] || {};
@@ -183,6 +203,27 @@ module.exports = async function handler(req, res) {
                   declinedFeed: n(p.declined_feed), declinedEmail: n(p.declined_email) }
         };
       })(popup[0] || {}),
+      geo: (function () {
+        // US rows keep their state; everything else rolls up to its country.
+        const states = [], other = {};
+        let unknown = 0;
+        geo.forEach(function (r) {
+          const c = n(r.sessions);
+          if (r.country === 'US' && r.region) states.push({ state: r.region, sessions: c });
+          else if (r.country) other[r.country] = (other[r.country] || 0) + c;
+          else unknown += c;
+        });
+        return {
+          states: states,
+          other: Object.keys(other)
+            .map(function (k) { return { country: k, sessions: other[k] }; })
+            .sort(function (a, b) { return b.sessions - a.sessions; }),
+          unknown: unknown,
+          live: geoLive.map(function (r) {
+            return { country: r.country, region: r.region, city: r.city, visitors: n(r.visitors) };
+          })
+        };
+      })(),
       recent: recent.map(function (r) {
         return { at: r.at, name: r.name, path: r.path, species: r.species, value: r.value };
       })

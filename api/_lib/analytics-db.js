@@ -219,7 +219,14 @@ async function ensureSchema() {
    )`;
   await q`create index if not exists open_carts_due_idx
           on open_carts (updated_at) where closed_at is null`;
-  return 18;
+
+  // Where visitors are, for the desk's map. Vercel derives these from the IP
+  // at its edge and hands them over as request headers — we store the derived
+  // place (state and city) and let the address itself go, same bargain as
+  // visitorId above. Coarse on purpose: a state colours a map; an IP is PII.
+  await q`alter table sessions add column if not exists region text`;
+  await q`alter table sessions add column if not exists city   text`;
+  return 19;
 }
 
 // Run a query, and if it fails only because the schema is behind the code,
