@@ -5865,8 +5865,6 @@ Component.prototype.renderVals = function () {
   .hb-research__bean--c { right: 18px; top: 150px; width: 44px; animation: hbRBeanC 3.4s ease-in-out infinite 0.9s; }
   .hb-research__step { position: relative; }
   .hb-research__step[hidden] { display: none; }
-  .hb-research__live { display: flex; align-items: center; gap: 8px; margin-bottom: 26px; }
-  .hb-research__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hb-r-green); animation: hbRBlink 1.6s ease-in-out infinite; }
   .hb-research__label { font-family: 'HB Mono Figures','DM Mono',monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--hb-r-muted-2); }
   .hb-research__counter { display: flex; gap: 4px; margin-bottom: 18px; }
   .hb-research__digits { display: flex; gap: 4px; perspective: 600px; }
@@ -5912,12 +5910,29 @@ Component.prototype.renderVals = function () {
   .hb-research__close:hover { color: var(--hb-r-text); }
   @keyframes hbRRise { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: none; } }
   @keyframes hbRFlip { 0% { transform: rotateX(-90deg); filter: brightness(0.7); } 100% { transform: rotateX(0deg); filter: brightness(1); } }
-  @keyframes hbRBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
   @keyframes hbRBeanA { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-10px) rotate(4deg); } }
   @keyframes hbRBeanB { 0%, 100% { transform: translateY(0) rotate(12deg); } 50% { transform: translateY(-14px) rotate(20deg); } }
   @keyframes hbRBeanC { 0%, 100% { transform: translateY(0) rotate(-18deg); } 50% { transform: translateY(-7px) rotate(-10deg); } }
   @media (prefers-reduced-motion: reduce) {
-    .hb-research__bean, .hb-research__dot, .hb-research__digit, .hb-research__sent { animation: none !important; }
+    .hb-research__bean, .hb-research__digit, .hb-research__sent { animation: none !important; }
+  }
+
+  /* Compact cut for phones — same card, about two-thirds the height. */
+  @media (max-width: 480px) {
+    .hb-research { padding: 22px 20px 18px; }
+    .hb-research__counter { margin-bottom: 12px; }
+    .hb-research__digit { min-width: 30px; padding: 6px 7px; font-size: 44px; border-radius: 3px; }
+    .hb-research__plus { font-size: 24px; }
+    .hb-research__title { font-size: 24px; margin-bottom: 8px; max-width: 300px; }
+    .hb-research__body { font-size: 13.5px; margin-bottom: 14px; max-width: 320px; }
+    .hb-research__input { padding: 12px 12px; font-size: 14px; }
+    .hb-research__submit { padding: 14px 16px; }
+    .hb-research__fine { margin-top: 9px; font-size: 8.5px; }
+    .hb-research__close { margin-top: 10px; font-size: 12.5px; }
+    .hb-research__bean--a { right: 16px; top: 16px; width: 62px; }
+    .hb-research__bean--b { right: 84px; top: 62px; width: 36px; }
+    .hb-research__bean--c { right: 12px; top: 104px; width: 30px; }
+    .hb-research__glow { right: -140px; top: -140px; }
   }
 
   #hbPopup { position:fixed; z-index:9999; left:50%; top:50%; transform:translate(-50%,-50%);
@@ -6113,24 +6128,20 @@ Component.prototype.renderVals = function () {
     <img class="hb-research__bean hb-research__bean--c" src="assets/img/popup/research-bean-c.webp" alt="">
 
     <div class="hb-research__step" data-rstep="form">
-      <div class="hb-research__live">
-        <span class="hb-research__dot" aria-hidden="true"></span>
-        <span class="hb-research__label">Live &middot; owners on the formula</span>
-      </div>
       <div class="hb-research__counter" aria-label="1,200 plus pet owners">
         <span class="hb-research__digits" data-rdigits aria-hidden="true">
           <span class="hb-research__digit">0</span><span class="hb-research__digit">0</span><span class="hb-research__digit">0</span><span class="hb-research__digit">0</span>
         </span>
         <span class="hb-research__plus" aria-hidden="true">+</span>
       </div>
-      <h2 class="hb-research__title">Why over 1,200 pet owners chose Happy Beanie</h2>
+      <h2 class="hb-research__title">Pet owners chose Happy Beanie</h2>
       <p class="hb-research__body">Happy Beanie is built on published research we didn&rsquo;t fund. We&rsquo;ll send you the research for free. Two minutes of reading, straight to your email.</p>
       <form class="hb-research__form" id="hbRForm" novalidate>
         <input class="hb-research__input" id="hbREmail" type="email" name="email" placeholder="you@email.com" autocomplete="email" aria-label="Email address">
         <button class="hb-research__submit" id="hbRSend" type="submit">Send me the research &rarr;</button>
       </form>
       <p class="hb-research__error" id="hbRErr" role="alert" hidden></p>
-      <p class="hb-research__fine" id="hbRFine">Unsubscribe anytime &middot; We never sell your address</p>
+      <p class="hb-research__fine" id="hbRFine">Unsubscribe anytime &middot; We never sell your info</p>
     </div>
 
     <div class="hb-research__step" data-rstep="done" hidden>
