@@ -137,11 +137,14 @@ module.exports = async function handler(req, res) {
           order by ts desc limit 25`,
 
       sql`select
-            count(distinct session_id) filter (where name = 'popup_shown')      as shown,
-            count(distinct session_id) filter (where name = 'popup_fed')        as fed,
-            count(distinct session_id) filter (where name = 'popup_subscribed') as subscribed,
-            count(distinct session_id) filter (where name = 'popup_declined' and species = 'feed')  as declined_feed,
-            count(distinct session_id) filter (where name = 'popup_declined' and species = 'email') as declined_email
+            count(distinct session_id) filter (where name = 'popup_shown' and species = 'research')       as r_shown,
+            count(distinct session_id) filter (where name = 'popup_subscribed' and species = 'research')  as r_subscribed,
+            count(distinct session_id) filter (where name = 'popup_declined' and species = 'research')    as r_declined,
+            count(distinct session_id) filter (where name = 'popup_shown' and (species is null or species = 'bean')) as b_shown,
+            count(distinct session_id) filter (where name = 'popup_fed')                                  as b_fed,
+            count(distinct session_id) filter (where name = 'popup_subscribed' and (species is null or species <> 'research')) as b_subscribed,
+            count(distinct session_id) filter (where name = 'popup_declined' and species = 'feed')        as declined_feed,
+            count(distinct session_id) filter (where name = 'popup_declined' and species = 'email')       as declined_email
           from events
           where name like 'popup%' and ts >= ${since}::timestamptz
             and (${until}::timestamptz is null or ts < ${until}::timestamptz)
@@ -174,8 +177,11 @@ module.exports = async function handler(req, res) {
         visits: n(f.visits), product: n(f.product), cart: n(f.cart), checkout: n(f.checkout)
       },
       popup: (function (p) {
-        return { shown: n(p.shown), fed: n(p.fed), subscribed: n(p.subscribed),
-                 declinedFeed: n(p.declined_feed), declinedEmail: n(p.declined_email) };
+        return {
+          research: { shown: n(p.r_shown), subscribed: n(p.r_subscribed), declined: n(p.r_declined) },
+          bean: { shown: n(p.b_shown), fed: n(p.b_fed), subscribed: n(p.b_subscribed),
+                  declinedFeed: n(p.declined_feed), declinedEmail: n(p.declined_email) }
+        };
       })(popup[0] || {}),
       recent: recent.map(function (r) {
         return { at: r.at, name: r.name, path: r.path, species: r.species, value: r.value };

@@ -306,12 +306,16 @@ tr:last-child td { border-bottom:none; }
              '<div class="bar"><div class="fill" style="width:' + Math.max(pct, s[1] ? 1 : 0) + '%"></div></div>' +
              '<div class="n">' + s[1] + ' <span>' + pct + '%</span></div></div>';
     }
-    var declined = (pop.declinedFeed || 0) + (pop.declinedEmail || 0);
+    var rp = pop.research || {}, bp = pop.bean || {};
+    var beanDeclined = (bp.declinedFeed || 0) + (bp.declinedEmail || 0);
     $('funnel').innerHTML = steps.map(stepRow).join('') +
-      '<div class="fdiv">The popup</div>' +
-      [['Popup shown', pop.shown || 0], ['Fed the bean', pop.fed || 0], ['Email captured', pop.subscribed || 0]].map(stepRow).join('') +
-      (declined
-        ? '<div class="fnote">' + declined + ' declined — ' + (pop.declinedFeed || 0) + ' at the bean, ' + (pop.declinedEmail || 0) + ' at the email ask</div>'
+      '<div class="fdiv">Research popup · first touch</div>' +
+      [['Shown', rp.shown || 0], ['Email captured', rp.subscribed || 0]].map(stepRow).join('') +
+      ((rp.declined || 0) ? '<div class="fnote">' + rp.declined + ' declined</div>' : '') +
+      '<div class="fdiv">Bean popup · 10% code</div>' +
+      [['Shown', bp.shown || 0], ['Fed the bean', bp.fed || 0], ['Email captured', bp.subscribed || 0]].map(stepRow).join('') +
+      (beanDeclined
+        ? '<div class="fnote">' + beanDeclined + ' declined — ' + (bp.declinedFeed || 0) + ' at the bean, ' + (bp.declinedEmail || 0) + ' at the email ask</div>'
         : '');
 
     var isToday = prefs().days === 0;
