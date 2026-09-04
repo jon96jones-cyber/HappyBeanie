@@ -1558,48 +1558,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     </div>
   </section>
 
-    <section data-m="pad short" style="background: #EDE6D8; padding: 92px 44px; border-top: 1px solid #DDD3C0;">
-      <div style="max-width: 1180px; margin: 0 auto;">
-        <div data-m="faqhead">
-          <div>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">Before you decide</div>
-            <h2 data-m="faqh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.4vw, 48px); line-height: 1.04; margin: 0 0 40px; max-width: 20em;">The questions owners ask us <span style="color: oklch(0.44 0.07 152);">before the first box.</span></h2>
-          </div>
-          <div data-m="askcol" style="display: grid; gap: 0;">
-          <button sc-camel-on-click="{{ toggleAsk }}" data-m="mobonly asktile" data-open="{{ askOpenFlag }}" style="text-align: left; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1px dashed oklch(0.44 0.07 152 / 0.6); border-radius: 6px; background: linear-gradient(168deg, #FFFDF7 0%, #F2EBDC 100%); box-shadow: 0 12px 22px -18px rgba(23,20,15,0.5), 0 1px 0 rgba(255,255,255,0.9) inset; padding: 12px 12px 13px;">
-            <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 6px;">Add yours</span>
-            <span style="display: block; font-weight: 700; letter-spacing: -0.03em; font-size: 14px; line-height: 1.15; color: #17140F;">{{ askTileLabel }}</span>
-          </button>
-          <div data-m="mobonly askbox" data-open="{{ askOpenFlag }}">
-          <sc-if value="{{ askUnsent }}" hint-placeholder-val="{{ true }}">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Still wondering?</div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.2; color: #17140F; margin-bottom: 12px;">Ask us directly.</div>
-            <textarea value="{{ askQ }}" sc-camel-on-change="{{ onAskQ }}" placeholder="" rows="3" style="width: 100%; box-sizing: border-box; resize: vertical; font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.55; color: #17140F; background: #FCFAF4; border: 1px solid #E0D6C2; border-radius: 4px; padding: 12px 13px; margin-bottom: 8px;"></textarea>
-            <input value="{{ askEmail }}" sc-camel-on-change="{{ onAskEmail }}" type="email" placeholder="Email for the reply" style="width: 100%; box-sizing: border-box; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #17140F; background: #FCFAF4; border: 1px solid #E0D6C2; border-radius: 4px; padding: 12px 13px; margin-bottom: 12px;">
-            <button sc-camel-on-click="{{ sendAsk }}" style="width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding: 15px; border: none; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer;">Send my question →</button>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E; text-align: center; margin-top: 10px;">Answered usually same day</div>
-          </sc-if>
-          <sc-if value="{{ askSent }}" hint-placeholder-val="{{ false }}">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Question received</div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.25; color: #17140F; margin-bottom: 8px;">We'll come back to you by email.</div>
-            <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0;">A real person on our support team reads every one of these — no bots, no canned replies. If it's urgent, call the number in the footer.</p>
-          </sc-if>
-          </div>
-        </div>
-        <div data-m="faqwrap" style="display: grid; gap: 0; border-top: 1px solid #E0D6C2;">
-          <sc-for list="{{ faqs }}" as="q4" hint-placeholder-count="4">
-            <div data-m="faqrow" data-open="{{ q4.openFlag }}" style="border-bottom: 1px solid #E0D6C2;">
-              <button sc-camel-on-click="{{ q4.toggle }}" data-m="faqbtn" style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 20px; text-align: left; padding: 22px 4px; background: transparent; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 23px; color: #17140F;">{{ q4.q }}<span data-m="faqsign" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 16px; color: #8A7F6E;">{{ q4.sign }}</span></button>
-              <div style="max-height: {{ q4.maxHeight }}; opacity: {{ q4.opacity }}; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease;">
-                <p data-m="faqans" style="font-size: 15px; line-height: 1.7; color: #554C40; margin: 0 0 18px; max-width: 44em;">{{ q4.a }}</p>
-                <div data-m="faqans" style="margin: 0 0 24px;"><button sc-camel-on-click="{{ q4.goCta }}" style="display: {{ q4.ctaDisplay }}; align-items: center; gap: 10px; border: none; cursor: pointer; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 22px; border-radius: 2px; background: #17140F; color: #F5F0E6; transition: background 0.2s ease, transform 0.2s ease;" style-hover="background: oklch(0.44 0.07 152); transform: translateY(-2px);">{{ q4.ctaLabel }}</button></div>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-        </div>
-      </div>
-    </section>
+
 
   <div data-m="pad" style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; transform: {{ barShift }}; opacity: {{ barOpacity }}; transition: transform 0.35s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease; background: rgba(23,20,15,0.96); backdrop-filter: blur(10px); border-top: 1px solid rgba(245,240,230,0.16); padding: 13px 44px;">
     <div aria-hidden="true" class="hb-progress" style="position: absolute; left: 0; top: 0; height: 2px; width: 0%; background: oklch(0.86 0.14 92); transition: width 0.12s linear;"></div>
