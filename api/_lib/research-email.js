@@ -21,7 +21,7 @@ const SITE = 'https://www.happybeanie.com';
 // below feeds the text version and stays in step with the design's cards.
 const designed = require('./research-designed.js');
 
-const SUBJECT = 'The research, in plain English';
+const SUBJECT = "Here's the research you asked for";
 
 // Kept in step with the evidence pile in index.html.
 const STUDIES = [
@@ -57,7 +57,7 @@ function build(t) {
 
 build.text = function (t) {
   const lines = [
-    'The research, in plain English.',
+    'Here is the research you asked for.',
     '',
     'Six published studies - three on dogs, three on cats - behind what goes',
     'into Happy Beanie. We funded none of them, and none of them tested our',
