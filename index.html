@@ -1779,7 +1779,11 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
           <!-- Nutrition Facts label (designer handoff, lifted as-is). Follows the
                page's species choice; the ingredient columns and the For line
                are the design's own copy per species, bound in the state. -->
-          <div style="display: {{ pdpPanelDisplay }}; background: #FCFAF4; border: 2px solid #17140F; border-radius: 4px; box-shadow: 0 30px 60px -36px rgba(23,20,15,0.5); overflow: hidden;">
+          <!-- The label renders at its designed size, then scales down just
+               enough that the left column never outgrows the buy column —
+               fitFacts() measures and writes factsScale/factsWrapH. -->
+          <div style="display: {{ pdpPanelDisplay }}; height: {{ pdpFactsWrapH }};">
+          <div id="hbFactsCard" style="background: #FCFAF4; border: 2px solid #17140F; border-radius: 4px; box-shadow: 0 30px 60px -36px rgba(23,20,15,0.5); overflow: hidden; transform: scale({{ pdpFactsScale }}); transform-origin: top center;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 22px; background: #17140F;">
               <img src="/assets/email/lifecycle/hb-wordmark.png" alt="happy beanie" width="132" height="22" style="display: block; width: 132px; height: auto;">
               <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #F0C64B;">Daily Supplement</span>
@@ -1828,6 +1832,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
               <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Formulated fresh · Scottsdale, AZ</span>
               <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">happybeanie.com</span>
             </div>
+          </div>
           </div>
         </div>
         <div>
@@ -3247,7 +3252,7 @@ class Component extends DCLogic {
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null, signedIn: false, wholesale: false, trade: null,
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
-    pdpView: 'photo', pdpSel: 0, pdpCut: false, pdpReady: false,
+    pdpView: 'photo', pdpSel: 0, pdpCut: false, pdpReady: false, factsScale: 1, factsWrapH: 'auto',
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
@@ -3512,6 +3517,33 @@ class Component extends DCLogic {
   }
 
   // --- Chew inspector -------------------------------------------------------
+
+  // Scale the Nutrition Facts label so the left column (photo/bean + tabs +
+  // label) never outgrows the buy column. Layout offsets, not viewport rects:
+  // the column is sticky, so client rects move with scroll while offsets hold
+  // still. Runs from componentDidUpdate and window resize; converges in one
+  // extra render because the inputs don't depend on the scale it writes.
+  fitFacts() {
+    if (this.state.page !== 'product' || this.state.pdpView !== '3d') return;
+    const card = document.getElementById('hbFactsCard');
+    if (!card) return;
+    const wrap = card.parentElement;
+    const leftCol = wrap.closest('[data-m~="nostick"]');
+    const row = leftCol && leftCol.parentElement;
+    const rightCol = row && Array.prototype.find.call(row.children, c => c !== leftCol);
+    if (!rightCol) return;
+    // Stacked (mobile) layouts have no shared bottom edge to respect.
+    const sideBySide = rightCol.getBoundingClientRect().left >
+                       leftCol.getBoundingClientRect().left + 100;
+    const natural = card.offsetHeight;                   // transform-independent
+    const avail = rightCol.offsetHeight - wrap.offsetTop - 2;
+    let scale = 1;
+    if (sideBySide && avail > 120 && avail < natural) scale = Math.max(0.45, avail / natural);
+    const wrapH = scale === 1 ? 'auto' : Math.floor(natural * scale) + 'px';
+    if (Math.abs(scale - (this.state.factsScale || 1)) > 0.005 || wrapH !== this.state.factsWrapH) {
+      this.setState({ factsScale: scale, factsWrapH: wrapH });
+    }
+  }
 
   // three.js is ~2MB unminified, so none of it is fetched until the shopper
   // actually opens the 3D tab. The product page is the conversion page; it
@@ -4100,6 +4132,10 @@ class Component extends DCLogic {
       if (VALID_PAGES.includes(p)) this.setState({ page: p, menuOpen: false });
     };
     window.addEventListener('popstate', this.onPopState);
+    // The label's fit depends on both columns' heights, which move with the
+    // viewport; refit on resize (cheap no-op when the tab is closed).
+    this._onFitResize = () => this.fitFacts();
+    window.addEventListener('resize', this._onFitResize);
     this.rvNodes = [];
     this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Lab room idle rotation — a no-op until the About page's stage mounts.
@@ -4201,6 +4237,7 @@ class Component extends DCLogic {
 
   componentDidUpdate() {
     requestAnimationFrame(() => this.scan());
+    requestAnimationFrame(() => this.fitFacts());
     const _pg = this.state.page || 'home';
     if (this._popPage !== _pg) { this._popPage = _pg; this.popPageChanged(_pg); }
     // The catch section mounts and unmounts with the product page.
@@ -4290,6 +4327,7 @@ class Component extends DCLogic {
     clearTimeout(this.rvFallback);
     if (this.io) this.io.disconnect();
     window.removeEventListener('popstate', this.onPopState);
+    if (this._onFitResize) window.removeEventListener('resize', this._onFitResize);
   }
 
   nav(page) {
@@ -4613,6 +4651,8 @@ class Component extends DCLogic {
           pdpFactsFor: isDog ? 'Dogs · 12 months +' : 'Cats',
           pdpFactsColA: factsRows(factsCols[0]),
           pdpFactsColB: factsRows(factsCols[1]),
+          pdpFactsScale: this.state.factsScale || 1,
+          pdpFactsWrapH: this.state.factsWrapH || 'auto',
           pdpShowPhoto: () => this.setState({ pdpView: 'photo' }),
           // Re-opening the tab on a still-mounted stage skips the loading
           // state; a fresh visit shows the photo + "Preparing 3D view…" until
