@@ -455,7 +455,11 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 /* FAQ card carousel (designer handoff, Setup_31). Scoped under .hb-faq; the
    section renders as the site's dark inset band inside each page's container. */
 .hb-faq { --hb-ink: #17140F; --hb-cream: #FCFAF4; --hb-cream-text: #F5F0E6; --hb-muted: #8A7F6E; --hb-num: #C9BFA8; --hb-yellow: oklch(0.86 0.14 92); --hb-green: oklch(0.44 0.07 152); --hb-sans: 'DM Sans', system-ui, sans-serif; --hb-mono: 'HB Mono Figures', 'DM Mono', ui-monospace, monospace; --card-w: 264px; --card-gap: 18px; }
-.hb-faq { position: relative; overflow: hidden; background: var(--hb-ink); color: var(--hb-cream-text); padding: 88px 0 80px; font-family: var(--hb-sans); border-radius: 5px; }
+/* Full-bleed: the hosts sit inside centred, padded containers, so the band
+   breaks out to the viewport edges the classic way. html/body overflow-x is
+   already clipped, so the scrollbar-width excess of 100vw cannot pan. */
+[data-hb-faq-host] { width: 100vw; margin-left: calc(50% - 50vw); }
+.hb-faq { position: relative; overflow: hidden; background: var(--hb-ink); color: var(--hb-cream-text); padding: 88px 0 80px; font-family: var(--hb-sans); }
 .hb-faq * { box-sizing: border-box; }
 .hb-faq__glow { position: absolute; right: -160px; top: -160px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(closest-side, rgba(240,198,75,0.28), transparent); pointer-events: none; }
 .hb-faq__bean { position: absolute; pointer-events: none; filter: drop-shadow(0 14px 16px rgba(0,0,0,0.6)); }
