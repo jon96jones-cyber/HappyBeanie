@@ -3259,6 +3259,7 @@ class Component extends DCLogic {
     coa: null, certFilter: 'all', batch: null, signedIn: false, wholesale: false, trade: null,
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
     pdpView: 'photo', pdpSel: 0, pdpCut: false, pdpReady: false, factsScale: 1, factsWrapH: 'auto', factsTileH: 'auto',
+    factsNarrow: typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 600px)').matches,
     cartPlanDog: 1, cartPlanCat: 1, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
@@ -4164,6 +4165,11 @@ class Component extends DCLogic {
     // viewport; refit on resize (cheap no-op when the tab is closed).
     this._onFitResize = () => this.fitFacts();
     window.addEventListener('resize', this._onFitResize);
+    // The label's column chunking follows the same breakpoint as its grid CSS.
+    this._mqFacts = window.matchMedia('(max-width: 600px)');
+    this._onMqFacts = () => this.setState({ factsNarrow: this._mqFacts.matches });
+    if (this._mqFacts.addEventListener) this._mqFacts.addEventListener('change', this._onMqFacts);
+    if (this._mqFacts.matches !== this.state.factsNarrow) this._onMqFacts();
     this.rvNodes = [];
     this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Lab room idle rotation — a no-op until the About page's stage mounts.
@@ -4356,6 +4362,7 @@ class Component extends DCLogic {
     if (this.io) this.io.disconnect();
     window.removeEventListener('popstate', this.onPopState);
     if (this._onFitResize) window.removeEventListener('resize', this._onFitResize);
+    if (this._mqFacts && this._mqFacts.removeEventListener) this._mqFacts.removeEventListener('change', this._onMqFacts);
   }
 
   nav(page) {
@@ -4662,8 +4669,13 @@ class Component extends DCLogic {
         // Three columns reading down each in turn, filled four rows at a time
         // like the dog label, so both species' labels stand the same height;
         // the widest names set the 12px size that keeps every row on one line.
-        const per = 4;
-        const factsCols = [factsAll.slice(0, per), factsAll.slice(per, per * 2), factsAll.slice(per * 2)];
+        // Phones drop to two columns (see the factsgrid media rule), and the
+        // items re-chunk to five on the left with the rest on the right —
+        // letting the desktop thirds reflow instead would stack two chunks on
+        // one side and read 7/4.
+        const factsCols = this.state.factsNarrow
+          ? [factsAll.slice(0, 5), factsAll.slice(5), []]
+          : [factsAll.slice(0, 4), factsAll.slice(4, 8), factsAll.slice(8)];
         const factsRows = (list) => list.map((name, i) => ({
           name, bb: i === list.length - 1 ? 'none' : '1px solid #E0D6C3'
         }));
