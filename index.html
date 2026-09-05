@@ -4520,7 +4520,7 @@ class Component extends DCLogic {
           { k: 'A1 Peptides', v: 'Proprietary peptide blend' },
           { k: 'A2 Whole-food', v: 'Elk blend' },
           { k: 'A3 Mushroom', v: 'Lion\u2019s mane, reishi, turkey tail' },
-          { k: 'Weight range', v: '6\u2013120 lb' },
+          { k: 'Weight range', v: '10\u2013150 lb' },
           { k: 'Ritual', v: 'One chew each morning' }
         ] },
       { key: 'cat', badge: 'For cats', format: 'Happy Beans for Cats™ · daily supplement chew', name: 'Happy Beans for Cats', price: 'As low as $74', term: 'Per month · buy 3 get 1 free', slot: 'hbv2-shop-cat', ph: 'Happy Beans for Cats box with cat, editorial',
@@ -7285,13 +7285,13 @@ var HB_DOSE_TOP = '<div class="hb-dose">'
   + '</div></div>'
   + '<div class="ds-slider">'
   + '<div class="ds-slider__track">'
-  + '<span class="mono ds-tick-l" style="left: 10.34%" aria-hidden="true">20 lb</span>'
-  + '<span class="mono ds-tick-l" style="left: 65.52%" aria-hidden="true">100 lb</span>'
-  + '<span class="ds-tick" style="left: 10.34%" aria-hidden="true"></span>'
-  + '<span class="ds-tick" style="left: 65.52%" aria-hidden="true"></span>'
-  + '<input type="range" min="5" max="150" step="1" value="45" aria-label="Weight in pounds" data-range>'
+  + '<span class="mono ds-tick-l" style="left: 7.14%" aria-hidden="true">20 lb</span>'
+  + '<span class="mono ds-tick-l" style="left: 64.29%" aria-hidden="true">100 lb</span>'
+  + '<span class="ds-tick" style="left: 7.14%" aria-hidden="true"></span>'
+  + '<span class="ds-tick" style="left: 64.29%" aria-hidden="true"></span>'
+  + '<input type="range" min="10" max="150" step="1" value="45" aria-label="Weight in pounds" data-range>'
   + '</div>'
-  + '<div class="mono ds-slider__ends"><span>5 lb</span><span>150 lb</span></div>'
+  + '<div class="mono ds-slider__ends"><span>10 lb</span><span>150 lb</span></div>'
   + '</div>'
   + '<p class="ds-catnote">The cat formula is dosed flat. From a 5 lb to 20 lb, one chew a day.</p>'
   + '<div class="ds-result">'
@@ -7342,7 +7342,7 @@ window.hbDoseInit = function () {
     try {
       var pets = JSON.parse(localStorage.getItem('hb-pets') || '[]');
       var p = pets.find && pets.find(function (x) { return x && x.species; });
-      if (p) { species = p.species; if (p.weight) lb = Math.max(5, Math.min(150, Number(p.weight))); }
+      if (p) { species = p.species; if (p.weight) lb = Math.max(10, Math.min(150, Number(p.weight))); }
     } catch (e) {}
 
     function chewHtml(w, h, img) { return '<span style="width:' + w + 'px;height:' + h + 'px"><img src="/assets/img/dosing/chew.webp" alt="" style="width:' + img + 'px;height:' + img + 'px"></span>'; }
