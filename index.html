@@ -451,6 +451,14 @@ html.hb-subs-open [data-subs-hide] { display: none !important; }
    chip is hidden while prelaunch is on, so the margin would otherwise
    stack onto the row gap below it. Comes back with the chip. */
 html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
+
+/* Nutrition Facts label on phones: three ingredient columns are too narrow
+   for the longest names, so the grid drops to two (the third chunk flows
+   under the first), and the footer strip is allowed to stack. */
+@media (max-width: 600px) {
+  [data-m~="factsgrid"] { grid-template-columns: 1fr 1fr !important; }
+  [data-m~="factsfoot"] { flex-wrap: wrap !important; }
+}
 </style>
 
 <!-- Chew inspector (product page, 3D view). The scene modules import
@@ -1791,7 +1799,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
               <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #F0C64B;">Daily Supplement</span>
             </div>
             <div style="height: 3px; background: #F0C64B;"></div>
-            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 13px 18px 11px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; padding: 13px 18px 11px;">
               <div style="font-weight: 700; font-size: 21px; line-height: 1; letter-spacing: -0.03em; color: #17140F; white-space: nowrap;">Nutrition Facts</div>
               <div style="font-size: 11.5px; color: #4A4237; white-space: nowrap;">Serving size <span style="font-weight: 600; color: #17140F;">1 chew</span> · Per box <span style="font-weight: 600; color: #17140F;">30</span> · For <span style="font-weight: 600; color: #17140F;">{{ pdpFactsFor }}</span></div>
             </div>
@@ -1801,7 +1809,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
                 <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: #17140F; font-weight: 500;">Ingredients</span>
                 <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">Per chew</span>
               </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 16px;">
+              <div data-m="factsgrid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 16px;">
                 <div>
                   <sc-for list="{{ pdpFactsColA }}" as="fa" hint-placeholder-count="4">
                     <div style="display: flex; align-items: center; padding: 6px 0; border-bottom: {{ fa.bb }};">
@@ -1826,7 +1834,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
               </div>
             </div>
             <div style="margin: 8px 18px 0; height: 3px; background: #17140F;"></div>
-            <div style="margin-top: 8px; padding: 8px 18px 9px; background: #F2EEE3; border-top: 1px solid #E0D6C3; display: flex; justify-content: space-between; gap: 12px; align-items: center;">
+            <div data-m="factsfoot" style="margin-top: 8px; padding: 8px 18px 9px; background: #F2EEE3; border-top: 1px solid #E0D6C3; display: flex; justify-content: space-between; gap: 4px 12px; align-items: center;">
               <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Formulated fresh · Scottsdale, AZ</span>
               <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">happybeanie.com</span>
             </div>
@@ -4648,8 +4656,8 @@ class Component extends DCLogic {
         const ready = this.state.pdpReady;
         const factsAll = isDog
           ? ['Omega-3 EPA/DHA', 'Turkey Tail', 'Elk Liver', 'B-Complex', 'L-Carnitine', 'Green-Lipped Mussel',
-             'Curcumin', 'Elk Velvet Antler', 'Blueberry Polyphenols', 'CoQ10', 'Collagen Peptide Type II']
-          : ['Omega-3 EPA/DHA', 'Green-Lipped Mussel', 'Blueberry Polyphenols', 'B-Complex', 'L-Carnitine',
+             'Curcumin', 'Elk Velvet Antler', 'Polyphenols', 'CoQ10', 'Collagen Peptide II']
+          : ['Omega-3 EPA/DHA', 'Green-Lipped Mussel', 'Polyphenols', 'B-Complex', 'L-Carnitine',
              'Taurine', 'Collagen Peptide Blend', 'Organic Cranberry Extract', 'CoQ10'];
         // Three columns reading down each in turn, filled four rows at a time
         // like the dog label, so both species' labels stand the same height;
