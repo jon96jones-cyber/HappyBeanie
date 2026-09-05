@@ -1776,16 +1776,58 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
             <button sc-camel-on-click="{{ pdpShowPhoto }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 12px; border: none; cursor: pointer; background: {{ pdpTabPhotoBg }}; color: {{ pdpTabPhotoFg }};">Product photos</button>
             <button sc-camel-on-click="{{ pdpShow3d }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 12px; border: none; cursor: pointer; background: {{ pdpTab3dBg }}; color: {{ pdpTab3dFg }};">See What's Inside</button>
           </div>
-          <div style="display: {{ pdpPanelDisplay }}; border: 1px solid rgba(23,20,15,0.12); border-radius: 5px; background: #FCFAF4; overflow: hidden; box-shadow: 0 18px 34px -26px rgba(23,20,15,0.4);">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 1px; background: rgba(23,20,15,0.1); border-bottom: 1px solid rgba(23,20,15,0.1);">
-              <sc-for list="{{ pdpIngredients }}" as="ig" hint-placeholder-count="10">
-                <button sc-camel-on-click="{{ ig.pick }}" style="display: flex; align-items: center; gap: 9px; padding: 10px 14px; text-align: left; border: none; cursor: pointer; background: {{ ig.bg }};" style-hover="background: rgba(23,20,15,0.05);">
-                  <span style="flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; background: {{ ig.dot }}; box-shadow: inset 0 0 0 1px rgba(23,20,15,0.25);"></span>
-                  <span style="min-width: 0; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.05em; color: {{ ig.fg }}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ ig.name }}</span>
-                </button>
-              </sc-for>
+          <!-- Formula Facts label (designer handoff, lifted as-is). Follows the
+               page's species choice; the ingredient columns and the For line
+               are the design's own copy per species, bound in the state. -->
+          <div style="display: {{ pdpPanelDisplay }}; background: #FCFAF4; border: 2px solid #17140F; border-radius: 4px; box-shadow: 0 30px 60px -36px rgba(23,20,15,0.5); overflow: hidden;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 22px; background: #17140F;">
+              <img src="/assets/email/lifecycle/hb-wordmark.png" alt="happy beanie" width="132" height="22" style="display: block; width: 132px; height: auto;">
+              <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #F0C64B;">Daily Supplement</span>
             </div>
-            <div style="padding: 13px 16px 15px; font-size: 13px; line-height: 1.6; color: #554C40;"><strong style="color: #17140F;">{{ pdpIngName }}</strong> — {{ pdpIngBenefit }}</div>
+            <div style="height: 3px; background: #F0C64B;"></div>
+            <div style="padding: 24px 22px 0;">
+              <div style="margin: 0 0 6px; font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: -0.04em; color: #17140F;">Formula Facts</div>
+              <div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 12px 0 10px; border-bottom: 1px solid #E0D6C3;">
+                <span style="font-size: 14px; color: #4A4237;">Serving size</span>
+                <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; color: #17140F;">1 chew</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 10px 0 12px; border-bottom: 1px solid #E0D6C3;">
+                <span style="font-size: 14px; color: #4A4237;">Servings per box</span>
+                <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; color: #17140F;">30</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 10px 0 12px;">
+                <span style="font-size: 14px; color: #4A4237;">For</span>
+                <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; color: #17140F;">{{ pdpFactsFor }}</span>
+              </div>
+            </div>
+            <div style="height: 8px; background: #17140F;"></div>
+            <div style="padding: 16px 22px 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px;">
+                <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #17140F; font-weight: 500;">Ingredients</span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">Per chew</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 22px;">
+                <div>
+                  <sc-for list="{{ pdpFactsColA }}" as="fa" hint-placeholder-count="6">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: {{ fa.bb }};">
+                      <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; line-height: 1.3; color: #17140F;">{{ fa.name }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div>
+                  <sc-for list="{{ pdpFactsColB }}" as="fb" hint-placeholder-count="5">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: {{ fb.bb }};">
+                      <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; line-height: 1.3; color: #17140F;">{{ fb.name }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="margin: 14px 22px 0; height: 4px; background: #17140F;"></div>
+            <div style="margin-top: 14px; padding: 14px 22px 16px; background: #F2EEE3; border-top: 1px solid #E0D6C3; display: flex; justify-content: space-between; gap: 12px; align-items: center;">
+              <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Formulated fresh · Scottsdale, AZ</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">happybeanie.com</span>
+            </div>
           </div>
         </div>
         <div>
@@ -3170,36 +3212,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;oklch(0.86 0.14 92)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;oklch(0.86 0.14 92)&quot;,&quot;oklch(0.72 0.08 152)&quot;,&quot;oklch(0.78 0.11 45)&quot;,&quot;oklch(0.8 0.06 250)&quot;],&quot;section&quot;:&quot;Brand&quot;},&quot;basePrice&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:68,&quot;min&quot;:30,&quot;max&quot;:180,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Commerce&quot;}}">
-// Fleck palette baked into the chew model, in model order — index i is the
-// colour of the Flecks_(i+1) group. Mirrors COLS in hb-chew-stage.js.
-const CHEW_COLS = ['#d9a441', '#d97e2f', '#b09877', '#e5d9c0', '#7a3b2e', '#6b4d8f', '#e3c34e', '#c96a2d', '#d8a29a', '#efe6d4'];
-const CHEW_IGS = {
-  dog: [
-    { name: 'Omega-3 EPA/DHA', benefit: 'Brain, heart, joints & inflammation' },
-    { name: 'Curcumin', benefit: 'Anti-inflammatory & antioxidant' },
-    { name: 'Turkey Tail', benefit: 'Immune regulation' },
-    { name: 'Elk Velvet Antler', benefit: 'Joint repair & mobility' },
-    { name: 'Elk Liver', benefit: 'Whole-food vitamin A, iron & palatability' },
-    { name: 'Blueberry Polyphenols', benefit: 'Cellular antioxidant defense' },
-    { name: 'B-Complex', benefit: 'Energy metabolism & nerve function' },
-    { name: 'CoQ10', benefit: 'Cardiac energy & mitochondrial support' },
-    { name: 'L-Carnitine', benefit: 'Fat metabolism & lean muscle maintenance' },
-    { name: 'Collagen Peptide Blend', benefit: 'Cartilage & connective tissue' }
-  ],
-  cat: [
-    { name: 'Omega-3 EPA/DHA', benefit: 'Brain, heart, joints & inflammation' },
-    { name: 'Taurine', benefit: 'Heart muscle function, eye health & nervous system' },
-    { name: 'Green-Lipped Mussel', benefit: 'Joint repair & mobility' },
-    { name: 'Collagen Peptide Blend', benefit: 'Cartilage & connective tissue' },
-    { name: 'Blueberry Polyphenols', benefit: 'Cellular antioxidant defense' },
-    { name: 'Organic Cranberry Extract', benefit: 'Urinary tract support & antioxidant protection' },
-    { name: 'B-Complex', benefit: 'Energy metabolism & nerve function' },
-    { name: 'CoQ10', benefit: 'Cardiac energy & mitochondrial support' },
-    { name: 'L-Carnitine', benefit: 'Fat metabolism & lean muscle maintenance' },
-    { name: 'Chamomile Extract', benefit: 'Calming & digestive comfort' }
-  ]
-};
-
 // The single switch for whether anyone sees the popup. The card itself is the
 // "feed Summer" component at the end of the body; this only gates it.
 const POP_ON = true;
@@ -3500,12 +3512,6 @@ class Component extends DCLogic {
   }
 
   // --- Chew inspector -------------------------------------------------------
-  // Index-matched to CHEW_COLS and to the fleck groups inside the 3D model:
-  // row i drives Flecks_(i+1). Reordering either list silently mismatches the
-  // colour dot against the flecks that rise, so keep them in step.
-  chewIngredients() {
-    return CHEW_IGS[this.state.sp === 'cat' ? 'cat' : 'dog'];
-  }
 
   // three.js is ~2MB unminified, so none of it is fetched until the shopper
   // actually opens the 3D tab. The product page is the conversion page; it
@@ -4577,14 +4583,19 @@ class Component extends DCLogic {
       pdpCollage: copy.thumbs.map(t => ({ ...t, col: 'auto', row: '2' })),
       pdpOther: copy.other,
       ...(() => {
-        // Chew inspector. The ingredient list follows the page's species
-        // choice; the fleck colours are index-matched to the palette baked
-        // into the 3D model, so order here must track the model's order.
+        // Chew inspector. The panel below the tabs is the Formula Facts label
+        // from the design handoff — its columns and the For line are the
+        // design's own copy, chosen by the page's species state.
         const is3d = this.state.pdpView === '3d';
         const ready = this.state.pdpReady;
-        const igs = this.chewIngredients();
-        const sel = Math.min(this.state.pdpSel, igs.length - 1);
-        const cur = igs[sel] || { name: '', benefit: '' };
+        const factsCols = isDog
+          ? [['Omega-3 EPA/DHA', 'Turkey Tail', 'Elk Liver', 'B-Complex', 'L-Carnitine', 'Green-Lipped Mussel'],
+             ['Curcumin', 'Elk Velvet Antler', 'Blueberry Polyphenols', 'CoQ10', 'Collagen Peptide Type II']]
+          : [['Omega-3 EPA/DHA', 'Green-Lipped Mussel', 'Blueberry Polyphenols', 'B-Complex', 'L-Carnitine'],
+             ['Taurine', 'Collagen Peptide Blend', 'Organic Cranberry Extract', 'CoQ10']];
+        const factsRows = (list) => list.map((name, i) => ({
+          name, bb: i === list.length - 1 ? 'none' : '1px solid #E0D6C3'
+        }));
         return {
           // While three.js downloads the photo stays up and the stage fades in
           // over it only once the chew is actually in the scene — never a blank
@@ -4599,17 +4610,9 @@ class Component extends DCLogic {
           pdpTabPhotoFg: is3d ? '#554C40' : '#F5F0E6',
           pdpTab3dBg: is3d ? '#17140F' : '#FCFAF4',
           pdpTab3dFg: is3d ? '#F5F0E6' : '#554C40',
-          pdpIngName: cur.name,
-          pdpIngBenefit: cur.benefit,
-          pdpIngredients: igs.map((ig, i) => ({
-            name: ig.name,
-            dot: CHEW_COLS[i],
-            // The row highlight would be claiming "these flecks are showing"
-            // while the chew is still closed, so it only lights up once cut.
-            bg: (this.state.pdpCut && sel === i) ? 'rgba(23,20,15,0.07)' : '#FCFAF4',
-            fg: (this.state.pdpCut && sel === i) ? '#17140F' : '#554C40',
-            pick: () => this.setState({ pdpSel: i, pdpCut: true }, () => this.chewSync())
-          })),
+          pdpFactsFor: isDog ? 'Dogs · 12 months +' : 'Cats',
+          pdpFactsColA: factsRows(factsCols[0]),
+          pdpFactsColB: factsRows(factsCols[1]),
           pdpShowPhoto: () => this.setState({ pdpView: 'photo' }),
           // Re-opening the tab on a still-mounted stage skips the loading
           // state; a fresh visit shows the photo + "Preparing 3D view…" until
