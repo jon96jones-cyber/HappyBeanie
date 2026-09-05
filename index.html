@@ -4540,7 +4540,7 @@ class Component extends DCLogic {
       { k: 'A3 Third active', dog: 'Mushroom blend', cat: 'Green-lipped mussel' },
       { k: 'Copper', dog: 'Included as cofactor', cat: 'None — removed entirely' },
       { k: 'Dosing', dog: 'One chew daily', cat: 'One chew daily' },
-      { k: 'Weight range', dog: '6–120 lb', cat: '4–22 lb' },
+      { k: 'Weight range', dog: '10–150 lb', cat: '4–22 lb' },
       { k: 'Supply', dog: '30-day box', cat: '30-day box' },
       { k: 'Flavour base', dog: 'Natural chicken', cat: 'Natural tuna, salmon oil' }
     ];
@@ -4646,7 +4646,7 @@ class Component extends DCLogic {
     const bestIdx = this.state.wholesale ? 0 : (subsOff ? 2 : 1);
     const bestDef = planDefs.find(p => p.idx === bestIdx) || planDefs[0];
     const speciesDefs = [
-      { key: 'dog', label: 'For dogs', meta: 'Happy Beans™ · 6–120 lb', slot: 'hbv2-species-dog', ph: 'Dog portrait, natural light' },
+      { key: 'dog', label: 'For dogs', meta: 'Happy Beans™ · 10–150 lb', slot: 'hbv2-species-dog', ph: 'Dog portrait, natural light' },
       { key: 'cat', label: 'For cats', meta: 'Happy Beans for Cats™ · 4–22 lb', slot: 'hbv2-species-cat', ph: 'Cat portrait, natural light' }
     ];
     const copy = isDog ? {
