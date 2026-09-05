@@ -452,6 +452,64 @@ html.hb-subs-open [data-subs-hide] { display: none !important; }
    stack onto the row gap below it. Comes back with the chip. */
 html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
+/* FAQ card carousel (designer handoff, Setup_31). Scoped under .hb-faq; the
+   section renders as the site's dark inset band inside each page's container. */
+.hb-faq { --hb-ink: #17140F; --hb-cream: #FCFAF4; --hb-cream-text: #F5F0E6; --hb-muted: #8A7F6E; --hb-num: #C9BFA8; --hb-yellow: oklch(0.86 0.14 92); --hb-green: oklch(0.44 0.07 152); --hb-sans: 'DM Sans', system-ui, sans-serif; --hb-mono: 'HB Mono Figures', 'DM Mono', ui-monospace, monospace; --card-w: 264px; --card-gap: 18px; }
+.hb-faq { position: relative; overflow: hidden; background: var(--hb-ink); color: var(--hb-cream-text); padding: 88px 0 80px; font-family: var(--hb-sans); border-radius: 5px; }
+.hb-faq * { box-sizing: border-box; }
+.hb-faq__glow { position: absolute; right: -160px; top: -160px; width: 460px; height: 460px; border-radius: 50%; background: radial-gradient(closest-side, rgba(240,198,75,0.28), transparent); pointer-events: none; }
+.hb-faq__bean { position: absolute; pointer-events: none; filter: drop-shadow(0 14px 16px rgba(0,0,0,0.6)); }
+.hb-faq__bean--a { right: 64px; top: 44px; width: 84px; animation: hbFloatA 3.2s ease-in-out infinite; }
+.hb-faq__bean--c { right: 170px; top: 130px; width: 42px; animation: hbFloatB 3.8s ease-in-out infinite 0.6s; }
+.hb-faq__inner { max-width: 1180px; margin: 0 auto; padding: 0 44px; position: relative; }
+.hb-faq__kicker { font-family: var(--hb-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--hb-yellow); margin-bottom: 18px; }
+.hb-faq__title { margin: 0 0 40px; font-weight: 700; letter-spacing: -0.045em; font-size: clamp(30px, 3.6vw, 52px); line-height: 0.98; max-width: 16em; color: var(--hb-cream-text); text-wrap: balance; }
+.hb-faq__title em { font-style: normal; color: var(--hb-yellow); }
+.hb-faq__rail { position: relative; }
+.hb-faq__fade { position: absolute; top: 0; bottom: 0; width: 140px; z-index: 2; pointer-events: none; }
+.hb-faq__fade--l { left: 0; background: linear-gradient(to right, var(--hb-ink) 25%, rgba(23,20,15,0)); }
+.hb-faq__fade--r { right: 0; background: linear-gradient(to left, var(--hb-ink) 25%, rgba(23,20,15,0)); }
+.hb-faq__track { display: grid; grid-template-columns: repeat(6, var(--card-w)); gap: var(--card-gap); perspective: 1400px; width: max-content; padding: 8px 0 16px; transform: translateX(var(--x, 0px)); transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.hb-faq__arrow { position: absolute; top: 50%; margin-top: -24px; z-index: 3; width: 48px; height: 48px; border-radius: 50%; background: var(--hb-yellow); border: none; color: var(--hb-ink); font-size: 20px; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 10px 24px -8px rgba(0,0,0,0.6); transition: opacity 0.3s ease, transform 0.25s ease; }
+.hb-faq__arrow:hover { transform: scale(1.06); }
+.hb-faq__arrow--prev { left: 32px; } .hb-faq__arrow--next { right: 32px; }
+.hb-faq__arrow[disabled] { opacity: 0.35; cursor: default; }
+.hb-faq__card { position: relative; min-height: 300px; padding: 0; background: transparent; border: none; cursor: pointer; text-align: left; font-family: var(--hb-sans); transform: rotate(var(--tilt)); transform-style: preserve-3d; opacity: 0.55; transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.5s ease; }
+.hb-faq__card.is-visible { opacity: 1; }
+.hb-faq__card:hover { transform: rotate(0deg) translateY(-6px); }
+.hb-faq__face { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 22px 22px 24px; border-radius: 4px; box-shadow: 0 24px 40px -24px rgba(0,0,0,0.7); backface-visibility: hidden; transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.hb-faq__face--front { background: var(--hb-cream); transform: rotateY(0deg); }
+.hb-faq__face--back { background: var(--hb-yellow); transform: rotateY(180deg); }
+.hb-faq__card.is-open .hb-faq__face--front { transform: rotateY(180deg); }
+.hb-faq__card.is-open .hb-faq__face--back { transform: rotateY(360deg); }
+.hb-faq__meta { display: flex; justify-content: space-between; align-items: center; }
+.hb-faq__num { font-weight: 500; font-size: 13px; color: var(--hb-num); }
+.hb-faq__paw { width: 26px; opacity: 0.35; display: block; }
+.hb-faq__q { display: block; margin: 0 0 12px; font-weight: 700; font-size: 22px; line-height: 1.12; letter-spacing: -0.03em; color: var(--hb-ink); text-wrap: balance; }
+.hb-faq__flip { font-family: var(--hb-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hb-green); }
+.hb-faq__qsmall { display: block; font-family: var(--hb-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hb-ink); line-height: 1.5; }
+.hb-faq__a { display: block; margin: 0 0 12px; font-size: 14.5px; line-height: 1.45; color: var(--hb-ink); text-wrap: pretty; }
+.hb-faq__cta { font-family: var(--hb-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--hb-ink); text-decoration: underline; text-underline-offset: 3px; }
+.hb-faq__foot { max-width: 1180px; margin: 32px auto 0; padding: 0 44px; display: flex; justify-content: flex-end; position: relative; }
+.hb-faq__ask { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; background: transparent; border: 1.5px dashed var(--hb-yellow); border-radius: 999px; font-family: var(--hb-mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hb-yellow); cursor: pointer; transition: background 0.2s ease, color 0.2s ease; }
+.hb-faq__ask:hover { background: var(--hb-yellow); color: var(--hb-ink); }
+.hb-faq__panel { max-width: 1180px; margin: 0 auto; padding: 0 44px; max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.45s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease; }
+.hb-faq__panel.is-open { max-height: 520px; opacity: 1; }
+.hb-faq__form { margin: 20px auto 0; padding: 22px 24px; background: var(--hb-cream); border-radius: 4px; max-width: 560px; color: var(--hb-ink); }
+.hb-faq__form-k { font-family: var(--hb-mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hb-green); margin-bottom: 10px; }
+.hb-faq__form-h { font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.2; margin-bottom: 12px; }
+.hb-faq__form textarea, .hb-faq__form input { width: 100%; font-family: var(--hb-sans); font-size: 14px; line-height: 1.55; color: var(--hb-ink); background: #FFFDF7; border: 1px solid #E0D6C2; border-radius: 4px; padding: 12px 13px; margin-bottom: 8px; }
+.hb-faq__form textarea { resize: vertical; }
+.hb-faq__form input { font-family: var(--hb-mono); font-size: 12px; letter-spacing: 0.04em; margin-bottom: 12px; }
+.hb-faq__send { width: 100%; font-family: var(--hb-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding: 15px; border: none; border-radius: 3px; background: var(--hb-ink); color: var(--hb-cream-text); cursor: pointer; }
+.hb-faq__form p { font-size: 14px; line-height: 1.6; color: #554C40; margin: 0; }
+.hb-faq__form [hidden] { display: none; }
+@media (max-width: 900px) { .hb-faq__foot { justify-content: center; } }
+@keyframes hbFloatA { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes hbFloatB { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-13px); } }
+@media (prefers-reduced-motion: reduce) { .hb-faq__bean { animation: none; } .hb-faq__track, .hb-faq__face, .hb-faq__card { transition: none; } }
+
+
 /* Nutrition Facts label on phones: three ingredient columns are too narrow
    for the longest names, so the grid drops to two (the third chunk flows
    under the first), and the footer strip is allowed to stack. */
@@ -669,23 +727,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   @keyframes hbFloatA { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
   @keyframes hbFloatB { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-13px); } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
-  [data-m~="faqhead"] { display: grid; grid-template-columns: minmax(0, 1fr) 300px; column-gap: 40px; align-items: start; }
-  [data-m~="faqhead"] > :first-child { grid-column: 1; grid-row: 1; }
-  [data-m~="askcol"] { grid-column: 2; grid-row: 2; align-self: start; }
-  [data-m~="faqwrap"] { grid-column: 1; grid-row: 2; }
-  [data-m~="faqwrap"] { border-top: none !important; gap: 10px !important; }
-  [data-m~="faqrow"] { border-bottom: none !important; border: 1px solid #E4DBC9; border-radius: 8px; overflow: hidden; background: linear-gradient(168deg, #FFFDF7 0%, #F7F2E8 100%); box-shadow: 0 14px 26px -22px rgba(23,20,15,0.5), 0 1px 0 rgba(255,255,255,0.9) inset; transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.2,0.7,0.2,1), background 0.35s ease, border-color 0.3s ease; }
-  [data-m~="faqrow"]:hover { border-color: oklch(0.44 0.07 152 / 0.45); }
-  [data-m~="faqrow"][data-open="1"] { background: linear-gradient(168deg, #FFFFFF 0%, #F5F0E6 100%); border-color: oklch(0.44 0.07 152 / 0.55); box-shadow: 0 30px 50px -28px rgba(23,20,15,0.55), 0 1px 0 rgba(255,255,255,0.95) inset; transform: translateY(-3px); }
-  [data-m~="faqbtn"] { padding: 24px 28px !important; }
-  [data-m~="faqsign"] { width: 30px; height: 30px; flex: 0 0 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #EDE6D8; color: #17140F; transition: background 0.3s ease, color 0.3s ease, transform 0.4s cubic-bezier(0.2,0.7,0.2,1); }
-  [data-m~="faqrow"][data-open="1"] [data-m~="faqsign"] { background: oklch(0.44 0.07 152); color: #FCFAF4; transform: rotate(180deg); }
-  [data-m~="faqans"] { padding: 0 28px; }
-  [data-m~="asktile"] { width: 100%; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease; }
-  [data-m~="asktile"]:hover { transform: translateY(-2px); border-color: oklch(0.44 0.07 152); }
-  [data-m~="asktile"][data-open="1"] { background: linear-gradient(168deg, #FFFFFF 0%, #EDE6D8 100%); border-style: solid; transform: translateY(-2px); box-shadow: 0 22px 34px -22px rgba(23,20,15,0.55); }
-  [data-m~="askbox"] { max-height: 0; opacity: 0; overflow: hidden; border-radius: 6px; background: linear-gradient(168deg, #FFFDF7 0%, #F5F0E6 100%); transition: max-height 0.5s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease, margin-top 0.3s ease; }
-  [data-m~="askbox"][data-open="1"] { max-height: 460px; opacity: 1; margin-top: 10px; padding: 20px 20px 22px; border: 1px solid #E4DBC9; box-shadow: 0 20px 36px -26px rgba(23,20,15,0.45), 0 1px 0 rgba(255,255,255,0.9) inset; }
   @media (max-width: 1180px) { [data-m~="hidewide"] { display: none !important; } }
   [data-m~="flipwrap"]:focus-visible { outline: 2px solid #17140F; outline-offset: -2px; }
   [data-m~="fliparrow"] { display: none; }
@@ -838,22 +879,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="ctstat"] > :first-child { font-size: 8.5px !important; padding: 5px 8px !important; }
     [data-m~="ctlot"] { grid-column: 1 !important; font-size: 11px !important; }
     [data-m~="ctdate"] { display: none !important; }
-    [data-m~="askcol"] { display: contents !important; }
-    [data-m~="faqwrap"] { grid-column: 1 / -1 !important; grid-row: auto !important; }
-    [data-m~="faqhead"] > :first-child { grid-column: 1 !important; grid-row: 1 !important; }
-    [data-m~="faqhead"] { display: grid !important; grid-template-columns: minmax(0, 1fr) 116px !important; column-gap: 12px !important; align-items: start !important; }
-    [data-m~="faqh2"] { margin-bottom: 20px !important; }
-    [data-m~="asktile"] { transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease, background 0.3s ease !important; }
-    [data-m~="asktile"][data-open="1"] { background: linear-gradient(168deg, #FFFFFF 0%, #EDE6D8 100%) !important; border-style: solid !important; transform: translateY(-2px) !important; box-shadow: 0 20px 32px -20px rgba(23,20,15,0.55) !important; }
-    [data-m~="askbox"] { grid-column: 1 / -1 !important; max-height: 0 !important; opacity: 0 !important; overflow: hidden !important; margin-top: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; transition: max-height 0.45s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease, margin-top 0.3s ease !important; }
-    [data-m~="askbox"][data-open="1"] { max-height: 420px !important; opacity: 1 !important; margin-top: 4px !important; margin-bottom: 16px !important; padding: 18px 16px 20px !important; border: 1px solid #E4DBC9 !important; box-shadow: 0 18px 34px -24px rgba(23,20,15,0.45), 0 1px 0 rgba(255,255,255,0.9) inset !important; }
-    [data-m~="faqwrap"] { border-top: none !important; gap: 8px !important; }
-    [data-m~="faqrow"] { border-bottom: none !important; border: 1px solid #E4DBC9 !important; border-radius: 6px !important; overflow: hidden !important; background: linear-gradient(168deg, #FFFDF7 0%, #F7F2E8 100%) !important; box-shadow: 0 10px 20px -18px rgba(23,20,15,0.5), 0 1px 0 rgba(255,255,255,0.9) inset !important; transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.2,0.7,0.2,1), background 0.35s ease !important; }
-    [data-m~="faqrow"][data-open="1"] { background: linear-gradient(168deg, #FFFFFF 0%, #F5F0E6 100%) !important; box-shadow: 0 24px 40px -22px rgba(23,20,15,0.55), 0 1px 0 rgba(255,255,255,0.95) inset !important; transform: translateY(-2px) !important; border-color: oklch(0.44 0.07 152 / 0.55) !important; }
-    [data-m~="faqbtn"] { padding: 16px 16px !important; font-size: 16px !important; line-height: 1.25 !important; gap: 12px !important; }
-    [data-m~="faqsign"] { width: 24px !important; height: 24px !important; flex: 0 0 24px !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 50% !important; background: #EDE6D8 !important; color: #17140F !important; font-size: 13px !important; transition: background 0.3s ease, transform 0.35s ease !important; }
-    [data-m~="faqrow"][data-open="1"] [data-m~="faqsign"] { background: oklch(0.44 0.07 152) !important; color: #FCFAF4 !important; transform: rotate(180deg) !important; }
-    [data-m~="faqans"] { font-size: 13.5px !important; line-height: 1.6 !important; padding: 0 16px !important; margin-bottom: 16px !important; }
     [data-m~="fmh3"] { font-size: 19px !important; }
     [data-m~="fmp"] { font-size: 13.5px !important; line-height: 1.55 !important; margin-bottom: 12px !important; }
     [data-m~="fmchip"] { font-size: 9px !important; padding: 5px 8px !important; }
@@ -2186,44 +2211,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
       </div>
 
       <div style="max-width: 1180px; margin: 72px auto 0;">
-        <div data-m="faqhead">
-          <div>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">Before you decide</div>
-            <h2 data-m="faqh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 44px); line-height: 1.05; margin: 0 0 32px; max-width: 22em;">The questions owners ask us <span style="color: oklch(0.44 0.07 152);">before the first box.</span></h2>
-          </div>
-          <div data-m="askcol" style="display: grid; gap: 0;">
-          <button sc-camel-on-click="{{ toggleAsk }}" data-m="mobonly asktile" data-open="{{ askOpenFlag }}" style="text-align: left; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1px dashed oklch(0.44 0.07 152 / 0.6); border-radius: 6px; background: linear-gradient(168deg, #FFFDF7 0%, #F2EBDC 100%); box-shadow: 0 12px 22px -18px rgba(23,20,15,0.5), 0 1px 0 rgba(255,255,255,0.9) inset; padding: 12px 12px 13px;">
-            <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 6px;">Add yours</span>
-            <span style="display: block; font-weight: 700; letter-spacing: -0.03em; font-size: 14px; line-height: 1.15; color: #17140F;">{{ askTileLabel }}</span>
-          </button>
-          <div data-m="mobonly askbox" data-open="{{ askOpenFlag }}">
-          <sc-if value="{{ askUnsent }}" hint-placeholder-val="{{ true }}">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Still wondering?</div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.2; color: #17140F; margin-bottom: 12px;">Ask us directly.</div>
-            <textarea value="{{ askQ }}" sc-camel-on-change="{{ onAskQ }}" placeholder="" rows="3" style="width: 100%; box-sizing: border-box; resize: vertical; font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.55; color: #17140F; background: #FCFAF4; border: 1px solid #E0D6C2; border-radius: 4px; padding: 12px 13px; margin-bottom: 8px;"></textarea>
-            <input value="{{ askEmail }}" sc-camel-on-change="{{ onAskEmail }}" type="email" placeholder="Email for the reply" style="width: 100%; box-sizing: border-box; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #17140F; background: #FCFAF4; border: 1px solid #E0D6C2; border-radius: 4px; padding: 12px 13px; margin-bottom: 12px;">
-            <button sc-camel-on-click="{{ sendAsk }}" style="width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding: 15px; border: none; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer;">Send my question →</button>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E; text-align: center; margin-top: 10px;">Answered usually same day</div>
-          </sc-if>
-          <sc-if value="{{ askSent }}" hint-placeholder-val="{{ false }}">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Question received</div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.25; color: #17140F; margin-bottom: 8px;">We'll come back to you by email.</div>
-            <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0;">A real person on our support team reads every one of these — no bots, no canned replies. If it's urgent, call the number in the footer.</p>
-          </sc-if>
-          </div>
-        </div>
-        <div data-m="faqwrap" style="display: grid; gap: 0; border-top: 1px solid #E0D6C2;">
-          <sc-for list="{{ faqs }}" as="q" hint-placeholder-count="4">
-            <div data-m="faqrow" data-open="{{ q.openFlag }}" style="border-bottom: 1px solid #E0D6C2;">
-              <button sc-camel-on-click="{{ q.toggle }}" data-m="faqbtn" style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 20px; text-align: left; padding: 22px 4px; background: transparent; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 23px; color: #17140F;">{{ q.q }}<span data-m="faqsign" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 16px; color: #8A7F6E;">{{ q.sign }}</span></button>
-              <div style="max-height: {{ q.maxHeight }}; opacity: {{ q.opacity }}; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease;">
-                <p data-m="faqans" style="font-size: 15px; line-height: 1.7; color: #554C40; margin: 0 0 18px; max-width: 44em;">{{ q.a }}</p>
-                <div data-m="faqans" style="margin: 0 0 24px;"><button sc-camel-on-click="{{ q.goCta }}" style="display: {{ q.ctaDisplay }}; align-items: center; gap: 10px; border: none; cursor: pointer; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 22px; border-radius: 2px; background: #17140F; color: #F5F0E6; transition: background 0.2s ease, transform 0.2s ease;" style-hover="background: oklch(0.44 0.07 152); transform: translateY(-2px);">{{ q.ctaLabel }}</button></div>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-        </div>
+        <div data-hb-faq-host></div>
       </div>
 
       <div data-m="inset" data-rv="1" style="position: relative; max-width: 1180px; margin: 88px auto 0; background: #17140F; border-radius: 5px; padding: 72px 56px; overflow: hidden; opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);">
@@ -2392,44 +2380,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
     <section data-m="pad short" style="background: #EDE6D8; padding: 92px 44px; border-top: 1px solid #DDD3C0;">
       <div style="max-width: 1180px; margin: 0 auto;">
-        <div data-m="faqhead">
-          <div>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">Straight answers</div>
-            <h2 data-m="faqh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.4vw, 48px); line-height: 1.04; margin: 0 0 40px; max-width: 20em;">What owners ask us <span style="color: oklch(0.44 0.07 152);">most often.</span></h2>
-          </div>
-          <div data-m="askcol" style="display: grid; gap: 0;">
-          <button sc-camel-on-click="{{ toggleAsk }}" data-m="mobonly asktile" data-open="{{ askOpenFlag }}" style="text-align: left; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1px dashed oklch(0.44 0.07 152 / 0.6); border-radius: 6px; background: linear-gradient(168deg, #FFFDF7 0%, #F2EBDC 100%); box-shadow: 0 12px 22px -18px rgba(23,20,15,0.5), 0 1px 0 rgba(255,255,255,0.9) inset; padding: 12px 12px 13px;">
-            <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 6px;">Add yours</span>
-            <span style="display: block; font-weight: 700; letter-spacing: -0.03em; font-size: 14px; line-height: 1.15; color: #17140F;">{{ askTileLabel }}</span>
-          </button>
-          <div data-m="mobonly askbox" data-open="{{ askOpenFlag }}">
-          <sc-if value="{{ askUnsent }}" hint-placeholder-val="{{ true }}">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Still wondering?</div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.2; color: #17140F; margin-bottom: 12px;">Ask us directly.</div>
-            <textarea value="{{ askQ }}" sc-camel-on-change="{{ onAskQ }}" placeholder="" rows="3" style="width: 100%; box-sizing: border-box; resize: vertical; font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.55; color: #17140F; background: #FCFAF4; border: 1px solid #E0D6C2; border-radius: 4px; padding: 12px 13px; margin-bottom: 8px;"></textarea>
-            <input value="{{ askEmail }}" sc-camel-on-change="{{ onAskEmail }}" type="email" placeholder="Email for the reply" style="width: 100%; box-sizing: border-box; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #17140F; background: #FCFAF4; border: 1px solid #E0D6C2; border-radius: 4px; padding: 12px 13px; margin-bottom: 12px;">
-            <button sc-camel-on-click="{{ sendAsk }}" style="width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding: 15px; border: none; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer;">Send my question →</button>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E; text-align: center; margin-top: 10px;">Answered usually same day</div>
-          </sc-if>
-          <sc-if value="{{ askSent }}" hint-placeholder-val="{{ false }}">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Question received</div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.25; color: #17140F; margin-bottom: 8px;">We'll come back to you by email.</div>
-            <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0;">A real person on our support team reads every one of these — no bots, no canned replies. If it's urgent, call the number in the footer.</p>
-          </sc-if>
-          </div>
-        </div>
-        <div data-m="faqwrap" style="display: grid; gap: 0; border-top: 1px solid #E0D6C2;">
-          <sc-for list="{{ faqs }}" as="q5" hint-placeholder-count="4">
-            <div data-m="faqrow" data-open="{{ q5.openFlag }}" style="border-bottom: 1px solid #E0D6C2;">
-              <button sc-camel-on-click="{{ q5.toggle }}" data-m="faqbtn" style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 20px; text-align: left; padding: 22px 4px; background: transparent; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 23px; color: #17140F;">{{ q5.q }}<span data-m="faqsign" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 16px; color: #8A7F6E;">{{ q5.sign }}</span></button>
-              <div style="max-height: {{ q5.maxHeight }}; opacity: {{ q5.opacity }}; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease;">
-                <p data-m="faqans" style="font-size: 15px; line-height: 1.7; color: #554C40; margin: 0 0 18px; max-width: 44em;">{{ q5.a }}</p>
-                <div data-m="faqans" style="margin: 0 0 24px;"><button sc-camel-on-click="{{ q5.goCta }}" style="display: {{ q5.ctaDisplay }}; align-items: center; gap: 10px; border: none; cursor: pointer; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 22px; border-radius: 2px; background: #17140F; color: #F5F0E6; transition: background 0.2s ease, transform 0.2s ease;" style-hover="background: oklch(0.44 0.07 152); transform: translateY(-2px);">{{ q5.ctaLabel }}</button></div>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-        </div>
+        <div data-hb-faq-host></div>
       </div>
     </section>
 
@@ -2571,44 +2522,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
     <section data-m="pad short" style="background: #EDE6D8; padding: 92px 44px; border-top: 1px solid #DDD3C0;">
       <div style="max-width: 1180px; margin: 0 auto;">
-        <div data-m="faqhead">
-          <div>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">Before you write</div>
-            <h2 data-m="faqh2" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.4vw, 48px); line-height: 1.04; margin: 0 0 40px; max-width: 20em;">Most questions have <span style="color: oklch(0.44 0.07 152);">a short answer.</span></h2>
-          </div>
-          <div data-m="askcol" style="display: grid; gap: 0;">
-          <button sc-camel-on-click="{{ toggleAsk }}" data-m="mobonly asktile" data-open="{{ askOpenFlag }}" style="text-align: left; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1px dashed oklch(0.44 0.07 152 / 0.6); border-radius: 6px; background: linear-gradient(168deg, #FFFDF7 0%, #F2EBDC 100%); box-shadow: 0 12px 22px -18px rgba(23,20,15,0.5), 0 1px 0 rgba(255,255,255,0.9) inset; padding: 12px 12px 13px;">
-            <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 6px;">Add yours</span>
-            <span style="display: block; font-weight: 700; letter-spacing: -0.03em; font-size: 14px; line-height: 1.15; color: #17140F;">{{ askTileLabel }}</span>
-          </button>
-          <div data-m="mobonly askbox" data-open="{{ askOpenFlag }}">
-          <sc-if value="{{ askUnsent }}" hint-placeholder-val="{{ true }}">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Still wondering?</div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.2; color: #17140F; margin-bottom: 12px;">Ask us directly.</div>
-            <textarea value="{{ askQ }}" sc-camel-on-change="{{ onAskQ }}" placeholder="" rows="3" style="width: 100%; box-sizing: border-box; resize: vertical; font-family: 'DM Sans', sans-serif; font-size: 14px; line-height: 1.55; color: #17140F; background: #FCFAF4; border: 1px solid #E0D6C2; border-radius: 4px; padding: 12px 13px; margin-bottom: 8px;"></textarea>
-            <input value="{{ askEmail }}" sc-camel-on-change="{{ onAskEmail }}" type="email" placeholder="Email for the reply" style="width: 100%; box-sizing: border-box; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #17140F; background: #FCFAF4; border: 1px solid #E0D6C2; border-radius: 4px; padding: 12px 13px; margin-bottom: 12px;">
-            <button sc-camel-on-click="{{ sendAsk }}" style="width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding: 15px; border: none; border-radius: 3px; background: #17140F; color: #F5F0E6; cursor: pointer;">Send my question →</button>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E; text-align: center; margin-top: 10px;">Answered usually same day</div>
-          </sc-if>
-          <sc-if value="{{ askSent }}" hint-placeholder-val="{{ false }}">
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 10px;">Question received</div>
-            <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 19px; line-height: 1.25; color: #17140F; margin-bottom: 8px;">We'll come back to you by email.</div>
-            <p style="font-size: 14px; line-height: 1.6; color: #554C40; margin: 0;">A real person on our support team reads every one of these — no bots, no canned replies. If it's urgent, call the number in the footer.</p>
-          </sc-if>
-          </div>
-        </div>
-        <div data-m="faqwrap" style="display: grid; gap: 0; border-top: 1px solid #E0D6C2;">
-          <sc-for list="{{ faqs }}" as="q3" hint-placeholder-count="4">
-            <div data-m="faqrow" data-open="{{ q3.openFlag }}" style="border-bottom: 1px solid #E0D6C2;">
-              <button sc-camel-on-click="{{ q3.toggle }}" data-m="faqbtn" style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 20px; text-align: left; padding: 22px 4px; background: transparent; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 23px; color: #17140F;">{{ q3.q }}<span data-m="faqsign" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 16px; color: #8A7F6E;">{{ q3.sign }}</span></button>
-              <div style="max-height: {{ q3.maxHeight }}; opacity: {{ q3.opacity }}; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease;">
-                <p data-m="faqans" style="font-size: 15px; line-height: 1.7; color: #554C40; margin: 0 0 18px; max-width: 44em;">{{ q3.a }}</p>
-                <div data-m="faqans" style="margin: 0 0 24px;"><button sc-camel-on-click="{{ q3.goCta }}" style="display: {{ q3.ctaDisplay }}; align-items: center; gap: 10px; border: none; cursor: pointer; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 13px 22px; border-radius: 2px; background: #17140F; color: #F5F0E6; transition: background 0.2s ease, transform 0.2s ease;" style-hover="background: oklch(0.44 0.07 152); transform: translateY(-2px);">{{ q3.ctaLabel }}</button></div>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-        </div>
+        <div data-hb-faq-host></div>
       </div>
     </section>
 
@@ -3287,7 +3201,7 @@ const POP_AUTH_WAIT = 9000;
 const POP_NEVER = ['cart', 'checkout', 'quiz'];
 
 class Component extends DCLogic {
-  state = { igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', faq: 0, topic: 0, sent: false, barOn: false, pct: 0,
+  state = { igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', topic: 0, sent: false, barOn: false, pct: 0,
     form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null, signedIn: false, wholesale: false, trade: null,
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
@@ -4310,6 +4224,7 @@ class Component extends DCLogic {
     // The catch section mounts and unmounts with the product page.
     try { if (window.hbCatchTick) window.hbCatchTick(); } catch (e) {}
     try { if (window.hbRateScan) window.hbRateScan(); } catch (e) {}
+    try { if (window.hbFaqInit) window.hbFaqInit(); } catch (e) {}
     // Same idea for the evidence pile: it builds its papers imperatively, so
     // it has to be told when the product page has been rendered and when the
     // species has changed under it. sync() is cheap when neither has.
@@ -4574,14 +4489,6 @@ class Component extends DCLogic {
       statusBg: c.status === 'Released' ? 'oklch(0.44 0.07 152)' : '#8A7F6E',
       panels: c.panels.map(p => ({ ...p, mark: p.pass ? 'Pass' : 'Fail', markColor: p.pass ? 'oklch(0.44 0.07 152)' : 'oklch(0.52 0.17 25)' }))
     }));
-    const faqDefs = [
-      { q: 'How fast will I see something?', a: 'While most owners report changes within a few weeks, some pet owners see their beans behaving differently by week 12.' },
-      { q: 'Is it safe alongside prescriptions?', a: 'In most cases, yes \u2014 but run the eligibility quiz first. It screens every input against your pet\u2019s medications and flags anything worth reviewing yourself before the first chew.', cta: 'Take the eligibility quiz', ctaPage: 'quiz' },
-      { q: 'What if my animal refuses it?', a: 'This is extremely rare — Happy Beans are loved by thousands of pets. If your bean isn\u2019t a fan, feel free to get creative!' },
-      { q: 'Where are the certificates of analysis?', a: 'Lab tests can be seen here, and they stay online for the life of the product.', cta: 'View lab tests', ctaPage: 'certs' },
-      { q: 'How do I dose it?', a: 'One chew a day, after food \u2014 dogs and cats alike. Each chew is scored down the middle, so if your vet suggests starting smaller, a half dose is exact. No cutting guesswork, no pill pockets.' },
-      { q: 'How does the subscription work?', a: 'Subscribe & Save ships a fresh 30-day box every month at $99 instead of $115. Pause, skip or cancel anytime from your account \u2014 no calls, no hoops \u2014 and the next box arrives before the current one runs out.' }
-    ];
     const isDog = this.state.sp === 'dog';
     const base = (this.props.basePrice ?? 68) - (isDog ? 0 : 6);
     const planDefsAll = [
@@ -5268,28 +5175,6 @@ class Component extends DCLogic {
         'Lean muscle maintenance',
         'Cartilage & connective tissue support'
       ].map((label, i) => ({ label, n: (i + 1 < 10 ? '0' : '') + (i + 1) })),
-      askQ: this.state.askQ || '',
-      askOpenFlag: this.state.askOpen ? '1' : '0',
-      askTileLabel: this.state.askSent ? 'Question sent' : (this.state.askOpen ? 'Close' : 'Ask your own question'),
-      toggleAsk: () => this.setState(s => ({ askOpen: !s.askOpen })),
-      askEmail: this.state.askEmail || '',
-      askSent: !!this.state.askSent,
-      askUnsent: !this.state.askSent,
-      askCanSend: (this.state.askQ || '').trim().length > 3,
-      onAskQ: (e) => this.setState({ askQ: e.target.value }),
-      onAskEmail: (e) => this.setState({ askEmail: e.target.value }),
-      sendAsk: () => { if ((this.state.askQ || '').trim().length > 3) this.setState({ askSent: true }); },
-      faqs: faqDefs.map((q, i) => ({
-        q: q.q, a: q.a,
-        openFlag: this.state.faq === i ? '1' : '0',
-        toggle: () => this.setState(s => ({ faq: s.faq === i ? -1 : i })),
-        sign: this.state.faq === i ? '\u2013' : '+',
-        maxHeight: this.state.faq === i ? (q.cta ? '340px' : '260px') : '0px',
-        opacity: this.state.faq === i ? 1 : 0,
-        ctaDisplay: q.cta ? 'inline-flex' : 'none',
-        ctaLabel: q.cta || '',
-        goCta: this.nav(q.ctaPage || 'quiz')
-      })),
       timeline: this.evRecs(),
       team: [
         { name: 'Marcus Vance', role: 'Founder · formulation', body: 'Fifteen years in human sterile prep. Owns every formulation decision and signs each release.', slot: 'hbv2-team1', ph: 'Founder portrait' },
@@ -7164,4 +7049,68 @@ Component.prototype.renderVals = function () {
 })();
 </script>
 
+
+<script>
+var HB_FAQ_HTML = "<section class=\"hb-faq\" data-hb-faq>\n  <span class=\"hb-faq__glow\" aria-hidden=\"true\"></span>\n  <img class=\"hb-faq__bean hb-faq__bean--a\" src=\"/assets/img/faq/chew-a.webp\" alt=\"\">\n  <img class=\"hb-faq__bean hb-faq__bean--c\" src=\"/assets/img/faq/chew-c.webp\" alt=\"\">\n  <div class=\"hb-faq__inner\">\n    <div class=\"hb-faq__kicker\">Before you decide</div>\n    <h2 class=\"hb-faq__title\">The questions owners ask us <em>before their first box.</em></h2>\n  </div>\n  <div class=\"hb-faq__rail\" data-rail>\n    <span class=\"hb-faq__fade hb-faq__fade--l\" aria-hidden=\"true\"></span>\n    <span class=\"hb-faq__fade hb-faq__fade--r\" aria-hidden=\"true\"></span>\n    <div class=\"hb-faq__track\" data-track>\n      <button class=\"hb-faq__card\" type=\"button\" aria-expanded=\"false\" style=\"--tilt: -1.2deg\">\n        <span class=\"hb-faq__face hb-faq__face--front\">\n          <span class=\"hb-faq__meta\"><span class=\"hb-faq__num\">01</span><img class=\"hb-faq__paw\" src=\"/assets/img/faq/paw.webp\" alt=\"\"></span>\n          <span>\n            <span class=\"hb-faq__q\">How fast will I see something?</span>\n            <span class=\"hb-faq__flip\">Tap to flip \u2192</span>\n          </span>\n        </span>\n        <span class=\"hb-faq__face hb-faq__face--back\">\n          <span class=\"hb-faq__qsmall\">How fast will I see something?</span>\n          <span>\n            <span class=\"hb-faq__a\">Owners most often report a change between weeks two and six \u2014 usually energy and willingness to move before anything visible in coat or weight. Effects compound with consistency, so daily matters more than dose size.</span>\n          </span>\n        </span>\n      </button>\n      <button class=\"hb-faq__card\" type=\"button\" aria-expanded=\"false\" style=\"--tilt: 0.8deg\">\n        <span class=\"hb-faq__face hb-faq__face--front\">\n          <span class=\"hb-faq__meta\"><span class=\"hb-faq__num\">02</span><img class=\"hb-faq__paw\" src=\"/assets/img/faq/paw.webp\" alt=\"\"></span>\n          <span>\n            <span class=\"hb-faq__q\">Is it safe alongside prescriptions?</span>\n            <span class=\"hb-faq__flip\">Tap to flip \u2192</span>\n          </span>\n        </span>\n        <span class=\"hb-faq__face hb-faq__face--back\">\n          <span class=\"hb-faq__qsmall\">Is it safe alongside prescriptions?</span>\n          <span>\n            <span class=\"hb-faq__a\">In most cases, yes, but take the eligibility quiz to be safe. As an extra precaution always feel free to reach out to your pet\u2019s veterinarian to ensure safety.</span>\n            <a class=\"hb-faq__cta\" href=\"/quiz\">Take the eligibility quiz \u2192</a>\n          </span>\n        </span>\n      </button>\n      <button class=\"hb-faq__card\" type=\"button\" aria-expanded=\"false\" style=\"--tilt: -0.6deg\">\n        <span class=\"hb-faq__face hb-faq__face--front\">\n          <span class=\"hb-faq__meta\"><span class=\"hb-faq__num\">03</span><img class=\"hb-faq__paw\" src=\"/assets/img/faq/paw.webp\" alt=\"\"></span>\n          <span>\n            <span class=\"hb-faq__q\">What if my animal refuses it?</span>\n            <span class=\"hb-faq__flip\">Tap to flip \u2192</span>\n          </span>\n        </span>\n        <span class=\"hb-faq__face hb-faq__face--back\">\n          <span class=\"hb-faq__qsmall\">What if my animal refuses it?</span>\n          <span>\n            <span class=\"hb-faq__a\">This is extremely rare \u2014 Happy Beans are loved by thousands of pets. If your bean isn\u2019t a fan, feel free to get creative!</span>\n          </span>\n        </span>\n      </button>\n      <button class=\"hb-faq__card\" type=\"button\" aria-expanded=\"false\" style=\"--tilt: 1.4deg\">\n        <span class=\"hb-faq__face hb-faq__face--front\">\n          <span class=\"hb-faq__meta\"><span class=\"hb-faq__num\">04</span><img class=\"hb-faq__paw\" src=\"/assets/img/faq/paw.webp\" alt=\"\"></span>\n          <span>\n            <span class=\"hb-faq__q\">Where are the certificates of analysis?</span>\n            <span class=\"hb-faq__flip\">Tap to flip \u2192</span>\n          </span>\n        </span>\n        <span class=\"hb-faq__face hb-faq__face--back\">\n          <span class=\"hb-faq__qsmall\">Where are the certificates of analysis?</span>\n          <span>\n            <span class=\"hb-faq__a\">Lab tests can be seen here, and they stay online for the life of the product.</span>\n            <a class=\"hb-faq__cta\" href=\"/certs\">View lab tests \u2192</a>\n          </span>\n        </span>\n      </button>\n      <button class=\"hb-faq__card\" type=\"button\" aria-expanded=\"false\" style=\"--tilt: -0.9deg\">\n        <span class=\"hb-faq__face hb-faq__face--front\">\n          <span class=\"hb-faq__meta\"><span class=\"hb-faq__num\">05</span><img class=\"hb-faq__paw\" src=\"/assets/img/faq/paw.webp\" alt=\"\"></span>\n          <span>\n            <span class=\"hb-faq__q\">How do I dose it?</span>\n            <span class=\"hb-faq__flip\">Tap to flip \u2192</span>\n          </span>\n        </span>\n        <span class=\"hb-faq__face hb-faq__face--back\">\n          <span class=\"hb-faq__qsmall\">How do I dose it?</span>\n          <span>\n            <span class=\"hb-faq__a\">One chew a day, dosed by weight \u2014 the chart is on every bag. Small beans get a half chew.</span>\n            <a class=\"hb-faq__cta\" href=\"/product\">See the dosing chart \u2192</a>\n          </span>\n        </span>\n      </button>\n      <button class=\"hb-faq__card\" type=\"button\" aria-expanded=\"false\" style=\"--tilt: 1.1deg\">\n        <span class=\"hb-faq__face hb-faq__face--front\">\n          <span class=\"hb-faq__meta\"><span class=\"hb-faq__num\">06</span><img class=\"hb-faq__paw\" src=\"/assets/img/faq/paw.webp\" alt=\"\"></span>\n          <span>\n            <span class=\"hb-faq__q\">How does the subscription work?</span>\n            <span class=\"hb-faq__flip\">Tap to flip \u2192</span>\n          </span>\n        </span>\n        <span class=\"hb-faq__face hb-faq__face--back\">\n          <span class=\"hb-faq__qsmall\">How does the subscription work?</span>\n          <span>\n            <span class=\"hb-faq__a\">A fresh 30-day box ships every month. Skip, pause or cancel anytime from your account \u2014 no calls, no fees.</span>\n          </span>\n        </span>\n      </button>\n    </div>\n    <button class=\"hb-faq__arrow hb-faq__arrow--prev\" type=\"button\" data-prev aria-label=\"Previous questions\">\u2190</button>\n    <button class=\"hb-faq__arrow hb-faq__arrow--next\" type=\"button\" data-next aria-label=\"More questions\">\u2192</button>\n  </div>\n  <div class=\"hb-faq__foot\">\n    <button class=\"hb-faq__ask\" type=\"button\" data-ask aria-expanded=\"false\">Ask your own question \u2192</button>\n  </div>\n  <div class=\"hb-faq__panel\" data-panel>\n    <form class=\"hb-faq__form\" data-form novalidate>\n      <div data-unsent>\n        <div class=\"hb-faq__form-k\">Still wondering?</div>\n        <div class=\"hb-faq__form-h\">Ask us directly.</div>\n        <textarea name=\"question\" rows=\"3\" placeholder=\"Your question\" required></textarea>\n        <input name=\"email\" type=\"email\" placeholder=\"Email for the reply\" required>\n        <button class=\"hb-faq__send\" type=\"submit\">Send my question \u2192</button>\n      </div>\n      <div data-sent hidden>\n        <div class=\"hb-faq__form-k\">Question received</div>\n        <div class=\"hb-faq__form-h\">We'll come back to you by email.</div>\n        <p>A real person on our support team reads every one of these \u2014 no bots, no canned replies. If it's urgent, call the number in the footer.</p>\n      </div>\n    </form>\n  </div>\n</section>";
+// FAQ card carousel (designer handoff, Setup_31). The SPA re-renders page
+// sections, so init is re-entrant: every un-wired [data-hb-faq] root gets its
+// carousel, flips and ask form, and componentDidUpdate calls back in after
+// each render. Submitting the ask form dispatches hb:faq-ask; nothing is
+// posted anywhere yet — same as the accordion's form before it.
+// Wiring is tracked by node identity, not by attribute: the SPA's hydration
+// can clone a mounted subtree, and a clone keeps markup and attributes but
+// loses every listener — a WeakSet sees it as the stranger it is.
+var hbFaqWired = new WeakSet();
+window.hbFaqInit = function () {
+  document.querySelectorAll('[data-hb-faq-host]').forEach(function (host) {
+    var root = host.firstElementChild;
+    if (!root) { host.innerHTML = HB_FAQ_HTML; root = host.firstElementChild; }
+    if (!root || hbFaqWired.has(root)) return;
+    hbFaqWired.add(root);
+    var rail = root.querySelector('[data-rail]'), track = root.querySelector('[data-track]');
+    var cards = Array.prototype.slice.call(track.children);
+    var prev = root.querySelector('[data-prev]'), next = root.querySelector('[data-next]');
+    var CARD = 264, GAP = 18, STEP = CARD + GAP, TOTAL = cards.length, pos = 1;
+
+    // Fluid carousel: how many cards fit (max 4), centred, edge cards dimmed.
+    function layout() {
+      var w = rail.clientWidth;
+      if (!w) return;
+      var visible = Math.max(1, Math.min(4, Math.floor((w - 120 + GAP) / STEP)));
+      var maxPos = TOTAL - visible;
+      pos = Math.max(0, Math.min(pos, maxPos));
+      var windowW = visible * CARD + (visible - 1) * GAP;
+      track.style.setProperty('--x', Math.round((w - windowW) / 2 - pos * STEP) + 'px');
+      cards.forEach(function (c, i) { c.classList.toggle('is-visible', i >= pos && i < pos + visible); });
+      prev.disabled = pos === 0; next.disabled = pos === maxPos;
+    }
+    prev.addEventListener('click', function () { pos--; layout(); });
+    next.addEventListener('click', function () { pos++; layout(); });
+    if (window.ResizeObserver) new ResizeObserver(layout).observe(rail); else window.addEventListener('resize', layout);
+    layout();
+
+    cards.forEach(function (c) {
+      c.addEventListener('click', function (e) {
+        if (e.target.closest('a')) return; // let CTAs navigate
+        var open = c.classList.toggle('is-open');
+        c.setAttribute('aria-expanded', open);
+      });
+    });
+
+    var ask = root.querySelector('[data-ask]'), panel = root.querySelector('[data-panel]');
+    var form = root.querySelector('[data-form]'), unsent = form.querySelector('[data-unsent]'), sent = form.querySelector('[data-sent]');
+    var open = false;
+    function setOpen(v) { open = v; panel.classList.toggle('is-open', v); ask.setAttribute('aria-expanded', v); ask.textContent = v ? 'Close →' : (sent.hidden ? 'Ask your own question →' : 'Question sent'); }
+    ask.addEventListener('click', function () { setOpen(!open); });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var q = form.question.value.trim(), em = form.email.value.trim();
+      if (q.length < 4 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) return;
+      root.dispatchEvent(new CustomEvent('hb:faq-ask', { bubbles: true, detail: { question: q, email: em } }));
+      unsent.hidden = true; sent.hidden = false;
+    });
+  });
+};
+window.hbFaqInit();
+</script>
 </body></html>
