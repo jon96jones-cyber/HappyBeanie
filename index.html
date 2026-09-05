@@ -1779,58 +1779,56 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
           <!-- Nutrition Facts label (designer handoff, lifted as-is). Follows the
                page's species choice; the ingredient columns and the For line
                are the design's own copy per species, bound in the state. -->
-          <!-- The label renders at its designed size, then scales down just
-               enough that the left column never outgrows the buy column —
-               fitFacts() measures and writes factsScale/factsWrapH. -->
+          <!-- Nutrition Facts, recomposed wide: the designed label's language
+               (ink header bar, gold rule, hairline rows, Scottsdale footer)
+               relaid to fill the column width and fit the height under the
+               tabs at full size — serving facts ride beside the title instead
+               of stacking. fitFacts() stays as a safety net only. -->
           <div style="display: {{ pdpPanelDisplay }}; height: {{ pdpFactsWrapH }};">
           <div id="hbFactsCard" style="background: #FCFAF4; border: 2px solid #17140F; border-radius: 4px; box-shadow: 0 30px 60px -36px rgba(23,20,15,0.5); overflow: hidden; transform: scale({{ pdpFactsScale }}); transform-origin: top center;">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 22px; background: #17140F;">
-              <img src="/assets/email/lifecycle/hb-wordmark.png" alt="happy beanie" width="132" height="22" style="display: block; width: 132px; height: auto;">
-              <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #F0C64B;">Daily Supplement</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 18px; background: #17140F;">
+              <img src="/assets/email/lifecycle/hb-wordmark.png" alt="happy beanie" width="108" height="18" style="display: block; width: 108px; height: auto;">
+              <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #F0C64B;">Daily Supplement</span>
             </div>
             <div style="height: 3px; background: #F0C64B;"></div>
-            <div style="padding: 24px 22px 0;">
-              <div style="margin: 0 0 6px; font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: -0.04em; color: #17140F;">Nutrition Facts</div>
-              <div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 12px 0 10px; border-bottom: 1px solid #E0D6C3;">
-                <span style="font-size: 14px; color: #4A4237;">Serving size</span>
-                <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; color: #17140F;">1 chew</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 10px 0 12px; border-bottom: 1px solid #E0D6C3;">
-                <span style="font-size: 14px; color: #4A4237;">Servings per box</span>
-                <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; color: #17140F;">30</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 10px 0 12px;">
-                <span style="font-size: 14px; color: #4A4237;">For</span>
-                <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; color: #17140F;">{{ pdpFactsFor }}</span>
-              </div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; padding: 13px 18px 11px;">
+              <div style="font-weight: 700; font-size: 21px; line-height: 1; letter-spacing: -0.03em; color: #17140F;">Nutrition Facts</div>
+              <div style="font-size: 12px; color: #4A4237;">Serving size <span style="font-weight: 600; color: #17140F;">1 chew</span> &nbsp;·&nbsp; Per box <span style="font-weight: 600; color: #17140F;">30</span> &nbsp;·&nbsp; For <span style="font-weight: 600; color: #17140F;">{{ pdpFactsFor }}</span></div>
             </div>
-            <div style="height: 8px; background: #17140F;"></div>
-            <div style="padding: 16px 22px 0;">
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px;">
-                <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #17140F; font-weight: 500;">Ingredients</span>
-                <span style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">Per chew</span>
+            <div style="height: 6px; background: #17140F;"></div>
+            <div style="padding: 9px 18px 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 1px;">
+                <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: #17140F; font-weight: 500;">Ingredients</span>
+                <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">Per chew</span>
               </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 22px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 16px;">
                 <div>
-                  <sc-for list="{{ pdpFactsColA }}" as="fa" hint-placeholder-count="6">
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: {{ fa.bb }};">
-                      <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; line-height: 1.3; color: #17140F;">{{ fa.name }}</span>
+                  <sc-for list="{{ pdpFactsColA }}" as="fa" hint-placeholder-count="4">
+                    <div style="display: flex; align-items: center; padding: 6px 0; border-bottom: {{ fa.bb }};">
+                      <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 12px; line-height: 1.25; color: #17140F; white-space: nowrap;">{{ fa.name }}</span>
                     </div>
                   </sc-for>
                 </div>
                 <div>
-                  <sc-for list="{{ pdpFactsColB }}" as="fb" hint-placeholder-count="5">
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: {{ fb.bb }};">
-                      <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; line-height: 1.3; color: #17140F;">{{ fb.name }}</span>
+                  <sc-for list="{{ pdpFactsColB }}" as="fb" hint-placeholder-count="4">
+                    <div style="display: flex; align-items: center; padding: 6px 0; border-bottom: {{ fb.bb }};">
+                      <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 12px; line-height: 1.25; color: #17140F; white-space: nowrap;">{{ fb.name }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div>
+                  <sc-for list="{{ pdpFactsColC }}" as="fc" hint-placeholder-count="3">
+                    <div style="display: flex; align-items: center; padding: 6px 0; border-bottom: {{ fc.bb }};">
+                      <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 12px; line-height: 1.25; color: #17140F; white-space: nowrap;">{{ fc.name }}</span>
                     </div>
                   </sc-for>
                 </div>
               </div>
             </div>
-            <div style="margin: 14px 22px 0; height: 4px; background: #17140F;"></div>
-            <div style="margin-top: 14px; padding: 14px 22px 16px; background: #F2EEE3; border-top: 1px solid #E0D6C3; display: flex; justify-content: space-between; gap: 12px; align-items: center;">
-              <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Formulated fresh · Scottsdale, AZ</span>
-              <span style="font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">happybeanie.com</span>
+            <div style="margin: 8px 18px 0; height: 3px; background: #17140F;"></div>
+            <div style="margin-top: 8px; padding: 8px 18px 9px; background: #F2EEE3; border-top: 1px solid #E0D6C3; display: flex; justify-content: space-between; gap: 12px; align-items: center;">
+              <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Formulated fresh · Scottsdale, AZ</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">happybeanie.com</span>
             </div>
           </div>
           </div>
@@ -4626,11 +4624,16 @@ class Component extends DCLogic {
         // design's own copy, chosen by the page's species state.
         const is3d = this.state.pdpView === '3d';
         const ready = this.state.pdpReady;
-        const factsCols = isDog
-          ? [['Omega-3 EPA/DHA', 'Turkey Tail', 'Elk Liver', 'B-Complex', 'L-Carnitine', 'Green-Lipped Mussel'],
-             ['Curcumin', 'Elk Velvet Antler', 'Blueberry Polyphenols', 'CoQ10', 'Collagen Peptide Type II']]
-          : [['Omega-3 EPA/DHA', 'Green-Lipped Mussel', 'Blueberry Polyphenols', 'B-Complex', 'L-Carnitine'],
-             ['Taurine', 'Collagen Peptide Blend', 'Organic Cranberry Extract', 'CoQ10']];
+        const factsAll = isDog
+          ? ['Omega-3 EPA/DHA', 'Turkey Tail', 'Elk Liver', 'B-Complex', 'L-Carnitine', 'Green-Lipped Mussel',
+             'Curcumin', 'Elk Velvet Antler', 'Blueberry Polyphenols', 'CoQ10', 'Collagen Peptide Type II']
+          : ['Omega-3 EPA/DHA', 'Green-Lipped Mussel', 'Blueberry Polyphenols', 'B-Complex', 'L-Carnitine',
+             'Taurine', 'Collagen Peptide Blend', 'Organic Cranberry Extract', 'CoQ10'];
+        // Three balanced columns reading down each in turn, per the label's
+        // original order; the widest names set the 12px size that keeps every
+        // row on one line at this column width.
+        const per = Math.ceil(factsAll.length / 3);
+        const factsCols = [factsAll.slice(0, per), factsAll.slice(per, per * 2), factsAll.slice(per * 2)];
         const factsRows = (list) => list.map((name, i) => ({
           name, bb: i === list.length - 1 ? 'none' : '1px solid #E0D6C3'
         }));
@@ -4651,6 +4654,7 @@ class Component extends DCLogic {
           pdpFactsFor: isDog ? 'Dogs · 12 months +' : 'Cats',
           pdpFactsColA: factsRows(factsCols[0]),
           pdpFactsColB: factsRows(factsCols[1]),
+          pdpFactsColC: factsRows(factsCols[2]),
           pdpFactsScale: this.state.factsScale || 1,
           pdpFactsWrapH: this.state.factsWrapH || 'auto',
           pdpShowPhoto: () => this.setState({ pdpView: 'photo' }),
