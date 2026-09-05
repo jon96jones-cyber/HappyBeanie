@@ -1064,11 +1064,14 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="qzsub"] { font-size: 14px !important; line-height: 1.5 !important; margin-bottom: 18px !important; }
     [data-m~="qzbtn"] { padding: 15px 30px !important; }
     [data-m~="qzcard"] { margin-top: 20px !important; }
-    /* On a phone the eligibility card reads better after the guarantee
-       rows than above the price, so the copy down there takes over and
-       the one beside the product copy steps aside. */
+    /* On a phone the eligibility card sits right under the buy button
+       instead of beside the product copy (product page) or above
+       "Choose your supply" (homepage): the desktop card steps aside
+       and the copy under the CTA takes over. */
     [data-m~="pdpqz"] { display: none !important; }
     [data-m~="pdpqzm"] { display: grid !important; }
+    [data-m~="hmquiz"] { display: none !important; }
+    [data-m~="hmquizm"] { display: flex !important; }
     [data-m~="qzstats"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     [data-m~="qzstats"] > div { padding: 11px 12px !important; }
     [data-m~="qzstats"] > div > div:first-child { font-size: 18px !important; margin-bottom: 4px !important; }
@@ -1502,6 +1505,13 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
           <div data-pre-show data-subs-hide style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">Subscribe &amp; save returns when Batch 0072 ships</div>
         </div>
         <button sc-camel-on-click="{{ cartCta }}" style="width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 20px; border: 1.5px solid #17140F; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-weight: 500; cursor: pointer; box-shadow: 0 20px 34px -22px oklch(0.86 0.14 92 / 0.72), 0 3px 8px -4px rgba(23,20,15,0.22); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.25s ease;" style-hover="background: oklch(0.9 0.15 92); transform: translateY(-2px); box-shadow: 0 26px 42px -24px oklch(0.86 0.14 92 / 0.8), 0 4px 10px -4px rgba(23,20,15,0.26);">{{ cartLabel }}</button>
+        <a sc-camel-on-click="{{ goQuiz }}" data-m="hmquizm" style="display: none; cursor: pointer; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 15px; border: 1px solid #E0D6C2; border-radius: 3px; background: #F5F0E6; margin: 14px 0 0; color: #17140F;">
+          <span style="flex: 1 1 260px; min-width: 0;">
+            <span data-m="hmqh" style="display: block; font-weight: 700; font-size: 15px; margin-bottom: 4px;">Not sure Happy Beanie is right for your pet?</span>
+            <span data-m="hmqs" style="display: block; font-size: 13px; line-height: 1.5; color: #6A6055;">One minute, eight questions, screened against every ingredient on the formulation sheet.</span>
+          </span>
+          <span data-m="qzcta" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152); white-space: nowrap;">Check eligibility →</span>
+        </a>
         <div data-m="buynote" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 14px 0 34px; text-align: center;">Free shipping over $60 · Cancel anytime · 30-day guarantee</div>
       </div>
     </div>
@@ -1969,16 +1979,16 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
             <div data-pre-show data-subs-hide style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">Subscribe &amp; save returns when Batch 0072 ships</div>
           </div>
           <button sc-camel-on-click="{{ cartCta }}" style="width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: 1.5px solid #17140F; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-weight: 500; cursor: pointer; box-shadow: 0 20px 34px -22px oklch(0.86 0.14 92 / 0.72), 0 3px 8px -4px rgba(23,20,15,0.22); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.25s ease;" style-hover="background: oklch(0.9 0.15 92); transform: translateY(-2px); box-shadow: 0 26px 42px -24px oklch(0.86 0.14 92 / 0.8), 0 4px 10px -4px rgba(23,20,15,0.26);">{{ cartLabel }}</button>
+          <a sc-camel-on-click="{{ goQuiz }}" data-m="pdpqzm" style="display: none; cursor: pointer; gap: 12px; margin: 14px 0 0; padding: 20px; border: 1px solid rgba(23,20,15,0.1); border-radius: 20px; background: #FCFAF4; color: #17140F; box-shadow: 0 22px 40px -26px rgba(23,20,15,0.3), 0 1px 0 rgba(255,255,255,0.9) inset;">
+            <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">Before you buy</span>
+            <span style="display: block; font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35;">Is Happy Beanie right for your pet?</span>
+            <span data-m="qzcta" style="display: block; text-align: center; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 12px 14px; border-radius: 999px;">Check eligibility →</span>
+          </a>
           <div data-m="stack" style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 4px; margin: 14px 0 24px; overflow: hidden;">
             <div style="background: #FCFAF4; padding: 14px 12px; text-align: center;"><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 5px;">30 days</div><div style="font-size: 12.5px; line-height: 1.4; color: #554C40;">Money back, no return shipment</div></div>
             <div style="background: #FCFAF4; padding: 14px 12px; text-align: center;"><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 5px;">Free shipping</div><div style="font-size: 12.5px; line-height: 1.4; color: #554C40;">On every order over $60</div></div>
             <div style="background: #FCFAF4; padding: 14px 12px; text-align: center;"><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 5px;">Cancel anytime</div><div style="font-size: 12.5px; line-height: 1.4; color: #554C40;">One click, no phone call</div></div>
           </div>
-          <a sc-camel-on-click="{{ goQuiz }}" data-m="pdpqzm" style="display: none; cursor: pointer; gap: 12px; margin: 16px 0 22px; padding: 20px; border: 1px solid rgba(23,20,15,0.1); border-radius: 20px; background: #FCFAF4; color: #17140F; box-shadow: 0 22px 40px -26px rgba(23,20,15,0.3), 0 1px 0 rgba(255,255,255,0.9) inset;">
-            <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">Before you buy</span>
-            <span style="display: block; font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35;">Is Happy Beanie right for your pet?</span>
-            <span data-m="qzcta" style="display: block; text-align: center; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 12px 14px; border-radius: 999px;">Check eligibility →</span>
-          </a>
           <div data-m="stack" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #E0D6C2; border-bottom: 1px solid #E0D6C2; margin-bottom: 32px;">
             <sc-for list="{{ specs }}" as="sp2" hint-placeholder-count="3">
               <div style="padding: 20px 16px 20px 0;">
