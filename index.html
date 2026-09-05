@@ -246,6 +246,41 @@ fbq('track', 'PageView');
 <noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=2580258509080253&ev=PageView&noscript=1"/></noscript>
 <script>
+/* Product structured data for /product — Google Merchant Center's landing-page
+   checks read this to match the feed's price and availability, so the price
+   here is the one-time price (the only one a feed may list) and availability
+   follows the prelaunch switch. Keep in sync with /google-product-feed.tsv. */
+(function () {
+  if (location.pathname.replace(/\/+$/, '') !== '/product') return;
+  var sp = 'dog';
+  try { var q = new URLSearchParams(location.search).get('sp'); if (q === 'cat') sp = 'cat'; } catch (e) {}
+  var pre = !!(window.HB_PRELAUNCH && window.HB_PRELAUNCH.on);
+  var data = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: sp === 'cat' ? 'Happy Beans for Cats' : 'Happy Beans for Dogs',
+    description: sp === 'cat'
+      ? 'Daily supplement soft chew for cats. One chew a day, 30 chews per box. Made in Scottsdale, Arizona, and third-party tested lot by lot.'
+      : 'Daily supplement soft chew for dogs, 10–150 lb, dosed by weight. 30 chews per box. Made in Scottsdale, Arizona, and third-party tested lot by lot.',
+    image: 'https://www.happybeanie.com/assets/img/pdp-' + sp + '.webp',
+    brand: { '@type': 'Brand', name: 'Happy Beanie' },
+    sku: sp === 'cat' ? 'HB-CAT-30' : 'HB-DOG-30',
+    offers: {
+      '@type': 'Offer',
+      url: 'https://www.happybeanie.com/product?sp=' + sp,
+      priceCurrency: 'USD',
+      price: '115.00',
+      availability: pre ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition'
+    }
+  };
+  var s = document.createElement('script');
+  s.type = 'application/ld+json';
+  s.textContent = JSON.stringify(data);
+  document.head.appendChild(s);
+})();
+</script>
+<script>
 /* Product-page catch animation. The section only exists while the product
    page is mounted and the SPA re-renders it, so nothing is cached across
    ticks — every frame looks the elements up and quietly does nothing when
