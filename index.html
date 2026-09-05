@@ -477,11 +477,15 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hb-faq__card { position: relative; min-height: 300px; padding: 0; background: transparent; border: none; cursor: pointer; text-align: left; font-family: var(--hb-sans); transform: rotate(var(--tilt)); transform-style: preserve-3d; opacity: 0.55; transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.5s ease; }
 .hb-faq__card.is-visible { opacity: 1; }
 .hb-faq__card:hover { transform: rotate(0deg) translateY(-6px); }
-.hb-faq__face { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 22px 22px 24px; border-radius: 4px; box-shadow: 0 24px 40px -24px rgba(0,0,0,0.7); backface-visibility: hidden; transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
-.hb-faq__face--front { background: var(--hb-cream); transform: rotateY(0deg); }
-.hb-faq__face--back { background: var(--hb-yellow); transform: rotateY(180deg); }
-.hb-faq__card.is-open .hb-faq__face--front { transform: rotateY(180deg); }
-.hb-faq__card.is-open .hb-faq__face--back { transform: rotateY(360deg); }
+.hb-faq__face { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 22px 22px 24px; border-radius: 4px; box-shadow: 0 24px 40px -24px rgba(0,0,0,0.7); backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s linear 0.3s; }
+/* Mobile GPUs sometimes paint a "hidden" backface mid-scroll, flashing the
+   yellow answer side of unflipped cards. Visibility settles the argument:
+   the off face is truly hidden at rest, swapped at the flip's halfway point
+   so the 3D turn still reads. */
+.hb-faq__face--front { background: var(--hb-cream); transform: rotateY(0deg); visibility: visible; }
+.hb-faq__face--back { background: var(--hb-yellow); transform: rotateY(180deg); visibility: hidden; }
+.hb-faq__card.is-open .hb-faq__face--front { transform: rotateY(180deg); visibility: hidden; }
+.hb-faq__card.is-open .hb-faq__face--back { transform: rotateY(360deg); visibility: visible; }
 .hb-faq__meta { display: flex; justify-content: space-between; align-items: center; }
 .hb-faq__num { font-weight: 500; font-size: 13px; color: var(--hb-num); }
 .hb-faq__paw { width: 26px; opacity: 0.35; display: block; }
