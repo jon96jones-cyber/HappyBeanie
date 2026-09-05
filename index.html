@@ -4670,11 +4670,12 @@ class Component extends DCLogic {
         // like the dog label, so both species' labels stand the same height;
         // the widest names set the 12px size that keeps every row on one line.
         // Phones drop to two columns (see the factsgrid media rule), and the
-        // items re-chunk to five on the left with the rest on the right —
+        // items re-chunk into halves, left heavy — dogs 6/5, cats 5/4 —
         // letting the desktop thirds reflow instead would stack two chunks on
         // one side and read 7/4.
+        const half = Math.ceil(factsAll.length / 2);
         const factsCols = this.state.factsNarrow
-          ? [factsAll.slice(0, 5), factsAll.slice(5), []]
+          ? [factsAll.slice(0, half), factsAll.slice(half), []]
           : [factsAll.slice(0, 4), factsAll.slice(4, 8), factsAll.slice(8)];
         const factsRows = (list) => list.map((name, i) => ({
           name, bb: i === list.length - 1 ? 'none' : '1px solid #E0D6C3'
