@@ -1376,18 +1376,54 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
             <div style="height: 130px; border-radius: 3px; overflow: hidden;"><image-slot id="{{ th.slot }}" placeholder="{{ th.ph }}" style="width: 100%; height: 100%;"></image-slot></div>
           </sc-for>
         </div>
-        <div style="border: 1px solid rgba(23,20,15,0.12); border-radius: 4px; background: #FCFAF4; overflow: hidden; box-shadow: 0 18px 34px -30px rgba(23,20,15,0.3);">
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid rgba(23,20,15,0.1); background: rgba(23,20,15,0.03);">
-            <span style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>What’s inside · {{ pdpInsideLabel }}</span>
-            <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;">3 Active Ingredients</span>
+        <!-- The same Nutrition Facts label as the product page, always open
+             here — it replaced the placeholder-era actives list, and its
+             columns re-chunk with the shared factsNarrow/factsgrid rules. -->
+        <div style="background: #FCFAF4; border: 2px solid #17140F; border-radius: 4px; box-shadow: 0 30px 60px -36px rgba(23,20,15,0.5); overflow: hidden;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 18px; background: #17140F;">
+            <img src="/assets/email/lifecycle/hb-wordmark.png" alt="happy beanie" width="108" height="18" style="display: block; width: 108px; height: auto;">
+            <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #F0C64B;">Daily Supplement</span>
           </div>
-          <sc-for list="{{ actives }}" as="mi" hint-placeholder-count="3">
-            <div style="display: grid; grid-template-columns: auto 1fr; gap: 13px; align-items: center; padding: 13px 16px; border-bottom: 1px solid rgba(23,20,15,0.07);">
-              <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: #F5F0E6; background: #17140F; padding: 4px 7px; border-radius: 2px;">{{ mi.code }}</span>
-              <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 14.5px; color: #17140F; line-height: 1.3;">{{ mi.name }}</span>
+          <div style="height: 3px; background: #F0C64B;"></div>
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; padding: 13px 18px 11px;">
+            <div style="font-weight: 700; font-size: 21px; line-height: 1; letter-spacing: -0.03em; color: #17140F; white-space: nowrap;">Nutrition Facts</div>
+            <div style="font-size: 11.5px; color: #4A4237; white-space: nowrap;">Serving size <span style="font-weight: 600; color: #17140F;">1 chew</span> · Per box <span style="font-weight: 600; color: #17140F;">30</span> · For <span style="font-weight: 600; color: #17140F;">{{ pdpFactsFor }}</span></div>
+          </div>
+          <div style="height: 6px; background: #17140F;"></div>
+          <div style="padding: 9px 18px 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 1px;">
+              <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: #17140F; font-weight: 500;">Ingredients</span>
+              <span style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;">Per chew</span>
             </div>
-          </sc-for>
-          <div style="padding: 11px 16px 12px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.6;">Food supplement · not FDA evaluated</div>
+            <div data-m="factsgrid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 16px;">
+              <div>
+                <sc-for list="{{ pdpFactsColA }}" as="ha" hint-placeholder-count="4">
+                  <div style="display: flex; align-items: center; padding: 6px 0; border-bottom: {{ ha.bb }};">
+                    <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 12px; line-height: 1.25; color: #17140F; white-space: nowrap;">{{ ha.name }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div>
+                <sc-for list="{{ pdpFactsColB }}" as="hb" hint-placeholder-count="4">
+                  <div style="display: flex; align-items: center; padding: 6px 0; border-bottom: {{ hb.bb }};">
+                    <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 12px; line-height: 1.25; color: #17140F; white-space: nowrap;">{{ hb.name }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div>
+                <sc-for list="{{ pdpFactsColC }}" as="hc" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: center; padding: 6px 0; border-bottom: {{ hc.bb }};">
+                    <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 12px; line-height: 1.25; color: #17140F; white-space: nowrap;">{{ hc.name }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="margin: 8px 18px 0; height: 3px; background: #17140F;"></div>
+          <div data-m="factsfoot" style="margin-top: 8px; padding: 8px 18px 9px; background: #F2EEE3; border-top: 1px solid #E0D6C3; display: flex; justify-content: space-between; gap: 4px 12px; align-items: center;">
+            <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Formulated fresh · Scottsdale, AZ</span>
+            <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">happybeanie.com</span>
+          </div>
         </div>
       </div>
       <div>
@@ -5226,16 +5262,6 @@ class Component extends DCLogic {
         { n: '02 Nutrition', title: 'Taurine-forward carriers', amount: 'Taurine + vitamin E', body: 'Built around the amino acid cats cannot make enough of, with salmon oil for absorption and no added iron.' },
         { n: '03 Delivery', title: 'Soft chew', amount: 'Stability tested to 18 months', body: 'A soft chew built for feline palates, scored down the middle so a half dose is exact during the first week.' }
       ]).map((x, i) => ({ ...x, delay: i * 110 })),
-      actives: (isDog ? [
-        { code: '1', name: 'Proprietary peptide blend', dose: 'Signalling active', role: 'The signalling layer — instructs repair in joint, skin and connective tissue.' },
-        { code: '2', name: 'Elk blend', dose: 'Whole-food base', role: 'Whole-food velvet antler and organ nutrition: the cofactors repair actually spends.' },
-        { code: '3', name: 'Mushroom extract blend', dose: 'Botanical blend', role: 'Lion’s mane, reishi and turkey tail for immune, gut and nerve support.' }
-      ] : [
-        { code: '1', name: 'Proprietary peptide blend', dose: 'Signalling active', role: 'Copper-free signalling, dosed to a cat’s faster clearance rate.' },
-        { code: '2', name: 'Taurine & salmon blend', dose: 'Amino-acid base', role: 'The amino acid cats cannot make enough of, with salmon oil for absorption.' },
-        { code: '3', name: 'Green-lipped mussel', dose: 'Joint support', role: 'Whole New Zealand green-lipped mussel — natural glucosamine, chondroitin and rare omega-3s for joints.' }
-      ]),
-      pdpInsideLabel: isDog ? 'For dogs' : 'For cats',
       benefits: [
         'Supports brain, heart & joint health',
         'Cellular antioxidant defense',
