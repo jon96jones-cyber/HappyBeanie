@@ -4958,7 +4958,12 @@ class Component extends DCLogic {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email, source: 'footer' })
         }).then(r => r.json().catch(() => ({}))).then(b => {
-          if (b && b.ok) { this.hbListed(email); this.setState({ joinBusy: false, joined: true }); return; }
+          if (b && b.ok) {
+            this.hbListed(email);
+            try { if (window.fbq) window.fbq('track', 'Lead'); } catch (err) {}
+            this.setState({ joinBusy: false, joined: true });
+            return;
+          }
           this.setState({
             joinBusy: false,
             joinErr: (b && b.error === 'bad_email')
@@ -6401,6 +6406,7 @@ Component.prototype.renderVals = function () {
         rStepForm.hidden = true; rStepDone.hidden = false;
         rNo.textContent = 'Close';
         try { if (window.hbTrack) window.hbTrack('popup_subscribed', { species: 'research' }); } catch (err) {}
+        try { if (window.fbq) window.fbq('track', 'Lead'); } catch (err) {}
         return;
       }
       rShowError((b && b.error === 'bad_email')
@@ -6472,6 +6478,7 @@ Component.prototype.renderVals = function () {
         }
         step = 'done';
         try { if (window.hbTrack) window.hbTrack('popup_subscribed'); } catch (err) {}
+        try { if (window.fbq) window.fbq('track', 'Lead'); } catch (err) {}
         render();
         return;
       }
