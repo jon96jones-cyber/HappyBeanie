@@ -9,13 +9,14 @@ files** — they aren't served by the site; you paste each into the Shopify admi
 | File | Shopify notification | Accent | Liquid |
 |------|----------------------|--------|--------|
 | `order-confirmation.html` | **Order confirmation** (every order incl. 1st subscription order) | green | real, near drop-in |
-| `new-subscription.html` | New subscription (contract created) | green | `[[TOKENS]]` |
-| `upcoming-billing.html` | Upcoming billing / payment reminder | gold | `[[TOKENS]]` |
-| `payment-failed.html` | Subscription payment failure | clay | `[[TOKENS]]` |
-| `card-expiring.html` | Credit card / payment method expiring | clay | `[[TOKENS]]` |
-| `paused.html` | Subscription paused | muted | `[[TOKENS]]` |
-| `resumed.html` | Subscription resumed | green | `[[TOKENS]]` |
-| `cancelled.html` | Subscription cancelled | muted | `[[TOKENS]]` |
+| `new-subscription.html` | New subscription (contract created) | green | **wired** — real Liquid, paste as-is |
+| `upcoming-billing.html` | Upcoming order / payment reminder | gold | **wired** — real Liquid, paste as-is |
+| `payment-failed.html` | Subscription payment failure (after dunning; branches on `status_after_dunning`) | clay | **wired** — real Liquid, paste as-is |
+| `skipped.html` | Subscription skipped | muted | **wired** — real Liquid, paste as-is |
+| `card-expiring.html` | Credit card / payment method expiring | clay | `[[TOKENS]]` — NOT wired; do not install until wired from its default |
+| `paused.html` | Subscription paused | muted | **wired** — real Liquid, paste as-is |
+| `resumed.html` | Subscription resumed | green | **wired** — real Liquid, paste as-is |
+| `cancelled.html` | Subscription cancelled | muted | **wired** — real Liquid, paste as-is |
 | `shipping-confirmation.html` | **Shipping confirmation** (every shipment) | green | real Liquid |
 | `order-canceled.html` | **Order canceled** | muted | real Liquid |
 | `refund-notification.html` | **Refund notification** | muted | real Liquid + `[[REFUND_AMOUNT]]` |
@@ -42,12 +43,24 @@ It should render as-is. The only thing to verify on **Send test**: that the sell
 line shows for subscription items — if your Shopify version exposes that under a different
 field, tell me the name and I'll adjust.
 
-## `[[TOKENS]]` for the subscription emails
+## Wired subscription templates
 
-The subscription notifications' Liquid schema isn't publicly documented, so those bits are
-`[[TOKENS]]`. Replace each with the variable the **editor lists for that notification**
-(names below are the usual ones — confirm and adjust). If a token has no matching variable,
-delete its whole detail `<div>` box; the layout collapses cleanly.
+The subscription templates marked **wired** carry real Liquid taken from Shopify's own
+default templates (pasted from the admin on 2026-09-06), so they install as-is: paste,
+Save, **Send test**. The schema is the `subscription_contract_billing_cycle` object
+(line_items, total_price, billing_frequency, product_names, shipping/billing_address,
+payment_instrument, customer_self_serve_url, update_payment_method_url; dates are
+`billing_attempt_expected_date` on upcoming/skipped and `next_billing_date` on
+resumed/skipped — the names differ per notification, don't guess). Anything the defaults
+didn't prove sits behind an `if`-guard with a clean fallback, so a missing value collapses
+its box instead of printing broken text.
+
+**Never install a template that still contains `[[TOKENS]]`** — Shopify sends the
+brackets literally (this happened once, on upcoming-billing). Wire it from that
+notification's default first. Remaining: `card-expiring.html` and the
+`[[REFUND_AMOUNT]]` in `refund-notification.html`.
+
+Legacy token mapping, kept for the unwired files:
 
 | Token | Typical Liquid | Used in |
 |-------|----------------|---------|
