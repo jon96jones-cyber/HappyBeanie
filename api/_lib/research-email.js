@@ -20,6 +20,8 @@ const SITE = 'https://www.happybeanie.com';
 // unsubscribe marker and keeps the subject and text alternate; STUDIES
 // below feeds the text version and stays in step with the design's cards.
 const designed = require('./research-designed.js');
+// The 2026-09 scene redesign — tools/build-scene-emails.js.
+const scene = require('./scene-designs.js');
 
 const SUBJECT = "Here's the research you asked for";
 
@@ -52,7 +54,9 @@ function esc(s) {
 
 function build(t) {
   const unsub = esc((t && t.unsubUrl) || SITE + '/api/unsubscribe');
-  return designed.html.split(designed.UNSUB_MARK).join(unsub);
+  return scene.research
+    .split(scene.UNSUB_MARK).join(unsub)
+    .split(scene.CTA_MARK).join(SITE + '/product?utm_source=email&utm_medium=lifecycle&utm_campaign=research_pack');
 }
 
 build.text = function (t) {

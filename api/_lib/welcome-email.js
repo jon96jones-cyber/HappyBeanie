@@ -29,6 +29,8 @@ const WORDMARK = SITE + '/assets/email/lifecycle/hb-wordmark.png';
 // (Step 1's STEPS entry below still supplies its subject and text alternate.)
 const hello = require('./welcome-hello-email.js');
 const screener = require('./welcome-screener-email.js');
+// Step 1's art since the 2026-09 scene redesign — see tools/build-scene-emails.js.
+const scene = require('./scene-designs.js');
 
 const INK = '#17140F', PAPER = '#FAF8F1', PAGE = '#DED5C4', GOLD = '#F0C64B',
       BODY = '#4A4237', MUTED = '#8A7F6E', HAIR = '#E0D6C3', FOOT_BG = '#F2EEE3';
@@ -132,14 +134,27 @@ function helloCodeRow(t) {
     '</td></tr></table></td></tr>';
 }
 
+// The scene design's code strip — the calendar's own rhythm (44px gutters,
+// cream card) rather than the older welcome's.
+function sceneCodeRow(t) {
+  if (!t || !t.code) return '';
+  return '<tr><td colspan="2" class="sm-pad" style="padding:26px 56px 0 56px;">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FCFAF4; border:1.5px dashed ' + INK + ';">' +
+    '<tr><td style="padding:14px 18px; font-family:' + MONO + '; font-size:10px; letter-spacing:1.4px; text-transform:uppercase; color:' + MUTED + ';">' +
+    'Your 10% code &middot; one order' + (t.expiresLabel ? ' &middot; until ' + esc(t.expiresLabel) : '') +
+    '</td><td align="right" style="padding:14px 18px; font-family:' + MONO + '; font-size:15px; letter-spacing:0.08em; color:' + INK + '; white-space:nowrap;">' + esc(t.code) + '</td>' +
+    '</tr></table></td></tr>';
+}
+
 function build(step, t) {
   const s = pick(step);
   const unsub = esc((t && t.unsubUrl) || SITE + '/api/unsubscribe');
-  // The designed welcome, with its two markers filled per recipient.
+  // Step 1 is the scene redesign — the first month drawn as a wall calendar.
   if (String(step) === '1') {
-    return hello.html
-      .split(hello.UNSUB_MARK).join(unsub)
-      .split(hello.CODEROW_MARK).join(helloCodeRow(t));
+    return scene.welcome1
+      .split(scene.UNSUB_MARK).join(unsub)
+      .split(scene.CTA_MARK).join(utm('/product', '1'))
+      .split(scene.CODEROW_MARK).join(sceneCodeRow(t));
   }
   // The designed screener, exactly as drawn — no code strip; it should ask
   // for two minutes and nothing else.

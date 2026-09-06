@@ -1,12 +1,26 @@
-// Ambassador approval email builder. Same design family as the wholesale
-// approval email (dark header, gold rule, card, numbered steps, real-person
-// sign-off). Tokens: firstName, code, link, buyerPct, commissionPct, senderName.
+// Ambassador emails. Since the 2026-09 scene redesign the art is the
+// lanyard-pass design in email-templates/scene/ambassador.html, embedded by
+// tools/build-scene-emails.js — edit the template and re-run the generator,
+// never a string here. This module fills the pass's tokens for the two
+// variants: approval (the ambassador still has to claim a code) and retier
+// (the rate changed; the code stays).
+//
+// Tokens: firstName, code, link, buyerPct, commissionPct, senderName.
 
-const TEMPLATE = "<!doctype html>\n<html lang=\"en\">\n<head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><meta name=\"color-scheme\" content=\"light\"><title>Welcome to the Happy Beanie ambassador program</title></head>\n<body style=\"margin:0; padding:0; background:#e7decb;\">\n  <div style=\"display:none; max-height:0; overflow:hidden; opacity:0; color:#e7decb; font-size:1px; line-height:1px;\">You're in — your code [[CODE]] and your link are inside.</div>\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#e7decb;\"><tr><td align=\"center\" style=\"padding:28px 12px;\">\n    <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:600px; max-width:600px; background:#fcfaf4; border:1px solid #e0d6c2; border-radius:10px; overflow:hidden;\">\n\n      <tr><td style=\"background:#17140f; padding:22px 30px;\"><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr>\n        <td align=\"left\"><img src=\"https://www.happybeanie.com/assets/email-logo-2.png\" width=\"133\" height=\"38\" alt=\"happy beanie\" style=\"display:block; border:0; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:20px; font-weight:700; letter-spacing:-0.5px; color:#f5f0e6;\"></td>\n        <td align=\"right\" style=\"font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;\">Ambassador&nbsp;program</td>\n      </tr></table></td></tr>\n      <tr><td style=\"height:3px; background:#f2ce59; font-size:0; line-height:0;\">&nbsp;</td></tr>\n\n      <tr><td style=\"padding:38px 34px 6px;\">\n        <p style=\"margin:0 0 14px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;\">— &nbsp;Application · approved</p>\n        <h1 style=\"margin:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:27px; line-height:1.1; letter-spacing:-1px; font-weight:700; color:#17140f;\">You're in, [[FIRST_NAME]].</h1>\n        <p style=\"margin:0 0 26px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15.5px; line-height:1.62; color:#554c40;\">Welcome to the Happy Beanie ambassador program. Your personal code and link are below — they're live right now.</p>\n\n        <!-- Code card -->\n        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#17140f; border-radius:10px;\"><tr><td style=\"padding:24px 24px 22px;\" align=\"center\">\n          <p style=\"margin:0 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#7eb38c;\">Your code · [[BUYER_PCT]]% off for your people</p>\n          <p style=\"margin:0 0 14px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:30px; letter-spacing:4px; font-weight:700; color:#f2ce59;\">[[CODE]]</p>\n          <p style=\"margin:0; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:11px; letter-spacing:0.5px; color:#8a7f6e; word-break:break-all;\">[[LINK]]</p>\n          <p style=\"margin:14px 0 0; padding-top:14px; border-top:1px solid rgba(245,240,230,0.14); font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9.5px; letter-spacing:1px; text-transform:uppercase; color:#8a7f6e;\">You earn&nbsp; [[COMMISSION_PCT]]% &nbsp;of every sale it drives</p>\n        </td></tr></table>\n\n        <!-- How it works -->\n        <p style=\"margin:28px 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;\">— &nbsp;How it works</p>\n        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n          <tr><td style=\"padding:0 0 12px;\">\n            <span style=\"display:inline-block; width:22px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:11px; color:#325e3f; vertical-align:top;\">01</span><span style=\"display:inline-block; width:520px; max-width:88%; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14.5px; line-height:1.6; color:#554c40; vertical-align:top;\"><b style=\"color:#17140f;\">Share your link or code</b> — anyone who uses it gets [[BUYER_PCT]]% off their order, and the sale is credited to you automatically.</span>\n          </td></tr>\n          <tr><td style=\"padding:0 0 12px;\">\n            <span style=\"display:inline-block; width:22px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:11px; color:#325e3f; vertical-align:top;\">02</span><span style=\"display:inline-block; width:520px; max-width:88%; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14.5px; line-height:1.6; color:#554c40; vertical-align:top;\"><b style=\"color:#17140f;\">Get paid monthly</b> — [[COMMISSION_PCT]]% of net product sales (after discounts and refunds, before shipping and tax), paid at month end once you've earned $25 or more.</span>\n          </td></tr>\n          <tr><td style=\"padding:0 0 6px;\">\n            <span style=\"display:inline-block; width:22px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:11px; color:#325e3f; vertical-align:top;\">03</span><span style=\"display:inline-block; width:520px; max-width:88%; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14.5px; line-height:1.6; color:#554c40; vertical-align:top;\"><b style=\"color:#17140f;\">Play it straight</b> — always disclose the partnership (#ad or #happybeaniepartner), never make health claims we don't make ourselves, and keep the code off coupon sites. The full rules live in your portal.</span>\n          </td></tr>\n        </table>\n\n        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin:24px 0 8px;\"><tr><td align=\"center\" bgcolor=\"#f2ce59\" style=\"border-radius:999px;\">\n          <a href=\"https://www.happybeanie.com/account\" style=\"display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#17140f; text-decoration:none;\">Open your ambassador portal →</a>\n        </td></tr></table>\n\n        <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin:26px 0 30px; background:#f5f0e6; border:1px solid #e0d6c2; border-radius:8px;\"><tr><td style=\"padding:18px 20px;\">\n          <p style=\"margin:0 0 4px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14.5px; line-height:1.6; color:#554c40;\">Questions about content, payouts or anything else — reply directly to me. A person reads this inbox, not a queue.</p>\n          <p style=\"margin:10px 0 0; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14.5px; color:#17140f;\"><b>[[YOUR_NAME]]</b><br><span style=\"font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#8a7f6e;\">Ambassador team · Happy Beanie</span></p>\n        </td></tr></table>\n      </td></tr>\n\n      <tr><td style=\"background:#f5f0e6; border-top:1px solid #e0d6c2; padding:26px 34px 30px;\" align=\"center\">\n        <p style=\"margin:0 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;\">Formulated fresh · Scottsdale, AZ</p>\n        <p style=\"margin:0; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:11px; line-height:1.6; color:#8a7f6e;\">Questions? <a href=\"mailto:hello@happybeanie.com\" style=\"color:#325e3f; text-decoration:none;\">hello@happybeanie.com</a> &nbsp;·&nbsp; © 2026 Happy Beanie</p>\n      </td></tr>\n    </table>\n  </td></tr></table>\n</body>\n</html>\n";
+const scene = require('./scene-designs.js');
+const TEMPLATE = scene.ambassador;
 
 function fill(tpl, t) {
   return tpl
     .replace(/\[\[FIRST_NAME\]\]/g, t.firstName)
+    .replace(/\[\[TITLE\]\]/g, t.title || '')
+    .replace(/\[\[PREHEADER\]\]/g, t.preheader || '')
+    .replace(/\[\[EYEBROW\]\]/g, t.eyebrow || '')
+    .replace(/\[\[HEADLINE\]\]/g, t.headline || '')
+    .replace(/\[\[CODE_LINE\]\]/g, t.codeLine || '')
+    .replace(/\[\[INTRO\]\]/g, t.intro || '')
+    .replace(/\[\[STEP1\]\]/g, t.step1 || '')
+    .replace(/\[\[SIGNIN_NOTE\]\]/g, t.signinNote || '')
     .replace(/\[\[CODE\]\]/g, t.code)
     .replace(/\[\[LINK\]\]/g, t.link)
     .replace(/\[\[BUYER_PCT\]\]/g, String(t.buyerPct))
@@ -15,37 +29,42 @@ function fill(tpl, t) {
 }
 
 // Approval: the desk approves terms only — the ambassador picks their own
-// code in the portal, so the card invites them in rather than showing a code.
+// code in the portal, so the pass shows the invitation rather than a code.
 module.exports = function buildApprovalEmail(t) {
-  const tpl = TEMPLATE
-    .replace('Welcome to the Happy Beanie ambassador program</title>', 'Pick your Happy Beanie ambassador code</title>')
-    .replace("You're in — your code [[CODE]] and your link are inside.",
-             "You're in — open your portal and pick your personal code.")
-    .replace("Welcome to the Happy Beanie ambassador program. Your personal code and link are below — they're live right now.",
-             "Welcome to the Happy Beanie ambassador program. One thing left to do: sign in to your portal and pick your personal code — it goes live the moment you claim it.")
-    .replace('Your code · [[BUYER_PCT]]% off for your people', 'First move · claim your code')
-    .replace("font-family:'DM Mono',Menlo,Consolas,monospace; font-size:30px; letter-spacing:4px; font-weight:700; color:#f2ce59;\">[[CODE]]</p>",
-             "font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:21px; letter-spacing:-0.5px; font-weight:700; color:#f2ce59;\">You pick it — in your portal</p>")
+  return fill(TEMPLATE, Object.assign({}, t, {
+    title: 'Pick your Happy Beanie ambassador code',
+    preheader: "You're in — open your portal and pick your personal code.",
+    eyebrow: 'Application &middot; approved',
+    headline: "You're in, " + t.firstName + '.',
+    codeLine: 'You pick it',
+    intro: 'Pick your own code in the portal &mdash; any 3&ndash;20 letters or numbers, ' +
+           'your name or your pet&rsquo;s. It goes live the moment you claim it.',
+    step1: '<strong style="color:#F2EAD9;">Pick your code</strong> &mdash; sign in and claim it, ' +
+           'then share the code or your link. Your audience gets [[BUYER_PCT]]% off with it, and ' +
+           'every sale it drives is credited to you automatically.',
     // The portal uses passwordless sign-in; without this line a first-timer
     // can sign in with some other address and land in an empty account.
-    .replace('Open your ambassador portal →</a>\n        </td></tr></table>',
-             'Open your ambassador portal →</a>\n        </td></tr></table>\n        <p style="margin:10px 0 0; font-family:\'DM Sans\',Helvetica,Arial,sans-serif; font-size:12.5px; line-height:1.6; color:#8a7f6e; text-align:center;">Sign in with this same email address — we\'ll send you a one-time code. No password to create.</p>')
-    .replace('<b style="color:#17140f;">Share your link or code</b> — anyone who uses it gets [[BUYER_PCT]]% off their order, and the sale is credited to you automatically.',
-             '<b style="color:#17140f;">Pick your code</b> — sign in and claim any code, 3–20 letters or numbers (your name, your pet\'s name, your call). Your audience gets [[BUYER_PCT]]% off with it, and every sale it drives is credited to you automatically.');
-  return fill(tpl, t);
+    signinNote: '<tr><td colspan="2" align="center" style="padding:14px 60px 0 60px; ' +
+      "font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; " +
+      'font-size:12.5px; line-height:20px; color:#8A7F6E;">Sign in with this same email address ' +
+      '&mdash; we&rsquo;ll send you a one-time code. No password to create.</td></tr>'
+  }));
 };
 
-// Tier-change variant: same design, copy announces the new commission rate.
+// Tier-change variant: same pass, and the code on it is the one they hold.
 module.exports.retier = function buildRetierEmail(t) {
-  const tpl = TEMPLATE
-    .replace('Welcome to the Happy Beanie ambassador program</title>', 'Your new Happy Beanie ambassador rate</title>')
-    .replace("You're in — your code [[CODE]] and your link are inside.",
-             'Your commission moved to [[COMMISSION_PCT]]% — details inside.')
-    .replace('— &nbsp;Application · approved', '— &nbsp;Ambassador · rate update')
-    .replace("You're in, [[FIRST_NAME]].", 'New rate, [[FIRST_NAME]].')
-    .replace('Welcome to the Happy Beanie ambassador program. Your personal code and link are below — they\'re live right now.',
-             'Good news from the ambassador program — your commission rate just changed. Your code and link stay exactly the same; the new rate applies to every sale from today.');
-  return fill(tpl, t);
+  return fill(TEMPLATE, Object.assign({}, t, {
+    title: 'Your new Happy Beanie ambassador rate',
+    preheader: 'Your commission moved to ' + t.commissionPct + '% — details inside.',
+    eyebrow: 'Ambassador &middot; rate update',
+    headline: 'New rate, ' + t.firstName + '.',
+    codeLine: t.code,
+    intro: 'Your commission rate just changed. Your code and link stay exactly the same &mdash; ' +
+           'the new rate applies to every sale from today.',
+    step1: '<strong style="color:#F2EAD9;">Share your link or code</strong> &mdash; anyone who uses ' +
+           'it gets [[BUYER_PCT]]% off their order, and the sale is credited to you automatically.',
+    signinNote: ''
+  }));
 };
 
 // Plain-text parts — HTML-only sends are a spam signal, so every send

@@ -23,6 +23,8 @@
 // build.subject(step)     subject line
 
 const designs = require('./postpurchase-designs.js');
+// checkin's art since the 2026-09 scene redesign — tools/build-scene-emails.js.
+const scene = require('./scene-designs.js');
 
 function esc(s) {
   return String(s == null ? '' : s)
@@ -118,6 +120,13 @@ function pick(step) {
 function build(step, t) {
   pick(step);
   const unsub = esc((t && t.unsubUrl) || SITE + '/api/unsubscribe');
+  // checkin is the 2026-09 scene redesign — week one drawn as seven chews
+  // counted out. The other four keep the Setup_29 designs.
+  if (String(step) === 'checkin') {
+    return scene.ppCheckin
+      .split(scene.UNSUB_MARK).join(unsub)
+      .split(scene.CTA_MARK).join(utm('pp_checkin'));
+  }
   let h = designs.html[String(step)].split(designs.UNSUB_MARK).join(unsub);
   if (String(step) === 'halfway' || String(step) === 'halfway-sub') {
     const n = parseInt(t && t.chewsRemaining, 10);
