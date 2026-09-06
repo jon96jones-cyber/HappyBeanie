@@ -47,11 +47,18 @@ label.remember { display:flex; align-items:center; gap:7px; font-size:13px; colo
 .stage .subj .v { font-weight:700; font-size:16px; letter-spacing:-0.02em; }
 .note { padding:9px 18px; font-size:12.5px; color:#B9AF9C; border-bottom:1px solid rgba(245,240,230,0.12); background:rgba(240,198,75,0.06); }
 .frameWrap { background:#DED5C4; padding:20px 0; display:flex; justify-content:center; min-height:400px; }
+.device, .screen { display:contents; }
 iframe { border:0; background:#fff; width:640px; max-width:100%; height:1200px; display:block; box-shadow:0 24px 50px -30px rgba(0,0,0,0.6); }
-/* Phone mode mimics what mail apps do with the fixed 600px table: render at
-   full width and scale the whole thing down to phone size. A 390px viewport
-   would clip the right third instead. */
-iframe.phone { width:624px; height:1900px; transform:scale(0.625); transform-origin:top center; margin-bottom:-712px; }
+/* Phone mode is an iPhone 15 Pro Max mockup: 430x932 screen inside the black
+   chassis, dynamic island and home indicator, with the email scrolling inside
+   the screen. The templates' fixed 600px table is scaled the way mail apps
+   scale it (624 -> 430), so nothing clips. */
+.frameWrap.phone { padding:36px 0 44px; }
+.frameWrap.phone .device { display:block; position:relative; background:#0B0A08; border-radius:58px; padding:14px; box-shadow:0 50px 90px -45px rgba(0,0,0,0.85), 0 0 0 2px rgba(255,255,255,0.07) inset; }
+.frameWrap.phone .device::before { content:""; position:absolute; left:50%; top:30px; transform:translateX(-50%); width:126px; height:36px; background:#0B0A08; border-radius:20px; z-index:6; box-shadow:0 0 0 1px rgba(255,255,255,0.05); }
+.frameWrap.phone .screen { display:block; position:relative; width:430px; height:932px; border-radius:44px; overflow:hidden; background:#fff; }
+.frameWrap.phone .screen::after { content:""; position:absolute; bottom:9px; left:50%; transform:translateX(-50%); width:134px; height:5px; border-radius:3px; background:rgba(0,0,0,0.8); z-index:6; pointer-events:none; }
+.frameWrap.phone iframe { width:641px; max-width:none; height:1390px; transform:scale(0.6708); transform-origin:top left; margin:0; box-shadow:none; }
 pre.textalt { display:none; padding:20px 22px; white-space:pre-wrap; font-family:'DM Mono',ui-monospace,monospace; font-size:12.5px; line-height:1.7; color:#DED5C4; background:#100E0A; }
 .hint { color:#8A7F6E; font-size:13px; margin-top:14px; }
 @media (max-width: 860px) { .wrap { grid-template-columns:1fr; } .list { position:static; max-height:none; display:grid; grid-template-columns:1fr 1fr; gap:0 10px; } .grp { grid-column:1/-1; } }
@@ -73,7 +80,7 @@ pre.textalt { display:none; padding:20px 22px; white-space:pre-wrap; font-family
     <div class="tools">
       <a href="/admin/campaigns" class="mono" style="font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none;">← Campaigns desk</a>
       <button id="wDesk" class="on">Desktop</button>
-      <button id="wPhone">Phone</button>
+      <button id="wPhone">iPhone 15 Pro Max</button>
       <button id="wText">Text version</button>
     </div>
   </div></header>
@@ -86,7 +93,7 @@ pre.textalt { display:none; padding:20px 22px; white-space:pre-wrap; font-family
           <div class="mono" style="font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E;" id="meta"></div>
         </div>
         <div class="note" id="note" hidden></div>
-        <div class="frameWrap"><iframe id="frame" title="Email preview"></iframe></div>
+        <div class="frameWrap" id="frameWrap"><div class="device"><div class="screen"><iframe id="frame" title="Email preview"></iframe></div></div></div>
         <pre class="textalt" id="textalt"></pre>
       </div>
     </div>
@@ -135,8 +142,8 @@ pre.textalt { display:none; padding:20px 22px; white-space:pre-wrap; font-family
     $('wText').className = m === 'text' ? 'on' : '';
     var showText = m === 'text';
     $('textalt').style.display = showText ? 'block' : 'none';
-    $('frame').parentElement.style.display = showText ? 'none' : 'flex';
-    $('frame').className = m === 'phone' ? 'phone' : '';
+    $('frameWrap').style.display = showText ? 'none' : 'flex';
+    $('frameWrap').className = 'frameWrap' + (m === 'phone' ? ' phone' : '');
   }
   $('wDesk').addEventListener('click', function () { setMode('desk'); });
   $('wPhone').addEventListener('click', function () { setMode('phone'); });
