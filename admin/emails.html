@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Email designs — Happy Beanie</title>
+<link rel="icon" type="image/png" href="/favicon.png?v=4">
+<script src="/assets/nodrag.js" defer></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#17140F; color:#F5F0E6; font-family:'DM Sans',-apple-system,'Segoe UI',sans-serif; font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+.mono { font-family:'DM Mono',ui-monospace,monospace; }
+.shell { max-width:1180px; margin:0 auto; padding:0 24px 80px; }
+a { color:#F0C64B; }
+
+header.bar { border-bottom:1px solid rgba(245,240,230,0.12); background:rgba(23,20,15,0.92); position:sticky; top:0; z-index:20; }
+header.bar .in { max-width:1180px; margin:0 auto; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+header.bar b { font-size:20px; letter-spacing:-0.03em; }
+header.bar .sub { font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.tools { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+
+button { font-family:'DM Mono',ui-monospace,monospace; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; padding:9px 15px; border-radius:3px; border:1px solid rgba(245,240,230,0.24); background:transparent; color:#F5F0E6; cursor:pointer; }
+button:hover { border-color:#F0C64B; color:#F0C64B; }
+button.on { background:#F0C64B; border-color:#F0C64B; color:#17140F; font-weight:700; }
+
+#gate { max-width:420px; margin:14vh auto; padding:0 24px; }
+#gate h1 { font-size:26px; letter-spacing:-0.03em; margin-bottom:8px; }
+#gate p { color:#B9AF9C; font-size:14px; margin-bottom:20px; }
+input[type=password] { width:100%; background:rgba(245,240,230,0.06); border:1px solid rgba(245,240,230,0.24); border-radius:3px; color:#F5F0E6; padding:12px 14px; font-size:15px; }
+input:focus { outline:none; border-color:#F0C64B; }
+label.remember { display:flex; align-items:center; gap:7px; font-size:13px; color:#8A7F6E; margin:12px 0 16px; cursor:pointer; }
+.err { color:#E0A48F; font-size:13.5px; margin-top:12px; }
+
+.wrap { display:grid; grid-template-columns:280px minmax(0,1fr); gap:22px; margin-top:26px; align-items:start; }
+.list { position:sticky; top:82px; max-height:calc(100vh - 100px); overflow:auto; padding-right:4px; }
+.grp { font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; margin:18px 0 7px; }
+.grp:first-child { margin-top:0; }
+.item { display:block; width:100%; text-align:left; border:1px solid rgba(245,240,230,0.12); border-radius:5px; background:rgba(245,240,230,0.03); padding:10px 12px; margin-bottom:6px; cursor:pointer; color:#F5F0E6; font-family:inherit; font-size:13.5px; letter-spacing:0; text-transform:none; line-height:1.45; }
+.item:hover { border-color:rgba(240,198,75,0.6); color:#F5F0E6; }
+.item.on { border-color:#F0C64B; background:rgba(240,198,75,0.1); }
+.item .nm { font-weight:700; display:block; }
+.item .sj { color:#B9AF9C; font-size:12px; display:block; }
+
+.stage { border:1px solid rgba(245,240,230,0.14); border-radius:6px; background:rgba(245,240,230,0.04); overflow:hidden; }
+.stage .head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:14px 18px; border-bottom:1px solid rgba(245,240,230,0.12); }
+.stage .subj { min-width:0; }
+.stage .subj .k { font-family:'DM Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; }
+.stage .subj .v { font-weight:700; font-size:16px; letter-spacing:-0.02em; }
+.note { padding:9px 18px; font-size:12.5px; color:#B9AF9C; border-bottom:1px solid rgba(245,240,230,0.12); background:rgba(240,198,75,0.06); }
+.frameWrap { background:#DED5C4; padding:20px 0; display:flex; justify-content:center; min-height:400px; }
+iframe { border:0; background:#fff; width:640px; max-width:100%; height:1200px; display:block; box-shadow:0 24px 50px -30px rgba(0,0,0,0.6); }
+iframe.phone { width:390px; }
+pre.textalt { display:none; padding:20px 22px; white-space:pre-wrap; font-family:'DM Mono',ui-monospace,monospace; font-size:12.5px; line-height:1.7; color:#DED5C4; background:#100E0A; }
+.hint { color:#8A7F6E; font-size:13px; margin-top:14px; }
+@media (max-width: 860px) { .wrap { grid-template-columns:1fr; } .list { position:static; max-height:none; display:grid; grid-template-columns:1fr 1fr; gap:0 10px; } .grp { grid-column:1/-1; } }
+</style>
+</head><body>
+
+<div id="gate" hidden>
+  <h1>Email designs</h1>
+  <p>Same key as the live desk.</p>
+  <input id="key" type="password" placeholder="Desk key" autocomplete="current-password">
+  <label class="remember"><input id="rememberKey" type="checkbox" checked> Remember on this device</label>
+  <button class="on" id="enter">Open the gallery</button>
+  <div class="err" id="gateErr" hidden></div>
+</div>
+
+<div id="desk" hidden>
+  <header class="bar"><div class="in">
+    <div><b>Email designs</b> <span class="sub">· every template, rendered with sample data</span></div>
+    <div class="tools">
+      <a href="/admin/campaigns" class="mono" style="font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none;">← Campaigns desk</a>
+      <button id="wDesk" class="on">Desktop</button>
+      <button id="wPhone">Phone</button>
+      <button id="wText">Text version</button>
+    </div>
+  </div></header>
+  <div class="shell">
+    <div class="wrap">
+      <nav class="list" id="list"></nav>
+      <div class="stage">
+        <div class="head">
+          <div class="subj"><div class="k">Subject line</div><div class="v" id="subj">Pick a design</div></div>
+          <div class="mono" style="font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E;" id="meta"></div>
+        </div>
+        <div class="note" id="note" hidden></div>
+        <div class="frameWrap"><iframe id="frame" title="Email preview"></iframe></div>
+        <pre class="textalt" id="textalt"></pre>
+      </div>
+    </div>
+    <p class="hint">Rendered live from the same code the crons send with — what you see here is exactly what ships. Sample values (JORDAN15, $99 cart) stand in for real customer data.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var key = '', designs = [], current = null, mode = 'desk';
+
+  function api(qs) {
+    return fetch('/api/admin/email-gallery' + (qs ? '?' + qs : ''), { headers: { 'x-analytics-key': key } })
+      .then(function (r) { return r.json(); });
+  }
+
+  function showGate(msg) {
+    $('gate').hidden = false; $('desk').hidden = true;
+    if (msg) { $('gateErr').textContent = msg; $('gateErr').hidden = false; }
+  }
+
+  function renderList() {
+    var box = $('list'); box.textContent = '';
+    var lastGroup = null;
+    designs.forEach(function (d) {
+      if (d.group !== lastGroup) {
+        lastGroup = d.group;
+        var g = document.createElement('div'); g.className = 'grp'; g.textContent = d.group; box.appendChild(g);
+      }
+      var b = document.createElement('button');
+      b.className = 'item' + (current === d.id ? ' on' : '');
+      b.dataset.id = d.id;
+      var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = d.name;
+      var sj = document.createElement('span'); sj.className = 'sj'; sj.textContent = d.subject;
+      b.appendChild(nm); b.appendChild(sj);
+      b.addEventListener('click', function () { load(d.id); });
+      box.appendChild(b);
+    });
+  }
+
+  function setMode(m) {
+    mode = m;
+    $('wDesk').className = m === 'desk' ? 'on' : '';
+    $('wPhone').className = m === 'phone' ? 'on' : '';
+    $('wText').className = m === 'text' ? 'on' : '';
+    var showText = m === 'text';
+    $('textalt').style.display = showText ? 'block' : 'none';
+    $('frame').parentElement.style.display = showText ? 'none' : 'flex';
+    $('frame').className = m === 'phone' ? 'phone' : '';
+  }
+  $('wDesk').addEventListener('click', function () { setMode('desk'); });
+  $('wPhone').addEventListener('click', function () { setMode('phone'); });
+  $('wText').addEventListener('click', function () { setMode('text'); });
+
+  function load(id) {
+    current = id; renderList();
+    $('subj').textContent = 'Rendering…'; $('meta').textContent = ''; $('note').hidden = true;
+    api('id=' + encodeURIComponent(id)).then(function (b) {
+      if (!b.ok) { $('subj').textContent = 'Could not render: ' + (b.error || ''); return; }
+      $('subj').textContent = b.subject;
+      $('meta').textContent = b.group + ' · ' + b.id;
+      if (b.note) { $('note').textContent = b.note; $('note').hidden = false; }
+      $('frame').srcdoc = b.html;
+      $('textalt').textContent = b.text || 'No separate text version for this design.';
+      if (mode === 'text' && !b.text) setMode('desk');
+    });
+  }
+
+  function boot() {
+    api('').then(function (b) {
+      if (!b.ok) {
+        if (b.error === 'unauthorized') { try { localStorage.removeItem('hb_ckey'); } catch (e) {} }
+        return showGate(b.error === 'unauthorized' ? 'That key was not accepted.' : 'The gallery could not load: ' + (b.error || 'unknown'));
+      }
+      designs = b.designs;
+      $('gate').hidden = true; $('desk').hidden = false;
+      renderList();
+      if (designs.length) load(designs[0].id);
+    }).catch(function () { showGate('The gallery could not be reached.'); });
+  }
+
+  $('enter').addEventListener('click', function () {
+    key = $('key').value.trim();
+    if (!key) return;
+    try {
+      if ($('rememberKey').checked) localStorage.setItem('hb_ckey', key);
+      else localStorage.removeItem('hb_ckey');
+    } catch (e) {}
+    boot();
+  });
+  $('key').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('enter').click(); });
+
+  var saved = '';
+  try { saved = localStorage.getItem('hb_ckey') || ''; } catch (e) {}
+  if (saved) { key = saved; boot(); } else { showGate(); }
+})();
+</script>
+</body></html>
