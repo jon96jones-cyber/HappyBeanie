@@ -1,45 +1,75 @@
 <!--
-  Happy Beanie · PAYMENT FAILED (clay)
-  Paste into: Settings → Notifications → (Subscriptions) Payment failure → Edit code.
-  Replace [[TOKENS]] with the notification's Liquid variables (see README).
+  Happy Beanie · PAYMENT FAILED (clay)  (WIRED — real Liquid)
+  Paste into: Settings → Notifications → (Subscriptions) Subscription payment failure → Edit code.
+  Then SAVE and SEND TEST before leaving the page. Nothing else to edit.
+
+  This notification fires AFTER Shopify's retries are exhausted: the top-level
+  status_after_dunning variable says what happened to the plan (paused,
+  canceled, or skipped) and the copy branches on it. Also proven by the
+  default: update_payment_method_url, payment_instrument (card brand + last
+  four), total_price. The paused wording doubles as the fallback when the
+  status is blank (e.g. a test send).
 -->
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>Update your Happy Beanie payment</title></head>
 <body style="margin:0; padding:0; background:#e7decb;">
-  <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#e7decb; font-size:1px; line-height:1px;">We couldn’t charge your card — update it to keep your box on track.</div>
+  {% assign hb_cycle = subscription_contract_billing_cycle %}
+  {% assign hb_card = hb_cycle.payment_instrument %}
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#e7decb; font-size:1px; line-height:1px;">We couldn’t charge your card — update it to get your box back on track.</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e7decb;"><tr><td align="center" style="padding:28px 12px;">
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background:#fcfaf4; border:1px solid #e0d6c2; border-radius:10px; overflow:hidden;">
       <tr><td style="background:#17140f; padding:22px 30px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
         <td align="left" style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:20px; font-weight:700; letter-spacing:-0.5px; color:#f5f0e6;">happy&nbsp;beanie</td>
-        <td align="right" style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Hormone&nbsp;care</td>
+        <td align="right" style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Subscription</td>
       </tr></table></td></tr>
       <tr><td style="height:3px; background:#b4472c; font-size:0; line-height:0;">&nbsp;</td></tr>
 
       <tr><td style="padding:38px 34px 6px;">
         <p style="margin:0 0 14px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#b4472c;">▲ &nbsp;Payment failed</p>
         <h1 style="margin:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:27px; line-height:1.1; letter-spacing:-1px; font-weight:700; color:#17140f;">We couldn’t charge your card.</h1>
-        <p style="margin:0 0 26px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15.5px; line-height:1.62; color:#554c40;">Your next box is on hold until the payment goes through. Update your card and we’ll retry automatically — it takes a minute, and nothing ships until it clears.</p>
+        <p style="margin:0 0 26px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15.5px; line-height:1.62; color:#554c40;">
+          {% if status_after_dunning == "canceled" %}
+            We tried a few times without luck, so your plan has been cancelled — no further charges. Update your card and start a new plan whenever you’re ready; the subscriber price will be waiting.
+          {% elsif status_after_dunning == "skipped" %}
+            We tried a few times without luck, so this delivery was skipped — you won’t be charged for it. Update your card to keep your future boxes on schedule.
+          {% else %}
+            We tried a few times without luck, so your plan is on hold. Update your card, then resume from your account — it takes a minute, and nothing ships or charges until you do.
+          {% endif %}
+        </p>
 
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#17140f; border-radius:10px;"><tr><td style="padding:22px 24px;">
+          {% if hb_card %}
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;"><tr><td style="padding:12px 14px; background:rgba(180,71,44,0.10); border:1px solid rgba(180,71,44,0.35); border-radius:6px;">
             <div style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#d98a72; padding-bottom:5px;">Card on file</div>
-            <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14px; color:#ded5c4;">[[CARD_BRAND]] ending [[CARD_LAST4]]</div>
+            <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14px; color:#ded5c4;">{{ hb_card.credit_card_company | default: "Card" }} ending {{ hb_card.credit_card_last_four_digits }}</div>
+          </td></tr></table>
+          {% endif %}
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:8px;"><tr><td style="padding:12px 14px; background:rgba(245,240,230,0.04); border:1px solid rgba(245,240,230,0.10); border-radius:6px;">
+            <div style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e; padding-bottom:5px;">Amount due</div>
+            <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14px; color:#ded5c4;">{{ hb_cycle.total_price | money_with_currency }}</div>
           </td></tr></table>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:12px 14px; background:rgba(245,240,230,0.04); border:1px solid rgba(245,240,230,0.10); border-radius:6px;">
-            <div style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e; padding-bottom:5px;">Amount due</div>
-            <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14px; color:#ded5c4;">[[AMOUNT]]</div>
+            <div style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e; padding-bottom:5px;">Plan status</div>
+            <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14px; color:#ded5c4;">{% if status_after_dunning == "canceled" %}Cancelled{% elsif status_after_dunning == "skipped" %}This delivery skipped{% else %}Paused until payment clears{% endif %}</div>
           </td></tr></table>
         </td></tr></table>
 
+        {% if status_after_dunning == "canceled" %}
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 8px;"><tr><td align="center" bgcolor="#b4472c" style="border-radius:999px;">
-          <a href="https://www.happybeanie.com/account" style="display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#ffffff; text-decoration:none;">Update payment →</a>
+          <a href="https://www.happybeanie.com/account" style="display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#ffffff; text-decoration:none;">Start a new plan →</a>
         </td></tr></table>
-        <p style="margin:0 0 30px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#8a7f6e; text-align:center;">We’ll retry a few times before pausing the plan. Need a hand? Just reply.</p>
+        <p style="margin:0 0 30px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#8a7f6e; text-align:center;">Think this was a mistake, or need a hand? Just reply — a human reads every note.</p>
+        {% else %}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 8px;"><tr><td align="center" bgcolor="#b4472c" style="border-radius:999px;">
+          <a href="{{ hb_cycle.update_payment_method_url | default: 'https://www.happybeanie.com/account' }}" style="display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#ffffff; text-decoration:none;">Update payment →</a>
+        </td></tr></table>
+        <p style="margin:0 0 30px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#8a7f6e; text-align:center;">Card updated? <a href="{{ hb_cycle.customer_self_serve_url | default: 'https://www.happybeanie.com/account' }}" style="color:#325e3f;">Reactivate your plan here</a> — or just reply if you need a hand.</p>
+        {% endif %}
       </td></tr>
 
       <tr><td style="background:#f5f0e6; border-top:1px solid #e0d6c2; padding:26px 34px 30px;" align="center">
-        <p style="margin:0 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Formulated fresh · Scottsdale, AZ</p>
+        <p style="margin:0 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Made in one facility · Scottsdale, AZ</p>
         <p style="margin:0; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:11px; line-height:1.6; color:#8a7f6e;">Questions? <a href="mailto:hello@happybeanie.com" style="color:#325e3f; text-decoration:none;">hello@happybeanie.com</a> &nbsp;·&nbsp; © 2026 Happy Beanie</p>
       </td></tr>
     </table>
