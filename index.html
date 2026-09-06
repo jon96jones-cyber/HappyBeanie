@@ -721,8 +721,11 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .bp-card { border: 1px solid rgba(245,240,230,0.18); background: rgba(245,240,230,0.04); padding: 26px 26px 28px; animation: bpIn 0.35s cubic-bezier(0.2,0.7,0.2,1) both; }
 .bp-card__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 18px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow); }
 .bp-card__head span:first-child { white-space: nowrap; } .bp-card__head span:last-child { color: var(--muted); text-align: right; }
-.bp-card__photo { height: 200px; margin-bottom: 20px; border: 1px solid rgba(245,240,230,0.14); overflow: hidden; background: #1E1A14; display: grid; place-items: center; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); text-align: center; padding: 16px; }
-.bp-card__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bp-card__photo { position: relative; height: 200px; margin-bottom: 20px; border: 1px solid rgba(245,240,230,0.14); overflow: hidden; background: #1E1A14; display: grid; place-items: center; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); text-align: center; padding: 16px; }
+/* Absolutely pinned so the height is definite — as a centered grid item the
+   img's height:100% never resolved, it overflowed at natural aspect and
+   object-position was a no-op. */
+.bp-card__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .bp-card h3 { font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1.05; margin: 0 0 6px; }
 .bp-card__prevents { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--green-lt); margin-bottom: 14px; }
 .bp-card p { font-size: 15px; line-height: 1.65; color: var(--muted-2); margin: 0; text-wrap: pretty; }
@@ -7536,7 +7539,8 @@ window.hbBpInit = function () {
       "prevents": "Moisture ruining a good powder",
       "body": "Excipients and botanicals are dried to a target water activity before blending. Damp powder cakes, doses unevenly, and shortens the shelf life we just promised.",
       "meta": "Loss on drying < 5%",
-      "photo": "/assets/img/lab/drying-oven.webp"
+      "photo": "/assets/img/lab/drying-oven.webp",
+      "pos": "center 68%"
     },
     {
       "no": "04",
@@ -7544,7 +7548,8 @@ window.hbBpInit = function () {
       "prevents": "A jar that quietly fades",
       "body": "Samples of every formulation sit here for the length of their claimed shelf life, accelerated and real-time. If potency falls before the date on the jar, the date changes.",
       "meta": "40 °C / 75% RH · 24 months",
-      "photo": "/assets/img/lab/stability-chamber.webp"
+      "photo": "/assets/img/lab/stability-chamber.webp",
+      "pos": "center 65%"
     },
     {
       "no": "05",
@@ -7552,7 +7557,8 @@ window.hbBpInit = function () {
       "prevents": "A supplier's word standing in for proof",
       "body": "Every incoming lot is run against our own validated method, and every finished lot again before release. This is where we get to refuse a shipment and say exactly why.",
       "meta": "100% of lots, identity and potency",
-      "photo": "/assets/img/lab/hplc-bay.webp"
+      "photo": "/assets/img/lab/hplc-bay.webp",
+      "pos": "center 62%"
     },
     {
       "no": "06",
@@ -7577,7 +7583,7 @@ window.hbBpInit = function () {
       card.querySelector('[data-body]').textContent = s.body;
       var ph = card.querySelector('[data-photo]');
       ph.textContent = '';
-      if (s.photo) { var im = document.createElement('img'); im.src = s.photo; im.alt = s.key; ph.appendChild(im); }
+      if (s.photo) { var im = document.createElement('img'); im.src = s.photo; im.alt = s.key; if (s.pos) im.style.objectPosition = s.pos; ph.appendChild(im); }
       else ph.textContent = s.key + ' \u2014 photo';
       card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
     }
