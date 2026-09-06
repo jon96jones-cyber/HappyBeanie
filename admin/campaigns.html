@@ -171,6 +171,10 @@ tr.click:hover td { background:rgba(245,240,230,0.045); }
         '<div class="dim" style="margin-top:6px">' + (s.failed ? s.failed + ' failed · ' : '') + esc(when(s.last_at)) + '</div></div>';
     }).join('');
 
+    // Signup emails can be re-fired safely (one code per address for life, so
+    // a resend re-sends the same code); sequenced campaigns belong to their
+    // crons and get no button.
+    var canResend = b.flow === 'popup-code' || b.flow === 'research-pack';
     var rows = b.sends.map(function (s) {
       return '<tr>' +
         '<td>' + esc(s.email) + (s.sends > 1 ? ' <span class="pill">sent ' + s.sends + '×</span>' : '') +
@@ -179,6 +183,7 @@ tr.click:hover td { background:rgba(245,240,230,0.045); }
         '<td class="hide dim">' + esc(s.subject || '—') + '</td>' +
         '<td>' + (s.status === 'failed' ? '<span class="pill bad">failed</span>' : '<span class="pill ok">sent</span>') + '</td>' +
         '<td class="num dim">' + esc(when(s.sent_at)) + '</td>' +
+        (canResend ? '<td class="num"><button class="fixsend" data-em="' + esc(s.email) + '" style="font-size:9.5px; padding:6px 10px;">Fix / resend</button></td>' : '') +
       '</tr>';
     }).join('');
 
@@ -206,7 +211,7 @@ tr.click:hover td { background:rgba(245,240,230,0.045); }
           '<div class="searchrow"><input type="search" id="q" placeholder="Filter by email address" value="' + esc(view.q) + '">' +
             '<button id="doSearch">Search</button>' + (view.q ? '<button id="clearSearch">Clear</button>' : '') + '</div>' +
           (b.sends.length
-            ? '<table><thead><tr><th>Recipient</th><th>Step</th><th class="hide">Subject</th><th>Status</th><th class="num">Sent</th></tr></thead><tbody>' + rows + '</tbody></table>'
+            ? '<table><thead><tr><th>Recipient</th><th>Step</th><th class="hide">Subject</th><th>Status</th><th class="num">Sent</th>' + (canResend ? '<th></th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table>'
             : '<div class="empty"><b>No matches</b>Nothing in this campaign matches that address.</div>') +
           '<div class="pager">' +
             '<button id="prev"' + (view.offset ? '' : ' disabled') + '>← Newer</button>' +
@@ -220,6 +225,32 @@ tr.click:hover td { background:rgba(245,240,230,0.045); }
     if ($('clearSearch')) $('clearSearch').addEventListener('click', function () { view.q = ''; view.offset = 0; load(); });
     $('prev').addEventListener('click', function () { view.offset = Math.max(0, view.offset - b.pageSize); load(); });
     $('next').addEventListener('click', function () { view.offset += b.pageSize; load(); });
+    Array.prototype.forEach.call(document.querySelectorAll('button.fixsend'), function (btn) {
+      btn.addEventListener('click', function () {
+        var cur = btn.getAttribute('data-em');
+        var to = prompt('Resend this email. Edit the address to fix a typo, or leave it to resend as-is:', cur);
+        if (to == null) return;
+        to = to.trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/.test(to)) { alert('That does not look like an email address.'); return; }
+        btn.disabled = true; btn.textContent = 'Sending…';
+        fetch('/api/admin/campaign-resend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-analytics-key': key },
+          body: JSON.stringify({ flow: view.flow, email: cur, newEmail: to })
+        }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (j) {
+          if (j.ok) {
+            alert((j.corrected ? 'Address corrected. ' : '') + (j.emailed ? 'Email sent to ' + j.target + '.' : 'Saved, but the email did not send: ' + (j.why || 'unknown')));
+            load();
+            return;
+          }
+          btn.disabled = false; btn.textContent = 'Fix / resend';
+          alert('Could not resend: ' + (j.error || 'unknown') + (j.detail ? ' (' + j.detail + ')' : ''));
+        }).catch(function () {
+          btn.disabled = false; btn.textContent = 'Fix / resend';
+          alert('Could not reach the resend endpoint.');
+        });
+      });
+    });
   }
 
   function open(flow) { view = { flow: flow, offset: 0, q: '' }; load(); }
