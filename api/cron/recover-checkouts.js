@@ -45,9 +45,9 @@ const HOUR = 60 * MIN;
 // subject — the design handoff's instruction for extra touches was to reuse the
 // email and change only the subject line.
 const RUNGS = [
-  { step: 1, after: 45 * MIN, subject: 'Your box is still packed' },
-  { step: 2, after: 24 * HOUR, subject: 'Still packed, still yours' },
-  { step: 3, after: 48 * HOUR, subject: 'We’ll stop reminding you after this' }
+  { step: 1, after: 45 * MIN, subject: 'You left your box on the counter' },
+  { step: 2, after: 24 * HOUR, subject: 'Should we set your box aside?' },
+  { step: 3, after: 48 * HOUR, subject: 'Last one from us, promise' }
 ];
 
 const LAST = RUNGS[RUNGS.length - 1];

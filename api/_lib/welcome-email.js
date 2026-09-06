@@ -47,7 +47,7 @@ function utm(path, step) {
 
 const STEPS = {
   '1': {
-    subject: 'One chew, once a day',
+    subject: 'What happens in the first 30 days',
     preheader: 'What the bean is, what is in it, and how the first week goes.',
     eyebrow: 'The daily ritual',
     title: 'One chew, once a day. That&rsquo;s the whole routine.',
@@ -65,7 +65,7 @@ const STEPS = {
     ]
   },
   '2': {
-    subject: 'Worth checking first',
+    subject: 'Not every pet should take this',
     preheader: 'Not every pet should take this. The screener will tell you plainly.',
     eyebrow: 'Before you order',
     title: 'We&rsquo;d rather tell you no.',
@@ -83,7 +83,7 @@ const STEPS = {
     ]
   },
   '3': {
-    subject: 'The research behind the bean',
+    subject: 'The studies we built on (we funded none of them)',
     preheader: 'Independent studies on the ingredients — none funded by us.',
     eyebrow: 'The evidence',
     title: 'We did the research so you don&rsquo;t have to.',

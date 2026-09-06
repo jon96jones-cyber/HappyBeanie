@@ -159,7 +159,7 @@ module.exports = async function handler(req, res) {
         to: c.email,
         flow: 'cart-nudge',
         step: '1',
-        subject: 'Your box is still packed',
+        subject: 'You left your box on the counter',
         html: lifecycle('cart-recovery', t),
         text: lifecycle.text('cart-recovery', t),
         unsubUrl: unsubUrl
