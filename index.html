@@ -745,8 +745,10 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   .bp__kicker { margin-bottom: 12px; }
   .bp__title { margin-bottom: 20px; }
   .bp__cols { grid-template-columns: 1fr; gap: 14px; }
-  .bp-plan { padding: 28px 16px 16px 32px; }
-  .bp-dim--top { left: 32px; right: 16px; top: 6px; } .bp-dim--left { top: 28px; bottom: 16px; left: 5px; }
+  /* Equal side gutters so the sheet reads centered; the 50' ruler tucks
+     into the left gutter. */
+  .bp-plan { padding: 28px 22px 16px 22px; }
+  .bp-dim--top { left: 22px; right: 22px; top: 6px; } .bp-dim--left { top: 28px; bottom: 16px; left: 2px; }
   .bp-detail { position: static; }
   .bp-legend { flex-wrap: wrap; gap: 8px 14px; margin-top: 10px; font-size: 8.5px; }
   .bp-legend > span:first-child { gap: 12px; }
