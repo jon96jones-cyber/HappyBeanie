@@ -24,8 +24,12 @@ module.exports = function buildApprovalEmail(t) {
     .replace("Welcome to the Happy Beanie ambassador program. Your personal code and link are below — they're live right now.",
              "Welcome to the Happy Beanie ambassador program. One thing left to do: sign in to your portal and pick your personal code — it goes live the moment you claim it.")
     .replace('Your code · [[BUYER_PCT]]% off for your people', 'First move · claim your code')
-    .replace("font-size:30px; letter-spacing:4px; font-weight:700; color:#f2ce59;\">[[CODE]]</p>",
-             "font-size:21px; letter-spacing:2px; font-weight:700; color:#f2ce59;\">You pick it — in your portal</p>")
+    .replace("font-family:'DM Mono',Menlo,Consolas,monospace; font-size:30px; letter-spacing:4px; font-weight:700; color:#f2ce59;\">[[CODE]]</p>",
+             "font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:21px; letter-spacing:-0.5px; font-weight:700; color:#f2ce59;\">You pick it — in your portal</p>")
+    // The portal uses passwordless sign-in; without this line a first-timer
+    // can sign in with some other address and land in an empty account.
+    .replace('Open your ambassador portal →</a>\n        </td></tr></table>',
+             'Open your ambassador portal →</a>\n        </td></tr></table>\n        <p style="margin:10px 0 0; font-family:\'DM Sans\',Helvetica,Arial,sans-serif; font-size:12.5px; line-height:1.6; color:#8a7f6e; text-align:center;">Sign in with this same email address — we\'ll send you a one-time code. No password to create.</p>')
     .replace('<b style="color:#17140f;">Share your link or code</b> — anyone who uses it gets [[BUYER_PCT]]% off their order, and the sale is credited to you automatically.',
              '<b style="color:#17140f;">Pick your code</b> — sign in and claim any code, 3–20 letters or numbers (your name, your pet\'s name, your call). Your audience gets [[BUYER_PCT]]% off with it, and every sale it drives is credited to you automatically.');
   return fill(tpl, t);
@@ -68,6 +72,8 @@ function textApproval(t) {
     "     off coupon sites. Full rules in your portal.",
     "",
     "Your portal: https://www.happybeanie.com/account",
+    "Sign in with this same email address - we'll send you a one-time",
+    "code. No password to create.",
     "",
     "Questions - reply directly to me. A person reads this inbox.",
     "",
