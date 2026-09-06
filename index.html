@@ -663,6 +663,90 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 }
 @media (prefers-reduced-motion: reduce) { .ds-hero__glow, .ds-hero__rule, .ds-photo__dot, .ds-chews span, .ds-hero__kicker, .ds-hero__title, .ds-hero__title em { animation: none; } }
 
+/* Lab blueprint (Setup_33), about page. Vars scoped on .hb-bp like .hb-dose. */
+.hb-bp { --ink: #17140F; --cream: #F5F0E6; --muted: #8A7F6E; --muted-2: #B9AF9C; --yellow: oklch(0.86 0.14 92); --green-lt: oklch(0.72 0.08 152); --line: rgba(245,240,230,0.7); --sans: 'DM Sans', system-ui, sans-serif; --mono: 'HB Mono Figures', 'DM Mono', ui-monospace, monospace; }
+.hb-bp .bp { font-family: var(--sans); position: relative; background: var(--ink); color: var(--cream); padding: 82px 44px 90px; overflow: hidden; }
+.bp * { box-sizing: border-box; }
+.bp__grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(245,240,230,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.035) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
+.bp__inner { position: relative; max-width: 1180px; margin: 0 auto; }
+.hb-bp .mono { font-family: var(--mono); letter-spacing: 0.18em; text-transform: uppercase; }
+.bp__kicker { font-size: 11px; letter-spacing: 0.2em; color: var(--green-lt); margin-bottom: 18px; }
+.bp__title { font-weight: 700; letter-spacing: -0.045em; font-size: clamp(34px, 4.4vw, 62px); line-height: 0.98; margin: 0 0 44px; max-width: 14em; }
+.bp__title em { font-style: normal; color: var(--yellow); }
+.bp__cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr); gap: 40px; align-items: start; }
+
+/* plan */
+.bp-plan { position: relative; padding: 40px 48px 56px 56px; }
+.bp-dim { position: absolute; display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--muted); }
+.bp-dim--top { left: 56px; right: 48px; top: 14px; }
+.bp-dim--left { top: 40px; bottom: 56px; left: 22px; flex-direction: column; }
+.bp-dim__rule { flex: 1; background: rgba(245,240,230,0.35); position: relative; }
+.bp-dim--top .bp-dim__rule { height: 1px; } .bp-dim--left .bp-dim__rule { width: 1px; }
+.bp-dim__rule::before { content: ""; position: absolute; background: rgba(245,240,230,0.5); }
+.bp-dim--top .bp-dim__rule:first-child::before { left: 0; top: -4px; width: 1px; height: 9px; }
+.bp-dim--top .bp-dim__rule:last-child::before { right: 0; top: -4px; width: 1px; height: 9px; }
+.bp-dim--left .bp-dim__rule:first-child::before { top: 0; left: -4px; height: 1px; width: 9px; }
+.bp-dim--left .bp-dim__rule:last-child::before { bottom: 0; left: -4px; height: 1px; width: 9px; }
+.bp-dim--left span:not(.bp-dim__rule) { writing-mode: vertical-rl; transform: rotate(180deg); }
+.bp-sheet { position: relative; aspect-ratio: 6 / 5; border: 1.5px solid rgba(245,240,230,0.85); background: rgba(245,240,230,0.025); background-image: linear-gradient(rgba(245,240,230,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.07) 1px, transparent 1px); background-size: 10% 12%; overflow: hidden; }
+.bp-scan { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.bp-scan::after { content: ""; position: absolute; left: 0; right: 0; height: 100%; background: linear-gradient(to bottom, transparent 0%, oklch(0.86 0.14 92 / 0.06) 50%, transparent 100%); animation: bpScan 9s linear infinite; }
+.bp-wall { position: absolute; pointer-events: none; }
+.bp-wall--gown { left: 0; top: 0; width: 26%; height: 48%; border-right: 1.5px solid var(--line); border-bottom: 1.5px solid var(--line); }
+.bp-wall--gap { left: 26%; top: 34%; width: 6%; border-top: 1.5px dashed rgba(245,240,230,0.5); }
+.bp-wall--door1 { left: 26%; top: 34%; width: 7%; aspect-ratio: 1; border: 1.5px dashed transparent; border-right-color: rgba(245,240,230,0.45); border-radius: 50%; transform: translateX(-50%); }
+.bp-wall--corner { left: 0; bottom: 0; width: 34%; height: 34%; border-right: 1.5px dashed rgba(245,240,230,0.35); border-top: 1.5px dashed rgba(245,240,230,0.35); }
+.bp-wall--bench { right: 0; top: 0; width: 28%; height: 100%; border-left: 1.5px solid var(--line); }
+.bp-wall--qc { right: 0; top: 40%; width: 28%; height: 1.5px; background: var(--line); }
+.bp-wall--door2 { right: 28%; top: 62%; width: 9%; aspect-ratio: 1; border: 1.5px dashed transparent; border-bottom-color: rgba(245,240,230,0.45); border-radius: 50%; transform: translateX(50%) rotate(-45deg); }
+.bp-wall--door3 { left: 30%; top: 100%; width: 10%; aspect-ratio: 1; border: 1.5px dashed transparent; border-top-color: rgba(245,240,230,0.45); border-radius: 50%; transform: translateY(-50%) rotate(45deg); }
+.bp-room { position: absolute; font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); line-height: 1.5; }
+.bp-north { position: absolute; right: 3%; bottom: 4%; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(245,240,230,0.45); display: grid; place-items: center; font-family: var(--mono); font-size: 9px; color: var(--cream); }
+.bp-north::before { content: ""; position: absolute; top: 3px; left: 50%; width: 1px; height: 10px; background: var(--yellow); }
+.bp-station { position: absolute; padding: 0; margin: 0; border: 1.5px solid rgba(245,240,230,0.7); background: rgba(23,20,15,0.6); cursor: pointer; transition: background 0.3s, border-color 0.3s, box-shadow 0.3s; }
+.bp-station__hatch { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(245,240,230,0.35) 0 1px, transparent 1px 7px); opacity: 0.8; }
+.bp-station__pin { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; }
+.bp-station__pulse { position: absolute; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--yellow); animation: bpPulse 2.2s ease-out infinite; display: none; }
+.bp-station__dot { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--cream); border: 1px solid rgba(245,240,230,0.7); display: grid; place-items: center; font-family: var(--mono); font-size: 10px; font-weight: 500; transition: background 0.3s, color 0.3s; }
+.bp-station.is-on { border-color: var(--yellow); background: oklch(0.86 0.14 92 / 0.14); box-shadow: 0 0 0 6px oklch(0.86 0.14 92 / 0.12), 0 0 40px oklch(0.86 0.14 92 / 0.25); }
+.bp-station.is-on .bp-station__hatch { background-image: repeating-linear-gradient(45deg, oklch(0.86 0.14 92 / 0.5) 0 1px, transparent 1px 7px); }
+.bp-station.is-on .bp-station__pulse { display: block; }
+.bp-station.is-on .bp-station__dot { background: var(--yellow); color: var(--ink); border-color: var(--yellow); }
+.bp-legend { display: flex; justify-content: space-between; gap: 14px; margin-top: 14px; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.bp-legend > span:first-child { display: flex; gap: 18px; flex-wrap: wrap; }
+.bp-legend i { display: inline-block; width: 14px; height: 8px; vertical-align: middle; margin-right: 6px; }
+
+/* detail */
+.bp-detail { position: sticky; top: 40px; }
+.bp-card { border: 1px solid rgba(245,240,230,0.18); background: rgba(245,240,230,0.04); padding: 26px 26px 28px; animation: bpIn 0.35s cubic-bezier(0.2,0.7,0.2,1) both; }
+.bp-card__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 18px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow); }
+.bp-card__head span:first-child { white-space: nowrap; } .bp-card__head span:last-child { color: var(--muted); text-align: right; }
+.bp-card__photo { height: 200px; margin-bottom: 20px; border: 1px solid rgba(245,240,230,0.14); overflow: hidden; background: #1E1A14; display: grid; place-items: center; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); text-align: center; padding: 16px; }
+.bp-card__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bp-card h3 { font-weight: 700; letter-spacing: -0.042em; font-size: 30px; line-height: 1.05; margin: 0 0 6px; }
+.bp-card__prevents { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--green-lt); margin-bottom: 14px; }
+.bp-card p { font-size: 15px; line-height: 1.65; color: var(--muted-2); margin: 0; text-wrap: pretty; }
+.bp-bars { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin-top: 14px; }
+.bp-bar { height: 3px; border: none; padding: 0; background: rgba(245,240,230,0.18); cursor: pointer; transition: background 0.3s; }
+.bp-bar.is-on { background: var(--yellow); }
+.bp-foot { display: flex; justify-content: flex-end; margin-top: 22px; }
+.bp-foot a { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
+.bp-foot a:hover { color: var(--cream); }
+
+@keyframes bpPulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.9); opacity: 0; } }
+@keyframes bpIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes bpScan { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+@media (max-width: 900px) {
+  .hb-bp .bp { font-family: var(--sans); padding: 56px 20px 64px; }
+  .bp__cols { grid-template-columns: 1fr; gap: 28px; }
+  .bp-plan { padding: 34px 20px 44px 40px; }
+  .bp-dim--top { left: 40px; right: 20px; } .bp-dim--left { top: 34px; bottom: 44px; left: 10px; }
+  .bp-detail { position: static; }
+  .bp-legend { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) { .bp-scan::after, .bp-station__pulse, .bp-card { animation: none; } }
+
+
 /* Nutrition Facts label on phones: three ingredient columns are too narrow
    for the longest names, so the grid drops to two (the third chunk flows
    under the first), and the footer strip is allowed to stack. */
@@ -2426,83 +2510,11 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
   <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
   <div>
-    <section data-m="pad short" style="position: relative; background: #17140F; color: #F5F0E6; padding: 82px 44px 78px; overflow: hidden;">
-      <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.05) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(110% 90% at 85% 0%, #000 12%, transparent 78%); -webkit-mask-image: radial-gradient(110% 90% at 85% 0%, #000 12%, transparent 78%);"></div>
-      <div aria-hidden="true" style="position: absolute; right: -140px; top: -180px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, oklch(0.72 0.08 152 / 0.16), transparent 70%); pointer-events: none;"></div>
-
-      <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
-        <h1 data-m="abh1" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(34px, 4.4vw, 62px); line-height: 1.0; margin: 0 0 30px;">View our <span style="color: oklch(0.86 0.14 92);">lab.</span></h1>
-
-        <div data-m="stack gap" style="display: grid; grid-template-columns: minmax(0, 1fr) clamp(240px, 26%, 360px); gap: clamp(20px, 3vw, 40px); align-items: start;">
-          <div>
-            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 14px; margin-bottom: 14px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <sc-if value="{{ roomZoomed }}" hint-placeholder-val="{{ false }}">
-                  <button sc-camel-on-click="{{ roomZoomOut }}" style="height: 32px; padding: 0 14px; border: 1px solid oklch(0.86 0.14 92 / 0.55); border-radius: 999px; background: transparent; color: oklch(0.86 0.14 92); font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: background 0.25s ease, color 0.25s ease;" style-hover="background: oklch(0.86 0.14 92); color: #17140F;">Zoom out</button>
-                </sc-if>
-                <button sc-camel-on-click="{{ roomReset }}" style="height: 32px; padding: 0 14px; border: 1px solid rgba(245,240,230,0.2); border-radius: 999px; background: transparent; color: #DED5C4; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: background 0.25s ease, border-color 0.25s ease;" style-hover="background: rgba(245,240,230,0.08); border-color: rgba(245,240,230,0.45);">Reset view</button>
-              </div>
-            </div>
-            <div ref="{{ roomStageRef }}" sc-camel-tab-index="0" sc-camel-on-key-down="{{ roomKeys }}" sc-camel-on-pointer-down="{{ roomDown }}" sc-camel-on-pointer-move="{{ roomMove }}" sc-camel-on-pointer-up="{{ roomUp }}" sc-camel-on-pointer-cancel="{{ roomUp }}" data-m="roomstage" style="position: relative; height: {{ roomStageH }}; overflow: hidden; display: grid; place-items: center; perspective: 1500px; perspective-origin: 50% 46%; cursor: {{ roomCursor }}; touch-action: none; user-select: none; outline: none;">
-              <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(120% 90% at 50% 45%, transparent 52%, rgba(23,20,15,0.55) 100%);"></div>
-              <div aria-hidden="true" style="position: absolute; inset: 8% 6%; border-radius: 50%; background: radial-gradient(circle at 50% 45%, rgba(245,240,230,0.5), transparent 66%); filter: blur(64px); opacity: 0.22; pointer-events: none;"></div>
-              <div style="position: absolute; left: 50%; top: 50%; width: 740px; height: 740px; transform-style: preserve-3d; transform: {{ roomCam }}; transition: {{ roomCamTrans }};">
-                <div style="position: absolute; inset: 0; transform-style: preserve-3d; transform: {{ roomWorld }}; transition: transform 0.18s linear;">
-                <div aria-hidden="true" style="position: absolute; inset: 0; border-radius: 3px; background-color: #E4E1D8; background-image: radial-gradient(120% 90% at 32% 18%, rgba(255,255,255,0.85), transparent 62%), linear-gradient(rgba(23,20,15,0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(23,20,15,0.055) 1px, transparent 1px); background-size: 100% 100%, 70px 70px, 70px 70px; box-shadow: 0 0 60px rgba(23,20,15,0.22) inset;"></div>
-                <div aria-hidden="true" style="position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(112deg, transparent 18%, rgba(255,255,255,0.55) 30%, transparent 40%, transparent 60%, rgba(255,255,255,0.3) 70%, transparent 80%); opacity: 0.5; transform: translateZ(0.3px); pointer-events: none;"></div>
-                <div aria-hidden="true" style="position: absolute; inset: 0; border-radius: 3px; background: radial-gradient(120% 90% at 78% 82%, rgba(23,20,15,0.3), transparent 62%); transform: translateZ(0.4px); pointer-events: none;"></div>
-                <div aria-hidden="true" style="position: absolute; left: 30%; top: 46%; width: 250px; height: 160px; transform: translate(-50%, -50%) translateZ(0.4px); border: 2px dashed rgba(180,140,40,0.45); border-radius: 2px;"></div>
-                <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 250px; transform-origin: top center; transform: rotateX(90deg); background-color: #EFEBE1; background-image: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.1) 46%, rgba(23,20,15,0.1) 100%), linear-gradient(90deg, rgba(23,20,15,0.07) 2px, transparent 2px); background-size: 100% 100%, 140px 100%; border-top: 3px solid #FBF9F4; box-shadow: 0 -18px 30px -18px rgba(23,20,15,0.45) inset, 0 8px 20px -12px rgba(23,20,15,0.35) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #CFCBC1, #B9B5AA);"></div><div style="position: absolute; right: 10%; top: 20%; width: 74px; height: 46px; background: repeating-linear-gradient(180deg, #C4C0B5 0 3px, #A9A599 3px 6px); box-shadow: 0 0 0 2px #DCD8CE;"></div><div style="position: absolute; left: 12%; top: 26%; width: 168px; height: 96px; background: linear-gradient(160deg, #FCFBF7, #EFECE4); box-shadow: 0 0 0 3px #C9C5BA, 0 6px 14px -8px rgba(23,20,15,0.5);"></div><div style="position: absolute; left: 40%; top: 30%; width: 62px; height: 82px; background: #F7F5EF; box-shadow: 0 0 0 2px #B7B3A8;"></div><div style="position: absolute; left: 47%; top: 30%; width: 62px; height: 82px; background: #F7F5EF; box-shadow: 0 0 0 2px #B7B3A8;"></div><div style="position: absolute; right: 26%; top: 24%; width: 40px; height: 40px; border-radius: 50%; background: #FAF8F2; box-shadow: 0 0 0 3px #A9A599;"></div></div>
-                <div aria-hidden="true" style="position: absolute; left: 0; top: 0; bottom: 0; width: 250px; transform-origin: left center; transform: rotateY(-90deg); background-color: #E4E0D6; background-image: linear-gradient(90deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.05) 44%, rgba(23,20,15,0.14) 100%), linear-gradient(rgba(23,20,15,0.07) 2px, transparent 2px); background-size: 100% 100%, 100% 140px; border-left: 3px solid #F6F3EC; box-shadow: 0 -18px 30px -18px rgba(23,20,15,0.4) inset, 8px 0 20px -12px rgba(23,20,15,0.3) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #C9C5BA, #B2AEA3);"></div><div style="position: absolute; left: 22%; top: 0; bottom: 12px; width: 8px; background: linear-gradient(90deg, #B7B3A8, #DCD8CE, #A9A599);"></div><div style="position: absolute; left: 26%; top: 0; bottom: 12px; width: 5px; background: linear-gradient(90deg, #A9A599, #CFCBC1, #9A968B);"></div><div style="position: absolute; left: 58%; top: 34%; width: 54px; height: 34px; background: oklch(0.52 0.09 152); box-shadow: 0 0 0 2px #E4E0D7;"></div><div style="position: absolute; left: 74%; top: 30%; width: 90px; height: 60px; background: linear-gradient(160deg, #F7F5EF, #E4E0D7); box-shadow: 0 0 0 2px #BDB9AE;"></div></div>
-
-                <div aria-hidden="true" style="position: absolute; left: 34%; top: 34%; width: 420px; height: 190px; transform: translate(-50%, -50%) translateZ(0.5px); background: radial-gradient(closest-side, rgba(255,252,242,0.75), rgba(255,252,242,0.2) 58%, transparent 100%); filter: blur(16px); opacity: 0.55; pointer-events: none;"></div>
-                <div aria-hidden="true" style="position: absolute; left: 62%; top: 66%; width: 420px; height: 190px; transform: translate(-50%, -50%) translateZ(0.5px); background: radial-gradient(closest-side, rgba(255,252,242,0.7), rgba(255,252,242,0.18) 58%, transparent 100%); filter: blur(16px); opacity: 0.5; pointer-events: none;"></div>
-                <sc-for list="{{ roomLightsList }}" as="rlt" hint-placeholder-count="2">
-                  <div aria-hidden="true" style="position: absolute; left: {{ rlt.left }}; top: {{ rlt.top }}; width: {{ rlt.width }}; height: {{ rlt.height }}; transform: {{ rlt.t }}; border-radius: 3px; background: linear-gradient(180deg, #FFFDF6, #EFEADC); box-shadow: 0 0 40px 12px rgba(255,250,235,0.35);"></div>
-                </sc-for>
-
-                <div aria-hidden="true" style="position: absolute; left: 0; bottom: 0; width: 74px; height: 250px; transform-origin: bottom center; transform: rotateX(-90deg); background-color: #E9E5DB; background-image: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.08) 46%, rgba(23,20,15,0.12) 100%); border-top: 3px solid #F6F3EC; box-shadow: -10px 0 22px -14px rgba(23,20,15,0.55) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #C9C5BA, #B2AEA3);"></div></div>
-                <div aria-hidden="true" style="position: absolute; right: 0; top: 0; width: 250px; height: 74px; transform-origin: right center; transform: rotateY(90deg); background-color: #E7E3D9; background-image: linear-gradient(90deg, rgba(23,20,15,0.12) 0%, rgba(255,255,255,0.1) 54%, rgba(255,255,255,0.72) 100%); border-right: 3px solid #F6F3EC; box-shadow: 0 -10px 22px -14px rgba(23,20,15,0.5) inset;"><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(180deg, #C9C5BA, #B2AEA3);"></div></div>
-                <sc-for list="{{ roomStations }}" as="rs" hint-placeholder-count="7">
-                  <div data-station="{{ rs.idx }}" sc-camel-on-mouse-enter="{{ rs.enter }}" sc-camel-on-mouse-leave="{{ rs.leave }}" style="position: absolute; left: {{ rs.left }}; top: {{ rs.top }}; width: {{ rs.width }}; height: {{ rs.height }}; transform-style: preserve-3d; transform: {{ rs.wrap }}; cursor: pointer; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1);">
-                    <div aria-hidden="true" style="position: absolute; inset: -4px; border-radius: 12px; background: radial-gradient(closest-side, rgba(23,20,15,0.62), rgba(23,20,15,0.28) 62%, transparent 100%); transform: {{ rs.shadowT }}; filter: {{ rs.shadowBlur }}; opacity: {{ rs.shadowO }};"></div>
-                    <div aria-hidden="true" style="position: absolute; left: 2px; right: 2px; top: 100%; height: {{ rs.reflH }}; background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12) 52%, transparent 88%); transform: {{ rs.reflT }}; filter: blur(5px); opacity: 0.4;"></div>
-                    <div style="position: absolute; inset: 0; border-radius: 2px; background: {{ rs.topBg }}; box-shadow: {{ rs.topRing }}, 0 1px 2px rgba(255,255,255,0.5) inset; transform: {{ rs.topT }}; transition: box-shadow 0.35s ease;">
-                      <div aria-hidden="true" style="position: absolute; inset: 0; border-radius: 2px; background: linear-gradient(118deg, transparent 26%, rgba(255,255,255,0.55) 42%, rgba(255,255,255,0.1) 52%, transparent 66%); opacity: 0.75;"></div>
-                      <div style="position: absolute; inset: 0; border-radius: 2px; background: oklch(0.86 0.14 92); opacity: {{ rs.warmO }}; transition: opacity 0.35s ease;"></div>
-                    </div>
-                    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: {{ rs.sideH }}; transform-origin: bottom center; transform: rotateX(-90deg); background: {{ rs.southBg }}; box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 -16px 20px -14px rgba(23,20,15,0.75) inset;">
-                      <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.16), transparent 40%, rgba(23,20,15,0.14));"></div>
-                      <div style="position: absolute; inset: 0; background: oklch(0.86 0.14 92); opacity: {{ rs.warmO }}; transition: opacity 0.35s ease;"></div>
-                    </div>
-                    <div style="position: absolute; top: 0; bottom: 0; right: 0; width: {{ rs.sideH }}; transform-origin: right center; transform: rotateY(90deg); background: {{ rs.eastBg }}; filter: brightness(0.82); box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 -16px 20px -14px rgba(23,20,15,0.8) inset;">
-                      <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.1), transparent 46%, rgba(23,20,15,0.2));"></div>
-                      <div style="position: absolute; inset: 0; background: oklch(0.86 0.14 92); opacity: {{ rs.warmO }}; transition: opacity 0.35s ease;"></div>
-                    </div>
-                    <div aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: 1px; height: 26px; transform-origin: bottom center; transform: {{ rs.stemT }}; background: linear-gradient(rgba(23,20,15,0.5), rgba(23,20,15,0.05));"></div>
-                    <div style="position: absolute; left: 50%; top: 50%; transform: {{ rs.pinT }}; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; border: 1px solid {{ rs.pinBorder }}; background: {{ rs.pinBg }}; color: {{ rs.pinFg }}; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; box-shadow: 0 6px 14px -6px rgba(0,0,0,0.6); transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;">{{ rs.no }}</div>
-                  </div>
-                </sc-for>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <div style="display: grid; gap: 18px;">
-            <div style="display: grid; align-content: start; gap: 6px;">
-              <sc-for list="{{ roomList }}" as="rl" hint-placeholder-count="6">
-                <button sc-camel-on-click="{{ rl.pick }}" sc-camel-on-mouse-enter="{{ rl.enter }}" sc-camel-on-mouse-leave="{{ rl.leave }}" data-m="roomrow" style="position: relative; text-align: left; cursor: pointer; border: 1px solid {{ rl.border }}; border-radius: 6px; background: {{ rl.bg }}; padding: 10px 14px 11px 18px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 11px; align-items: center; transform: {{ rl.lift }}; transition: background 0.3s ease, border-color 0.3s ease, transform 0.4s cubic-bezier(0.2,0.7,0.2,1);">
-                  <span aria-hidden="true" style="position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: oklch(0.86 0.14 92); transform: scaleY({{ rl.railScale }}); transition: transform 0.4s cubic-bezier(0.2,0.7,0.2,1);"></span>
-                  <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; color: {{ rl.numColor }}; transition: color 0.3s ease;">{{ rl.no }}</span>
-                  <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.02em; font-size: 15px; color: {{ rl.keyColor }}; transition: color 0.3s ease;">{{ rl.key }}</span>
-                </button>
-              </sc-for>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- "View our lab" blueprint (Setup_33) replaces the isometric room.
+         Injected and wired imperatively (hbBpInit) like the FAQ/dosing
+         widgets: hydration clones lose listeners, so the widget owns its
+         subtree. The old room drag/spin code stays but never mounts. -->
+    <div data-hb-bp-host></div>
     <section data-m="pad short" style="position: relative; background: radial-gradient(110% 80% at 20% 0%, #FDFCF7 0%, #F5F0E6 46%, #EDE5D5 100%); padding: 96px 44px;">
 
       <div data-m="stack gap" style="position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 68px; align-items: center; max-width: 1180px; margin: 0 auto;">
@@ -4421,6 +4433,7 @@ class Component extends DCLogic {
     try { if (window.hbRateScan) window.hbRateScan(); } catch (e) {}
     try { if (window.hbFaqInit) window.hbFaqInit(); } catch (e) {}
     try { if (window.hbDoseInit) window.hbDoseInit(); } catch (e) {}
+    try { if (window.hbBpInit) window.hbBpInit(); } catch (e) {}
     // A re-render rebuilds the buy bar with its template-hidden style; put it
     // back the way the scroll handler last decided.
     try { if (this.applyBar) this.applyBar(); } catch (e) {}
@@ -7486,5 +7499,101 @@ window.hbDoseInit = function () {
   });
 };
 window.hbDoseInit();
+</script>
+<script>
+// Lab blueprint (Setup_33): the about page's View-our-lab section. Same
+// mount pattern as the FAQ carousel — WeakSet-tracked wiring, re-entered
+// from componentDidUpdate, and the auto-tour interval clears itself when
+// its subtree is dropped by a navigation.
+var HB_BP_HTML = '\n<div class="hb-bp"><section class="bp" data-bp>\n  <div class="bp__grid" aria-hidden="true"></div>\n  <div class="bp__inner">\n    <div class="mono bp__kicker">Our lab · Scottsdale, AZ</div>\n    <h2 class="bp__title">View our <em>lab.</em></h2>\n\n    <div class="bp__cols">\n      <div class="bp-plan">\n        <div class="bp-dim bp-dim--top" aria-hidden="true"><span class="bp-dim__rule"></span><span>60\' – 0"</span><span class="bp-dim__rule"></span></div>\n        <div class="bp-dim bp-dim--left" aria-hidden="true"><span class="bp-dim__rule"></span><span>50\' – 0"</span><span class="bp-dim__rule"></span></div>\n\n        <div class="bp-sheet" data-sheet>\n          <div class="bp-scan" aria-hidden="true"></div>\n          <div class="bp-wall bp-wall--gown" aria-hidden="true"></div>\n          <div class="bp-wall bp-wall--gap" aria-hidden="true"></div>\n          <div class="bp-wall bp-wall--door1" aria-hidden="true"></div>\n          <div class="bp-wall bp-wall--corner" aria-hidden="true"></div>\n          <div class="bp-wall bp-wall--bench" aria-hidden="true"></div>\n          <div class="bp-wall bp-wall--qc" aria-hidden="true"></div>\n          <div class="bp-wall bp-wall--door2" aria-hidden="true"></div>\n          <div class="bp-wall bp-wall--door3" aria-hidden="true"></div>\n          <div class="bp-room" style="left:3%;top:4%">Gowning<br>ISO 8</div>\n          <div class="bp-room" style="left:30%;top:4%">Cold-blend suite<br>ISO 7</div>\n          <div class="bp-room" style="right:3%;top:4%;text-align:right">Analytical<br>bench</div>\n          <div class="bp-room" style="right:3%;top:44%;text-align:right">QC / release</div>\n          <div class="bp-room" style="right:30%;bottom:12%">Exit → shipping</div>\n\n          <button class="bp-station" type="button" data-i="0" aria-label="Gowning airlock" style="left:3%;top:20%;width:20%;height:24%">\n            <span class="bp-station__hatch" aria-hidden="true"></span>\n            <span class="bp-station__pin"><span class="bp-station__pulse" aria-hidden="true"></span><span class="bp-station__dot">01</span></span>\n          </button>\n          <button class="bp-station" type="button" data-i="1" aria-label="Cold storage" style="left:31%;top:14%;width:12%;height:24%">\n            <span class="bp-station__hatch" aria-hidden="true"></span>\n            <span class="bp-station__pin"><span class="bp-station__pulse" aria-hidden="true"></span><span class="bp-station__dot">02</span></span>\n          </button>\n          <button class="bp-station" type="button" data-i="2" aria-label="Drying oven" style="left:46%;top:14%;width:10%;height:16%">\n            <span class="bp-station__hatch" aria-hidden="true"></span>\n            <span class="bp-station__pin"><span class="bp-station__pulse" aria-hidden="true"></span><span class="bp-station__dot">03</span></span>\n          </button>\n          <button class="bp-station" type="button" data-i="3" aria-label="Stability chamber" style="left:59%;top:14%;width:11%;height:26%">\n            <span class="bp-station__hatch" aria-hidden="true"></span>\n            <span class="bp-station__pin"><span class="bp-station__pulse" aria-hidden="true"></span><span class="bp-station__dot">04</span></span>\n          </button>\n          <button class="bp-station" type="button" data-i="4" aria-label="HPLC bay" style="left:76%;top:15%;width:20%;height:22%">\n            <span class="bp-station__hatch" aria-hidden="true"></span>\n            <span class="bp-station__pin"><span class="bp-station__pulse" aria-hidden="true"></span><span class="bp-station__dot">05</span></span>\n          </button>\n          <button class="bp-station" type="button" data-i="5" aria-label="Fill and seal island" style="left:36%;top:54%;width:30%;height:16%">\n            <span class="bp-station__hatch" aria-hidden="true"></span>\n            <span class="bp-station__pin"><span class="bp-station__pulse" aria-hidden="true"></span><span class="bp-station__dot">06</span></span>\n          </button>\n          <div class="bp-north" aria-hidden="true">N</div>\n        </div>\n\n        <div class="bp-legend">\n          <span><span><i style="border:1px solid rgba(245,240,230,0.7)"></i>Wall</span><span><i style="height:0;border-top:1.5px dashed rgba(245,240,230,0.5)"></i>Air barrier</span><span><i style="background:repeating-linear-gradient(45deg, rgba(245,240,230,0.5) 0 1px, transparent 1px 4px)"></i>Equipment</span></span>\n          <span style="white-space:nowrap">Not for construction</span>\n        </div>\n      </div>\n\n      <div class="bp-detail">\n        <div class="bp-card" data-card>\n          <div class="bp-card__head"><span>Station <b data-no>01</b> / 06</span><span data-meta></span></div>\n          <div class="bp-card__photo" data-photo></div>\n          <h3 data-key></h3>\n          <div class="bp-card__prevents">Prevents · <span data-prevents></span></div>\n          <p data-body></p>\n        </div>\n        <div class="bp-bars">\n          <button class="bp-bar" type="button" data-i="0" aria-label="Gowning airlock"></button>\n          <button class="bp-bar" type="button" data-i="1" aria-label="Cold storage"></button>\n          <button class="bp-bar" type="button" data-i="2" aria-label="Drying oven"></button>\n          <button class="bp-bar" type="button" data-i="3" aria-label="Stability chamber"></button>\n          <button class="bp-bar" type="button" data-i="4" aria-label="HPLC bay"></button>\n          <button class="bp-bar" type="button" data-i="5" aria-label="Fill and seal island"></button>\n        </div>\n        <div class="bp-foot"><a href="/certs">Certificates by lot →</a></div>\n      </div>\n    </div>\n  </div>\n</section></div>';
+var hbBpWired = new WeakSet();
+window.hbBpInit = function () {
+  document.querySelectorAll('[data-hb-bp-host]').forEach(function (host) {
+    var wrap = host.firstElementChild;
+    if (!wrap) { host.innerHTML = HB_BP_HTML; wrap = host.firstElementChild; }
+    if (!wrap || hbBpWired.has(wrap)) return;
+    hbBpWired.add(wrap);
+    var STATIONS = [
+    {
+      "no": "01",
+      "key": "Gowning airlock",
+      "prevents": "The room bringing itself in",
+      "body": "Nobody walks in from the parking lot. Gowning, tacky mat, air shower, then the suite — because the fastest way to contaminate a batch is to wear the outside into it.",
+      "meta": "ISO 8 · gowned entry only",
+      "photo": ""
+    },
+    {
+      "no": "02",
+      "key": "Cold storage",
+      "prevents": "Actives dying before they are dosed",
+      "body": "Fish oils, probiotics and anything light- or heat-sensitive live at 2–8 °C from delivery to fill, on a logger that alarms a phone at night if the door is left ajar.",
+      "meta": "2–8 °C · logged every 5 min",
+      "photo": ""
+    },
+    {
+      "no": "03",
+      "key": "Drying oven",
+      "prevents": "Moisture ruining a good powder",
+      "body": "Excipients and botanicals are dried to a target water activity before blending. Damp powder cakes, doses unevenly, and shortens the shelf life we just promised.",
+      "meta": "Loss on drying < 5%",
+      "photo": ""
+    },
+    {
+      "no": "04",
+      "key": "Stability chamber",
+      "prevents": "A jar that quietly fades",
+      "body": "Samples of every formulation sit here for the length of their claimed shelf life, accelerated and real-time. If potency falls before the date on the jar, the date changes.",
+      "meta": "40 °C / 75% RH · 24 months",
+      "photo": ""
+    },
+    {
+      "no": "05",
+      "key": "HPLC bay",
+      "prevents": "A supplier's word standing in for proof",
+      "body": "Every incoming lot is run against our own validated method, and every finished lot again before release. This is where we get to refuse a shipment and say exactly why.",
+      "meta": "100% of lots, identity and potency",
+      "photo": ""
+    },
+    {
+      "no": "06",
+      "key": "Fill and seal island",
+      "prevents": "An unsigned jar leaving the room",
+      "body": "Jars are filled, capped, dated and initialled by the person who made them, then a retain from the lot leaves the same day for an independent laboratory.",
+      "meta": "Signed by name · retain pulled per lot",
+      "photo": ""
+    }
+  ];
+    var root = wrap.querySelector('[data-bp]');
+    var stations = root.querySelectorAll('.bp-station'), bars = root.querySelectorAll('.bp-bar'), card = root.querySelector('[data-card]');
+    var active = 0, hover = null, auto = true;
+    function render() {
+      var cur = hover != null ? hover : active, s = STATIONS[cur];
+      stations.forEach(function (el, i) { el.classList.toggle('is-on', i === cur); });
+      bars.forEach(function (el, i) { el.classList.toggle('is-on', i === cur); });
+      card.querySelector('[data-no]').textContent = s.no;
+      card.querySelector('[data-meta]').textContent = s.meta;
+      card.querySelector('[data-key]').textContent = s.key;
+      card.querySelector('[data-prevents]').textContent = s.prevents;
+      card.querySelector('[data-body]').textContent = s.body;
+      var ph = card.querySelector('[data-photo]');
+      ph.textContent = '';
+      if (s.photo) { var im = document.createElement('img'); im.src = s.photo; im.alt = s.key; ph.appendChild(im); }
+      else ph.textContent = s.key + ' \u2014 photo';
+      card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
+    }
+    stations.forEach(function (el, i) {
+      el.addEventListener('mouseenter', function () { hover = i; render(); });
+      el.addEventListener('click', function () { active = i; hover = null; auto = false; render(); });
+    });
+    root.querySelector('[data-sheet]').addEventListener('mouseleave', function () { hover = null; render(); });
+    bars.forEach(function (el, i) { el.addEventListener('click', function () { active = i; auto = false; render(); }); });
+    var iv = setInterval(function () {
+      if (!wrap.isConnected) { clearInterval(iv); return; }
+      if (auto && hover == null) { active = (active + 1) % STATIONS.length; render(); }
+    }, 4200);
+    render();
+  });
+};
+window.hbBpInit();
 </script>
 </body></html>
