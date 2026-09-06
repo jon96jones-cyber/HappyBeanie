@@ -215,8 +215,8 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
   function toast() {
     var d = document.createElement('div');
     d.setAttribute('role', 'status');
-    d.textContent = said === 'off' ? 'Meta pixel off for this browser'
-                                   : 'Meta pixel back on for this browser';
+    d.textContent = said === 'off' ? 'Meta pixel + Google Analytics off for this browser'
+                                   : 'Meta pixel + Google Analytics back on for this browser';
     d.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);' +
       'z-index:2147483647;background:#17140F;color:#F5F0E6;font-size:11px;letter-spacing:0.14em;' +
       'text-transform:uppercase;padding:13px 20px;border-radius:2px;font-family:ui-monospace,monospace;' +
@@ -245,6 +245,26 @@ fbq('track', 'PageView');
 </script>
 <noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=2580258509080253&ev=PageView&noscript=1"/></noscript>
+<script>
+/* Google Analytics 4 — ads plumbing (Google Ads conversions, Merchant Center
+   reporting), not the desk's replacement: the desk stays the cookie-free
+   first-party truth. Gated by the same own-traffic flag as the Meta pixel,
+   so /?nofb=1 silences both on this browser and preview deployments never
+   report. Enhanced measurement's history watcher picks up the SPA's
+   pushState navigations, so no per-page wiring is needed. */
+if (!window.__hbInternal) {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  gtag('js', new Date());
+  gtag('config', 'G-5DGXYFTKK5');
+  (function () {
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-5DGXYFTKK5';
+    document.head.appendChild(s);
+  })();
+}
+</script>
 <script>
 /* Product structured data for /product — Google Merchant Center's landing-page
    checks read this to match the feed's price and availability, so the price
