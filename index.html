@@ -7215,8 +7215,8 @@ var HB_FAQ_HTML = "<section class=\"hb-faq\" data-hb-faq>\n  <span class=\"hb-fa
 // FAQ card carousel (designer handoff, Setup_31). The SPA re-renders page
 // sections, so init is re-entrant: every un-wired [data-hb-faq] root gets its
 // carousel, flips and ask form, and componentDidUpdate calls back in after
-// each render. Submitting the ask form dispatches hb:faq-ask; nothing is
-// posted anywhere yet — same as the accordion's form before it.
+// each render. The ask form posts to /api/faq-ask (an email into hello@)
+// and only shows its success card once the server confirms the send.
 // Wiring is tracked by node identity, not by attribute: the SPA's hydration
 // can clone a mounted subtree, and a clone keeps markup and attributes but
 // loses every listener — a WeakSet sees it as the stranger it is.
@@ -7259,15 +7259,55 @@ window.hbFaqInit = function () {
 
     var ask = root.querySelector('[data-ask]'), panel = root.querySelector('[data-panel]');
     var form = root.querySelector('[data-form]'), unsent = form.querySelector('[data-unsent]'), sent = form.querySelector('[data-sent]');
+    // The success card's hidden attribute does not reliably survive the SPA's
+    // hydration cloning, so the resting state is enforced here at wire time —
+    // otherwise both cards render stacked inside the panel.
+    unsent.hidden = false; sent.hidden = true;
     var open = false;
     function setOpen(v) { open = v; panel.classList.toggle('is-open', v); ask.setAttribute('aria-expanded', v); ask.textContent = v ? 'Close →' : (sent.hidden ? 'Ask your own question →' : 'Question sent'); }
     ask.addEventListener('click', function () { setOpen(!open); });
+    // The question goes to /api/faq-ask, which emails it to hello@ — the
+    // success card only shows once the server says it landed. The old handler
+    // showed "Question received" and dropped the question on the floor.
+    var sendBtn = form.querySelector('.hb-faq__send');
+    var askErr = document.createElement('p');
+    askErr.style.cssText = 'display:none; color:oklch(0.55 0.19 25); font-size:13px; line-height:1.5; margin:0 0 10px;';
+    sendBtn.parentNode.insertBefore(askErr, sendBtn);
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (form.dataset.busy) return;
       var q = form.question.value.trim(), em = form.email.value.trim();
-      if (q.length < 4 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) return;
-      root.dispatchEvent(new CustomEvent('hb:faq-ask', { bubbles: true, detail: { question: q, email: em } }));
-      unsent.hidden = true; sent.hidden = false;
+      if (q.length < 4 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) {
+        askErr.textContent = q.length < 4 ? 'Type your question first — a few words is plenty.' : 'That email address doesn’t look right — check it and try again.';
+        askErr.style.display = 'block';
+        return;
+      }
+      askErr.style.display = 'none';
+      form.dataset.busy = '1';
+      sendBtn.disabled = true;
+      var oldLabel = sendBtn.textContent;
+      sendBtn.textContent = 'Sending…';
+      fetch('/api/faq-ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, email: em, page: location.pathname })
+      }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (b) {
+        delete form.dataset.busy;
+        sendBtn.disabled = false; sendBtn.textContent = oldLabel;
+        if (b && b.ok) {
+          root.dispatchEvent(new CustomEvent('hb:faq-ask', { bubbles: true, detail: { question: q, email: em } }));
+          try { if (window.hbTrack) window.hbTrack('faq_ask'); } catch (err) {}
+          unsent.hidden = true; sent.hidden = false;
+          return;
+        }
+        askErr.textContent = 'That didn’t go through. Try again in a moment, or email hello@happybeanie.com.';
+        askErr.style.display = 'block';
+      }).catch(function () {
+        delete form.dataset.busy;
+        sendBtn.disabled = false; sendBtn.textContent = oldLabel;
+        askErr.textContent = 'That didn’t go through. Try again in a moment, or email hello@happybeanie.com.';
+        askErr.style.display = 'block';
+      });
     });
   });
 };
