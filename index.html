@@ -176,6 +176,7 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
   // Express checkout skips the on-site checkout page, so the InitiateCheckout
   // pixel event fires here at the true handoff (deduped against the page).
   try { if (window.fbq && !window.__hbFbIC) { window.__hbFbIC = true; window.fbq('track', 'InitiateCheckout'); } } catch (e) {}
+  try { if (window.gtag && !window.__hbGaBC) { window.__hbGaBC = true; window.gtag('event', 'begin_checkout', { currency: 'USD', value: 115 }); } } catch (e) {}
   try { if (window.hbTrack) window.hbTrack('begin_checkout'); } catch (e) {}
   window.location.href = url;
 };
@@ -4407,20 +4408,26 @@ class Component extends DCLogic {
     } catch (e) {}
     // Meta pixel SPA events — the base snippet fired the first PageView, so
     // only page CHANGES track here. Cart-count increases fire AddToCart no
-    // matter which control added the box.
+    // matter which control added the box. GA4 mirrors the commerce events
+    // under its recommended names (view_item / begin_checkout / add_to_cart);
+    // page_view needs no mirror — enhanced measurement's history watcher
+    // already reports SPA navigations.
     try {
       if (window.fbq) {
         const pg = this.state.page || 'home';
         if (this._fbPage !== pg) {
           if (this._fbPage != null) window.fbq('track', 'PageView');
           if (pg === 'product') {
+            const gaItem = this.state.sp === 'cat' ? 'happy-beans-cat' : 'happy-beans-dog';
             window.fbq('track', 'ViewContent', {
               content_type: 'product',
-              content_ids: [this.state.sp === 'cat' ? 'happy-beans-cat' : 'happy-beans-dog'],
+              content_ids: [gaItem],
               content_name: 'Happy Beans', currency: 'USD', value: 115
             });
+            if (window.gtag) window.gtag('event', 'view_item', { currency: 'USD', value: 115, items: [{ item_id: gaItem, item_name: 'Happy Beans' }] });
           }
           if (pg === 'checkout' && !window.__hbFbIC) { window.__hbFbIC = true; window.fbq('track', 'InitiateCheckout'); }
+          if (pg === 'checkout' && window.gtag && !window.__hbGaBC) { window.__hbGaBC = true; window.gtag('event', 'begin_checkout', { currency: 'USD', value: 115 }); }
           this._fbPage = pg;
         }
         const fbQty = (this.state.cartDog || 0) + (this.state.cartCat || 0);
@@ -4428,7 +4435,9 @@ class Component extends DCLogic {
         else if (fbQty !== this._fbQty) {
           if (fbQty > this._fbQty) {
             window.fbq('track', 'AddToCart', { content_type: 'product', currency: 'USD', value: 115 * (fbQty - this._fbQty) });
+            if (window.gtag) window.gtag('event', 'add_to_cart', { currency: 'USD', value: 115 * (fbQty - this._fbQty) });
             window.__hbFbIC = false;
+            window.__hbGaBC = false;
           }
           this._fbQty = fbQty;
         }
@@ -5110,6 +5119,8 @@ class Component extends DCLogic {
           if (b && b.ok) {
             this.hbListed(email);
             try { if (window.fbq) window.fbq('track', 'Lead'); } catch (err) {}
+            try { if (window.gtag) window.gtag('event', 'generate_lead'); } catch (err) {}
+        try { if (window.gtag) window.gtag('event', 'generate_lead'); } catch (err) {}
             this.setState({ joinBusy: false, joined: true });
             return;
           }
@@ -6557,6 +6568,7 @@ Component.prototype.renderVals = function () {
         rNo.textContent = 'Close';
         try { if (window.hbTrack) window.hbTrack('popup_subscribed', { species: 'research' }); } catch (err) {}
         try { if (window.fbq) window.fbq('track', 'Lead'); } catch (err) {}
+        try { if (window.gtag) window.gtag('event', 'generate_lead'); } catch (err) {}
         return;
       }
       rShowError((b && b.error === 'bad_email')
@@ -6629,6 +6641,7 @@ Component.prototype.renderVals = function () {
         step = 'done';
         try { if (window.hbTrack) window.hbTrack('popup_subscribed'); } catch (err) {}
         try { if (window.fbq) window.fbq('track', 'Lead'); } catch (err) {}
+        try { if (window.gtag) window.gtag('event', 'generate_lead'); } catch (err) {}
         render();
         return;
       }
