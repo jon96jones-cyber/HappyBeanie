@@ -1,18 +1,24 @@
 <!--
-  Happy Beanie · SUBSCRIPTION PAUSED (muted)
+  Happy Beanie · SUBSCRIPTION PAUSED (muted)  (WIRED — real Liquid)
   Paste into: Settings → Notifications → (Subscriptions) Subscription paused → Edit code.
-  Replace [[TOKENS]] with the notification's Liquid variables (see README).
+  Then SAVE and SEND TEST before leaving the page. Nothing else to edit.
+
+  The default for this notification proves customer_self_serve_url on the
+  billing-cycle object. product_names is proven on the sibling notifications
+  (same object), so it is guarded here: if it ever comes back blank the plan
+  box reads "Paused" instead of printing broken text.
 -->
 <!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>Your subscription is paused</title></head>
 <body style="margin:0; padding:0; background:#e7decb;">
+  {% assign hb_cycle = subscription_contract_billing_cycle %}
   <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#e7decb; font-size:1px; line-height:1px;">Your plan is paused — no boxes, no charges, until you resume.</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e7decb;"><tr><td align="center" style="padding:28px 12px;">
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background:#fcfaf4; border:1px solid #e0d6c2; border-radius:10px; overflow:hidden;">
       <tr><td style="background:#17140f; padding:22px 30px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
         <td align="left" style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:20px; font-weight:700; letter-spacing:-0.5px; color:#f5f0e6;">happy&nbsp;beanie</td>
-        <td align="right" style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Hormone&nbsp;care</td>
+        <td align="right" style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Subscription</td>
       </tr></table></td></tr>
       <tr><td style="height:3px; background:#f2ce59; font-size:0; line-height:0;">&nbsp;</td></tr>
 
@@ -24,18 +30,18 @@
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#17140f; border-radius:10px;"><tr><td style="padding:22px 24px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:12px 14px; background:rgba(245,240,230,0.04); border:1px solid rgba(245,240,230,0.10); border-radius:6px;">
             <div style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e; padding-bottom:5px;">Plan</div>
-            <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14px; color:#ded5c4;">[[PRODUCT_NAME]] · paused</div>
+            <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:14px; color:#ded5c4;">{% if hb_cycle.product_names != blank %}{{ hb_cycle.product_names }} · paused{% else %}Paused{% endif %}</div>
           </td></tr></table>
         </td></tr></table>
 
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 8px;"><tr><td align="center" bgcolor="#f2ce59" style="border-radius:999px;">
-          <a href="https://www.happybeanie.com/account" style="display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#17140f; text-decoration:none;">Resume anytime →</a>
+          <a href="{{ hb_cycle.customer_self_serve_url | default: 'https://www.happybeanie.com/account' }}" style="display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#17140f; text-decoration:none;">Resume anytime →</a>
         </td></tr></table>
-        <p style="margin:0 0 30px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#8a7f6e; text-align:center;">One tap from your account brings it right back — same plan, same $16 saving.</p>
+        <p style="margin:0 0 30px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#8a7f6e; text-align:center;">One tap brings it right back — same plan, same subscriber price.</p>
       </td></tr>
 
       <tr><td style="background:#f5f0e6; border-top:1px solid #e0d6c2; padding:26px 34px 30px;" align="center">
-        <p style="margin:0 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Formulated fresh · Scottsdale, AZ</p>
+        <p style="margin:0 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Made in one facility · Scottsdale, AZ</p>
         <p style="margin:0; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:11px; line-height:1.6; color:#8a7f6e;">Questions? <a href="mailto:hello@happybeanie.com" style="color:#325e3f; text-decoration:none;">hello@happybeanie.com</a> &nbsp;·&nbsp; © 2026 Happy Beanie</p>
       </td></tr>
     </table>
