@@ -13,6 +13,14 @@
 //   → creates the fulfillment with tracking and notifyCustomer: true, which
 //     marks the order shipped AND fires the branded Shipping-confirmation email.
 //
+// POST { fulfillmentOrderId, noTracking: true }
+//   → same, minus the tracking number: for a hand-delivered order, a local
+//     drop-off, or a label whose barcode will not scan. The customer is still
+//     notified — the shipping email falls back to the order-status link when
+//     there is no tracking to show. noTracking must be sent explicitly; a
+//     missing tracking number on its own is still rejected, so a half-filled
+//     form can never ship an order silently.
+//
 // Requires SHOPIFY_ADMIN_TOKEN to hold read_orders + the fulfillment-order
 // scopes (read/write merchant-managed + assigned fulfillment orders).
 
@@ -238,26 +246,32 @@ module.exports = async function handler(req, res) {
     const fulfillmentOrderId = String(body.fulfillmentOrderId || '');
     const trackingNumber = String(body.trackingNumber || '').replace(/\s+/g, '');
     const trackingCompany = String(body.trackingCompany || '').trim();
-    if (!fulfillmentOrderId || !trackingNumber) {
+    // Shipping without tracking is a deliberate act, never a fallback: the desk
+    // has to say so outright. An empty tracking field alone still fails.
+    const noTracking = body.noTracking === true || body.noTracking === 'true';
+    if (!fulfillmentOrderId || (!trackingNumber && !noTracking)) {
       return res.status(400).json({ ok: false, error: 'bad_request' });
     }
     // Second line of defense behind the desk's own validation: tracking numbers
     // are 8-34 letters/digits across every carrier we ship with.
-    if (!/^[A-Za-z0-9]{8,34}$/.test(trackingNumber)) {
+    if (!noTracking && !/^[A-Za-z0-9]{8,34}$/.test(trackingNumber)) {
       return res.status(400).json({ ok: false, error: 'bad_tracking',
         message: 'That tracking number does not look valid (8-34 letters/digits).' });
     }
 
-    const tracking = { number: trackingNumber };
-    if (trackingCompany) tracking.company = trackingCompany; // Shopify derives the tracking URL for known carriers
+    const fulfillment = {
+      lineItemsByFulfillmentOrder: [{ fulfillmentOrderId: fulfillmentOrderId }],
+      // The customer hears either way. Without tracking the shipping email
+      // still lands and points at the order-status page.
+      notifyCustomer: true
+    };
+    if (!noTracking) {
+      const tracking = { number: trackingNumber };
+      if (trackingCompany) tracking.company = trackingCompany; // Shopify derives the tracking URL for known carriers
+      fulfillment.trackingInfo = tracking;
+    }
 
-    const out = await admin(token, FULFILL, {
-      fulfillment: {
-        lineItemsByFulfillmentOrder: [{ fulfillmentOrderId: fulfillmentOrderId }],
-        trackingInfo: tracking,
-        notifyCustomer: true
-      }
-    });
+    const out = await admin(token, FULFILL, { fulfillment: fulfillment });
     const node = out.json && out.json.data && out.json.data.fulfillmentCreate;
     const errs = (node && node.userErrors) || [];
     if (errs.length || (out.json && out.json.errors && out.json.errors.length)) {
@@ -272,7 +286,11 @@ module.exports = async function handler(req, res) {
       console.error('[admin/fulfillment] fulfill:', msg);
       return res.status(502).json({ ok: false, error: 'upstream', message: errs.length ? errs[0].message : undefined });
     }
-    return res.status(200).json({ ok: true, status: (node.fulfillment && node.fulfillment.status) || 'SUCCESS' });
+    return res.status(200).json({
+      ok: true,
+      status: (node.fulfillment && node.fulfillment.status) || 'SUCCESS',
+      tracked: !noTracking
+    });
   } catch (err) {
     console.error('[admin/fulfillment]', err && err.message);
     return res.status(502).json({ ok: false, error: 'upstream' });

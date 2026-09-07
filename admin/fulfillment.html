@@ -54,6 +54,12 @@ main { padding:28px 0 90px; }
 .confirmq { font-family:'DM Mono',monospace; font-size:11.5px; letter-spacing:0.05em; color:#17140F; flex:1 1 auto; }
 .confirmq b { color:#325E3F; }
 .dupwarn { flex-basis:100%; font-size:12.5px; color:#8C4630; }
+.confirmrow.bare { background:rgba(224,122,95,0.07); border-top-color:rgba(180,71,44,0.3); }
+.confirmrow.bare .confirmq b { color:#8C4630; }
+.barewarn { flex-basis:100%; font-size:12.5px; line-height:1.55; color:#8C4630; }
+.btn.warn { background:#8C4630; }
+.btn.warn:hover { background:#6F3524; }
+.notrack { flex:0 0 auto; }
 .carderr { margin:12px 20px 16px; border:1px solid rgba(196,88,60,0.4); background:rgba(224,122,95,0.09); color:#8C4630; border-radius:3px; padding:10px 12px; font-size:13px; }
 .remember { display:flex; gap:9px; align-items:center; margin-top:13px; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; cursor:pointer; user-select:none; }
 .remember input { width:auto; margin:0; accent-color:#325E3F; cursor:pointer; }
@@ -160,7 +166,7 @@ main { padding:28px 0 90px; }
       </div>
       <div class="orders" id="orders"></div>
       <div class="morewrap" id="moreWrap" style="display:none;"><button class="btn ghost" id="more">Load more ↓</button></div>
-      <div class="fine">Live from Shopify · auto-refreshes every 45s · marking shipped records tracking and emails the customer their branded shipping confirmation</div>
+      <div class="fine">Live from Shopify · auto-refreshes every 45s · marking shipped emails the customer their branded shipping confirmation &middot; “No tracking” ships without a number, after a confirm</div>
     </div>
   </div>
 </main>
@@ -492,6 +498,7 @@ main { padding:28px 0 90px; }
           '<select data-carrier>' + opts + '</select>' +
           '<span class="detect" data-detect></span>' +
           '<button class="btn" data-ship>Mark shipped →</button>' +
+          '<button class="btn ghost notrack" data-notrack title="Mark this order shipped with no tracking number">No tracking</button>' +
         '</div>' +
         '<div data-slot></div>' +
       '</div>';
@@ -511,8 +518,12 @@ main { padding:28px 0 90px; }
         else detectEl.textContent = '';
       });
       // Barcode scanners end a scan with Enter — jump straight to confirm.
-      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') beginConfirm(); });
-      shipBtn.onclick = beginConfirm;
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') beginConfirm(false); });
+      shipBtn.onclick = function () { beginConfirm(false); };
+      // Shipping with no tracking number — a hand-delivery, a local drop-off,
+      // or a label that will not scan. Same confirm step, louder wording.
+      var bareBtn = card.querySelector('[data-notrack]');
+      bareBtn.onclick = function () { beginConfirm(true); };
 
       // 📷 Scan: camera reads the label, fills the field, and goes straight
       // to the confirm step with the carrier auto-selected.
@@ -521,7 +532,7 @@ main { padding:28px 0 90px; }
           input.value = num;
           var c = detectCarrier(num);
           if (c) { select.value = c; detectEl.textContent = '✓ ' + c; }
-          beginConfirm();
+          beginConfirm(false);
         });
       };
 
@@ -529,8 +540,9 @@ main { padding:28px 0 90px; }
         slot.innerHTML = msg ? '<div class="carderr">' + esc(msg) + '</div>' : '';
       }
 
-      function beginConfirm() {
+      function beginConfirm(bare) {
         var num = cleanTrack(input.value);
+        if (bare) return beginBareConfirm(num);
         if (!validTrack(num)) {
           cardError(num ? 'That doesn’t look like a tracking number — 8+ letters/digits, no punctuation.' : 'Enter or scan the tracking number first.');
           input.focus();
@@ -557,18 +569,49 @@ main { padding:28px 0 90px; }
           shipBtn.disabled = false;
           input.focus();
         };
-        confirmBtn.onclick = function () { doShip(num, carrier, name, confirmBtn); };
+        confirmBtn.onclick = function () { doShip(num, carrier, name, confirmBtn, false); };
       }
 
-      function doShip(num, carrier, name, confirmBtn) {
+      // No tracking number: the customer still gets the shipping email, but it
+      // can only point at their order status page. Worth spelling out, because
+      // a fulfillment cannot be undone from this desk.
+      function beginBareConfirm(typed) {
+        var name = card.getAttribute('data-name');
+        cardError('');
+        shipBtn.disabled = true;
+        bareBtn.disabled = true;
+        slot.innerHTML = '<div class="confirmrow bare">' +
+          '<span class="confirmq">Mark <b>' + esc(name) + '</b> shipped with <b>no tracking</b>?</span>' +
+          '<span class="barewarn">The customer gets their shipping confirmation with no tracking number ' +
+            '&mdash; just a link to their order status. This can&rsquo;t be undone from this desk.' +
+            (typed ? ' The number you typed will be ignored.' : '') + '</span>' +
+          '<button class="btn warn" data-confirm>Yes, ship without tracking</button>' +
+          '<button class="btn ghost" data-cancel>Cancel</button>' +
+        '</div>';
+        var confirmBtn = slot.querySelector('[data-confirm]');
+        confirmBtn.disabled = true;
+        setTimeout(function () { confirmBtn.disabled = false; confirmBtn.focus(); }, 350);
+        slot.querySelector('[data-cancel]').onclick = function () {
+          slot.innerHTML = '';
+          shipBtn.disabled = false;
+          bareBtn.disabled = false;
+          input.focus();
+        };
+        confirmBtn.onclick = function () { doShip('', '', name, confirmBtn, true); };
+      }
+
+      function doShip(num, carrier, name, confirmBtn, bare) {
         confirmBtn.disabled = true; confirmBtn.textContent = 'Shipping…';
+        var payload = bare
+          ? { fulfillmentOrderId: card.getAttribute('data-fo'), noTracking: true }
+          : { fulfillmentOrderId: card.getAttribute('data-fo'), trackingNumber: num, trackingCompany: carrier };
         api({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fulfillmentOrderId: card.getAttribute('data-fo'), trackingNumber: num, trackingCompany: carrier })
+          body: JSON.stringify(payload)
         }).then(function (b) {
           if (b.ok) {
-            markUsed(num, name);
+            if (!bare) markUsed(num, name);
             slot.innerHTML = '';
             card.style.opacity = '0.4';
             load(true);
@@ -580,6 +623,7 @@ main { padding:28px 0 90px; }
             return;
           }
           shipBtn.disabled = false;
+          bareBtn.disabled = false;
           cardError(b.message || 'That did not go through — nothing was shipped. Try again.');
         });
       }
