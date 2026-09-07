@@ -28,14 +28,43 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
 .card { background:var(--card); border:1px solid var(--cardline); border-radius:6px; box-shadow:var(--cardshadow); }
 [hidden] { display:none !important; }
 
-/* brand bar */
-.tr-bar { max-width:1180px; margin:0 auto; padding:26px 44px 0; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-.tr-bar img { display:block; width:118px; height:auto; }
-.tr-bar a { font-family:var(--mono); font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); text-decoration:none; }
-.tr-bar a:hover { color:var(--ink); }
+/* site header — a static copy of the SPA's, since /track is served on its own */
+.hb-hdr { position:sticky; top:0; z-index:60; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 20px; padding:20px 44px; background:rgba(245,240,230,0.93); backdrop-filter:blur(10px); border-bottom:1px solid #DDD3C0; }
+.hb-mark { display:flex; align-items:baseline; gap:9px; text-decoration:none; color:var(--ink); }
+.hb-mark__w { font-family:var(--sans); font-weight:700; font-size:23px; letter-spacing:-0.045em; white-space:nowrap; }
+.hb-bean { position:relative; }
+.hb-bean i { position:absolute; left:50%; top:0.26em; width:0.19em; height:0.135em; margin-left:-0.095em; border-radius:46% 54% 50% 50% / 58% 42%; background:oklch(0.8 0.13 92); transform:rotate(-18deg); }
+.hb-bean span { position:relative; z-index:1; }
+.hb-mark__t { display:inline-flex; gap:0.5em; font-family:var(--mono); font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; white-space:nowrap; }
+.hb-nav { display:flex; flex-wrap:wrap; align-items:center; gap:10px clamp(12px,1.8vw,26px); font-size:14px; letter-spacing:0.01em; flex:1 1 auto; min-width:0; justify-content:flex-end; }
+.hb-nav a { color:var(--ink); text-decoration:none; padding-bottom:3px; border-bottom:1px solid transparent; }
+.hb-nav a:hover { border-bottom-color:var(--ink); }
+.hb-nav a.hb-cta { font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; white-space:nowrap; padding:12px clamp(12px,1.6vw,20px); border-radius:2px; background:var(--ink); color:#F5F0E6; border-bottom:none; }
+.hb-nav a.hb-cta:hover { background:oklch(0.36 0.055 152); }
+
+/* site footer */
+.hb-foot { background:var(--ink); color:#B9AF9C; border-top:1px solid rgba(245,240,230,0.14); padding:68px 44px 34px; }
+.hb-foot__grid { display:grid; grid-template-columns:1.4fr 1fr 1fr 1.2fr; gap:44px; max-width:1180px; margin:0 auto 52px; }
+.hb-foot__mark { font-weight:700; font-size:21px; letter-spacing:-0.045em; color:#F5F0E6; margin-bottom:14px; white-space:nowrap; }
+.hb-foot p { font-size:14px; line-height:1.65; margin:0; max-width:26em; }
+.hb-foot__k { font-family:var(--mono); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:#8A7F6E; margin-bottom:16px; }
+.hb-foot__links { display:grid; gap:10px; }
+.hb-foot__links a { font-size:14px; color:#B9AF9C; text-decoration:none; }
+.hb-foot__links a:hover { color:#F5F0E6; }
+.hb-join { display:flex; gap:8px; }
+.hb-join input { flex:1 1 0; min-width:0; background:transparent; border:1px solid rgba(245,240,230,0.28); border-radius:2px; padding:12px 14px; color:#F5F0E6; font-family:var(--sans); font-size:14px; }
+.hb-join input:focus { outline:none; border-color:rgba(245,240,230,0.6); }
+.hb-join button { font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; padding:12px 16px; border:none; border-radius:2px; background:rgba(245,240,230,0.18); color:#8A7F6E; cursor:not-allowed; transition:background 0.25s, color 0.25s; }
+.hb-join button.on { background:oklch(0.86 0.14 92); color:var(--ink); cursor:pointer; }
+.hb-joinmsg { font-size:13px; line-height:1.6; margin-top:10px; }
+.hb-joinmsg.err { color:#E2A18C; }
+.hb-joinmsg.ok { color:#B9AF9C; }
+.hb-foot__bar { display:grid; grid-template-columns:1fr auto; gap:16px; max-width:1180px; margin:0 auto; padding-top:26px; border-top:1px solid rgba(245,240,230,0.14); font-family:var(--mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:#8A7F6E; }
+.hb-foot__bar a { color:inherit; text-decoration:none; }
+.hb-foot__bar a:hover { color:#F5F0E6; }
 
 /* hero */
-.tr-hero { position:relative; overflow:hidden; background:var(--cream); padding:44px 44px 0; }
+.tr-hero { position:relative; overflow:hidden; background:var(--cream); padding:64px 44px 0; }
 .tr-hero__in { position:relative; max-width:1180px; margin:0 auto; }
 .tr-kicker { display:flex; align-items:center; gap:12px; font-family:var(--mono); font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--green); margin-bottom:20px; }
 .tr-kicker span:first-child { width:22px; height:1px; background:var(--ink); }
@@ -152,9 +181,6 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
 .tr-help { font-family:var(--mono); font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); line-height:1.9; }
 .tr-help a, .tr-help button { color:var(--green); text-decoration:none; border:none; border-bottom:1px solid oklch(0.44 0.07 152 / 0.4); background:none; padding:0; cursor:pointer; font:inherit; letter-spacing:inherit; text-transform:inherit; }
 
-/* foot */
-.tr-foot { padding:30px 44px 40px; text-align:center; font-family:var(--mono); font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted-2); line-height:2.1; }
-.tr-foot a { color:var(--muted); text-decoration:none; }
 
 @keyframes trDrive { 0% { transform:translateX(-24%); } 84%, 100% { transform:translateX(calc(100% - 268px)); } }
 @keyframes trJostle { 0%, 100% { transform:translateY(0); } 50% { transform:translateY(-2px); } }
@@ -167,8 +193,15 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
 @keyframes trIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
 
 @media (max-width:900px) {
-  .tr-bar { padding:20px 20px 0; }
-  .tr-hero { padding:28px 20px 0; }
+  .hb-hdr { padding:14px 20px; }
+  .hb-nav { flex:0 0 auto; }
+  .hb-nav a:not(.hb-cta) { display:none; }
+  .hb-nav a.hb-cta { padding:11px 16px; font-size:10px; }
+  .hb-mark__t { display:none; }
+  .hb-foot { padding:48px 20px 28px; }
+  .hb-foot__grid { grid-template-columns:1fr; gap:32px; margin-bottom:36px; }
+  .hb-foot__bar { grid-template-columns:1fr; }
+  .tr-hero { padding:40px 20px 0; }
   .tr-pad { padding:34px 20px 64px; }
   .tr-route { height:168px; }
   .tr-split { grid-template-columns:1fr; gap:22px; }
@@ -179,7 +212,6 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
   .tr-lookup { grid-template-columns:1fr; }
   .tr-meta { grid-template-columns:1fr 1fr; grid-auto-flow:row; }
   .tr-scan { grid-template-columns:1fr; gap:4px; }
-  .tr-foot { padding:24px 20px 34px; }
 }
 @media (prefers-reduced-motion:reduce) {
   .tr-drive, .tr-drive > div, .tr-hub, .tr-mailbox .flag, .tr-road--dash, .tr-track__rest, .tr-node__pulse, .tr-status span:first-child, .tr-detail { animation:none; }
@@ -188,10 +220,23 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
 </head>
 <body>
 
-<div class="tr-bar">
-  <a href="/"><img src="/assets/email-logo-light.png" alt="Happy Beanie"></a>
-  <a href="/">← happybeanie.com</a>
-</div>
+<header class="hb-hdr">
+  <a class="hb-mark" href="/">
+    <span class="hb-mark__w">happy bean<span class="hb-bean"><i></i><span>&#305;</span></span>e</span>
+    <span class="hb-mark__t"><span>hormone</span><span>care</span></span>
+  </a>
+  <nav class="hb-nav">
+    <a href="/shop">Shop</a>
+    <a href="/product">Products</a>
+    <a href="/dosing">Dosing</a>
+    <a href="/certs">Certificates</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+    <a href="/account">Account</a>
+    <a href="/quiz">Eligibility</a>
+    <a class="hb-cta" href="/shop">Try Happy Beanie</a>
+  </nav>
+</header>
 
 <section class="tr-hero">
   <div class="tr-hero__in">
@@ -274,7 +319,88 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
   </div>
 </section>
 
-<p class="tr-foot">Made in one facility · Scottsdale, AZ<br><a href="/">happybeanie.com</a> · <a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
+<footer class="hb-foot">
+  <div class="hb-foot__grid">
+    <div>
+      <div class="hb-foot__mark">happy bean<span class="hb-bean"><i></i><span>&#305;</span></span>e</div>
+      <p>Peptide-infused daily care, formulated in Scottsdale, Arizona.</p>
+    </div>
+    <div>
+      <div class="hb-foot__k">Shop</div>
+      <div class="hb-foot__links">
+        <a href="/product">Happy Beans · for dogs</a>
+        <a href="/product">Happy Beans for Cats</a>
+        <a href="/shop">Shop both formulas</a>
+        <a href="/dosing">Dosing guide</a>
+        <a href="/quiz">Eligibility screener</a>
+        <a href="/cart">Your cart</a>
+        <a href="/track">Track your order</a>
+      </div>
+    </div>
+    <div>
+      <div class="hb-foot__k">Company</div>
+      <div class="hb-foot__links">
+        <a href="/about">About Happy Beanie</a>
+        <a href="/certs">Certificate library</a>
+        <a href="/blog">Journal · ingredients explained</a>
+        <a href="/contact">Contact us</a>
+        <a href="/contact">For veterinarians</a>
+        <a href="/wholesale">Wholesale</a>
+        <a href="/ambassador">Become an ambassador</a>
+      </div>
+    </div>
+    <div>
+      <div class="hb-foot__k">Exclusive deals</div>
+      <p style="margin-bottom:14px;">Sign up with your email to receive exclusive deals and first dibs on waitlist products!</p>
+      <div class="hb-join">
+        <input id="hbJoin" placeholder="Email" inputmode="email" autocomplete="email">
+        <button id="hbJoinGo" type="button">Join</button>
+      </div>
+      <div class="hb-joinmsg" id="hbJoinMsg" hidden></div>
+    </div>
+  </div>
+  <div class="hb-foot__bar">
+    <span>&copy; 2026 Happy Beanie</span>
+    <span><a href="/account">Account</a>&nbsp;· <a href="/wholesale">Wholesale</a>&nbsp;· <a href="/ambassador">Ambassadors</a>&nbsp;· <a href="/policies/terms.html">Terms</a>&nbsp;· <a href="/policies/privacy.html">Privacy</a>&nbsp;· <a href="/policies/shipping.html">Shipping</a>&nbsp;· <a href="/policies/refunds.html">Refunds</a>&nbsp;· <a href="/policies/subscriptions.html">Subscriptions</a>&nbsp;· <a href="/policies/disclaimer.html">Disclaimer</a></span>
+  </div>
+</footer>
+
+<script>
+// The footer signup, wired to the same endpoint the site's own footer posts to.
+// A form that looks live and goes nowhere is worse than no form.
+(function () {
+  var input = document.getElementById('hbJoin');
+  var go = document.getElementById('hbJoinGo');
+  var msg = document.getElementById('hbJoinMsg');
+  var busy = false;
+  function ok(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').trim()); }
+  function say(text, cls) { msg.hidden = false; msg.className = 'hb-joinmsg ' + cls; msg.textContent = text; }
+  function sync() { go.classList.toggle('on', ok(input.value) && !busy); }
+  input.addEventListener('input', function () { msg.hidden = true; sync(); });
+  input.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') go.click(); });
+  go.addEventListener('click', function () {
+    if (busy || !ok(input.value)) return;
+    busy = true; go.textContent = 'Joining…'; sync();
+    fetch('/api/subscribe', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: input.value.trim(), source: 'track-footer' })
+    }).then(function (r) { return r.json().catch(function () { return {}; }); })
+      .then(function (b) {
+        busy = false; go.textContent = 'Join';
+        if (b && b.ok) { input.value = ''; sync(); say('You’re on the list.', 'ok'); return; }
+        sync();
+        say(b && b.error === 'bad_email'
+          ? 'That does not look like an email address.'
+          : 'That did not go through. Try again in a moment, or email hello@happybeanie.com.', 'err');
+      })
+      .catch(function () {
+        busy = false; go.textContent = 'Join'; sync();
+        say('That did not go through. Try again in a moment.', 'err');
+      });
+  });
+  sync();
+})();
+</script>
 
 <script>
 (function () {
@@ -394,10 +520,11 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
         ? ' This page follows the carrier’s own scans — the full history is below.'
         : ' This page updates as the carrier scans it.');
     }
+    var legWord = delivered ? 'In transit' : (ship && ship.status) || 'On its way';
     var transit = {
-      label: ship ? (ship.status || 'On its way') : 'On its way',
+      label: legWord,
       stamp: ship ? fmt(ship.shippedAt) : '',
-      title: ship ? (ship.status || 'On its way') : 'On its way',
+      title: legWord,
       body: body
     };
 
@@ -440,12 +567,14 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
       ];
     }
 
-    var pct = ((cur + 0.5) / stages.length) * 100;
+    var complete = !ord.cancelled && !!(ship && ship.delivered) && cur === stages.length - 1;
+    var pct = complete ? 100 : ((cur + 0.5) / stages.length) * 100;
     var nodes = stages.map(function (s, i) {
-      var cls = 'tr-node' + (i < cur ? ' is-done' : i === cur ? (s.stop ? ' is-stop' : ' is-current') : '');
+      var done = i < cur || (complete && i === cur);
+      var cls = 'tr-node' + (done ? ' is-done' : i === cur ? (s.stop ? ' is-stop' : ' is-current') : '');
       return '<button type="button" class="' + cls + '" data-i="' + i + '">' +
         '<span class="tr-node__dot"><span class="tr-node__pulse" aria-hidden="true"></span>' +
-        '<span>' + (i < cur ? '✓' : i === cur ? (s.stop ? '✕' : '') : (i + 1)) + '</span></span>' +
+        '<span>' + (done ? '✓' : i === cur ? (s.stop ? '✕' : '') : (i + 1)) + '</span></span>' +
         '<span><span class="tr-node__label">' + esc(s.label) + '</span>' +
         (s.stamp ? '<span class="tr-node__stamp">' + esc(s.stamp) + '</span>' : '') + '</span></button>';
     }).join('');
@@ -466,7 +595,7 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
     el.innerHTML =
       (count > 1 ? '<div class="tr-ship-k">Shipment ' + (idx + 1) + ' of ' + count + '</div>' : '') +
       '<div class="tr-track"><div class="tr-track__fill" style="width:' + pct + '%"></div>' +
-      '<div class="tr-track__rest" style="left:' + pct + '%"></div></div>' +
+      (complete ? '' : '<div class="tr-track__rest" style="left:' + pct + '%"></div>') + '</div>' +
       '<div class="tr-nodes" style="grid-template-columns:repeat(' + stages.length + ',minmax(0,1fr))">' + nodes + '</div>' +
       '<div class="tr-detail" data-detail></div>' + num;
 
