@@ -22,6 +22,10 @@
 //
 // (that is the page; the page calls this endpoint)
 //
+// Order numbers are the HB series — HB-385443 and up, see _lib/order-number.js.
+// The lookup takes either that or a raw Shopify number, so links sent before
+// the switch still open.
+//
 // A signed link still works too — k=HMAC-SHA256(order number, TRACK_SECRET)
 // truncated to 16 hex — for anywhere we send mail ourselves and would rather
 // not put an address in a URL. Either credential opens the page; neither is
@@ -31,6 +35,7 @@
 // needed for the signed variant.
 
 const crypto = require('crypto');
+const orderNo = require('./_lib/order-number.js');
 
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
 const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
@@ -142,20 +147,22 @@ module.exports = async function handler(req, res) {
   }
 
   const q = req.query || {};
-  // The order number as the email wrote it — digits only, so a stray '#'
-  // or whitespace cannot change what gets checked.
-  const orderNo = String(q.o || '').replace(/[^0-9]/g, '');
+  // What the customer holds is an HB number; Shopify knows the order by its
+  // own. Either form is accepted and both end up as the Shopify number.
+  const given = orderNo.digits(q.o);
+  const shopifyNo = orderNo.toShopify(q.o);
   const claimedEmail = String(q.e || '').trim().toLowerCase().slice(0, 200);
-  const given = String(q.k || '').toLowerCase().replace(/[^0-9a-f]/g, '');
+  const sig = String(q.k || '').toLowerCase().replace(/[^0-9a-f]/g, '');
   // A signature is proof on its own; an email has to be checked against the
-  // order once we have it.
-  const signed = !!(process.env.TRACK_SECRET && given.length === 16 && orderNo && sigOk(given, sign(orderNo)));
-  if (!orderNo || (!signed && !claimedEmail)) {
+  // order once we have it. It signs the number as the link carried it, so a
+  // link minted before the switch still verifies.
+  const signed = !!(process.env.TRACK_SECRET && sig.length === 16 && given && sigOk(sig, sign(given)));
+  if (!shopifyNo || (!signed && !claimedEmail)) {
     return res.status(404).json({ ok: false, error: 'not_found' });
   }
 
   try {
-    const out = await admin(token, ORDER, { q: 'name:#' + orderNo });
+    const out = await admin(token, ORDER, { q: 'name:#' + shopifyNo });
     if (out.json && out.json.errors) {
       console.error('[order-status] graphql', JSON.stringify(out.json.errors).slice(0, 400));
       return res.status(502).json({ ok: false, error: 'upstream' });
@@ -203,7 +210,9 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       ok: true,
       order: {
-        name: o.name,
+        // The HB number, never Shopify's — that one is ours, not the
+        // customer's, and it would not match their confirmation email.
+        name: orderNo.toDisplay(o.name),
         placedAt: o.processedAt,
         cancelled: !!o.cancelledAt,
         fulfillment: titleCase(o.displayFulfillmentStatus),

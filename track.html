@@ -94,7 +94,13 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
 .tr-lab { display:block; font-family:var(--mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
 .tr-lookup input { width:100%; color:var(--ink); background:var(--paper); border:1px solid rgba(23,20,15,0.18); border-radius:3px; padding:14px; font-family:var(--sans); font-size:14px; }
 .tr-lookup input:focus { outline:none; border-color:var(--green); }
-.tr-lookup input[name="order"] { font-family:var(--mono); font-size:13px; letter-spacing:0.08em; }
+.tr-lookup input[name="order"] { font-family:var(--mono); font-size:13px; letter-spacing:0.08em; border:none; border-radius:0; background:transparent; padding:14px 14px 14px 0; }
+.tr-lookup input[name="order"]:focus { outline:none; }
+/* The HB- is part of the field, not a value in it — it cannot be deleted,
+   and pasting a full "HB-385442" cannot produce "HB-HB-385442". */
+.tr-ordbox { display:flex; align-items:stretch; background:var(--paper); border:1px solid rgba(23,20,15,0.18); border-radius:3px; }
+.tr-ordbox:focus-within { border-color:var(--green); }
+.tr-ordbox__pre { display:flex; align-items:center; padding:0 2px 0 14px; font-family:var(--mono); font-size:13px; letter-spacing:0.08em; color:var(--muted); user-select:none; }
 .tr-submit { align-self:flex-end; font-family:var(--mono); font-size:11px; letter-spacing:0.16em; text-transform:uppercase; font-weight:500; padding:15px 26px; border:none; border-radius:3px; background:var(--ink); color:#F5F0E6; cursor:pointer; white-space:nowrap; }
 .tr-submit:hover { background:#2A2418; }
 .tr-note { font-family:var(--mono); font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted-2); margin-top:14px; }
@@ -438,12 +444,13 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
     slot.innerHTML =
       '<form class="tr-lookup card" data-form novalidate>' +
         '<label><span class="tr-lab">Order number</span>' +
-          '<input name="order" inputmode="numeric" autocomplete="off" placeholder="1004" value="' + esc(orderNo || '') + '" required></label>' +
+          '<span class="tr-ordbox"><span class="tr-ordbox__pre">HB-</span>' +
+          '<input name="order" inputmode="numeric" autocomplete="off" placeholder="385442" value="' + esc(orderNo || '') + '" required></span></label>' +
         '<label><span class="tr-lab">Email on the order</span>' +
           '<input name="email" type="email" autocomplete="email" placeholder="you@email.com" value="' + esc(email || '') + '" required></label>' +
         '<button class="tr-submit" type="submit">Track it →</button>' +
       '</form>' +
-      '<div class="tr-note">Your order number is on your confirmation email — it looks like #1004.</div>';
+      '<div class="tr-note">Your order number is on your confirmation email — it looks like HB-385442.</div>';
 
     var form = slot.querySelector('[data-form]');
     form.addEventListener('submit', function (ev) {
@@ -456,6 +463,10 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
       load(n, null, addr, true);
     });
     form.addEventListener('input', clearFail);
+    form.order.addEventListener('input', function () {
+      var clean = this.value.replace(/[^0-9]/g, '');
+      if (clean !== this.value) this.value = clean;
+    });
     (orderNo ? form.email : form.order).focus();
   }
 
