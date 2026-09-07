@@ -1,5 +1,5 @@
-// GET /api/track?o=<order id>&k=<signature> — the data behind /track, our own
-// order-status page.
+// GET /api/track?o=<order number>&k=<signature> — the data behind /track, our
+// own order-status page.
 //
 // Why this exists: Shopify's order-status page is the only thing a shipping
 // email could link to when there was no carrier URL, and it lands the customer
@@ -9,13 +9,19 @@
 // The link is one-click from an email, so there is no password — the signature
 // IS the credential:
 //
-//   k = HMAC-SHA256(order id, TRACK_SECRET), first 16 hex characters
+//   k = HMAC-SHA256(order number, TRACK_SECRET), first 16 hex characters
 //
 // 64 bits, compared in constant time, and derived from a secret that never
 // leaves the server. Shopify's notification templates mint the same value with
 // Liquid's hmac_sha256 filter, so the emails it sends can link here directly:
 //
-//   /track?o={{ order.id }}&k={{ order.id | hmac_sha256: '<TRACK_SECRET>' | slice: 0, 16 }}
+//   /track?o={{ order_name | remove: '#' }}&k={{ order_name | remove: '#' | hmac_sha256: '<TRACK_SECRET>' | slice: 0, 16 }}
+//
+// The identifier is the ORDER NUMBER rather than Shopify's internal id, for
+// one reason: order_name is present in every notification template Shopify
+// ships, so the link cannot depend on a variable that turns out not to exist
+// in that context. A guessable order number costs nothing — the signature is
+// the credential, and forging one needs the secret.
 //
 // Anyone holding the link sees one order — the same bargain as Shopify's own
 // order-status URL, which is likewise a bearer token in a link.
@@ -27,8 +33,9 @@ const crypto = require('crypto');
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
 const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 
-const ORDER = `query Track($id: ID!) {
-  order(id: $id) {
+const ORDER = `query Track($q: String!) {
+  orders(first: 1, query: $q) {
+    nodes {
     name
     processedAt
     displayFulfillmentStatus
@@ -44,6 +51,7 @@ const ORDER = `query Track($id: ID!) {
       estimatedDeliveryAt
       latestShipmentStatus
       trackingInfo { number url company }
+    }
     }
   }
 }`;
@@ -101,17 +109,20 @@ module.exports = async function handler(req, res) {
   }
 
   const q = req.query || {};
-  const orderId = String(q.o || '').replace(/[^0-9]/g, '');
+  // The order number as the email wrote it — digits only, so a stray '#'
+  // or whitespace cannot change what gets signed.
+  const orderNo = String(q.o || '').replace(/[^0-9]/g, '');
   const given = String(q.k || '').toLowerCase().replace(/[^0-9a-f]/g, '');
-  if (!orderId || given.length !== 16 || !sigOk(given, sign(orderId))) {
+  if (!orderNo || given.length !== 16 || !sigOk(given, sign(orderNo))) {
     // One message for every failure — a wrong signature and a missing order
     // must look identical, or the endpoint becomes an order-number oracle.
     return res.status(404).json({ ok: false, error: 'not_found' });
   }
 
   try {
-    const out = await admin(token, ORDER, { id: 'gid://shopify/Order/' + orderId });
-    const o = out.json && out.json.data && out.json.data.order;
+    const out = await admin(token, ORDER, { q: 'name:#' + orderNo });
+    const nodes = (out.json && out.json.data && out.json.data.orders && out.json.data.orders.nodes) || [];
+    const o = nodes[0];
     if (!o) return res.status(404).json({ ok: false, error: 'not_found' });
 
     const fulfillments = (o.fulfillments || []).map(function (f) {
