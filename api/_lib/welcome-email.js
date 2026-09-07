@@ -161,6 +161,13 @@ function build(step, t) {
   if (String(step) === '2') {
     return screener.html.split(screener.UNSUB_MARK).join(unsub);
   }
+  // Step 3 is the scene redesign — the six studies pinned to a wall.
+  if (String(step) === '3') {
+    return scene.welcome3
+      .split(scene.UNSUB_MARK).join(unsub)
+      .split(scene.CTA_MARK).join(utm('/product', '3'))
+      .split(scene.CODEROW_MARK).join(sceneCodeRow(t));
+  }
   return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
     '<meta name="color-scheme" content="light"><title>' + s.subject + '</title></head>' +

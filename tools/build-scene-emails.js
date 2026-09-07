@@ -36,6 +36,7 @@ const FILES = {
   cartRecovery: 'cart-recovery.html',
   cartRow: 'cart-item-row.html',
   welcome1: 'welcome-1.html',
+  welcome3: 'welcome-3.html',
   ppCheckin: 'pp-checkin.html',
   research: 'research.html',
   ambassador: 'ambassador.html'
