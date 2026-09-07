@@ -469,7 +469,7 @@ body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webk
 
   // ---- fetch ------------------------------------------------------------
   function load(o, k, e, fromForm) {
-    fetch('/api/track?o=' + encodeURIComponent(o) +
+    fetch('/api/order-status?o=' + encodeURIComponent(o) +
           (k ? '&k=' + encodeURIComponent(k) : '') +
           (e ? '&e=' + encodeURIComponent(e) : ''))
       .then(function (r) { return r.json().catch(function () { return { ok:false }; }); })
