@@ -1,32 +1,28 @@
-// GET /api/track?o=<order number>&k=<signature> — the data behind /track, our
-// own order-status page.
+// GET /api/track?o=<order number>&e=<email> — the data behind /track, our own
+// order-status page.
 //
 // Why this exists: Shopify's order-status page is the only thing a shipping
 // email could link to when there was no carrier URL, and it lands the customer
 // on shopify.com wearing Shop Pay's furniture. This serves the same facts from
 // our own domain.
 //
-// The link is one-click from an email, so there is no password — the signature
-// IS the credential:
+// Proving who you are costs the customer nothing: the link carries the order
+// number and the email the order was placed with, and the server checks the
+// pair against Shopify. Knowing an order number is easy — they run in
+// sequence — but knowing which address goes with it is not, which is the same
+// bargain every "look up my order" form on the web makes.
 //
-//   k = HMAC-SHA256(order number, TRACK_SECRET), first 16 hex characters
+// Shopify's notification templates need no secret and no setup to build it:
 //
-// 64 bits, compared in constant time, and derived from a secret that never
-// leaves the server. Shopify's notification templates mint the same value with
-// Liquid's hmac_sha256 filter, so the emails it sends can link here directly:
+//   /track?o={{ order_name | remove: '#' }}&e={{ email | default: customer.email | url_encode }}
 //
-//   /track?o={{ order_name | remove: '#' }}&k={{ order_name | remove: '#' | hmac_sha256: '<TRACK_SECRET>' | slice: 0, 16 }}
+// A signed link still works too — k=HMAC-SHA256(order number, TRACK_SECRET)
+// truncated to 16 hex — for anywhere we send mail ourselves and would rather
+// not put an address in a URL. Either credential opens the page; neither is
+// required to be present when the other is.
 //
-// The identifier is the ORDER NUMBER rather than Shopify's internal id, for
-// one reason: order_name is present in every notification template Shopify
-// ships, so the link cannot depend on a variable that turns out not to exist
-// in that context. A guessable order number costs nothing — the signature is
-// the credential, and forging one needs the secret.
-//
-// Anyone holding the link sees one order — the same bargain as Shopify's own
-// order-status URL, which is likewise a bearer token in a link.
-//
-// Env: SHOPIFY_ADMIN_TOKEN (read_orders), TRACK_SECRET.
+// Env: SHOPIFY_ADMIN_TOKEN (read_orders). TRACK_SECRET is optional and only
+// needed for the signed variant.
 
 const crypto = require('crypto');
 
@@ -104,18 +100,21 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'method_not_allowed' });
   }
   const token = process.env.SHOPIFY_ADMIN_TOKEN;
-  if (!token || !process.env.TRACK_SECRET) {
+  // TRACK_SECRET is optional — it only enables the signed variant.
+  if (!token) {
     return res.status(503).json({ ok: false, error: 'not_configured' });
   }
 
   const q = req.query || {};
   // The order number as the email wrote it — digits only, so a stray '#'
-  // or whitespace cannot change what gets signed.
+  // or whitespace cannot change what gets checked.
   const orderNo = String(q.o || '').replace(/[^0-9]/g, '');
+  const claimedEmail = String(q.e || '').trim().toLowerCase().slice(0, 200);
   const given = String(q.k || '').toLowerCase().replace(/[^0-9a-f]/g, '');
-  if (!orderNo || given.length !== 16 || !sigOk(given, sign(orderNo))) {
-    // One message for every failure — a wrong signature and a missing order
-    // must look identical, or the endpoint becomes an order-number oracle.
+  // A signature is proof on its own; an email has to be checked against the
+  // order once we have it.
+  const signed = !!(process.env.TRACK_SECRET && given.length === 16 && orderNo && sigOk(given, sign(orderNo)));
+  if (!orderNo || (!signed && !claimedEmail)) {
     return res.status(404).json({ ok: false, error: 'not_found' });
   }
 
@@ -123,7 +122,13 @@ module.exports = async function handler(req, res) {
     const out = await admin(token, ORDER, { q: 'name:#' + orderNo });
     const nodes = (out.json && out.json.data && out.json.data.orders && out.json.data.orders.nodes) || [];
     const o = nodes[0];
+    // One answer for every failure — a wrong email, a wrong signature and an
+    // order that does not exist must look identical, or the endpoint becomes
+    // a way to test which addresses shop here.
     if (!o) return res.status(404).json({ ok: false, error: 'not_found' });
+    if (!signed && String(o.email || '').trim().toLowerCase() !== claimedEmail) {
+      return res.status(404).json({ ok: false, error: 'not_found' });
+    }
 
     const fulfillments = (o.fulfillments || []).map(function (f) {
       const t = (f.trackingInfo || [])[0] || {};

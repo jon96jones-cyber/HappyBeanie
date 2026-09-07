@@ -60,6 +60,13 @@ a { color:#43684E; }
 .help { margin-top:20px; text-align:center; font-size:13.5px; color:#6A6055; }
 .foot { margin-top:26px; text-align:center; font-family:'DM Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:#A79C8A; line-height:2.1; }
 .msg { text-align:center; padding:40px 20px; color:#6A6055; }
+.form { margin-top:18px; }
+.form label { display:block; font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; margin:14px 0 6px; }
+.form input { width:100%; font-family:'DM Sans',sans-serif; font-size:15px; color:#17140F; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:4px; padding:12px 13px; }
+.form input:focus { outline:none; border-color:#43684E; }
+.form button { width:100%; margin-top:16px; font-family:'DM Mono',ui-monospace,monospace; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; padding:14px; border:none; border-radius:999px; background:#17140F; color:#F0C64B; cursor:pointer; }
+.form button:hover { background:#2A2418; }
+.formerr { margin-top:12px; font-size:13.5px; color:#8C4630; }
 .msg b { display:block; font-size:18px; color:#17140F; margin-bottom:8px; }
 </style>
 </head>
@@ -93,19 +100,52 @@ a { color:#43684E; }
   }
 
   var p = new URLSearchParams(location.search);
-  var o = p.get('o'), k = p.get('k');
-  if (!o || !k) {
-    message('This link is missing something',
-      'Open the tracking link from your shipping email, or find the order in your account.');
+  var o = p.get('o'), k = p.get('k'), e = p.get('e');
+  if (!o || (!k && !e)) {
+    lookupForm(o || '');
     return;
   }
+  load(o, k, e);
 
-  fetch('/api/track?o=' + encodeURIComponent(o) + '&k=' + encodeURIComponent(k))
+  // With nothing in the link to go on, ask. This is also what someone sees
+  // who comes to /track straight from the site.
+  function lookupForm(orderNo, err) {
+    out.innerHTML = card(
+      '<h1 class="headline" style="margin-top:0;">Find your order</h1>' +
+      '<p class="sub">Your order number is in your confirmation email — it looks like #1004.</p>' +
+      '<div class="form">' +
+        '<label for="fo">Order number</label>' +
+        '<input id="fo" inputmode="numeric" autocomplete="off" placeholder="1004" value="' + esc(orderNo) + '">' +
+        '<label for="fe">Email on the order</label>' +
+        '<input id="fe" type="email" autocomplete="email" placeholder="you@example.com">' +
+        '<button id="fgo">Show my order</button>' +
+        (err ? '<div class="formerr">' + esc(err) + '</div>' : '') +
+      '</div>');
+    var fo = document.getElementById('fo'), fe = document.getElementById('fe');
+    function submit() {
+      var n = fo.value.replace(/[^0-9]/g, ''), addr = fe.value.trim();
+      if (!n || !addr) { lookupForm(fo.value, 'Both the order number and the email are needed.'); return; }
+      out.innerHTML = card('<div class="msg">Looking up your order…</div>');
+      load(n, null, addr, true);
+    }
+    document.getElementById('fgo').onclick = submit;
+    [fo, fe].forEach(function (el) {
+      el.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') submit(); });
+    });
+    (orderNo ? fe : fo).focus();
+  }
+
+  function load(o, k, e, fromForm) {
+  fetch('/api/track?o=' + encodeURIComponent(o) +
+        (k ? '&k=' + encodeURIComponent(k) : '') +
+        (e ? '&e=' + encodeURIComponent(e) : ''))
     .then(function (r) { return r.json().catch(function () { return { ok:false }; }); })
     .then(function (b) {
       if (!b.ok) {
         if (b.error === 'not_configured') {
           message('Tracking is not switched on yet', 'Reply to your order email and we will send the update by hand.');
+        } else if (fromForm) {
+          lookupForm(o, 'No order matches that number and email. Check both against your confirmation email.');
         } else {
           message('We cannot find that order',
             'The link may have expired or been mistyped. Reply to your order email and we will look it up.');
@@ -117,6 +157,7 @@ a { color:#43684E; }
     .catch(function () {
       message('That did not load', 'Check your connection and try again — nothing is wrong with your order.');
     });
+  }
 
   function render(ord) {
     var ship = (ord.shipments || [])[0] || null;
