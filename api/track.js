@@ -29,25 +29,33 @@ const crypto = require('crypto');
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
 const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 
+// Fulfillment carries no "latest shipment status" field — the carrier's own
+// history lives in events, and the milestones it has crossed are the
+// deliveredAt / inTransitAt stamps. displayStatus is the summary word.
 const ORDER = `query Track($q: String!) {
   orders(first: 1, query: $q) {
     nodes {
-    name
-    processedAt
-    displayFulfillmentStatus
-    cancelledAt
-    shippingAddress { name city provinceCode zip country }
-    lineItems(first: 25) {
-      nodes { title quantity variantTitle image { url } }
-    }
-    fulfillments(first: 10) {
-      id
-      createdAt
-      displayStatus
-      estimatedDeliveryAt
-      latestShipmentStatus
-      trackingInfo { number url company }
-    }
+      name
+      email
+      processedAt
+      displayFulfillmentStatus
+      cancelledAt
+      shippingAddress { name city provinceCode zip country }
+      lineItems(first: 25) {
+        nodes { title quantity variantTitle image { url } }
+      }
+      fulfillments(first: 10) {
+        id
+        createdAt
+        displayStatus
+        estimatedDeliveryAt
+        deliveredAt
+        inTransitAt
+        trackingInfo { number url company }
+        events(first: 25, sortKey: HAPPENED_AT, reverse: true) {
+          nodes { happenedAt status message city province country estimatedDeliveryAt }
+        }
+      }
     }
   }
 }`;
@@ -74,23 +82,45 @@ async function admin(token, query, variables) {
   return { status: res.status, json: json };
 }
 
-// Shopify's shipment statuses, said the way a person would. Anything we have
-// not seen before falls through to the fulfillment's own display status rather
-// than inventing a phrase for it.
-const SHIPMENT_WORDS = {
+// Shopify's statuses, said the way a person would. Anything we have not seen
+// before falls through to a title-cased version of the enum rather than a
+// phrase we invented for it. Covers both FulfillmentDisplayStatus and
+// FulfillmentEventStatus — they overlap, and neither has a term the other
+// would read wrongly.
+const STATUS_WORDS = {
+  SUBMITTED: 'Handed to the carrier',
   LABEL_PRINTED: 'Label printed',
   LABEL_PURCHASED: 'Label printed',
-  ATTEMPTED_DELIVERY: 'Delivery attempted',
-  READY_FOR_PICKUP: 'Ready for pickup',
-  CONFIRMED: 'Picked up by the carrier',
+  LABEL_VOIDED: 'Label voided',
+  CONFIRMED: 'Confirmed by the carrier',
+  CARRIER_PICKED_UP: 'Picked up by the carrier',
+  PICKED_UP: 'Picked up',
   IN_TRANSIT: 'In transit',
   OUT_FOR_DELIVERY: 'Out for delivery',
+  ATTEMPTED_DELIVERY: 'Delivery attempted',
+  READY_FOR_PICKUP: 'Ready for pickup',
+  DELAYED: 'Delayed',
   DELIVERED: 'Delivered',
-  FAILURE: 'The carrier reported a problem'
+  NOT_DELIVERED: 'Not delivered',
+  FAILURE: 'The carrier reported a problem',
+  CANCELED: 'Cancelled',
+  // With no carrier scan yet, "Fulfilled" is Shopify's word, not a sentence
+  // anyone wants to read about their own parcel.
+  FULFILLED: 'On its way',
+  MARKED_AS_FULFILLED: 'On its way'
 };
+
+// Statuses that mean the box has not left the building yet, so the page can
+// tell "made, waiting for the carrier" apart from "moving".
+const PRE_TRANSIT = { SUBMITTED: 1, LABEL_PRINTED: 1, LABEL_PURCHASED: 1, LABEL_VOIDED: 1 };
 
 function titleCase(s) {
   return String(s || '').toLowerCase().replace(/_/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); });
+}
+
+function words(status) {
+  if (!status) return '';
+  return STATUS_WORDS[status] || titleCase(status);
 }
 
 module.exports = async function handler(req, res) {
@@ -120,6 +150,10 @@ module.exports = async function handler(req, res) {
 
   try {
     const out = await admin(token, ORDER, { q: 'name:#' + orderNo });
+    if (out.json && out.json.errors) {
+      console.error('[track] graphql', JSON.stringify(out.json.errors).slice(0, 400));
+      return res.status(502).json({ ok: false, error: 'upstream' });
+    }
     const nodes = (out.json && out.json.data && out.json.data.orders && out.json.data.orders.nodes) || [];
     const o = nodes[0];
     // One answer for every failure — a wrong email, a wrong signature and an
@@ -132,21 +166,30 @@ module.exports = async function handler(req, res) {
 
     const fulfillments = (o.fulfillments || []).map(function (f) {
       const t = (f.trackingInfo || [])[0] || {};
+      const events = ((f.events && f.events.nodes) || []);
+      const latest = events[0] || null;
+      // The carrier decides once it has spoken: displayStatus can still read
+      // DELIVERED while the last scan says the box is in transit, and the page
+      // must not announce an arrival the carrier hasn't.
+      const state = (latest && latest.status) || f.displayStatus || null;
       return {
         shippedAt: f.createdAt,
-        // With no carrier scan yet, "Fulfilled" is Shopify's word, not a
-        // sentence anyone wants to read about their own parcel.
-        status: f.latestShipmentStatus
-          ? (SHIPMENT_WORDS[f.latestShipmentStatus] || titleCase(f.latestShipmentStatus))
-          : (f.displayStatus === 'DELIVERED' ? 'Delivered' : 'On its way'),
-        // When the carrier has spoken, the carrier decides — displayStatus can
-        // still read DELIVERED while the last scan says the box is in transit,
-        // and the page must not announce an arrival the carrier hasn't.
-        delivered: f.latestShipmentStatus
-          ? f.latestShipmentStatus === 'DELIVERED'
-          : f.displayStatus === 'DELIVERED',
-        estimatedDelivery: f.estimatedDeliveryAt || null,
-        tracking: t.number ? { number: t.number, url: t.url || null, company: t.company || null } : null
+        status: words(state) || 'On its way',
+        delivered: !!(f.deliveredAt || state === 'DELIVERED'),
+        deliveredAt: f.deliveredAt || null,
+        // Anything before the first movement scan is still sitting with us.
+        moving: !!(f.inTransitAt || (state && !PRE_TRANSIT[state])),
+        estimatedDelivery: f.estimatedDeliveryAt || (latest && latest.estimatedDeliveryAt) || null,
+        tracking: t.number ? { number: t.number, url: t.url || null, company: t.company || null } : null,
+        // The carrier's own history, as scans. City and state only — the same
+        // restraint the shipping address gets.
+        scans: events.map(function (ev) {
+          return {
+            at: ev.happenedAt,
+            what: ev.message || words(ev.status),
+            where: [ev.city, ev.province].filter(Boolean).join(', ')
+          };
+        }).filter(function (s) { return !!s.what; })
       };
     });
     const a = o.shippingAddress || {};

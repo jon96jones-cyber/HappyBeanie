@@ -5584,7 +5584,8 @@ class Component extends DCLogic {
           { label: 'Shop both formulas', go: this.nav('shop') },
           { label: 'Dosing guide', go: this.nav('dosing') },
           { label: 'Eligibility screener', go: this.nav('quiz') },
-          { label: 'Your cart', go: this.nav('cart') }
+          { label: 'Your cart', go: this.nav('cart') },
+          { label: 'Track your order', go: () => { window.location.href = '/track'; } }
         ] },
         { title: 'Company', links: [
           { label: 'About Happy Beanie', go: this.nav('about') },

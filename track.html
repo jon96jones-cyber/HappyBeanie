@@ -4,85 +4,284 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Track your box · Happy Beanie</title>
+<meta name="color-scheme" content="light">
+<title>Track your order · Happy Beanie</title>
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32">
 <style>
+@font-face { font-family:'DM Sans'; font-weight:400 700; font-display:swap; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
 @font-face { font-family:'DM Mono'; font-weight:400; font-display:swap; src:url('/assets/fonts/23b5af97.woff2') format('woff2'); }
 @font-face { font-family:'DM Mono'; font-weight:500; font-display:swap; src:url('/assets/fonts/b847e313.woff2') format('woff2'); }
-@font-face { font-family:'DM Sans'; font-weight:400; font-display:swap; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
-@font-face { font-family:'DM Sans'; font-weight:700; font-display:swap; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
+/* DM Mono draws a slashed zero. Figures come from DM Sans so an order number
+   or a tracking number never reads as a typo. */
+@font-face { font-family:'HB Mono Figures'; font-weight:400 500; font-display:swap; src:url('/assets/fonts/d7200164.woff2') format('woff2'); unicode-range:U+0030-0039; }
 
+:root {
+  --ink:#17140F; --cream:#FCFAF4; --paper:#FFFDF7; --body:#4A4235; --muted:#6A6055; --muted-2:#7A7063;
+  --yellow:oklch(0.86 0.14 92); --green:oklch(0.44 0.07 152); --red:oklch(0.55 0.17 30);
+  --sans:'DM Sans',system-ui,-apple-system,Helvetica,Arial,sans-serif;
+  --mono:'HB Mono Figures','DM Mono',ui-monospace,Menlo,monospace;
+  --card:#FCFAF4; --cardline:rgba(23,20,15,0.1); --cardshadow:0 22px 44px -30px rgba(23,20,15,0.35);
+}
 * { box-sizing:border-box; }
-body { margin:0; background:#EFE9DB; color:#17140F; font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; }
-a { color:#43684E; }
-.wrap { max-width:620px; margin:0 auto; padding:28px 20px 64px; }
+html, body { margin:0; }
+body { background:var(--cream); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+.card { background:var(--card); border:1px solid var(--cardline); border-radius:6px; box-shadow:var(--cardshadow); }
+[hidden] { display:none !important; }
 
-.top { display:flex; align-items:center; justify-content:space-between; gap:16px; padding-bottom:22px; }
-.top img { display:block; width:126px; height:auto; }
-.top span { font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.2em; text-transform:uppercase; color:#8A7F6E; }
+/* brand bar */
+.tr-bar { max-width:1180px; margin:0 auto; padding:26px 44px 0; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.tr-bar img { display:block; width:118px; height:auto; }
+.tr-bar a { font-family:var(--mono); font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); text-decoration:none; }
+.tr-bar a:hover { color:var(--ink); }
 
-.card { background:#FCFAF4; border:1px solid #E0D6C2; border-radius:8px; padding:26px 24px; }
-.card + .card { margin-top:14px; }
+/* hero */
+.tr-hero { position:relative; overflow:hidden; background:var(--cream); padding:44px 44px 0; }
+.tr-hero__in { position:relative; max-width:1180px; margin:0 auto; }
+.tr-kicker { display:flex; align-items:center; gap:12px; font-family:var(--mono); font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--green); margin-bottom:20px; }
+.tr-kicker span:first-child { width:22px; height:1px; background:var(--ink); }
+.tr-hero h1 { font-weight:700; letter-spacing:-0.045em; font-size:clamp(36px,5vw,68px); line-height:0.98; margin:0 0 16px; max-width:15em; }
+.tr-hero h1 em { font-style:normal; color:var(--green); }
+.tr-hero p { font-size:16.5px; line-height:1.65; color:var(--body); margin:0 0 46px; max-width:34em; }
+.tr-route { position:relative; height:196px; }
+.tr-route__ends { position:absolute; left:0; right:0; top:128px; display:flex; justify-content:space-between; font-family:var(--mono); font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); }
+.tr-road { position:absolute; left:0; right:0; top:112px; height:2px; background:rgba(23,20,15,0.5); }
+.tr-road--dash { top:106px; background:none; background-image:repeating-linear-gradient(to right, var(--ink) 0 26px, transparent 26px 52px); background-size:208px 2px; opacity:0.28; animation:trBelt 5s linear infinite; }
+.tr-mailbox { position:absolute; right:6px; bottom:74px; width:58px; height:60px; }
+.tr-mailbox i { position:absolute; display:block; }
+.tr-mailbox .post { left:25px; bottom:0; width:6px; height:34px; background:var(--ink); }
+.tr-mailbox .box { left:6px; top:0; width:46px; height:26px; border:1.5px solid var(--ink); border-radius:13px 13px 3px 3px; background:var(--cream); }
+.tr-mailbox .slot { left:6px; top:12px; width:12px; height:14px; background:var(--ink); border-radius:0 0 0 2px; }
+.tr-mailbox .flag { left:48px; top:4px; width:3px; height:22px; background:var(--red); transform-origin:bottom center; animation:trFlag 9s ease-in-out infinite; }
+.tr-drive { position:absolute; left:0; right:0; top:4px; height:108px; animation:trDrive 9s linear infinite; }
+.tr-drive > div { width:214px; animation:trJostle 0.6s ease-in-out infinite; }
+.tr-van { display:block; overflow:visible; }
+.tr-hub { transform-box:fill-box; transform-origin:center; animation:trWheel 0.75s linear infinite; }
 
-.ordname { font-family:'DM Sans',sans-serif; font-weight:700; font-size:26px; letter-spacing:-0.5px; margin:0; }
-.ordmeta { font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin:7px 0 0; }
+/* tracker band */
+.tr-pad { background:linear-gradient(180deg,#FCFAF4 0%,#FBF4E0 26%,#F5E0AA 58%,#EFC96A 84%,#E9B84E 100%); padding:56px 44px 96px; }
+.tr-pad__in { max-width:1180px; margin:0 auto; }
+.tr-error { display:flex; align-items:center; gap:12px; padding:14px 18px; margin-bottom:18px; border:1px solid oklch(0.55 0.17 30 / 0.45); background:oklch(0.55 0.17 30 / 0.07); border-radius:4px; font-family:var(--mono); font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:oklch(0.5 0.17 30); }
+.tr-lookup { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto; gap:10px; align-items:stretch; padding:26px; max-width:860px; }
+.tr-lookup label { display:block; }
+.tr-lab { display:block; font-family:var(--mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.tr-lookup input { width:100%; color:var(--ink); background:var(--paper); border:1px solid rgba(23,20,15,0.18); border-radius:3px; padding:14px; font-family:var(--sans); font-size:14px; }
+.tr-lookup input:focus { outline:none; border-color:var(--green); }
+.tr-lookup input[name="order"] { font-family:var(--mono); font-size:13px; letter-spacing:0.08em; }
+.tr-submit { align-self:flex-end; font-family:var(--mono); font-size:11px; letter-spacing:0.16em; text-transform:uppercase; font-weight:500; padding:15px 26px; border:none; border-radius:3px; background:var(--ink); color:#F5F0E6; cursor:pointer; white-space:nowrap; }
+.tr-submit:hover { background:#2A2418; }
+.tr-note { font-family:var(--mono); font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted-2); margin-top:14px; }
+.tr-wait-msg { padding:34px 26px; text-align:center; font-size:15px; color:var(--muted); }
 
-.headline { font-family:'DM Sans',sans-serif; font-weight:700; font-size:21px; letter-spacing:-0.3px; margin:22px 0 4px; }
-.sub { margin:0; color:#6A6055; font-size:14.5px; }
+/* order header */
+.tr-head { display:flex; justify-content:space-between; align-items:flex-end; gap:28px; padding-bottom:22px; border-bottom:1px solid rgba(23,20,15,0.14); margin-bottom:30px; }
+.tr-status { display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--green); margin-bottom:12px; }
+.tr-status span:first-child { width:7px; height:7px; border-radius:50%; background:var(--green); animation:trBlip 1.7s ease-in-out infinite; }
+.tr-head.is-stop .tr-status { color:var(--red); }
+.tr-head.is-stop .tr-status span:first-child { background:var(--red); animation:none; }
+.tr-head.is-stop .tr-eta em { color:var(--red); }
+.tr-eta { font-weight:700; letter-spacing:-0.05em; font-size:clamp(30px,3.4vw,46px); line-height:1; }
+.tr-eta em { font-style:normal; color:var(--green); white-space:nowrap; }
+.tr-window { font-family:var(--mono); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-top:10px; }
+.tr-meta { display:grid; grid-auto-flow:column; gap:32px; }
+.tr-meta__k { font-family:var(--mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted-2); margin-bottom:7px; }
+.tr-meta__v { font-family:var(--mono); font-size:14px; letter-spacing:0.06em; }
 
-/* status rail */
-.rail { list-style:none; margin:24px 0 0; padding:0; position:relative; }
-.rail::before { content:""; position:absolute; left:6px; top:9px; bottom:9px; width:1px; background:#E0D6C2; }
-.step { position:relative; padding:0 0 18px 30px; }
-.step:last-child { padding-bottom:0; }
-.dot { position:absolute; left:0; top:4px; width:13px; height:13px; border-radius:50%; background:#FCFAF4; border:1px solid #C4B79E; }
-.step.done .dot { background:#43684E; border-color:#43684E; }
-.step.now .dot { background:#F0C64B; border-color:#B8871A; box-shadow:0 0 0 4px rgba(240,198,75,0.24); }
-.step b { display:block; font-weight:700; font-size:15px; }
-.step small { display:block; font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; margin-top:3px; }
-.step.pending b { color:#A79C8A; font-weight:400; }
+.tr-split { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(300px,0.55fr); gap:28px; align-items:start; }
+.tr-main { display:grid; gap:22px; }
 
-.trackbox { margin-top:22px; padding:16px 18px; background:#17140F; border-radius:6px; }
-.trackbox .lab { font-family:'DM Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:#8A7F6E; }
-.trackbox .num { font-family:'DM Mono',ui-monospace,monospace; font-size:17px; letter-spacing:0.06em; color:#F0C64B; margin-top:6px; word-break:break-all; }
-.trackbox a { display:inline-block; margin-top:12px; font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#F5F0E6; text-decoration:underline; }
+/* rail */
+.tr-rail-card { position:relative; padding:30px 30px 26px; }
+.tr-ship-k { font-family:var(--mono); font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted-2); margin-bottom:22px; }
+.tr-track { position:relative; height:2px; margin:8px 0 0; background:rgba(23,20,15,0.14); }
+.tr-track__fill { position:absolute; left:0; top:0; height:2px; background:var(--ink); transition:width 0.6s cubic-bezier(0.2,0.7,0.2,1); }
+.tr-track__rest { position:absolute; top:0; right:0; height:2px; background-image:repeating-linear-gradient(to right, rgba(23,20,15,0.3) 0 6px, transparent 6px 12px); background-size:120px 2px; animation:trDash 3s linear infinite; }
+.tr-nodes { display:grid; margin-top:-9px; }
+.tr-node { background:transparent; border:none; padding:0 6px; cursor:pointer; text-align:center; font-family:var(--sans); }
+.tr-node__dot { display:grid; place-items:center; justify-self:center; position:relative; width:20px; height:20px; border-radius:50%; background:var(--paper); border:1.5px solid rgba(23,20,15,0.25); color:var(--ink); font-family:var(--mono); font-size:8.5px; letter-spacing:0; transition:background 0.35s ease, border-color 0.35s ease; }
+.tr-node.is-done .tr-node__dot { background:var(--ink); border-color:var(--ink); color:var(--cream); }
+.tr-node.is-current .tr-node__dot { background:var(--yellow); border-color:var(--ink); }
+.tr-node.is-stop .tr-node__dot { background:var(--red); border-color:var(--red); color:#FFF; }
+.tr-node__pulse { position:absolute; inset:-1.5px; border-radius:50%; border:1.5px solid var(--ink); display:none; animation:trPulse 2.2s ease-out infinite; }
+.tr-node.is-current .tr-node__pulse { display:block; }
+.tr-node__label { display:block; margin-top:14px; font-family:var(--mono); font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted-2); line-height:1.5; transition:color 0.35s ease; }
+.tr-node.is-done .tr-node__label, .tr-node.is-current .tr-node__label { color:var(--ink); }
+.tr-node.is-sel .tr-node__label { color:var(--green); }
+.tr-node__stamp { display:block; margin-top:6px; font-family:var(--mono); font-size:9px; letter-spacing:0.1em; color:var(--muted-2); }
+.tr-detail { margin-top:26px; padding:22px 24px; border:1px solid var(--cardline); border-radius:4px; background:var(--paper); animation:trIn 0.35s cubic-bezier(0.2,0.7,0.2,1) both; }
+.tr-detail__head { display:flex; justify-content:space-between; align-items:baseline; gap:14px; font-family:var(--mono); font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--green); margin-bottom:12px; }
+.tr-detail__head span:first-child { white-space:nowrap; }
+.tr-detail__head span:last-child { color:var(--muted); text-align:right; }
+.tr-detail h3 { font-weight:700; letter-spacing:-0.042em; font-size:24px; line-height:1.1; margin:0 0 10px; }
+.tr-detail p { font-size:15px; line-height:1.65; color:var(--body); margin:0 0 16px; max-width:40em; text-wrap:pretty; }
+.tr-detail a { font-family:var(--mono); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; text-decoration:none; color:var(--green); border-bottom:1px solid oklch(0.44 0.07 152 / 0.4); }
 
-.lab { font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; }
-.items { margin-top:12px; }
-.it { display:flex; gap:14px; align-items:center; padding:11px 0; border-top:1px solid #EDE6D8; }
-.it:first-child { border-top:0; }
-.itimg { width:46px; height:46px; flex:none; border-radius:4px; object-fit:cover; background:#EFE9DB; }
-.ittitle { font-weight:700; font-size:14.5px; }
-.itsub { font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; color:#8A7F6E; margin-top:3px; }
-.qty { margin-left:auto; font-family:'DM Mono',ui-monospace,monospace; font-size:13px; color:#6A6055; }
-.shipto { margin-top:8px; font-size:14.5px; color:#4A4237; }
+/* tracking number */
+.tr-num { margin-top:22px; padding:16px 18px; background:var(--ink); border-radius:6px; }
+.tr-num__k { font-family:var(--mono); font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:#8A7F6E; }
+.tr-num__v { font-family:var(--mono); font-size:17px; letter-spacing:0.06em; color:var(--yellow); margin-top:6px; word-break:break-all; }
+.tr-num a { display:inline-block; margin-top:12px; font-family:var(--mono); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#F5F0E6; text-decoration:none; border-bottom:1px solid var(--yellow); }
+.tr-num__none { font-family:var(--sans); font-size:14px; color:#B9AF9C; margin-top:6px; }
 
-.help { margin-top:20px; text-align:center; font-size:13.5px; color:#6A6055; }
-.foot { margin-top:26px; text-align:center; font-family:'DM Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:#A79C8A; line-height:2.1; }
-.msg { text-align:center; padding:40px 20px; color:#6A6055; }
-.form { margin-top:18px; }
-.form label { display:block; font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; margin:14px 0 6px; }
-.form input { width:100%; font-family:'DM Sans',sans-serif; font-size:15px; color:#17140F; background:#FCFAF4; border:1px solid #DDD3C0; border-radius:4px; padding:12px 13px; }
-.form input:focus { outline:none; border-color:#43684E; }
-.form button { width:100%; margin-top:16px; font-family:'DM Mono',ui-monospace,monospace; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; padding:14px; border:none; border-radius:999px; background:#17140F; color:#F0C64B; cursor:pointer; }
-.form button:hover { background:#2A2418; }
-.formerr { margin-top:12px; font-size:13.5px; color:#8C4630; }
-.msg b { display:block; font-size:18px; color:#17140F; margin-bottom:8px; }
+/* scans */
+.tr-scans { padding:26px 28px 24px; }
+.tr-scans__head { display:flex; justify-content:space-between; align-items:baseline; gap:14px; margin-bottom:20px; font-family:var(--mono); font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); }
+.tr-scans__head span:last-child { letter-spacing:0.1em; color:var(--muted-2); text-transform:none; }
+.tr-scan { display:grid; grid-template-columns:120px 1fr auto; gap:16px; align-items:baseline; padding:13px 0; border-top:1px solid rgba(23,20,15,0.09); }
+.tr-scan span:first-child { font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+.tr-scan span:nth-child(2) { font-size:14.5px; line-height:1.45; color:var(--body); }
+.tr-scan:first-child span:nth-child(2) { color:var(--ink); }
+.tr-scan span:last-child { font-family:var(--mono); font-size:10px; letter-spacing:0.1em; color:var(--muted-2); white-space:nowrap; }
+
+/* sidebar */
+.tr-side { display:grid; gap:18px; }
+.tr-side__k { font-family:var(--mono); font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:18px; }
+.tr-box { padding:24px 24px 26px; }
+.tr-box__item { display:flex; gap:14px; align-items:center; padding:11px 0; border-top:1px solid rgba(23,20,15,0.09); }
+.tr-box__item:first-of-type { border-top:0; padding-top:0; }
+.tr-box__thumb { width:62px; height:62px; flex:0 0 auto; border-radius:4px; overflow:hidden; background:#F1EADA; }
+.tr-box__thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.tr-box__name { font-weight:700; letter-spacing:-0.03em; font-size:16px; line-height:1.2; }
+.tr-box__qty { font-family:var(--mono); font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+.tr-row { display:flex; justify-content:space-between; gap:12px; font-family:var(--mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); padding:11px 0; border-top:1px solid rgba(23,20,15,0.1); }
+.tr-row > span:first-child { white-space:nowrap; }
+.tr-row b { font-weight:400; color:var(--ink); text-align:right; }
+.tr-wait { padding:26px 24px; border-radius:6px; background:var(--ink); color:#F5F0E6; box-shadow:0 24px 48px -30px rgba(23,20,15,0.6); }
+.tr-wait__k { font-family:var(--mono); font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--yellow); margin-bottom:12px; }
+.tr-wait p { font-size:15px; line-height:1.6; color:#B9AF9C; margin:0 0 16px; }
+.tr-wait a { font-family:var(--mono); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; text-decoration:none; color:#F5F0E6; border-bottom:1px solid var(--yellow); }
+.tr-help { font-family:var(--mono); font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); line-height:1.9; }
+.tr-help a, .tr-help button { color:var(--green); text-decoration:none; border:none; border-bottom:1px solid oklch(0.44 0.07 152 / 0.4); background:none; padding:0; cursor:pointer; font:inherit; letter-spacing:inherit; text-transform:inherit; }
+
+/* foot */
+.tr-foot { padding:30px 44px 40px; text-align:center; font-family:var(--mono); font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted-2); line-height:2.1; }
+.tr-foot a { color:var(--muted); text-decoration:none; }
+
+@keyframes trDrive { 0% { transform:translateX(-24%); } 84%, 100% { transform:translateX(calc(100% - 268px)); } }
+@keyframes trJostle { 0%, 100% { transform:translateY(0); } 50% { transform:translateY(-2px); } }
+@keyframes trWheel { to { transform:rotate(360deg); } }
+@keyframes trFlag { 0%, 80% { transform:rotate(0deg); } 88%, 100% { transform:rotate(-92deg); } }
+@keyframes trBelt { to { background-position:208px 0; } }
+@keyframes trDash { to { background-position:120px 0; } }
+@keyframes trPulse { 0%, 100% { transform:scale(1); opacity:0.55; } 50% { transform:scale(2.1); opacity:0; } }
+@keyframes trBlip { 0%, 100% { opacity:1; } 50% { opacity:0.25; } }
+@keyframes trIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+@media (max-width:900px) {
+  .tr-bar { padding:20px 20px 0; }
+  .tr-hero { padding:28px 20px 0; }
+  .tr-pad { padding:34px 20px 64px; }
+  .tr-route { height:168px; }
+  .tr-split { grid-template-columns:1fr; gap:22px; }
+  .tr-head { flex-direction:column; align-items:flex-start; gap:18px; }
+  .tr-nodes { grid-template-columns:1fr !important; }
+  .tr-node { display:grid; grid-template-columns:34px 1fr; gap:14px; align-items:start; padding:14px 0; text-align:left; }
+  .tr-track { display:none; }
+  .tr-lookup { grid-template-columns:1fr; }
+  .tr-meta { grid-template-columns:1fr 1fr; grid-auto-flow:row; }
+  .tr-scan { grid-template-columns:1fr; gap:4px; }
+  .tr-foot { padding:24px 20px 34px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .tr-drive, .tr-drive > div, .tr-hub, .tr-mailbox .flag, .tr-road--dash, .tr-track__rest, .tr-node__pulse, .tr-status span:first-child, .tr-detail { animation:none; }
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <img src="/assets/email-logo-light.png" alt="Happy Beanie">
-    <span>Order tracking</span>
-  </div>
-  <div id="out"><div class="card"><div class="msg">Looking up your order…</div></div></div>
-  <p class="foot">Made in one facility · Scottsdale, AZ<br><a href="/">happybeanie.com</a> · hello@happybeanie.com</p>
+
+<div class="tr-bar">
+  <a href="/"><img src="/assets/email-logo-light.png" alt="Happy Beanie"></a>
+  <a href="/">← happybeanie.com</a>
 </div>
+
+<section class="tr-hero">
+  <div class="tr-hero__in">
+    <div class="tr-kicker"><span></span><span>Order tracking</span></div>
+    <h1>From the lab&nbsp;<em>to your door.</em></h1>
+    <p>Every Happy Beanie box is made and shipped from one facility in Scottsdale. Here&rsquo;s where yours is.</p>
+
+    <div class="tr-route">
+      <div class="tr-route__ends"><span>Scottsdale, AZ</span><span>Your mailbox</span></div>
+      <div class="tr-road" aria-hidden="true"></div>
+      <div class="tr-road tr-road--dash" aria-hidden="true"></div>
+      <div class="tr-mailbox" aria-hidden="true">
+        <i class="post"></i><i class="box"></i><i class="slot"></i><i class="flag"></i>
+      </div>
+      <div class="tr-drive" aria-hidden="true">
+        <div>
+        <svg class="tr-van" viewBox="0 0 1240 700" width="214" aria-hidden="true">
+          <ellipse cx="620" cy="668" rx="530" ry="12" fill="#0E0E10" opacity="0.1"></ellipse>
+          <path d="M 70 556 L 96 100 L 586 100 L 586 118 L 800 118 L 886 284 L 1062 320 L 1120 416 L 1130 556 Z" fill="#FDFDFE" stroke="#C8CDD3" stroke-width="3" stroke-linejoin="round"></path>
+          <path d="M 586 100 L 586 118 L 800 118 L 800 124 L 578 124 L 578 100 Z" fill="#EEF1F4"></path>
+          <path d="M 152 418 L 574 418 L 574 556 L 152 556 Z" fill="#F0F3F6"></path>
+          <path d="M 594 404 L 806 404 L 818 556 L 594 556 Z" fill="#F4F6F8"></path>
+          <path d="M 888 292 L 1060 328 L 1116 420 L 1126 556 L 900 556 L 888 400 Z" fill="#F8FAFB"></path>
+          <path d="M 890 290 L 1060 326 L 1118 418" fill="none" stroke="#E1E6EA" stroke-width="4"></path>
+          <path d="M 894 448 L 1050 452 L 1058 556 L 894 556 Z" fill="#F2F5F7"></path>
+          <rect x="162" y="128" width="404" height="14" fill="#3E4247"></rect>
+          <rect x="204" y="162" width="32" height="66" fill="#E6EAEE"></rect>
+          <rect x="144" y="100" width="6" height="456" fill="#DFE4E8"></rect>
+          <rect x="578" y="124" width="6" height="432" fill="#DFE4E8"></rect>
+          <rect x="194" y="452" width="46" height="34" rx="4" fill="#EBEEF2"></rect>
+          <path d="M 264 178 L 524 164 L 524 332 L 264 344 Z" fill="#1B3E6F"></path>
+          <path d="M 286 194 L 502 250 L 502 262 L 286 216 Z" fill="#FFFFFF"></path>
+          <path d="M 286 292 L 502 240 L 502 254 L 286 314 Z" fill="#FFFFFF"></path>
+          <path d="M 470 224 L 502 246 L 470 268 Z" fill="#FFFFFF"></path>
+          <path d="M 148 392 L 1058 378 L 1058 395 L 148 409 Z" fill="#E01B22"></path>
+          <path d="M 148 411 L 1058 397 L 1058 414 L 148 428 Z" fill="#1D3F72"></path>
+          <rect x="168" y="360" width="62" height="30" fill="#2B2B2D"></rect>
+          <rect x="174" y="366" width="50" height="18" fill="#E01B22"></rect>
+          <rect x="1000" y="462" width="52" height="26" fill="#2B2B2D"></rect>
+          <rect x="1006" y="467" width="40" height="16" fill="#F0A21E"></rect>
+          <rect x="600" y="176" width="184" height="202" rx="16" fill="#3A3E45"></rect>
+          <path d="M 704 176 L 746 176 L 664 378 L 622 378 Z" fill="#4B5058"></path>
+          <rect x="790" y="196" width="20" height="86" fill="#DDE2E7"></rect>
+          <path d="M 796 124 L 806 124 L 824 288 L 814 288 Z" fill="#EBEFF2"></path>
+          <rect x="70" y="526" width="96" height="36" fill="#2B2B2D"></rect>
+          <path d="M 1024 524 L 1130 538 L 1140 562 L 1024 562 Z" fill="#2B2B2D"></path>
+          <path d="M 240 556 a 95 95 0 0 1 190 0 z" fill="#1E1E20"></path>
+          <path d="M 850 556 a 95 95 0 0 1 190 0 z" fill="#1E1E20"></path>
+          <g transform="translate(335 576)">
+            <circle r="80" fill="#1E1E20"></circle>
+            <g class="tr-hub">
+              <circle r="47.2" fill="#2E3033"></circle><circle r="28" fill="#3C3E42"></circle>
+              <path d="M 0 -40 L 0 -16" stroke="#5C6066" stroke-width="5.6"></path>
+              <path d="M 0 40 L 0 16" stroke="#5C6066" stroke-width="5.6"></path>
+              <path d="M -40 0 L -16 0" stroke="#5C6066" stroke-width="5.6"></path>
+              <path d="M 40 0 L 16 0" stroke="#5C6066" stroke-width="5.6"></path>
+            </g>
+          </g>
+          <g transform="translate(945 576)">
+            <circle r="80" fill="#1E1E20"></circle>
+            <g class="tr-hub">
+              <circle r="47.2" fill="#2E3033"></circle><circle r="28" fill="#3C3E42"></circle>
+              <path d="M 0 -40 L 0 -16" stroke="#5C6066" stroke-width="5.6"></path>
+              <path d="M 0 40 L 0 16" stroke="#5C6066" stroke-width="5.6"></path>
+              <path d="M -40 0 L -16 0" stroke="#5C6066" stroke-width="5.6"></path>
+              <path d="M 40 0 L 16 0" stroke="#5C6066" stroke-width="5.6"></path>
+            </g>
+          </g>
+        </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tr-pad">
+  <div class="tr-pad__in" data-tr>
+    <div class="tr-error" data-error hidden><span></span></div>
+    <div data-slot></div>
+  </div>
+</section>
+
+<p class="tr-foot">Made in one facility · Scottsdale, AZ<br><a href="/">happybeanie.com</a> · <a href="mailto:hello@happybeanie.com">hello@happybeanie.com</a></p>
 
 <script>
 (function () {
-  var out = document.getElementById('out');
+  var root = document.querySelector('[data-tr]');
+  var slot = root.querySelector('[data-slot]');
+  var errEl = root.querySelector('[data-error]');
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
       return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c];
@@ -90,148 +289,314 @@ a { color:#43684E; }
   }
   function fmt(iso) {
     if (!iso) return '';
-    try {
-      return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-    } catch (e) { return ''; }
+    var d = new Date(iso);
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
   }
-  function card(inner) { return '<div class="card">' + inner + '</div>'; }
-  function message(title, body) {
-    out.innerHTML = card('<div class="msg"><b>' + esc(title) + '</b>' + esc(body) + '</div>');
+  function fmtDay(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
   }
+  function fmtStamp(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ' · ' +
+      d.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+  }
+  function fail(msg) { errEl.hidden = false; errEl.firstElementChild.textContent = msg; }
+  function clearFail() { errEl.hidden = true; }
 
-  var p = new URLSearchParams(location.search);
-  var o = p.get('o'), k = p.get('k'), e = p.get('e');
-  if (!o || (!k && !e)) {
-    lookupForm(o || '');
-    return;
-  }
-  load(o, k, e);
+  // ---- lookup form ------------------------------------------------------
+  function lookupForm(orderNo, email) {
+    slot.innerHTML =
+      '<form class="tr-lookup card" data-form novalidate>' +
+        '<label><span class="tr-lab">Order number</span>' +
+          '<input name="order" inputmode="numeric" autocomplete="off" placeholder="1004" value="' + esc(orderNo || '') + '" required></label>' +
+        '<label><span class="tr-lab">Email on the order</span>' +
+          '<input name="email" type="email" autocomplete="email" placeholder="you@email.com" value="' + esc(email || '') + '" required></label>' +
+        '<button class="tr-submit" type="submit">Track it →</button>' +
+      '</form>' +
+      '<div class="tr-note">Your order number is on your confirmation email — it looks like #1004.</div>';
 
-  // With nothing in the link to go on, ask. This is also what someone sees
-  // who comes to /track straight from the site.
-  function lookupForm(orderNo, err) {
-    out.innerHTML = card(
-      '<h1 class="headline" style="margin-top:0;">Find your order</h1>' +
-      '<p class="sub">Your order number is in your confirmation email — it looks like #1004.</p>' +
-      '<div class="form">' +
-        '<label for="fo">Order number</label>' +
-        '<input id="fo" inputmode="numeric" autocomplete="off" placeholder="1004" value="' + esc(orderNo) + '">' +
-        '<label for="fe">Email on the order</label>' +
-        '<input id="fe" type="email" autocomplete="email" placeholder="you@example.com">' +
-        '<button id="fgo">Show my order</button>' +
-        (err ? '<div class="formerr">' + esc(err) + '</div>' : '') +
-      '</div>');
-    var fo = document.getElementById('fo'), fe = document.getElementById('fe');
-    function submit() {
-      var n = fo.value.replace(/[^0-9]/g, ''), addr = fe.value.trim();
-      if (!n || !addr) { lookupForm(fo.value, 'Both the order number and the email are needed.'); return; }
-      out.innerHTML = card('<div class="msg">Looking up your order…</div>');
+    var form = slot.querySelector('[data-form]');
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var n = form.order.value.replace(/[^0-9]/g, '');
+      var addr = form.email.value.trim();
+      if (!n || !addr) { fail('Both the order number and the email are needed.'); return; }
+      clearFail();
+      waiting();
       load(n, null, addr, true);
-    }
-    document.getElementById('fgo').onclick = submit;
-    [fo, fe].forEach(function (el) {
-      el.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') submit(); });
     });
-    (orderNo ? fe : fo).focus();
+    form.addEventListener('input', clearFail);
+    (orderNo ? form.email : form.order).focus();
   }
 
+  function waiting() { slot.innerHTML = '<div class="card tr-wait-msg">Looking up your order…</div>'; }
+  function message(title, body) {
+    slot.innerHTML = '<div class="card tr-wait-msg"><b style="display:block; font-size:19px; color:var(--ink); margin-bottom:8px;">' +
+      esc(title) + '</b>' + esc(body) + '</div>';
+  }
+
+  // ---- fetch ------------------------------------------------------------
   function load(o, k, e, fromForm) {
-  fetch('/api/track?o=' + encodeURIComponent(o) +
-        (k ? '&k=' + encodeURIComponent(k) : '') +
-        (e ? '&e=' + encodeURIComponent(e) : ''))
-    .then(function (r) { return r.json().catch(function () { return { ok:false }; }); })
-    .then(function (b) {
-      if (!b.ok) {
-        if (b.error === 'not_configured') {
-          message('Tracking is not switched on yet', 'Reply to your order email and we will send the update by hand.');
-        } else if (fromForm) {
-          lookupForm(o, 'No order matches that number and email. Check both against your confirmation email.');
-        } else {
-          message('We cannot find that order',
-            'The link may have expired or been mistyped. Reply to your order email and we will look it up.');
+    fetch('/api/track?o=' + encodeURIComponent(o) +
+          (k ? '&k=' + encodeURIComponent(k) : '') +
+          (e ? '&e=' + encodeURIComponent(e) : ''))
+      .then(function (r) { return r.json().catch(function () { return { ok:false }; }); })
+      .then(function (b) {
+        if (!b.ok) {
+          if (b.error === 'not_configured') {
+            message('Tracking is not switched on yet', 'Reply to your order email and we will send the update by hand.');
+          } else if (fromForm) {
+            lookupForm(o, e);
+            fail('No order matches that number and email. Check both against your confirmation email.');
+          } else {
+            lookupForm(o, e);
+            fail('That link did not open an order. Check the number and the email on your confirmation.');
+          }
+          return;
         }
-        return;
-      }
-      render(b.order);
-    })
-    .catch(function () {
-      message('That did not load', 'Check your connection and try again — nothing is wrong with your order.');
-    });
+        clearFail();
+        render(b.order);
+      })
+      .catch(function () {
+        message('That did not load', 'Check your connection and try again — nothing is wrong with your order.');
+      });
   }
 
+  // ---- the trip, as four stages ----------------------------------------
+  // Every stamp and every status word below comes from the order itself. When
+  // we do not know something — an arrival date the carrier has not given, a
+  // tracking number that was never bought — the page says so rather than
+  // filling the space.
+  function stagesFor(ord, ship) {
+    var delivered = !!(ship && ship.delivered);
+    var carrier = (ship && ship.tracking && ship.tracking.company) || 'the carrier';
+    var hasScans = !!(ship && ship.scans && ship.scans.length);
+
+    // ship.status already carries the carrier's own word — "Label printed"
+    // when the box has not moved yet, "In transit" once it has — so the rail
+    // never has to guess which of those it is. The body has to make the same
+    // distinction in prose: a printed label is not a handover.
+    var body;
+    if (!ship) {
+      body = 'Not yet. We’ll email you the moment your box leaves Scottsdale.';
+    } else if (!ship.tracking) {
+      body = 'This one shipped without a tracking number, so there are no carrier scans to follow. It is on its way.';
+    } else if (!ship.moving) {
+      body = 'The label is bought and ' + carrier + ' has not scanned a pickup yet. This page updates the moment they do.';
+    } else {
+      body = 'Handed to ' + carrier + '.' + (hasScans
+        ? ' This page follows the carrier’s own scans — the full history is below.'
+        : ' This page updates as the carrier scans it.');
+    }
+    var transit = {
+      label: ship ? (ship.status || 'On its way') : 'On its way',
+      stamp: ship ? fmt(ship.shippedAt) : '',
+      title: ship ? (ship.status || 'On its way') : 'On its way',
+      body: body
+    };
+
+    return [
+      { label:'Order placed', stamp: fmt(ord.placedAt), title:'Order placed',
+        body:'Payment cleared and your order joined the queue in Scottsdale. One facility, nothing outsourced — your box is made and shipped from the same building.' },
+      { label:'Made in Scottsdale', stamp: ship ? fmt(ship.shippedAt) : 'In progress',
+        title: ship ? 'Made and packed' : 'Being made now',
+        body: ship
+          ? 'Made and packed at our own facility in Scottsdale — never pulled off someone else’s shelf and relabelled. Certificates are posted by lot.'
+          : 'Your box is in the queue at our Scottsdale facility. Certificates are posted by lot, and stay online.',
+        link:'Certificates by lot', href:'/certs' },
+      transit,
+      { label:'Delivered',
+        stamp: delivered ? (fmt(ship.deliveredAt) || 'Delivered')
+          : (ship && ship.estimatedDelivery ? 'Est. ' + fmt(ship.estimatedDelivery) : ''),
+        title:'Delivered',
+        body: delivered
+          ? ('The carrier marked it delivered' + (ship.deliveredAt ? ' on ' + fmt(ship.deliveredAt) : '') +
+             '. One chew a day is the whole routine — no loading dose, no schedule to keep.')
+          : 'We’ll email you when the carrier marks it delivered.',
+        link: delivered ? 'Open the dosing guide' : '', href:'/dosing' }
+    ];
+  }
+
+  function currentStep(ord, ship) {
+    if (!ship) return 1;
+    if (ship.delivered) return 3;
+    return 2;
+  }
+
+  function railCard(ord, ship, idx, count) {
+    var stages = stagesFor(ord, ship);
+    var cur = ord.cancelled ? 1 : currentStep(ord, ship);
+    if (ord.cancelled) {
+      stages = [
+        stages[0],
+        { label:'Cancelled', stamp:'', title:'This order was cancelled', stop:true,
+          body:'Nothing shipped and nothing was charged for it. If that is a surprise, reply to your order email and we will sort it out.' }
+      ];
+    }
+
+    var pct = ((cur + 0.5) / stages.length) * 100;
+    var nodes = stages.map(function (s, i) {
+      var cls = 'tr-node' + (i < cur ? ' is-done' : i === cur ? (s.stop ? ' is-stop' : ' is-current') : '');
+      return '<button type="button" class="' + cls + '" data-i="' + i + '">' +
+        '<span class="tr-node__dot"><span class="tr-node__pulse" aria-hidden="true"></span>' +
+        '<span>' + (i < cur ? '✓' : i === cur ? (s.stop ? '✕' : '') : (i + 1)) + '</span></span>' +
+        '<span><span class="tr-node__label">' + esc(s.label) + '</span>' +
+        (s.stamp ? '<span class="tr-node__stamp">' + esc(s.stamp) + '</span>' : '') + '</span></button>';
+    }).join('');
+
+    var num = '';
+    if (ship && ship.tracking) {
+      num = '<div class="tr-num"><div class="tr-num__k">' + esc(ship.tracking.company || 'Tracking number') + '</div>' +
+        '<div class="tr-num__v">' + esc(ship.tracking.number) + '</div>' +
+        (ship.tracking.url ? '<a href="' + esc(ship.tracking.url) + '" target="_blank" rel="noopener">See the carrier’s page →</a>' : '') +
+        '</div>';
+    } else if (ship) {
+      num = '<div class="tr-num"><div class="tr-num__k">Tracking</div>' +
+        '<div class="tr-num__none">This one shipped without a tracking number.</div></div>';
+    }
+
+    var el = document.createElement('div');
+    el.className = 'tr-rail-card card';
+    el.innerHTML =
+      (count > 1 ? '<div class="tr-ship-k">Shipment ' + (idx + 1) + ' of ' + count + '</div>' : '') +
+      '<div class="tr-track"><div class="tr-track__fill" style="width:' + pct + '%"></div>' +
+      '<div class="tr-track__rest" style="left:' + pct + '%"></div></div>' +
+      '<div class="tr-nodes" style="grid-template-columns:repeat(' + stages.length + ',minmax(0,1fr))">' + nodes + '</div>' +
+      '<div class="tr-detail" data-detail></div>' + num;
+
+    var detail = el.querySelector('[data-detail]');
+    var nodeEls = el.querySelectorAll('.tr-node');
+    function show(i) {
+      var s = stages[i];
+      detail.innerHTML =
+        '<div class="tr-detail__head"><span>Step 0' + (i + 1) + ' / 0' + stages.length + '</span>' +
+        '<span>' + esc(s.stamp || '') + '</span></div>' +
+        '<h3>' + esc(s.title) + '</h3><p>' + esc(s.body) + '</p>' +
+        (s.link ? '<a href="' + esc(s.href) + '">' + esc(s.link) + ' →</a>' : '');
+      [].forEach.call(nodeEls, function (n, j) { n.classList.toggle('is-sel', j === i); });
+      detail.style.animation = 'none'; void detail.offsetWidth; detail.style.animation = '';
+    }
+    [].forEach.call(nodeEls, function (n) {
+      n.addEventListener('click', function () { show(+n.dataset.i); });
+    });
+    show(cur);
+    return el;
+  }
+
+  function scansCard(ship) {
+    if (!ship || !ship.scans || !ship.scans.length) return null;
+    var el = document.createElement('div');
+    el.className = 'tr-scans card';
+    el.innerHTML = '<div class="tr-scans__head"><span>Scan history</span><span>' +
+      esc((ship.tracking && ship.tracking.number) || '') + '</span></div>' +
+      ship.scans.map(function (s) {
+        return '<div class="tr-scan"><span>' + esc(fmtStamp(s.at)) + '</span>' +
+          '<span>' + esc(s.what) + '</span><span>' + esc(s.where) + '</span></div>';
+      }).join('');
+    return el;
+  }
+
+  // ---- render -----------------------------------------------------------
   function render(ord) {
-    var ship = (ord.shipments || [])[0] || null;
+    var ships = ord.shipments || [];
+    var ship = ships[0] || null;
     var delivered = !!(ship && ship.delivered);
 
-    // The rail states the trip: ordered, shipped, arrived. The middle step
-    // carries the carrier's own words when the carrier has given us any.
-    var steps = [
-      { label: 'Order placed', when: fmt(ord.placedAt), state: 'done' }
-    ];
+    var statusLine = ord.cancelled ? 'Cancelled'
+      : delivered ? 'Delivered'
+      : ship ? (ship.status || 'On its way')
+      : 'Being made';
+
+    var eta, window_;
     if (ord.cancelled) {
-      steps.push({ label: 'Cancelled', when: '', state: 'now' });
+      eta = 'This order was <em>cancelled.</em>';
+      window_ = 'Nothing shipped and nothing was charged for it';
+    } else if (delivered) {
+      eta = 'It <em>arrived.</em>';
+      window_ = ship.deliveredAt ? 'Delivered ' + fmt(ship.deliveredAt) : '';
+    } else if (ship && ship.estimatedDelivery) {
+      eta = 'Arriving <em>' + esc(fmtDay(ship.estimatedDelivery)) + '</em>';
+      window_ = (ship.tracking && ship.tracking.company) ? ship.tracking.company + ' · estimate from the carrier' : 'Estimate from the carrier';
     } else if (ship) {
-      steps.push({ label: 'Left Scottsdale', when: fmt(ship.shippedAt), state: 'done' });
-      if (delivered) {
-        steps.push({ label: 'Delivered', when: ship.status, state: 'now' });
-      } else {
-        steps.push({ label: ship.status || 'On its way', when: ship.estimatedDelivery ? 'Est. ' + fmt(ship.estimatedDelivery) : '', state: 'now' });
-        steps.push({ label: 'Delivered', when: '', state: 'pending' });
-      }
+      eta = 'It’s <em>on the way.</em>';
+      window_ = 'The carrier has not given an arrival date yet';
     } else {
-      steps.push({ label: 'Being made', when: 'In our facility now', state: 'now' });
-      steps.push({ label: 'On its way', when: '', state: 'pending' });
-      steps.push({ label: 'Delivered', when: '', state: 'pending' });
+      eta = 'We’re <em>making it now.</em>';
+      window_ = 'We’ll email you the moment it ships';
     }
 
-    var headline = ord.cancelled ? 'This order was cancelled.'
-      : delivered ? 'It arrived.'
-      : ship ? 'It’s on its way.'
-      : 'We’re making it now.';
-    var sub = ord.cancelled ? 'Nothing shipped and nothing was charged for it.'
-      : delivered ? 'One chew a day — that’s the whole routine.'
-      : ship ? 'Made in our own Scottsdale facility and handed to the carrier.'
-      : 'Your box is in the queue. We’ll email the moment it ships.';
+    var meta = '<div><div class="tr-meta__k">Order</div><div class="tr-meta__v">' + esc(ord.name) + '</div></div>' +
+      '<div><div class="tr-meta__k">Placed</div><div class="tr-meta__v">' + esc(fmt(ord.placedAt)) + '</div></div>' +
+      (ship && ship.tracking && ship.tracking.company
+        ? '<div><div class="tr-meta__k">Carrier</div><div class="tr-meta__v">' + esc(ship.tracking.company) + '</div></div>'
+        : '');
 
-    var railHtml = steps.map(function (s) {
-      return '<li class="step ' + s.state + '"><span class="dot"></span>' +
-        '<b>' + esc(s.label) + '</b>' +
-        (s.when ? '<small>' + esc(s.when) + '</small>' : '') + '</li>';
+    var items = (ord.items || []).map(function (it) {
+      return '<div class="tr-box__item">' +
+        '<div class="tr-box__thumb">' + (it.image ? '<img src="' + esc(it.image) + '" alt="">' : '') + '</div>' +
+        '<div><div class="tr-box__name">' + esc(it.title) + '</div>' +
+        '<div class="tr-box__qty">' + (it.variant ? esc(it.variant) + ' · ' : '') + '× ' + esc(it.qty) + '</div></div></div>';
     }).join('');
 
-    var trackHtml = '';
-    if (ship && ship.tracking) {
-      trackHtml = '<div class="trackbox">' +
-        '<div class="lab">' + esc(ship.tracking.company || 'Tracking number') + '</div>' +
-        '<div class="num">' + esc(ship.tracking.number) + '</div>' +
-        (ship.tracking.url ? '<a href="' + esc(ship.tracking.url) + '" target="_blank" rel="noopener">See the carrier’s scans →</a>' : '') +
-        '</div>';
-    } else if (ship) {
-      trackHtml = '<div class="trackbox">' +
-        '<div class="lab">Tracking</div>' +
-        '<div class="num" style="font-size:14px; color:#DED5C4;">This one shipped without a tracking number.</div>' +
-        '</div>';
+    slot.innerHTML =
+      '<div class="tr-head' + (ord.cancelled ? ' is-stop' : '') + '">' +
+        '<div>' +
+          '<div class="tr-status"><span></span><span>' + esc(statusLine) + '</span></div>' +
+          '<div class="tr-eta">' + eta + '</div>' +
+          (window_ ? '<div class="tr-window">' + esc(window_) + '</div>' : '') +
+        '</div>' +
+        '<div class="tr-meta">' + meta + '</div>' +
+      '</div>' +
+      '<div class="tr-split"><div class="tr-main" data-main></div>' +
+      '<div class="tr-side">' +
+        '<div class="tr-box card"><div class="tr-side__k">In this box</div>' + items +
+          (ord.shipTo ? '<div class="tr-row"><span>Ship to</span><b>' + esc(ord.shipTo) + '</b></div>' : '') +
+        '</div>' +
+        (delivered || ord.cancelled ? '' :
+          '<div class="tr-wait"><div class="tr-wait__k">While you wait</div>' +
+          '<p>Set the dose before day one so the first chew counts.</p>' +
+          '<a href="/dosing">Open the dosing guide →</a></div>') +
+        '<div class="tr-help">Something wrong with this box?<br>' +
+          '<a href="mailto:hello@happybeanie.com">Tell us and we’ll fix it</a> · ' +
+          '<button type="button" data-reset>Track another order</button></div>' +
+      '</div></div>';
+
+    var main = slot.querySelector('[data-main]');
+    if (!ships.length) {
+      main.appendChild(railCard(ord, null, 0, 1));
+    } else {
+      ships.forEach(function (s, i) {
+        main.appendChild(railCard(ord, s, i, ships.length));
+        var sc = scansCard(s);
+        if (sc) main.appendChild(sc);
+      });
     }
-
-    var itemsHtml = (ord.items || []).map(function (it) {
-      return '<div class="it">' +
-        (it.image ? '<img class="itimg" src="' + esc(it.image) + '" alt="">' : '<span class="itimg"></span>') +
-        '<div><div class="ittitle">' + esc(it.title) + '</div>' +
-        (it.variant ? '<div class="itsub">' + esc(it.variant) + '</div>' : '') + '</div>' +
-        '<span class="qty">×' + esc(it.qty) + '</span></div>';
-    }).join('');
-
-    out.innerHTML =
-      card('<p class="ordname">Order ' + esc(ord.name) + '</p>' +
-        '<p class="ordmeta">Placed ' + esc(fmt(ord.placedAt)) + '</p>' +
-        '<h1 class="headline">' + esc(headline) + '</h1>' +
-        '<p class="sub">' + esc(sub) + '</p>' +
-        '<ul class="rail">' + railHtml + '</ul>' +
-        trackHtml) +
-      card('<span class="lab">In this box</span><div class="items">' + itemsHtml + '</div>' +
-        (ord.shipTo ? '<div style="margin-top:16px;"><span class="lab">Shipping to</span><div class="shipto">' + esc(ord.shipTo) + '</div></div>' : '')) +
-      '<p class="help">Questions about this order? <a href="mailto:hello@happybeanie.com">Reply to your order email</a> — a human reads every note.</p>';
+    slot.querySelector('[data-reset]').addEventListener('click', function () {
+      clearFail();
+      lookupForm('', '');
+      history.replaceState(null, '', '/track');
+    });
     document.title = 'Order ' + ord.name + ' · Happy Beanie';
+  }
+
+  // ---- entry ------------------------------------------------------------
+  // Our own mail sends o/e (or a signed k). The design's deep link uses
+  // order/email. Both open the same page.
+  var p = new URLSearchParams(location.search);
+  var o = (p.get('o') || p.get('order') || '').replace(/[^0-9]/g, '');
+  var e = (p.get('e') || p.get('email') || '').trim();
+  var k = p.get('k');
+  if (o && (k || e)) {
+    waiting();
+    load(o, k, e, false);
+  } else {
+    lookupForm(o, e);
   }
 })();
 </script>
