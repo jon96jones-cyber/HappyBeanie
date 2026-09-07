@@ -92,3 +92,37 @@ tell me and I'll adjust.
 - **All CTAs** point to `https://www.happybeanie.com/account` (silent-SSO / email pre-fill
   signs the customer straight in).
 - Tables + inline styles for Gmail/Outlook; `border-radius` degrades to square in Outlook (fine).
+
+## The tracking link — carry this through any redesign
+
+`shipping-confirmation.html` is the one template whose CTA does not go to
+`/account`. It goes to our own order-status page:
+
+```liquid
+https://www.happybeanie.com/track?o={{ order_name | remove: '#' }}&amp;e={{ email | default: customer.email | url_encode }}
+```
+
+Three things about it that are easy to lose and expensive to relearn:
+
+- **No secret, no setup.** The page authorises on the order-number/email pair
+  and checks it against Shopify, so the template needs nothing filled in.
+  There is a signed `k=` variant, but no email we send uses it — do not
+  reintroduce a `[[TRACK_SECRET]]` placeholder to a paste-ready file.
+- **Shopify notification Liquid is flat.** It is `{{ order_name }}` and
+  `{{ email }}`, never `{{ order.name }}` — the latter silently resolves to
+  nothing and ships a broken link.
+- **A test send will 404, and that is correct.** Shopify's *Send test* uses a
+  placeholder order that does not exist, so the button cannot find it. Verify
+  against a real order instead. Both of these were confirmed live against
+  order #1004:
+
+  ```
+  /api/track?o=1004&e=<the order's email>   → 200, the order
+  /api/track?o=1004&e=<any other address>   → 404, indistinguishable from
+                                               an order that does not exist
+  ```
+
+None of the order notifications are installed yet — the set is being
+redesigned in the scene style first (see the task list). Repo copies are the
+source of truth; the templates currently live in Shopify predate them and
+still carry retired taglines.
