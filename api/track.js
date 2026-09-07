@@ -1,115 +1,164 @@
-// POST /api/track — the collector behind the analytics desk.
+// GET /api/track?o=<order id>&k=<signature> — the data behind /track, our own
+// order-status page.
 //
-// The site beacons one small JSON body per thing that happens. This never
-// answers with anything the page waits on: it always returns 204, swallows its
-// own errors, and is fired with navigator.sendBeacon, so a slow or broken
-// analytics store can never slow down or break the storefront.
+// Why this exists: Shopify's order-status page is the only thing a shipping
+// email could link to when there was no carrier URL, and it lands the customer
+// on shopify.com wearing Shop Pay's furniture. This serves the same facts from
+// our own domain.
 //
-// Heartbeats only bump the session's last_seen — they are what makes
-// "visitors right now" true, and writing a row for each would bloat the log
-// for no reason.
+// The link is one-click from an email, so there is no password — the signature
+// IS the credential:
 //
-// Env: DATABASE_URL (auto-set by the Vercel/Neon integration).
-// Optional: ANALYTICS_SALT — rotates the pseudonymous visitor hash.
+//   k = HMAC-SHA256(order id, TRACK_SECRET), first 16 hex characters
+//
+// 64 bits, compared in constant time, and derived from a secret that never
+// leaves the server. Shopify's notification templates mint the same value with
+// Liquid's hmac_sha256 filter, so the emails it sends can link here directly:
+//
+//   /track?o={{ order.id }}&k={{ order.id | hmac_sha256: '<TRACK_SECRET>' | slice: 0, 16 }}
+//
+// Anyone holding the link sees one order — the same bargain as Shopify's own
+// order-status URL, which is likewise a bearer token in a link.
+//
+// Env: SHOPIFY_ADMIN_TOKEN (read_orders), TRACK_SECRET.
 
-const db = require('./_lib/analytics-db.js');
+const crypto = require('crypto');
 
-// Only events we actually chart. Anything else is dropped, so a stray or
-// spoofed beacon cannot invent event types in the log.
-const NAMES = [
-  'pageview',
-  'view_product',
-  'add_to_cart',
-  'begin_checkout',
-  'quiz_start',
-  'quiz_verdict',
-  'popup_shown',
-  'popup_fed',
-  'popup_subscribed',
-  'popup_declined',
-  'heartbeat'
-];
+const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'pxv2u2-kc.myshopify.com';
+const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 
-function readBody(req) {
-  if (req.body && typeof req.body === 'object') return req.body;
-  try { return JSON.parse(req.body || '{}'); } catch (e) { return {}; }
+const ORDER = `query Track($id: ID!) {
+  order(id: $id) {
+    name
+    processedAt
+    displayFulfillmentStatus
+    cancelledAt
+    shippingAddress { name city provinceCode zip country }
+    lineItems(first: 25) {
+      nodes { title quantity variantTitle image { url } }
+    }
+    fulfillments(first: 10) {
+      id
+      createdAt
+      displayStatus
+      estimatedDeliveryAt
+      latestShipmentStatus
+      trackingInfo { number url company }
+    }
+  }
+}`;
+
+function sign(orderId) {
+  return crypto.createHmac('sha256', String(process.env.TRACK_SECRET))
+    .update(String(orderId)).digest('hex').slice(0, 16);
 }
-function str(v, max) {
-  if (v === null || v === undefined) return null;
-  const s = String(v).trim();
-  if (!s) return null;
-  return s.slice(0, max || 255);
+
+// Constant-time compare that cannot throw on a length mismatch.
+function sigOk(given, expected) {
+  const a = crypto.createHash('sha256').update(String(given)).digest();
+  const b = crypto.createHash('sha256').update(String(expected)).digest();
+  return crypto.timingSafeEqual(a, b);
 }
-function num(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
+
+async function admin(token, query, variables) {
+  const res = await fetch('https://' + STORE_DOMAIN + '/admin/api/' + API_VERSION + '/graphql.json', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': token },
+    body: JSON.stringify({ query: query, variables: variables || {} })
+  });
+  const json = await res.json().catch(function () { return {}; });
+  return { status: res.status, json: json };
+}
+
+// Shopify's shipment statuses, said the way a person would. Anything we have
+// not seen before falls through to the fulfillment's own display status rather
+// than inventing a phrase for it.
+const SHIPMENT_WORDS = {
+  LABEL_PRINTED: 'Label printed',
+  LABEL_PURCHASED: 'Label printed',
+  ATTEMPTED_DELIVERY: 'Delivery attempted',
+  READY_FOR_PICKUP: 'Ready for pickup',
+  CONFIRMED: 'Picked up by the carrier',
+  IN_TRANSIT: 'In transit',
+  OUT_FOR_DELIVERY: 'Out for delivery',
+  DELIVERED: 'Delivered',
+  FAILURE: 'The carrier reported a problem'
+};
+
+function titleCase(s) {
+  return String(s || '').toLowerCase().replace(/_/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); });
 }
 
 module.exports = async function handler(req, res) {
-  // Beacons are fire-and-forget; the browser ignores this, but be explicit.
-  res.setHeader('Cache-Control', 'no-store');
-  if (req.method !== 'POST') return res.status(405).end();
-  if (!db.isConfigured()) return res.status(204).end();
+  res.setHeader('Cache-Control', 'private, no-store');
+  if (req.method !== 'GET') {
+    res.setHeader('Allow', 'GET');
+    return res.status(405).json({ ok: false, error: 'method_not_allowed' });
+  }
+  const token = process.env.SHOPIFY_ADMIN_TOKEN;
+  if (!token || !process.env.TRACK_SECRET) {
+    return res.status(503).json({ ok: false, error: 'not_configured' });
+  }
+
+  const q = req.query || {};
+  const orderId = String(q.o || '').replace(/[^0-9]/g, '');
+  const given = String(q.k || '').toLowerCase().replace(/[^0-9a-f]/g, '');
+  if (!orderId || given.length !== 16 || !sigOk(given, sign(orderId))) {
+    // One message for every failure — a wrong signature and a missing order
+    // must look identical, or the endpoint becomes an order-number oracle.
+    return res.status(404).json({ ok: false, error: 'not_found' });
+  }
 
   try {
-    const b = readBody(req);
-    const sid = str(b.sid, 64);
-    const name = str(b.name, 32);
-    if (!sid || !name || NAMES.indexOf(name) === -1) return res.status(204).end();
+    const out = await admin(token, ORDER, { id: 'gid://shopify/Order/' + orderId });
+    const o = out.json && out.json.data && out.json.data.order;
+    if (!o) return res.status(404).json({ ok: false, error: 'not_found' });
 
-    const sql = db.sql();
-    const vid = db.visitorId(req);
-    const path = str(b.path, 255);
-    const country = str(req.headers['x-vercel-ip-country'], 8);
-    // State and city as Vercel's edge derived them from the IP — the derived
-    // place is stored, the address never is. The city arrives URI-encoded.
-    const region = str(req.headers['x-vercel-ip-country-region'], 8);
-    let city = str(req.headers['x-vercel-ip-city'], 120);
-    try { if (city) city = decodeURIComponent(city); } catch (e) {}
-    // Our own traffic, from either signal: the server recognising the address,
-    // or the page telling us (opted-out browser, or a preview deployment).
-    // Labelled, never dropped — so a test still proves it registered.
-    const internal = db.isInternal(req) || b.internal === true;
+    const fulfillments = (o.fulfillments || []).map(function (f) {
+      const t = (f.trackingInfo || [])[0] || {};
+      return {
+        shippedAt: f.createdAt,
+        // With no carrier scan yet, "Fulfilled" is Shopify's word, not a
+        // sentence anyone wants to read about their own parcel.
+        status: f.latestShipmentStatus
+          ? (SHIPMENT_WORDS[f.latestShipmentStatus] || titleCase(f.latestShipmentStatus))
+          : (f.displayStatus === 'DELIVERED' ? 'Delivered' : 'On its way'),
+        // When the carrier has spoken, the carrier decides — displayStatus can
+        // still read DELIVERED while the last scan says the box is in transit,
+        // and the page must not announce an arrival the carrier hasn't.
+        delivered: f.latestShipmentStatus
+          ? f.latestShipmentStatus === 'DELIVERED'
+          : f.displayStatus === 'DELIVERED',
+        estimatedDelivery: f.estimatedDeliveryAt || null,
+        tracking: t.number ? { number: t.number, url: t.url || null, company: t.company || null } : null
+      };
+    });
+    const a = o.shippingAddress || {};
 
-    if (name === 'heartbeat') {
-      await db.withSchema(() => sql`update sessions
-                   set last_seen = now(), visitor_id = coalesce(visitor_id, ${vid}),
-                       internal = sessions.internal or ${internal}
-                 where session_id = ${sid}`);
-      return res.status(204).end();
-    }
-
-    const utm = b.utm || {};
-    // First beacon of a visit writes the acquisition detail; later ones only
-    // move last_seen forward, so the landing page and source stay as they were.
-    await db.withSchema(() => sql`
-      insert into sessions (
-        session_id, visitor_id, landing_path, referrer,
-        utm_source, utm_medium, utm_campaign, ref_code, device, country, region, city, pageviews, internal
-      ) values (
-        ${sid}, ${vid}, ${path}, ${str(b.ref, 255)},
-        ${str(utm.source, 120)}, ${str(utm.medium, 120)}, ${str(utm.campaign, 120)},
-        ${str(b.refCode, 40)}, ${db.deviceOf(req.headers['user-agent'])}, ${country}, ${region}, ${city},
-        ${name === 'pageview' ? 1 : 0}, ${internal}
-      )
-      on conflict (session_id) do update set
-        last_seen      = now(),
-        pageviews      = sessions.pageviews + ${name === 'pageview' ? 1 : 0},
-        viewed_product = sessions.viewed_product or ${name === 'view_product'},
-        added_to_cart  = sessions.added_to_cart  or ${name === 'add_to_cart'},
-        began_checkout = sessions.began_checkout or ${name === 'begin_checkout'},
-        ref_code       = coalesce(sessions.ref_code, ${str(b.refCode, 40)}),
-        internal       = sessions.internal or ${internal}`);
-
-    await db.withSchema(() => sql`
-      insert into events (session_id, visitor_id, name, path, species, value, meta, internal)
-      values (${sid}, ${vid}, ${name}, ${path}, ${str(b.species, 16)}, ${num(b.value)},
-              ${b.meta ? JSON.stringify(b.meta).slice(0, 2000) : null}, ${internal})`);
-
-    return res.status(204).end();
+    return res.status(200).json({
+      ok: true,
+      order: {
+        name: o.name,
+        placedAt: o.processedAt,
+        cancelled: !!o.cancelledAt,
+        fulfillment: titleCase(o.displayFulfillmentStatus),
+        // Enough of the address to confirm it is going to the right place,
+        // without restating the street to whoever holds a forwarded link.
+        shipTo: [a.name, [a.city, a.provinceCode, a.zip].filter(Boolean).join(' '), a.country]
+          .filter(Boolean).join(' · '),
+        items: ((o.lineItems && o.lineItems.nodes) || []).map(function (li) {
+          return {
+            title: li.title,
+            variant: (li.variantTitle && li.variantTitle !== 'Default Title') ? li.variantTitle : '',
+            qty: li.quantity,
+            image: (li.image && li.image.url) || ''
+          };
+        }),
+        shipments: fulfillments
+      }
+    });
   } catch (err) {
-    // Analytics is never allowed to surface a failure to the storefront.
     console.error('[track]', err && err.message);
-    return res.status(204).end();
+    return res.status(502).json({ ok: false, error: 'upstream' });
   }
 };

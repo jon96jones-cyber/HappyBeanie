@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Track your box · Happy Beanie</title>
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32">
+<style>
+@font-face { font-family:'DM Mono'; font-weight:400; font-display:swap; src:url('/assets/fonts/23b5af97.woff2') format('woff2'); }
+@font-face { font-family:'DM Mono'; font-weight:500; font-display:swap; src:url('/assets/fonts/b847e313.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:400; font-display:swap; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-weight:700; font-display:swap; src:url('/assets/fonts/d7200164.woff2') format('woff2'); }
+
+* { box-sizing:border-box; }
+body { margin:0; background:#EFE9DB; color:#17140F; font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif; font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+a { color:#43684E; }
+.wrap { max-width:620px; margin:0 auto; padding:28px 20px 64px; }
+
+.top { display:flex; align-items:center; justify-content:space-between; gap:16px; padding-bottom:22px; }
+.top img { display:block; width:126px; height:auto; }
+.top span { font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.2em; text-transform:uppercase; color:#8A7F6E; }
+
+.card { background:#FCFAF4; border:1px solid #E0D6C2; border-radius:8px; padding:26px 24px; }
+.card + .card { margin-top:14px; }
+
+.ordname { font-family:'DM Sans',sans-serif; font-weight:700; font-size:26px; letter-spacing:-0.5px; margin:0; }
+.ordmeta { font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E; margin:7px 0 0; }
+
+.headline { font-family:'DM Sans',sans-serif; font-weight:700; font-size:21px; letter-spacing:-0.3px; margin:22px 0 4px; }
+.sub { margin:0; color:#6A6055; font-size:14.5px; }
+
+/* status rail */
+.rail { list-style:none; margin:24px 0 0; padding:0; position:relative; }
+.rail::before { content:""; position:absolute; left:6px; top:9px; bottom:9px; width:1px; background:#E0D6C2; }
+.step { position:relative; padding:0 0 18px 30px; }
+.step:last-child { padding-bottom:0; }
+.dot { position:absolute; left:0; top:4px; width:13px; height:13px; border-radius:50%; background:#FCFAF4; border:1px solid #C4B79E; }
+.step.done .dot { background:#43684E; border-color:#43684E; }
+.step.now .dot { background:#F0C64B; border-color:#B8871A; box-shadow:0 0 0 4px rgba(240,198,75,0.24); }
+.step b { display:block; font-weight:700; font-size:15px; }
+.step small { display:block; font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#8A7F6E; margin-top:3px; }
+.step.pending b { color:#A79C8A; font-weight:400; }
+
+.trackbox { margin-top:22px; padding:16px 18px; background:#17140F; border-radius:6px; }
+.trackbox .lab { font-family:'DM Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:#8A7F6E; }
+.trackbox .num { font-family:'DM Mono',ui-monospace,monospace; font-size:17px; letter-spacing:0.06em; color:#F0C64B; margin-top:6px; word-break:break-all; }
+.trackbox a { display:inline-block; margin-top:12px; font-family:'DM Mono',ui-monospace,monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#F5F0E6; text-decoration:underline; }
+
+.lab { font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7F6E; }
+.items { margin-top:12px; }
+.it { display:flex; gap:14px; align-items:center; padding:11px 0; border-top:1px solid #EDE6D8; }
+.it:first-child { border-top:0; }
+.itimg { width:46px; height:46px; flex:none; border-radius:4px; object-fit:cover; background:#EFE9DB; }
+.ittitle { font-weight:700; font-size:14.5px; }
+.itsub { font-family:'DM Mono',ui-monospace,monospace; font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; color:#8A7F6E; margin-top:3px; }
+.qty { margin-left:auto; font-family:'DM Mono',ui-monospace,monospace; font-size:13px; color:#6A6055; }
+.shipto { margin-top:8px; font-size:14.5px; color:#4A4237; }
+
+.help { margin-top:20px; text-align:center; font-size:13.5px; color:#6A6055; }
+.foot { margin-top:26px; text-align:center; font-family:'DM Mono',ui-monospace,monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:#A79C8A; line-height:2.1; }
+.msg { text-align:center; padding:40px 20px; color:#6A6055; }
+.msg b { display:block; font-size:18px; color:#17140F; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <img src="/assets/email-logo-light.png" alt="Happy Beanie">
+    <span>Order tracking</span>
+  </div>
+  <div id="out"><div class="card"><div class="msg">Looking up your order…</div></div></div>
+  <p class="foot">Made in one facility · Scottsdale, AZ<br><a href="/">happybeanie.com</a> · hello@happybeanie.com</p>
+</div>
+
+<script>
+(function () {
+  var out = document.getElementById('out');
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c];
+    });
+  }
+  function fmt(iso) {
+    if (!iso) return '';
+    try {
+      return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    } catch (e) { return ''; }
+  }
+  function card(inner) { return '<div class="card">' + inner + '</div>'; }
+  function message(title, body) {
+    out.innerHTML = card('<div class="msg"><b>' + esc(title) + '</b>' + esc(body) + '</div>');
+  }
+
+  var p = new URLSearchParams(location.search);
+  var o = p.get('o'), k = p.get('k');
+  if (!o || !k) {
+    message('This link is missing something',
+      'Open the tracking link from your shipping email, or find the order in your account.');
+    return;
+  }
+
+  fetch('/api/track?o=' + encodeURIComponent(o) + '&k=' + encodeURIComponent(k))
+    .then(function (r) { return r.json().catch(function () { return { ok:false }; }); })
+    .then(function (b) {
+      if (!b.ok) {
+        if (b.error === 'not_configured') {
+          message('Tracking is not switched on yet', 'Reply to your order email and we will send the update by hand.');
+        } else {
+          message('We cannot find that order',
+            'The link may have expired or been mistyped. Reply to your order email and we will look it up.');
+        }
+        return;
+      }
+      render(b.order);
+    })
+    .catch(function () {
+      message('That did not load', 'Check your connection and try again — nothing is wrong with your order.');
+    });
+
+  function render(ord) {
+    var ship = (ord.shipments || [])[0] || null;
+    var delivered = !!(ship && ship.delivered);
+
+    // The rail states the trip: ordered, shipped, arrived. The middle step
+    // carries the carrier's own words when the carrier has given us any.
+    var steps = [
+      { label: 'Order placed', when: fmt(ord.placedAt), state: 'done' }
+    ];
+    if (ord.cancelled) {
+      steps.push({ label: 'Cancelled', when: '', state: 'now' });
+    } else if (ship) {
+      steps.push({ label: 'Left Scottsdale', when: fmt(ship.shippedAt), state: 'done' });
+      if (delivered) {
+        steps.push({ label: 'Delivered', when: ship.status, state: 'now' });
+      } else {
+        steps.push({ label: ship.status || 'On its way', when: ship.estimatedDelivery ? 'Est. ' + fmt(ship.estimatedDelivery) : '', state: 'now' });
+        steps.push({ label: 'Delivered', when: '', state: 'pending' });
+      }
+    } else {
+      steps.push({ label: 'Being made', when: 'In our facility now', state: 'now' });
+      steps.push({ label: 'On its way', when: '', state: 'pending' });
+      steps.push({ label: 'Delivered', when: '', state: 'pending' });
+    }
+
+    var headline = ord.cancelled ? 'This order was cancelled.'
+      : delivered ? 'It arrived.'
+      : ship ? 'It’s on its way.'
+      : 'We’re making it now.';
+    var sub = ord.cancelled ? 'Nothing shipped and nothing was charged for it.'
+      : delivered ? 'One chew a day — that’s the whole routine.'
+      : ship ? 'Made in our own Scottsdale facility and handed to the carrier.'
+      : 'Your box is in the queue. We’ll email the moment it ships.';
+
+    var railHtml = steps.map(function (s) {
+      return '<li class="step ' + s.state + '"><span class="dot"></span>' +
+        '<b>' + esc(s.label) + '</b>' +
+        (s.when ? '<small>' + esc(s.when) + '</small>' : '') + '</li>';
+    }).join('');
+
+    var trackHtml = '';
+    if (ship && ship.tracking) {
+      trackHtml = '<div class="trackbox">' +
+        '<div class="lab">' + esc(ship.tracking.company || 'Tracking number') + '</div>' +
+        '<div class="num">' + esc(ship.tracking.number) + '</div>' +
+        (ship.tracking.url ? '<a href="' + esc(ship.tracking.url) + '" target="_blank" rel="noopener">See the carrier’s scans →</a>' : '') +
+        '</div>';
+    } else if (ship) {
+      trackHtml = '<div class="trackbox">' +
+        '<div class="lab">Tracking</div>' +
+        '<div class="num" style="font-size:14px; color:#DED5C4;">This one shipped without a tracking number.</div>' +
+        '</div>';
+    }
+
+    var itemsHtml = (ord.items || []).map(function (it) {
+      return '<div class="it">' +
+        (it.image ? '<img class="itimg" src="' + esc(it.image) + '" alt="">' : '<span class="itimg"></span>') +
+        '<div><div class="ittitle">' + esc(it.title) + '</div>' +
+        (it.variant ? '<div class="itsub">' + esc(it.variant) + '</div>' : '') + '</div>' +
+        '<span class="qty">×' + esc(it.qty) + '</span></div>';
+    }).join('');
+
+    out.innerHTML =
+      card('<p class="ordname">Order ' + esc(ord.name) + '</p>' +
+        '<p class="ordmeta">Placed ' + esc(fmt(ord.placedAt)) + '</p>' +
+        '<h1 class="headline">' + esc(headline) + '</h1>' +
+        '<p class="sub">' + esc(sub) + '</p>' +
+        '<ul class="rail">' + railHtml + '</ul>' +
+        trackHtml) +
+      card('<span class="lab">In this box</span><div class="items">' + itemsHtml + '</div>' +
+        (ord.shipTo ? '<div style="margin-top:16px;"><span class="lab">Shipping to</span><div class="shipto">' + esc(ord.shipTo) + '</div></div>' : '')) +
+      '<p class="help">Questions about this order? <a href="mailto:hello@happybeanie.com">Reply to your order email</a> — a human reads every note.</p>';
+    document.title = 'Order ' + ord.name + ' · Happy Beanie';
+  }
+})();
+</script>
+</body>
+</html>
