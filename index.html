@@ -3745,8 +3745,9 @@ class Component extends DCLogic {
   // Keep the toggle from moving the section: with the label open, the left
   // column's margin box (including its sticky-brake bottom margin) must not
   // exceed the buy column, or the grid row grows and everything below shifts.
-  // The bean tile gives up exactly the overflow — resized, not cropped — and
-  // only if the tile hits its floor does the label scale as a last resort.
+  // The gallery tile keeps the photo's size in both views — switching tabs
+  // must never resize it (Jon, Sep 2026) — so the label alone gives way,
+  // scaling down to whatever height is left under the tile.
   // Layout offsets, not viewport rects: the column is sticky, so client rects
   // move with scroll while offsets hold still. Runs from componentDidUpdate
   // and window resize; each write moves the layout toward the fixed point and
@@ -3779,11 +3780,13 @@ class Component extends DCLogic {
     const natural = card.offsetHeight;
     const naturalTileH = Math.round(tile.offsetWidth * 848 / 1264);
     const budget = rightCol.offsetHeight - brake - chrome - 2;
-    const tileH = Math.max(220, Math.min(naturalTileH, budget - natural));
-    const tileVal = tileH >= naturalTileH ? 'auto' : tileH + 'px';
+    // The tile is never trimmed: 'auto' lets its aspect-ratio set the height,
+    // the same height the photo view has.
+    const tileH = naturalTileH;
+    const tileVal = 'auto';
     const avail = budget - tileH;
     let scale = 1;
-    if (avail > 120 && avail < natural) scale = Math.max(0.45, avail / natural);
+    if (avail < natural) scale = Math.max(0.45, avail / natural);
     const wrapH = scale === 1 ? 'auto' : Math.floor(natural * scale) + 'px';
     if (tileVal !== this.state.factsTileH ||
         Math.abs(scale - (this.state.factsScale || 1)) > 0.005 || wrapH !== this.state.factsWrapH) {
@@ -3811,7 +3814,7 @@ class Component extends DCLogic {
     // narrower must-revalidate header rule for chew/ cannot be relied on to
     // out-rank the immutable rule.
     this._chewLoad = script('/assets/js/chew/three-d-stage.js?v=4')
-      .then(() => script('/assets/js/chew/hb-chew-stage.js?v=5'));
+      .then(() => script('/assets/js/chew/hb-chew-stage.js?v=6'));
     return this._chewLoad;
   }
 
