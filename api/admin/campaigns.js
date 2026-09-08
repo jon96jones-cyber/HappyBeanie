@@ -175,6 +175,9 @@ module.exports = async function handler(req, res) {
                  coalesce(sum(sends), 0)::int                       as attempts,
                  count(*) filter (where status = 'sent')::int       as delivered,
                  count(*) filter (where status = 'failed')::int     as failed,
+                 count(*) filter (where opened_at is not null)::int  as opened,
+                 count(*) filter (where clicked_at is not null)::int as clicked,
+                 count(*) filter (where bounced_at is not null)::int as bounced,
                  count(distinct step)::int                          as steps,
                  min(sent_at)                                       as first_at,
                  max(sent_at)                                       as last_at
@@ -192,16 +195,23 @@ module.exports = async function handler(req, res) {
     const [steps, totals, rows] = await db.withSchema(function () {
       return Promise.all([
         sql`select step,
-                   count(*)::int                                  as people,
-                   count(*) filter (where status = 'failed')::int as failed,
-                   max(sent_at)                                   as last_at
+                   count(*)::int                                      as people,
+                   count(*) filter (where status = 'failed')::int     as failed,
+                   count(*) filter (where opened_at is not null)::int as opened,
+                   count(*) filter (where clicked_at is not null)::int as clicked,
+                   max(sent_at)                                       as last_at
             from email_sends where flow = ${flow}
             group by step order by max(sent_at) desc`,
-        sql`select count(*)::int                                  as people,
-                   count(*) filter (where status = 'failed')::int as failed
+        sql`select count(*)::int                                      as people,
+                   count(*) filter (where status = 'failed')::int     as failed,
+                   count(*) filter (where opened_at is not null)::int as opened,
+                   count(*) filter (where clicked_at is not null)::int as clicked,
+                   count(*) filter (where bounced_at is not null)::int as bounced
             from email_sends where flow = ${flow}
               and (${search} = '' or email like ${'%' + search + '%'})`,
-        sql`select email, step, status, error, subject, sends, sent_at, provider_id
+        sql`select email, step, status, error, subject, sends, sent_at, provider_id,
+                   delivered_at, opened_at, open_count, clicked_at, click_count,
+                   bounced_at, complained_at
             from email_sends
             where flow = ${flow}
               and (${search} = '' or email like ${'%' + search + '%'})
@@ -225,6 +235,9 @@ module.exports = async function handler(req, res) {
       steps: steps,
       total: total,
       failed: (totals[0] || {}).failed || 0,
+      opened: (totals[0] || {}).opened || 0,
+      clicked: (totals[0] || {}).clicked || 0,
+      bounced: (totals[0] || {}).bounced || 0,
       offset: offset,
       pageSize: PAGE,
       more: offset + rows.length < total,

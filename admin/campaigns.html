@@ -136,6 +136,42 @@ tr.click:hover td { background:rgba(245,240,230,0.045); }
     return '<span class="pill live">live · waiting</span>';
   }
 
+  // The send itself. Bounced and complained are written by the webhook after
+  // the fact, so this cannot just test for 'failed' — a bounce would otherwise
+  // report as a clean send.
+  function sentCell(status) {
+    if (status === 'failed')     return '<span class="pill bad">failed</span>';
+    if (status === 'bounced')    return '<span class="pill bad">bounced</span>';
+    if (status === 'complained') return '<span class="pill bad">spam report</span>';
+    return '<span class="pill ok">sent</span>';
+  }
+
+  // What happened to a message after it left. Deliberately ordered by how much
+  // each event actually tells you: a click is a person, an open might be Apple
+  // Mail fetching images on their behalf, and a bounce or complaint is the one
+  // that costs us if ignored.
+  function engagementCell(s) {
+    if (s.bounced_at)    return '<span class="pill bad">bounced</span>';
+    if (s.complained_at) return '<span class="pill bad">spam report</span>';
+    if (s.status === 'failed') return '<span class="dim">—</span>';
+    var out = [];
+    if (s.clicked_at) {
+      out.push('<span class="pill ok" title="Clicked ' + esc(when(s.clicked_at)) + '">clicked' +
+        (s.click_count > 1 ? ' ' + s.click_count + '\u00d7' : '') + '</span>');
+    }
+    if (s.opened_at) {
+      out.push('<span class="pill" title="First opened ' + esc(when(s.opened_at)) + '">opened' +
+        (s.open_count > 1 ? ' ' + s.open_count + '\u00d7' : '') + '</span>');
+    } else if (s.delivered_at) {
+      out.push('<span class="dim">not opened</span>');
+    } else {
+      // No delivery event yet. Saying "not opened" here would read as a fact
+      // about the reader when it is really a fact about our own reporting.
+      out.push('<span class="dim" title="No delivery event received yet">—</span>');
+    }
+    return out.join(' ');
+  }
+
   function renderList(b) {
     $('scope').textContent = 'all';
     $('back').style.display = 'none';
@@ -169,7 +205,9 @@ tr.click:hover td { background:rgba(245,240,230,0.045); }
     var steps = b.steps.map(function (s) {
       return '<div class="tile' + (s.failed ? ' bad' : '') + '"><div class="k">' + esc(s.step) + '</div>' +
         '<div class="v">' + s.people + '</div>' +
-        '<div class="dim" style="margin-top:6px">' + (s.failed ? s.failed + ' failed · ' : '') + esc(when(s.last_at)) + '</div></div>';
+        '<div class="dim" style="margin-top:6px">' + (s.failed ? s.failed + ' failed · ' : '') +
+          s.opened + ' opened · ' + s.clicked + ' clicked</div>' +
+        '<div class="dim" style="margin-top:2px">' + esc(when(s.last_at)) + '</div></div>';
     }).join('');
 
     // Signup emails can be re-fired safely (one code per address for life, so
@@ -182,7 +220,8 @@ tr.click:hover td { background:rgba(245,240,230,0.045); }
           (s.status === 'failed' && s.error ? '<div class="why">' + esc(s.error) + '</div>' : '') + '</td>' +
         '<td class="mono dim">' + esc(s.step) + '</td>' +
         '<td class="hide dim">' + esc(s.subject || '—') + '</td>' +
-        '<td>' + (s.status === 'failed' ? '<span class="pill bad">failed</span>' : '<span class="pill ok">sent</span>') + '</td>' +
+        '<td>' + sentCell(s.status) + '</td>' +
+        '<td>' + engagementCell(s) + '</td>' +
         '<td class="num dim">' + esc(when(s.sent_at)) + '</td>' +
         (canResend ? '<td class="num"><button class="fixsend" data-em="' + esc(s.email) + '" style="font-size:9.5px; padding:6px 10px;">Fix / resend</button></td>' : '') +
       '</tr>';
@@ -197,7 +236,10 @@ tr.click:hover td { background:rgba(245,240,230,0.045); }
       '<div class="crumb"><span class="flow">' + esc(b.name || title(b.flow)) + '</span>' +
         '<span class="pill">' + b.total + ' recipient' + (b.total === 1 ? '' : 's') + '</span>' +
         (b.status === 'draft' ? '<span class="pill">not wired</span>' : '') +
-        (b.failed ? '<span class="pill bad">' + b.failed + ' failed</span>' : '') + '</div>' +
+        (b.failed ? '<span class="pill bad">' + b.failed + ' failed</span>' : '') +
+        (b.total ? '<span class="pill">' + b.opened + ' opened</span>' +
+                   '<span class="pill">' + b.clicked + ' clicked</span>' : '') +
+        (b.bounced ? '<span class="pill bad">' + b.bounced + ' bounced</span>' : '') + '</div>' +
       (b.what || b.trigger
         ? '<p class="note" style="margin-top:8px">' + esc(b.what || '') +
           (b.trigger ? ' <span class="dim mono">· ' + esc(b.trigger) + '</span>' : '') + '</p>'
@@ -212,8 +254,11 @@ tr.click:hover td { background:rgba(245,240,230,0.045); }
           '<div class="searchrow"><input type="search" id="q" placeholder="Filter by email address" value="' + esc(view.q) + '">' +
             '<button id="doSearch">Search</button>' + (view.q ? '<button id="clearSearch">Clear</button>' : '') + '</div>' +
           (b.sends.length
-            ? '<table><thead><tr><th>Recipient</th><th>Step</th><th class="hide">Subject</th><th>Status</th><th class="num">Sent</th>' + (canResend ? '<th></th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table>'
+            ? '<table><thead><tr><th>Recipient</th><th>Step</th><th class="hide">Subject</th><th>Status</th><th>Opened</th><th class="num">Sent</th>' + (canResend ? '<th></th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table>'
             : '<div class="empty"><b>No matches</b>Nothing in this campaign matches that address.</div>') +
+          '<p class="note" style="margin-top:14px">Opens are a hint, not attention: Apple Mail fetches ' +
+          'images the moment a message arrives, whether or not anyone reads it, so some opens are the ' +
+          'device rather than the person. A click is a person.</p>' +
           '<div class="pager">' +
             '<button id="prev"' + (view.offset ? '' : ' disabled') + '>← Newer</button>' +
             '<span class="dim mono">' + (b.total ? (view.offset + 1) + '–' + (view.offset + b.sends.length) + ' of ' + b.total : '0') + '</span>' +

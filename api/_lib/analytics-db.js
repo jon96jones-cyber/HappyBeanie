@@ -168,6 +168,26 @@ async function ensureSchema() {
   await q`alter table email_sends add column if not exists sends   integer not null default 1`;
   await q`create index if not exists email_sends_status_idx on email_sends (flow, status)`;
 
+  // Engagement, stamped by api/hooks/resend.js from Resend's webhooks and
+  // joined on provider_id. Counts as well as timestamps: a second open is a
+  // different fact from a first one, and Apple Mail's prefetch makes the first
+  // one weak evidence on its own.
+  //
+  // Opens are recorded but should not be read as attention. Apple Mail Privacy
+  // Protection fetches every image the moment a message arrives, whether or not
+  // anyone looks at it, so a high open rate is partly a measure of how many
+  // recipients use Apple Mail. A click is a person.
+  await q`alter table email_sends add column if not exists delivered_at  timestamptz`;
+  await q`alter table email_sends add column if not exists opened_at     timestamptz`;
+  await q`alter table email_sends add column if not exists open_count    integer not null default 0`;
+  await q`alter table email_sends add column if not exists clicked_at    timestamptz`;
+  await q`alter table email_sends add column if not exists click_count   integer not null default 0`;
+  await q`alter table email_sends add column if not exists bounced_at    timestamptz`;
+  await q`alter table email_sends add column if not exists complained_at timestamptz`;
+  // The webhook arrives knowing only Resend's id, so that lookup has to be
+  // indexed; without it every event is a sequential scan of the whole log.
+  await q`create index if not exists email_sends_provider_idx on email_sends (provider_id)`;
+
   // One discount per address, remembered. Without this, signing up twice mints
   // a second single-use code, and the form is open to anyone who wants an
   // unlimited supply of them. Storing the code also means someone who lost the
