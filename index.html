@@ -6530,7 +6530,7 @@ Component.prototype.renderVals = function () {
   var rDigits = rRoot.querySelectorAll('[data-rdigits] .hb-research__digit');
   var rStepForm = rRoot.querySelector('[data-rstep="form"]'), rStepDone = rRoot.querySelector('[data-rstep="done"]');
   var mainParts = ['hbBar', 'hbHead', 'hbStage', 'hbFoot'].map(function (id) { return document.getElementById(id); });
-  var rMode = false, rDone = false, rTimers = [];
+  var rMode = false, rDone = false, rTimers = [], rRaf = 0;
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var step = 'feed', drag = null, busy = false, returnTo = null;
@@ -6666,8 +6666,12 @@ Component.prototype.renderVals = function () {
   }
   rInput.addEventListener('input', rClearError);
 
-  // The flip counter: only digits that changed replay the flip.
-  function rSet(n, flipMs) {
+  // The flip counter. Every digit that changed takes its new value at once;
+  // the flip itself replays only if the digit's last flip has had time to
+  // finish, so a fast-moving ones column ticks cleanly instead of restarting
+  // its animation on every frame and shuddering.
+  var rFlipAt = [0, 0, 0, 0];
+  function rSet(n, flipMs, now) {
     var str = String(n);
     while (str.length < 4) str = '0' + str;
     for (var i = 0; i < 4; i++) {
@@ -6675,27 +6679,38 @@ Component.prototype.renderVals = function () {
       if (el.textContent === str[i]) continue;
       el.textContent = str[i];
       if (reduced) continue;
+      var t = now == null ? performance.now() : now;
+      if (t - rFlipAt[i] < flipMs) continue;
+      rFlipAt[i] = t;
       el.style.setProperty('--flip', flipMs + 'ms');
       el.classList.remove('is-flipping');
       void el.offsetWidth;
       el.classList.add('is-flipping');
     }
   }
-  // Even metronome to 1197, then 1198 / 1199 / 1200 land one at a time.
+  // One continuous ease-out from 0 to 1200 on the frame clock. This used to
+  // be a setTimeout metronome (26 jumps of ~46, then a pause, then the last
+  // three digits landed one at a time); timer jitter on a phone made the
+  // jumps uneven and the change of tempo read as a stutter. Driven per frame
+  // the value only ever moves forward, and the eased curve is quick at the
+  // start and settles into 1200 by itself — the last few units take a beat
+  // each, which is the landing the old version staged by hand.
   function rTick() {
     rTimers.forEach(clearTimeout); rTimers = [];
+    if (rRaf) { cancelAnimationFrame(rRaf); rRaf = 0; }
+    rFlipAt = [0, 0, 0, 0];
     if (reduced) { rSet(1200, 0); return; }
-    var tick = 70, steps = 26, gap = 560, i = 0;
-    rSet(0, tick);
-    function run() {
-      i++;
-      rSet(Math.round((1197 * i) / steps), tick);
-      if (i < steps) { rTimers.push(setTimeout(run, tick)); return; }
-      [1198, 1199, 1200].forEach(function (v, k) {
-        rTimers.push(setTimeout(function () { rSet(v, 320); }, gap * (k + 1)));
-      });
+    var DUR = 2200, FLIP = 110, t0 = 0;
+    rSet(0, FLIP);
+    function frame(now) {
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / DUR);
+      var e = 1 - Math.pow(1 - p, 4);
+      rSet(Math.round(1200 * e), FLIP, now);
+      if (p < 1) rRaf = requestAnimationFrame(frame);
+      else { rRaf = 0; rSet(1200, FLIP, now); }
     }
-    rTimers.push(setTimeout(run, tick));
+    rRaf = requestAnimationFrame(frame);
   }
 
   rForm.addEventListener('submit', function (e) {
@@ -6875,6 +6890,7 @@ Component.prototype.renderVals = function () {
     // Closing the confirmation is not a dismissal — they already subscribed,
     // and hb-list suppresses this for good anyway.
     rTimers.forEach(clearTimeout); rTimers = [];
+    if (rRaf) { cancelAnimationFrame(rRaf); rRaf = 0; }
     var subscribed = rMode ? rDone : step === 'done';
     if (!subscribed) {
       try {
