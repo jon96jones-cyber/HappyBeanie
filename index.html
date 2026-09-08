@@ -2692,8 +2692,8 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
           <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             <div style="display: inline-flex; align-items: center; gap: 11px; padding: 11px 18px; border: 1px solid rgba(245,240,230,0.24); font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #DED5C4;">
               <span style="position: relative; width: 8px; height: 8px;">
-                <span style="position: absolute; inset: 0; border-radius: 50%; background: oklch(0.72 0.17 145);"></span>
-                <span style="position: absolute; inset: -5px; border-radius: 50%; border: 1px solid oklch(0.72 0.17 145); animation: pingRing 2.4s ease-out infinite;"></span>
+                <span style="position: absolute; inset: 0; border-radius: 50%; background: {{ deskColor }}; transition: background 0.6s ease;"></span>
+                <span style="position: absolute; inset: -5px; border-radius: 50%; border: 1px solid {{ deskColor }}; animation: pingRing 2.4s ease-out infinite;"></span>
               </span>
               {{ deskStatus }}
             </div>
@@ -3757,6 +3757,34 @@ class Component extends DCLogic {
     return null;
   }
 
+  // --- Support desk clock ---------------------------------------------------
+
+  // Open Monday to Friday, 8am to 5pm, on Arizona time. Arizona does not
+  // observe daylight saving, so America/Phoenix is MST all year; the fallback
+  // (a runtime without time-zone data) applies the same fixed UTC-7.
+  deskState(now) {
+    const d = now || new Date();
+    const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    let hr, day;
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Phoenix', hour: 'numeric', hourCycle: 'h23', weekday: 'short' }).formatToParts(d);
+      hr = parseInt(parts.find(p => p.type === 'hour').value, 10) % 24;
+      day = parts.find(p => p.type === 'weekday').value.slice(0, 3);
+      if (!Number.isFinite(hr) || DAYS.indexOf(day) === -1) throw new Error('bad parts');
+    } catch (e) {
+      const t = new Date(d.getTime() - 7 * 3600 * 1000);
+      hr = t.getUTCHours();
+      day = DAYS[t.getUTCDay()];
+    }
+    const weekday = day !== 'Sat' && day !== 'Sun';
+    const open = weekday && hr >= 8 && hr < 17;
+    // When the desk is next on shift, said the way a person would.
+    let resume = '8am MST';
+    if (!weekday || (day === 'Fri' && hr >= 17)) resume = 'Monday 8am MST';
+    else if (hr >= 17) resume = 'tomorrow 8am MST';
+    return { open, resume, hr, day };
+  }
+
   // --- Chew inspector -------------------------------------------------------
 
   // The gallery window is one size in both views. This used to trim the tile
@@ -4370,6 +4398,14 @@ class Component extends DCLogic {
     // viewport; refit on resize (cheap no-op when the tab is closed).
     this._onFitResize = () => this.fitFacts();
     window.addEventListener('resize', this._onFitResize);
+    // The desk light is a clock. Re-check once a minute and re-render only
+    // when open/closed actually flips, so a tab left open past five turns red
+    // without re-rendering the app every minute for nothing.
+    this._deskOpen = this.deskState().open;
+    this._deskTimer = setInterval(() => {
+      const open = this.deskState().open;
+      if (open !== this._deskOpen) { this._deskOpen = open; this.setState({ deskTick: Date.now() }); }
+    }, 60000);
     // The label's column chunking follows the same breakpoint as its grid CSS.
     this._mqFacts = window.matchMedia('(max-width: 600px)');
     this._onMqFacts = () => this.setState({ factsNarrow: this._mqFacts.matches });
@@ -4605,6 +4641,7 @@ class Component extends DCLogic {
     if (this.io) this.io.disconnect();
     window.removeEventListener('popstate', this.onPopState);
     if (this._onFitResize) window.removeEventListener('resize', this._onFitResize);
+    clearInterval(this._deskTimer);
     if (this._mqFacts && this._mqFacts.removeEventListener) this._mqFacts.removeEventListener('change', this._onMqFacts);
   }
 
@@ -4732,8 +4769,10 @@ class Component extends DCLogic {
     const filled = ['name', 'email', 'animal', 'message'].filter(k => form[k].trim().length > 1).length;
     const pct = Math.round((filled / 4) * 100);
     const canSend = form.name.trim().length > 1 && form.email.indexOf('@') > 0 && form.message.trim().length > 4;
-    const hr = new Date().getHours();
-    const deskOpen = hr >= 8 && hr < 17;
+    // Desk hours are Arizona's, Monday to Friday 8am–5pm. The label promises
+    // MST, so the check runs on America/Phoenix time, not the visitor's clock.
+    const desk = this.deskState();
+    const deskOpen = desk.open;
     const topicDefs = [
       { label: 'Dosing help', hint: 'Include species, age and weight — it is the first thing we will ask for.' },
       { label: 'Look up a lot', hint: 'The lot number is printed on the box, next to the best-by date.' },
@@ -5577,8 +5616,10 @@ class Component extends DCLogic {
       sentName: form.name ? form.name.split(' ')[0] : 'friend',
       ticketId: this.state.ticket,
       deskShort: deskOpen ? 'Open now' : 'Closed',
-      deskColor: deskOpen ? 'oklch(0.72 0.17 145)' : '#8A7F6E',
-      deskStatus: deskOpen ? 'Desk open · support team on shift' : 'Desk closed · replies resume 8am MST',
+      // Green on shift, red off shift — the light in the contact hero binds to
+      // this, dot and pulse ring both.
+      deskColor: deskOpen ? 'oklch(0.72 0.17 145)' : 'oklch(0.6 0.2 28)',
+      deskStatus: deskOpen ? 'Desk open · support team on shift' : 'Desk closed · replies resume ' + desk.resume,
       contactBlocks: [
         { k: 'Email', v: 'hello@happybeanie.com', note: 'Answered by our support team, weekdays inside one business day.', copyable: true },
         { k: 'Phone', v: '(480) 555-2263', note: 'Mon–Fri, 8am–5pm MST. Dosing questions welcome.', copyable: true },
