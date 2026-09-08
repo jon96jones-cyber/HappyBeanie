@@ -130,14 +130,6 @@
       model.add(bean);
       model.rotation.y = -0.55;
       stage.setObject(model);
-      // The stage frames the model's bounding sphere with a generous margin,
-      // which leaves an oblong bean small in a wide tile. Pull the camera in
-      // along its own line of sight so the chew fills the stage.
-      const cam = stage._camera, tgt = stage._controls.target;
-      cam.position.sub(tgt).multiplyScalar(0.6).add(tgt);
-      cam.near = Math.max(cam.position.distanceTo(tgt) / 100, 0.01);
-      cam.updateProjectionMatrix();
-      stage._controls.update();
       if (this._readyRes) this._readyRes();
     }
   }
