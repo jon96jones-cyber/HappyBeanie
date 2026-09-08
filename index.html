@@ -3742,52 +3742,17 @@ class Component extends DCLogic {
 
   // --- Chew inspector -------------------------------------------------------
 
-  // Keep the toggle from moving the section: with the label open, the left
-  // column's margin box (including its sticky-brake bottom margin) must not
-  // exceed the buy column, or the grid row grows and everything below shifts.
-  // The bean tile gives up exactly the overflow — resized, not cropped — and
-  // only if the tile hits its floor does the label scale as a last resort.
-  // Layout offsets, not viewport rects: the column is sticky, so client rects
-  // move with scroll while offsets hold still. Runs from componentDidUpdate
-  // and window resize; each write moves the layout toward the fixed point and
-  // the pass after it confirms and stops.
+  // The gallery window is one size in both views. This used to trim the tile
+  // (and, at the floor, scale the Nutrition Facts label) so the column stayed
+  // inside the buy column's height when the 3D view opened — which made the
+  // bean window shorter than the photo and the toggle jump. Jon's call
+  // (Sep 2026): the two windows match exactly, so the toggle reads as one
+  // frame changing contents, and the label sits below at full size. The
+  // three bindings it wrote (factsTileH, factsScale, factsWrapH) stay in
+  // state pinned at their natural values.
   fitFacts() {
-    const card = document.getElementById('hbFactsCard');
-    const reset = () => {
-      if (this.state.factsTileH !== 'auto' || (this.state.factsScale || 1) !== 1) {
-        this.setState({ factsTileH: 'auto', factsScale: 1, factsWrapH: 'auto' });
-      }
-    };
-    if (this.state.page !== 'product' || this.state.pdpView !== '3d' || !card) return reset();
-    const wrap = card.parentElement;
-    const leftCol = wrap.closest('[data-m~="nostick"]');
-    const row = leftCol && leftCol.parentElement;
-    const rightCol = row && Array.prototype.find.call(row.children, c => c !== leftCol);
-    const tile = leftCol && leftCol.querySelector('div[style*="aspect-ratio"]');
-    if (!rightCol || !tile) return;
-    // Stacked (mobile) layouts have no shared bottom edge to respect.
-    const sideBySide = rightCol.getBoundingClientRect().left >
-                       leftCol.getBoundingClientRect().left + 100;
-    if (!sideBySide) return reset();
-    // Everything from natural, override-independent quantities, so the two
-    // adjustments (tile height, label scale) share one fixed point instead of
-    // chasing each other: offsetHeights ignore transforms, and the fixed
-    // chrome between column top and label (gaps + tabs) is what surrounds the
-    // tile, whatever height the tile currently holds.
-    const brake = parseFloat(getComputedStyle(leftCol).marginBottom) || 0;
-    const chrome = wrap.offsetTop - tile.offsetHeight;
-    const natural = card.offsetHeight;
-    const naturalTileH = Math.round(tile.offsetWidth * 848 / 1264);
-    const budget = rightCol.offsetHeight - brake - chrome - 2;
-    const tileH = Math.max(220, Math.min(naturalTileH, budget - natural));
-    const tileVal = tileH >= naturalTileH ? 'auto' : tileH + 'px';
-    const avail = budget - tileH;
-    let scale = 1;
-    if (avail > 120 && avail < natural) scale = Math.max(0.45, avail / natural);
-    const wrapH = scale === 1 ? 'auto' : Math.floor(natural * scale) + 'px';
-    if (tileVal !== this.state.factsTileH ||
-        Math.abs(scale - (this.state.factsScale || 1)) > 0.005 || wrapH !== this.state.factsWrapH) {
-      this.setState({ factsTileH: tileVal, factsScale: scale, factsWrapH: wrapH });
+    if (this.state.factsTileH !== 'auto' || (this.state.factsScale || 1) !== 1 || this.state.factsWrapH !== 'auto') {
+      this.setState({ factsTileH: 'auto', factsScale: 1, factsWrapH: 'auto' });
     }
   }
 
