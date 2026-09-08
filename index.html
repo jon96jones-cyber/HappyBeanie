@@ -769,6 +769,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 @media (max-width: 600px) {
   [data-m~="factsgrid"] { grid-template-columns: 1fr 1fr !important; }
   [data-m~="factsfoot"] { flex-wrap: wrap !important; }
+  [data-m~="factsfootpdp"] { display: none !important; }
 }
 </style>
 
@@ -2204,7 +2205,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
               </div>
             </div>
             <div style="margin: 8px 18px 0; height: 3px; background: #17140F;"></div>
-            <div data-m="factsfoot" style="margin-top: 8px; padding: 8px 18px 9px; background: #F2EEE3; border-top: 1px solid #E0D6C3; display: flex; justify-content: space-between; gap: 4px 12px; align-items: center;">
+            <!-- factsfootpdp: hidden on phones (Jon, Sep 2026) — the label
+                 ends on its closing bar there. -->
+            <div data-m="factsfoot factsfootpdp" style="margin-top: 8px; padding: 8px 18px 9px; background: #F2EEE3; border-top: 1px solid #E0D6C3; display: flex; justify-content: space-between; gap: 4px 12px; align-items: center;">
               <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Formulated fresh · Scottsdale, AZ</span>
               <span style="font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">happybeanie.com</span>
             </div>
