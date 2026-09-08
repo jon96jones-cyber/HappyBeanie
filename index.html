@@ -997,15 +997,29 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   .nz__chew { display: flex; justify-content: center; margin-bottom: 44px; }
   .nz__chew img { display: block; width: 132px; height: auto; filter: drop-shadow(0 22px 26px rgba(0,0,0,0.65)); animation: nzFloat 4.2s ease-in-out infinite; }
   .nz__chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 900px; margin: 0 auto; }
-  .nz-chip { position: relative; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 12px 16px; border: 1px solid rgba(245,240,230,0.2); border-radius: 999px; color: #8A7F6E; background: rgba(245,240,230,0.03); animation: nzRise 0.45s cubic-bezier(0.2,0.7,0.2,1) both; }
-  .nz-strike { position: absolute; left: 14px; right: 14px; top: 51%; height: 1.5px; background: oklch(0.55 0.19 32); transform-origin: left center; animation: nzStrike 0.4s cubic-bezier(0.2,0.7,0.2,1) both; }
+  /* The chips wait, unstruck, until the band scrolls into view; hbNzInit()
+     stamps data-nz-in on the section at that moment and the rise + strike
+     play from there, each chip on its own delay. */
+  .nz-chip { position: relative; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 12px 16px; border: 1px solid rgba(245,240,230,0.2); border-radius: 999px; color: #8A7F6E; background: rgba(245,240,230,0.03); opacity: 0; transform: translateY(14px); }
+  .nz-strike { position: absolute; left: 14px; right: 14px; top: 51%; height: 1.5px; background: oklch(0.55 0.19 32); transform-origin: left center; transform: scaleX(0); }
+  .nz[data-nz-in="1"] .nz-chip { animation: nzRise 0.45s cubic-bezier(0.2,0.7,0.2,1) both; }
+  .nz[data-nz-in="1"] .nz-strike { animation: nzStrike 0.4s cubic-bezier(0.2,0.7,0.2,1) both; }
   @keyframes nzStrike { from { transform: scaleX(0); } to { transform: scaleX(1); } }
   @keyframes nzRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @keyframes nzFloat { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .nz-chip { opacity: 1; transform: none; }
+    .nz-strike { transform: scaleX(1); }
+  }
   @media (max-width: 900px) {
     .nz--home { padding: 0 20px 64px; }
     .nz--pdp { margin: 56px -20px 0; padding: 56px 20px 64px; }
     .nz__chew img { width: 104px; }
+    /* Smaller type and tighter padding so the long chips share a row on a
+       phone instead of each taking one. */
+    .nz__chips { gap: 7px; }
+    .nz-chip { font-size: 9px; letter-spacing: 0.1em; padding: 9px 12px; }
+    .nz-strike { left: 11px; right: 11px; }
   }
   @media (max-width: 620px) {
     .nz--pdp { margin: 44px -16px 0; padding: 44px 16px 56px; }
@@ -4418,6 +4432,7 @@ class Component extends DCLogic {
       });
     }, { rootMargin: '0px 0px -10% 0px', threshold: 0.06 });
     this.scan();
+    try { if (window.hbNzInit) window.hbNzInit(); } catch (e) {}
     this.onScroll();
   }
 
@@ -4463,9 +4478,19 @@ class Component extends DCLogic {
       // A touch more travel on phones so the reveal actually registers.
       this.prep(wrap, mobile ? 26 : 16, 0);
     });
+    // Safety net, not a timer: this used to reveal everything still hidden
+    // after 2.8s, which meant every section below the fold faded in at page
+    // load whether or not anyone had scrolled to it. It now only rescues
+    // elements that are already inside the viewport and somehow never got
+    // their intersection callback; everything else waits for the scroll
+    // (Jon, Sep 2026: animations play as the visitor reaches them).
     clearTimeout(this.rvFallback);
     this.rvFallback = setTimeout(() => {
-      document.querySelectorAll('[data-rv-prepped]:not([data-rv-done]), [data-rv]:not([data-rv-done])').forEach(el => this.show(el));
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      document.querySelectorAll('[data-rv-prepped]:not([data-rv-done]), [data-rv]:not([data-rv-done])').forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < vh) this.show(el);
+      });
     }, 2800);
   }
 
@@ -4478,6 +4503,7 @@ class Component extends DCLogic {
     try { if (window.hbCatchTick) window.hbCatchTick(); } catch (e) {}
     try { if (window.hbRateScan) window.hbRateScan(); } catch (e) {}
     try { if (window.hbFaqInit) window.hbFaqInit(); } catch (e) {}
+    try { if (window.hbNzInit) window.hbNzInit(); } catch (e) {}
     try { if (window.hbDoseInit) window.hbDoseInit(); } catch (e) {}
     try { if (window.hbBpInit) window.hbBpInit(); } catch (e) {}
     // A re-render rebuilds the buy bar with its template-hidden style; put it
@@ -7388,6 +7414,34 @@ var HB_FAQ_HTML = "<section class=\"hb-faq\" data-hb-faq>\n  <span class=\"hb-fa
 // can clone a mounted subtree, and a clone keeps markup and attributes but
 // loses every listener — a WeakSet sees it as the stranger it is.
 var hbFaqWired = new WeakSet();
+// "What is not inside": arm each band once, and stamp data-nz-in="1" on it
+// the first time its chips scroll into view so the rise + strike-through play
+// then rather than at page load (on a phone the band is well below the fold,
+// so a load-time animation is over before anyone sees it). Idempotent, called
+// from componentDidUpdate like the other section inits, because the SPA can
+// rebuild the band when the route changes.
+window.hbNzInit = function () {
+  var bands = document.querySelectorAll('.nz:not([data-nz-armed])');
+  if (!bands.length) return;
+  var io = window.hbNzIo;
+  if (!io && 'IntersectionObserver' in window) {
+    io = window.hbNzIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var band = e.target.closest('.nz');
+        if (band) band.setAttribute('data-nz-in', '1');
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.25 });
+  }
+  bands.forEach(function (band) {
+    band.setAttribute('data-nz-armed', '1');
+    var chips = band.querySelector('.nz__chips');
+    if (io && chips) io.observe(chips);
+    else band.setAttribute('data-nz-in', '1');
+  });
+};
+
 window.hbFaqInit = function () {
   document.querySelectorAll('[data-hb-faq-host]').forEach(function (host) {
     var root = host.firstElementChild;
