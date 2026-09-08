@@ -1588,42 +1588,39 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     </div>
   </section>
 
-  <section id="formula" data-m="pad short" style="background: #17140F; color: #F5F0E6; padding: 78px 44px;">
-
-    <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
-      <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 18px;">The formula</div>
-      <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.4vw, 48px); line-height: 1.04; margin: 0 0 14px; max-width: 22em;">Three layers. <span style="color: oklch(0.86 0.14 92);">One signal.</span></h2>
-      <p style="font-size: 16px; line-height: 1.6; color: #B9AF9C; max-width: 30em; margin: 0 0 38px;">Every Beanie format is built on the same architecture, whole foods, bioactive peptides, and stability.</p>
-      <div style="display: grid; gap: 10px;">
-        <sc-for list="{{ layers }}" as="l" hint-placeholder-count="3">
-          <div sc-camel-on-mouse-enter="{{ l.open }}" sc-camel-on-click="{{ l.open }}" style="position: relative; border: 1px solid {{ l.border }}; border-radius: 4px; background: {{ l.bg }}; box-shadow: {{ l.shadow }}; transform: {{ l.lift }}; transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.2,0.7,0.2,1); cursor: pointer; overflow: hidden;">
-            <div data-m="stack gap fmhead" style="position: relative; display: grid; grid-template-columns: 92px 1fr; gap: 28px; padding: 24px 30px; align-items: center;" "="">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="width: 26px; height: 1px; background: {{ l.rule }}; transition: background 0.3s ease;"></span>
-                <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.1em; color: {{ l.numColor }}; transition: color 0.3s ease;">{{ l.n }}</span>
-              </div>
-              <div data-m="stack gap" style="display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center;">
-                <h3 data-m="fmh3" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(21px, 1.8vw, 26px); line-height: 1.15; margin: 0;">{{ l.title }} <span style="color: oklch(0.86 0.14 92);">{{ l.accent }}</span></h3>
-              </div>
-            </div>
-            <div style="max-height: {{ l.maxHeight }}; opacity: {{ l.bodyOpacity }}; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.2,0.7,0.2,1), opacity 0.35s ease;">
-              <div data-m="stack gap fmbody" style="display: grid; grid-template-columns: 92px 1.15fr 0.85fr; gap: 28px; padding: 2px 30px 28px; align-items: start;">
-                <div data-m="hide"></div>
-                <div>
-                  <p data-m="fmp" style="font-size: 15px; line-height: 1.65; color: #C6BCA8; margin: 0 0 16px; text-wrap: pretty;">{{ l.body }}</p>
-                  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <sc-for list="{{ l.chips }}" as="c" hint-placeholder-count="4">
-                      <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 7px 11px; border: 1px solid rgba(245,240,230,0.22); border-radius: 2px; color: #DED5C4; background: rgba(245,240,230,0.04);" data-m="fmchip">{{ c }}</span>
-                    </sc-for>
-                  </div>
+  <section id="formula" data-m="pad short" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 88px 44px 96px; overflow: hidden;">
+    <div style="max-width: 1180px; margin: 0 auto;">
+      <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
+      <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em;">10 ingredients, 20 benefits, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
+      <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
+        <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03); font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;">
+          <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Fully Transparent Ingredient Profile</span>
+        </div>
+        <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: rgba(23,20,15,0.12);">
+          <sc-for list="{{ insideList }}" as="ig" hint-placeholder-count="10">
+            <div data-m="flipwrap" tabindex="0" data-open="{{ ig.openFlag }}" sc-camel-on-click="{{ ig.tap }}" style="position: relative; height: 84px; overflow: hidden; background: #FCFAF4; outline: none;"><span data-m="fliparrow" style="{{ ig.trackStyle }}" sc-camel-on-pointer-down="{{ ig.down }}" sc-camel-on-pointer-move="{{ ig.move }}" sc-camel-on-pointer-up="{{ ig.up }}" sc-camel-on-pointer-cancel="{{ ig.up }}"><span style="{{ ig.fillStyle }}"></span><span style="{{ ig.knobStyle }}"></span></span>
+              <div data-m="flipinner" style="position: absolute; inset: 0;">
+                <div data-m="flipface" style="{{ ig.faceStyle }}">
+                  <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: #17140F;">{{ ig.n }}</span>
+                  <span style="min-width: 0;">
+                    <span data-m="ignm" style="display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.026em; font-size: 16px; line-height: 1.25; color: #17140F;">{{ ig.name }}</span>
+                  </span>
                 </div>
-                <div data-m="fmimg" style="height: 158px; border-radius: 3px; overflow: hidden; box-shadow: 0 18px 40px rgba(0,0,0,0.45);">
-                  <image-slot id="{{ l.slot }}" placeholder="{{ l.ph }}" style="width: 100%; height: 100%;"></image-slot>
+                <div data-m="flipback" style="{{ ig.backStyle }}">
+                  <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: #F5F0E6;">{{ ig.n }}</span>
+                  <span style="min-width: 0;">
+                    <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 6px;">Supports</span>
+                    <span style="display: block; font-size: 14.5px; line-height: 1.36; color: #F5F0E6; text-wrap: pretty;">{{ ig.benefit }}</span>
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
-        </sc-for>
+          </sc-for>
+        </div>
+        <div style="position: relative; padding: 12px 22px 13px; border-top: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03);">
+          <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Disclaimer</div>
+          <p style="font-size: 11.5px; line-height: 1.55; color: #6A6055; margin: 0; max-width: none;">These statements have not been evaluated by the Food and Drug Administration. None of the ingredients listed above have been evaluated by the FDA for the benefits described, and this product is not intended to diagnose, treat, cure, or prevent any disease. Happy Beanie is a food supplement, not a medication.</p>
+        </div>
       </div>
     </div>
   </section>
