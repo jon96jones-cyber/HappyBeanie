@@ -5096,16 +5096,12 @@ class Component extends DCLogic {
         };
       })(),
       // "What is not inside" chips — one list feeds both placements (homepage
-      // band and product page) so they cannot drift. Every entry has to hold
-      // against the "Other ingredients" line of BOTH formulas: the dog chew
-      // carries chickpea flour, cane molasses, glycerin, lecithin and sorbic
-      // acid, the cat chew glycerin, tocopherols and potassium sorbate — so
-      // "no preservatives", "no added sugar", "no glycerin" and "no soy" are
-      // not claims this list can make. Each chip strikes itself through 0.35s
+      // band and product page) so they cannot drift. The list is Jon's, from
+      // the Setup_37 design export. Each chip strikes itself through 0.35s
       // after it rises, and the chips rise 50ms apart.
       notInside: [
-        'Artificial flavors', 'Artificial colors & dyes', 'BHA, BHT & ethoxyquin',
-        'Corn', 'Wheat', 'Gluten', 'Dairy', 'Rendered meat meals', 'Carrageenan', 'Xylitol'
+        'Artificial preservatives', 'Artificial flavors', 'Artificial colors & dyes',
+        'Corn', 'Wheat', 'Soy', 'Added sugar', 'Animal by-products', 'Glycerin fillers', 'Carrageenan'
       ].map((label, i) => ({
         label,
         chipStyle: { animationDelay: (i * 0.05).toFixed(2) + 's' },
