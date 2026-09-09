@@ -1400,6 +1400,11 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="upcell"] { grid-row: auto / span 2 !important; padding: 16px 16px 18px !important; gap: 8px !important; }
     [data-m~="upcell"] > :nth-child(3) span:nth-child(2) { font-size: 19px !important; }
     [data-m~="qzcta"] { display: block !important; width: 100% !important; min-height: 52px !important; text-align: center !important; padding: 17px 18px !important; border-radius: 999px !important; font-size: 11px !important; color: #FCFAF4 !important; background: oklch(0.36 0.055 152) !important; box-shadow: 0 16px 30px -18px oklch(0.36 0.055 152 / 0.85) !important; }
+    /* Product page only: the eligibility pill under the buy button runs at
+       about half the buy button's width, centred, with the note under it
+       set smaller (Jon, Sep 2026). The homepage card keeps the full pill. */
+    [data-m~="pdpqzm"] [data-m~="qzcta"] { width: 52% !important; margin: 2px auto 0 !important; min-height: 40px !important; padding: 12px 14px !important; font-size: 9.5px !important; letter-spacing: 0.12em !important; }
+    [data-m~="pdpqznote"] { font-size: 8.5px !important; margin: 10px 0 18px !important; }
     [data-m~="spimg"] { height: 132px !important; }
     [data-m~="spcard"] { grid-template-columns: 1fr !important; justify-items: center; text-align: center; gap: 8px !important; padding: 16px 12px 18px !important; }
     [data-m~="spcard"] > :nth-child(1) { width: 13px !important; height: 13px !important; }
