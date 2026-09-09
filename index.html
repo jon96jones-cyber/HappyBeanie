@@ -7479,7 +7479,7 @@ window.hbWallInit = function () {
     // duration derived from it, so the belt moves at the same pace however
     // many copies the screen needed. Re-done on resize, when the tile width
     // or the viewport changes.
-    var SPEED = { a: 64, b: 54 };
+    var SPEED = { a: 48, b: 40 };
     function fillBelt() {
       root.querySelectorAll('.hb-track').forEach(function (track) {
         if (!track.__unit) track.__unit = Array.prototype.slice.call(track.children, 0, Math.max(1, Math.floor(track.children.length / 2)));
