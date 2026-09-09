@@ -8179,7 +8179,7 @@ window.hbPcInit = function (ctx) {
         r.querySelector('[data-tag]').textContent = S.wholesale ? 'Trade account' : '';
       }
       fit.textContent = p.key === 'monthly'
-        ? (lasts === 30 ? 'A box lasts 30 days' : lasts > 30 ? 'A box lasts ' + lasts + ' days · skip every other month' : 'A box lasts ' + lasts + ' days · we ship every ' + lasts)
+        ? (lasts >= 30 ? 'A box lasts ' + lasts + ' days' : 'A box lasts ' + lasts + ' days · we ship every ' + lasts)
         : (p.boxes * lasts) + ' days of chews';
     });
     var c = PLANS[S.sel], price = S.sel === '0' && S.wholesale && S.tradePrice ? S.tradePrice : c.price;
