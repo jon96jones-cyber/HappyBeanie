@@ -639,9 +639,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   .hb-belt { margin-top: 28px; }
 }
 @media (prefers-reduced-motion: reduce) { .hb-track { animation: none; } }
-.hb-wallhost--pdp { margin: 88px -44px 0; }
-@media (max-width: 900px) { .hb-wallhost--pdp { margin: 56px -20px 0; } }
-@media (max-width: 620px) { .hb-wallhost--pdp { margin: 44px -16px 0; } }
+.hb-wallhost--pdp { margin: 0 -44px 0; }
+@media (max-width: 900px) { .hb-wallhost--pdp { margin: 0 -20px 0; } }
+@media (max-width: 620px) { .hb-wallhost--pdp { margin: 0 -16px 0; } }
 
 /* Dosing page (designer handoff, Setup_32): hero, calculator, quiz CTA band.
    Vars scoped on .hb-dose like .hb-faq's — the injected wrappers carry the
@@ -2446,6 +2446,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
          wall and the FAQ band. Split from #inside when the ingredient section
          moved up under the buy box (Jon, Sep 2026). -->
     <section id="pdpMore" data-m="pad short" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 0 44px 0; overflow: hidden;">
+      <!-- The bean wall: reviews + photo belt, injected by hbWallInit(). -->
+      <div class="hb-wallhost--pdp" data-hb-wall-host></div>
+
       <!-- The evidence pile. Replaces the tabbed record card that stood here.
            Only the shell is templated: the papers are built imperatively by
            the pile script at the end of this file, because the drag writes
@@ -2512,9 +2515,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
         </div>
       </div>
-
-      <!-- The bean wall: reviews + photo belt, injected by hbWallInit(). -->
-      <div class="hb-wallhost--pdp" data-hb-wall-host></div>
 
       <div data-m="stack gap" style="display: none; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; max-width: 1180px; margin: 88px auto 0;">
         <div data-m="auto" style="height: 520px; border-radius: 5px; overflow: hidden; box-shadow: 0 34px 60px -38px rgba(23,20,15,0.5);"><image-slot id="hbv2-pdp-story" placeholder="Beanie, the dog this began with" style="width: 100%; height: 100%;"></image-slot></div>
