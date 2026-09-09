@@ -554,8 +554,19 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 /* Full-bleed: the hosts sit inside centred, padded containers, so the band
    breaks out to the viewport edges the classic way. html/body overflow-x is
    already clipped, so the scrollbar-width excess of 100vw cannot pan. */
-[data-hb-faq-host] { width: 100vw; margin-left: calc(50% - 50vw); }
-.hb-faq { position: relative; overflow: hidden; background: var(--hb-ink); color: var(--hb-cream-text); padding: 88px 0 80px; font-family: var(--hb-sans); }
+/* The host carries the band's own ink. The FAQ section is injected and its
+   content fades in on scroll, so for a moment on a slow load there is a
+   full-width strip here with nothing painting it — and the cream page
+   behind showed through between this band and the dark one above it
+   (Jon, Sep 2026). Painting the host closes that window whatever the
+   renderer does with the section inside. */
+[data-hb-faq-host] { width: 100vw; margin-left: calc(50% - 50vw); background: #17140F; }
+/* isolation: the corner glow blends with `screen`, which composites against
+   whatever backdrop the nearest isolated ancestor provides. Left to the
+   page, a renderer can resolve that against the cream body and wash the
+   band's top corner pale; isolating keeps the blend on this section's own
+   ink. */
+.hb-faq { position: relative; overflow: hidden; isolation: isolate; background: var(--hb-ink); color: var(--hb-cream-text); padding: 88px 0 80px; font-family: var(--hb-sans); }
 .hb-faq * { box-sizing: border-box; }
 /* z-index 3 and screen blending: the rail's right-edge fade (z 2) painted ink
    over the lower part of this glow, cutting the light off on a hard line
@@ -2583,7 +2594,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         </div>
       </section>
 
-      <div data-m="wksec" style="position: relative; margin: 0 -44px 0; padding: 62px 44px 58px; background: #17140F; color: #F5F0E6; overflow: hidden;">
+      <div data-m="wksec" style="position: relative; isolation: isolate; margin: 0 -44px 0; padding: 62px 44px 58px; background: #17140F; color: #F5F0E6; overflow: hidden;">
         <div aria-hidden="true" style="position: absolute; right: -180px; top: -220px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.10), transparent 70%); pointer-events: none;"></div>
         <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.035) 1px, transparent 1px); background-size: 34px 34px; -webkit-mask-image: radial-gradient(120% 80% at 8% 0%, #000 0%, transparent 74%); mask-image: radial-gradient(120% 80% at 8% 0%, #000 0%, transparent 74%);"></div>
         <!-- The upper half of the FAQ band's corner glow. That band clips its
