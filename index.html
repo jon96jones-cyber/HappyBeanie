@@ -7537,7 +7537,12 @@ window.hbFaqInit = function () {
     var rail = root.querySelector('[data-rail]'), track = root.querySelector('[data-track]');
     var cards = Array.prototype.slice.call(track.children);
     var prev = root.querySelector('[data-prev]'), next = root.querySelector('[data-next]');
-    var CARD = 264, GAP = 18, STEP = CARD + GAP, TOTAL = cards.length, pos = 1;
+    // Desktop opens on the second card so the rail reads as a row with a
+    // card either side; on a phone only one card fits, so it opens on the
+    // first (Jon, Sep 2026) rather than on card two with the first hidden.
+    var mobile = false;
+    try { mobile = window.matchMedia('(max-width: 900px)').matches; } catch (e) {}
+    var CARD = 264, GAP = 18, STEP = CARD + GAP, TOTAL = cards.length, pos = mobile ? 0 : 1;
 
     // Fluid carousel: how many cards fit (max 4), centred, edge cards dimmed.
     function layout() {
