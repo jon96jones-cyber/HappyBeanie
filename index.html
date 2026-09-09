@@ -4599,6 +4599,28 @@ class Component extends DCLogic {
     this.rvNodes.push(el);
   }
 
+  // Where a section wrapper's reveal should land. A wrapper with no paint of
+  // its own fades as it is; one that paints a background — or that is just a
+  // host around a block that does — hands the fade down to its first content
+  // child, so the background stays put and only what sits on it moves. A
+  // host around a nested <section> is left alone: that section is revealed
+  // in its own right by the loop above.
+  rvTarget(el) {
+    const painted = n => { const cs = getComputedStyle(n); return cs.backgroundImage !== 'none' || !/^(rgba\(\d+, \d+, \d+, 0\)|transparent)$/.test(cs.backgroundColor); };
+    const kidOf = n => Array.from(n.children).find(c => !c.hasAttribute('aria-hidden') && !/^(absolute|fixed)$/.test(getComputedStyle(c).position));
+    let node = el;
+    for (let i = 0; i < 4; i++) {
+      const kid = kidOf(node);
+      if (!painted(node)) {
+        const fills = kid && kid.offsetHeight >= node.offsetHeight - 4;
+        if (!(fills && (painted(kid) || kid.tagName === 'SECTION'))) return node;
+      }
+      if (!kid || kid.tagName === 'SECTION') return null;
+      node = kid;
+    }
+    return node;
+  }
+
   prep(el, travel, delay) {
     var t = this.reduced ? 0 : travel;
     el.style.opacity = '0';
@@ -4629,10 +4651,19 @@ class Component extends DCLogic {
       this.io.observe(el);
     });
     document.querySelectorAll('section').forEach(sec => {
-      const wrap = sec.querySelector(':scope > div:not([aria-hidden]):not([data-rv]):not([data-rv-prepped])');
+      const wrap = sec.querySelector(':scope > div:not([aria-hidden]):not([data-rv]):not([data-rv-prepped]):not([data-rv-claimed])');
       if (!wrap || wrap.querySelector('[data-rv]')) return;
+      // Never fade a block that paints its own background (the dark
+      // What-to-expect band, the FAQ and wall sections inside their hosts):
+      // at opacity 0 and shifted down, the cream page showed through it and a
+      // pale strip opened between it and the section above while it loaded
+      // (Jon, Sep 2026). The fade lands on the content inside instead; the
+      // block itself is only claimed so the next scan moves on.
+      wrap.setAttribute('data-rv-claimed', '1');
+      const target = this.rvTarget(wrap);
+      if (!target || target.hasAttribute('data-rv-prepped') || target.hasAttribute('data-rv-done')) return;
       // A touch more travel on phones so the reveal actually registers.
-      this.prep(wrap, mobile ? 26 : 16, 0);
+      this.prep(target, mobile ? 26 : 16, 0);
     });
     // Safety net, not a timer: this used to reveal everything still hidden
     // after 2.8s, which meant every section below the fold faded in at page
