@@ -605,7 +605,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hb-track { display: flex; gap: 12px; width: max-content; will-change: transform; }
 .hb-track--a { animation: hbBeltL 60s linear infinite; }
 .hb-track--b { animation: hbBeltR 70s linear infinite; }
-.hb-marq:hover .hb-track { animation-play-state: paused; }
+/* Pause on hover only where hover exists. A tap on a phone leaves a sticky
+   :hover behind, which froze the belt until the next tap elsewhere. */
+@media (hover: hover) and (pointer: fine) { .hb-marq:hover .hb-track { animation-play-state: paused; } }
 .hb-tile { position: relative; width: 380px; height: 380px; flex: 0 0 auto; border-radius: 4px; overflow: hidden; background: #E4DBC9; }
 .hb-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
