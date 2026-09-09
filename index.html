@@ -1145,7 +1145,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   [data-m~="evtab"]:focus { outline: none; }
   [data-m~="evtab"]:focus-visible { outline: 2px solid #17140F; outline-offset: -3px; }
   @media (max-width: 900px) {
-    [data-m~="wksec"] { margin: 56px -20px 0 !important; padding: 52px 20px 48px !important; }
+    [data-m~="wksec"] { margin: 0 -20px 0 !important; padding: 52px 20px 48px !important; }
     [data-m~="bnrows"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     [data-m~="flipwrap"] { height: 92px !important; cursor: pointer; }
     [data-m~="fliparrow"] { display: block !important; }
@@ -1190,6 +1190,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     /* The what's-inside section ends with the full-bleed FAQ band; the short
        token's bottom padding would paint a cream strip back under it. */
     #inside, #pdpMore { padding-bottom: 0 !important; }
+    /* The evidence desk meets the catch above and the What-to-expect band
+       below with no cream between (Jon, Sep 2026). */
+    #pdpMore { padding-top: 0 !important; }
     [data-m~="hide"]  { display: none !important; }
   [data-m~="roomrow"] { padding: 8px 12px 9px 15px !important; gap: 2px 9px !important; }
   [data-m~="roomrow"] > span:nth-child(2) { font-size: 8.5px !important; }
@@ -1429,7 +1432,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="spcard"] div > div:last-child { display: none !important; }
   }
   @media (max-width: 620px) {
-    [data-m~="wksec"] { margin: 44px -16px 0 !important; padding: 44px 16px 40px !important; }
+    [data-m~="wksec"] { margin: 0 -16px 0 !important; padding: 44px 16px 40px !important; }
     [data-m~="two"]   { grid-template-columns: minmax(0, 1fr) !important; }
     /* Quiz intro: fit the whole screener (headline, button, engine card) in one
        phone viewport — keep the stats as a compact 2x2 and trim the spacing. */
@@ -2442,7 +2445,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     <!-- The rest of the product story: evidence, what to expect, the bean
          wall and the FAQ band. Split from #inside when the ingredient section
          moved up under the buy box (Jon, Sep 2026). -->
-    <section id="pdpMore" data-m="pad short" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 88px 44px 0; overflow: hidden;">
+    <section id="pdpMore" data-m="pad short" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 42%, #F2EBDC 100%); padding: 0 44px 0; overflow: hidden;">
       <!-- The evidence pile. Replaces the tabbed record card that stood here.
            Only the shell is templated: the papers are built imperatively by
            the pile script at the end of this file, because the drag writes
@@ -2463,7 +2466,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         </div>
       </section>
 
-      <div data-m="wksec" style="position: relative; margin: 92px -44px 0; padding: 62px 44px 58px; background: #17140F; color: #F5F0E6; border-top: 1px solid #DDD3C0; overflow: hidden;">
+      <div data-m="wksec" style="position: relative; margin: 0 -44px 0; padding: 62px 44px 58px; background: #17140F; color: #F5F0E6; border-top: 1px solid #DDD3C0; overflow: hidden;">
         <div aria-hidden="true" style="position: absolute; right: -180px; top: -220px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.10), transparent 70%); pointer-events: none;"></div>
         <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.035) 1px, transparent 1px); background-size: 34px 34px; -webkit-mask-image: radial-gradient(120% 80% at 8% 0%, #000 0%, transparent 74%); mask-image: radial-gradient(120% 80% at 8% 0%, #000 0%, transparent 74%);"></div>
 
