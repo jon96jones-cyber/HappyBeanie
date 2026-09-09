@@ -167,7 +167,7 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
     }
     // The weight the dose was set for travels with the line, so the order
     // (and the account) can show which cadence the shopper chose and why.
-    if (r.key === 'dog' && r.lb) line.attributes = [{ key: 'Dog weight', value: r.lb + ' lb' }, { key: 'Daily dose', value: r.dose || '' }];
+    if (r.lb) line.attributes = [{ key: 'Pet weight', value: r.lb + ' lb' }, { key: 'Daily dose', value: r.dose || '' }];
     return line;
   });
   const res = await fetch('https://' + cfg.domain + '/api/' + cfg.apiVersion + '/graphql.json', {
@@ -729,12 +729,8 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .pc-ticks i { position: absolute; top: 0; left: calc(var(--r) + (100% - 2 * var(--r)) * var(--p) / 100%); width: 1px; height: 6px; margin-left: -0.5px; background: rgba(23,20,15,0.32); }
 .pc-ticks i.is-major { width: 2px; height: 8px; margin-left: -1px; background: var(--ink); }
 .pc-ends { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #4A4235; }
-/* Cats: the formula is dosed flat, so the slider and its end labels go and
-   the readout says so (README, Setup_39). */
-.pc[data-sp="cat"] .pc-head__row { margin-bottom: 0; }
-.pc[data-sp="cat"] .pc-slider, .pc[data-sp="cat"] .pc-ends { display: none; }
-.pc[data-sp="cat"] .pc-lb { font-size: 22px; letter-spacing: -0.04em; line-height: 1; }
-.pc[data-sp="cat"] .pc-head__k { padding-bottom: 2px; }
+/* Cats get the same slider, on their own 4–30 lb scale (Jon, Sep 2026).
+   The dose is flat across it, so those ticks carry no major marks. */
 .pc-body { padding: 20px 24px 0; }
 .pc-dose { display: grid; grid-template-columns: 56px 1fr; gap: 16px; align-items: center; padding-bottom: 16px; border-bottom: 1px solid rgba(23,20,15,0.12); }
 .pc-chews { display: flex; align-items: flex-end; justify-content: center; gap: 3px; width: 56px; height: 50px; }
@@ -3596,7 +3592,7 @@ class Component extends DCLogic {
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
     pdpView: 'photo', pdpSel: 0, pdpCut: false, pdpReady: false, factsScale: 1, factsWrapH: 'auto', factsTileH: 'auto',
     factsNarrow: typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 600px)').matches,
-    cartPlanDog: 1, cartPlanCat: 1, cartLbDog: 45, dogLb: 45, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
+    cartPlanDog: 1, cartPlanCat: 1, cartLbDog: 45, cartLbCat: 10, dogLb: 45, catLb: 10, ordered: false, orderId: '', orderTotal: '', orderItems: '', joined: false, joinEmail: '',
     co: { email: '', name: '', addr: '', city: '', state: '', zip: '', card: '', exp: '', cvc: '',
       bname: '', baddr: '', bcity: '', bzip: '' }, billSame: true, acctOptIn: true };
 
@@ -4157,7 +4153,9 @@ class Component extends DCLogic {
     };
     const rows = [];
     if (this.state.cartDog > 0) rows.push({ key: 'dog', badge: 'For dogs', name: 'Happy Beans for Dogs', slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans box', qty: this.state.cartDog, plan: this.state.cartPlanDog, lb: lbDog, dose: (chewsDog === 0.5 ? '½ chew' : chewsDog === 1 ? '1 chew' : '1½ chews') + ' a day' });
-    if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box', qty: this.state.cartCat, plan: this.state.cartPlanCat === 3 ? 1 : this.state.cartPlanCat });
+    // Cats are dosed flat, so their weight changes nothing about the plan —
+    // it rides along so the order says which cat the box is for.
+    if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box', qty: this.state.cartCat, plan: this.state.cartPlanCat === 3 ? 1 : this.state.cartPlanCat, lb: this.state.cartLbCat || 10, dose: '1 chew a day' });
     // Wholesale accounts are never offered subscriptions or bundles — any
     // plan that slipped into the cart (the picker's subscription default, a
     // cart saved before sign-in) is coerced to one-time here, so pricing
@@ -4484,7 +4482,8 @@ class Component extends DCLogic {
           cartCat: saved.cartCat || 0,
           cartPlanDog: saved.cartPlanDog != null ? saved.cartPlanDog : 1,
           cartPlanCat: saved.cartPlanCat != null ? saved.cartPlanCat : 1,
-          cartLbDog: saved.cartLbDog || 45
+          cartLbDog: saved.cartLbDog || 45,
+          cartLbCat: saved.cartLbCat || 10
         });
       }
     } catch (e) {}
@@ -4494,6 +4493,8 @@ class Component extends DCLogic {
       const pets = JSON.parse(localStorage.getItem('hb-pets') || '[]');
       const pet = pets.find && pets.find(x => x && x.species === 'dog' && x.weight);
       if (pet) this.setState({ dogLb: Math.max(10, Math.min(150, Number(pet.weight))) });
+      const kit = pets.find && pets.find(x => x && x.species === 'cat' && x.weight);
+      if (kit) this.setState({ catLb: Math.max(4, Math.min(30, Number(kit.weight))) });
     } catch (e) {}
     // Purchase panel (Setup_39) → app: the panel is injected markup that owns
     // its slider and rows, and reports back through these two events. Plan
@@ -4503,7 +4504,10 @@ class Component extends DCLogic {
       const d = e.detail || {};
       const next = {};
       if (d.plan != null) { next.plan = Number(d.plan); next.added = false; }
-      if (d.lb != null) next.dogLb = Math.max(10, Math.min(150, Number(d.lb)));
+      if (d.lb != null) {
+        if ((d.sp || this.state.sp) === 'cat') next.catLb = Math.max(4, Math.min(30, Number(d.lb)));
+        else next.dogLb = Math.max(10, Math.min(150, Number(d.lb)));
+      }
       if (Object.keys(next).length) this.setState(next);
     };
     this._onPcAdd = e => {
@@ -4511,7 +4515,7 @@ class Component extends DCLogic {
       if (this.state.added) { this.nav('cart')(); return; }
       const plan = Number(d.plan);
       this.setState(st => st.sp === 'cat'
-        ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: plan === 3 ? 1 : plan }
+        ? { added: true, ordered: false, cartCat: st.cartCat + 1, cartPlanCat: plan === 3 ? 1 : plan, cartLbCat: d.weightLb != null ? Number(d.weightLb) : st.catLb }
         : { added: true, ordered: false, cartDog: st.cartDog + 1, cartPlanDog: plan, cartLbDog: d.weightLb != null ? Number(d.weightLb) : st.dogLb });
       this.nav('cart')();
     };
@@ -4729,7 +4733,7 @@ class Component extends DCLogic {
     // Persist the cart whenever it changes (guarded so scroll updates don't rewrite it).
     try {
       const s = this.state;
-      const cart = JSON.stringify({ cartDog: s.cartDog, cartCat: s.cartCat, cartPlanDog: s.cartPlanDog, cartPlanCat: s.cartPlanCat, cartLbDog: s.cartLbDog });
+      const cart = JSON.stringify({ cartDog: s.cartDog, cartCat: s.cartCat, cartPlanDog: s.cartPlanDog, cartPlanCat: s.cartPlanCat, cartLbDog: s.cartLbDog, cartLbCat: s.cartLbCat });
       if (cart !== this._lastCart) { this._lastCart = cart; localStorage.setItem('hbCart', cart); this.parkCart(); }
     } catch (e) {}
     // Meta pixel SPA events — the base snippet fired the first PageView, so
@@ -4833,7 +4837,7 @@ class Component extends DCLogic {
       if (head) { eyebrow = head.firstElementChild.firstElementChild.textContent.trim(); lede = head.querySelector('[data-m~="pdplede"]').textContent.trim(); }
     } catch (e) {}
     return {
-      sp: s.sp, plan: s.plan, lb: s.dogLb || 45, added: !!s.added,
+      sp: s.sp, plan: s.plan, lb: s.dogLb || 45, catLb: s.catLb || 10, added: !!s.added,
       wholesale: !!s.wholesale, subsOff: window.hbSubsPaused(),
       tradePrice: tradeUnit, tradeMin: (s.trade && s.trade.minQty) || 5,
       eyebrow: eyebrow, lede: lede
@@ -8073,9 +8077,9 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<div class="pc-head__row"><div class="pc-head__k">How big is your bean?</div><div class="pc-lb" data-lbwrap><b data-lb>45</b><span>lb</span></div></div>'
   + '<div class="pc-slider">'
   + '<input type="range" min="10" max="150" step="1" value="45" aria-label="Your dog\'s weight in pounds" data-range>'
-  + '<div class="pc-ticks" aria-hidden="true"><i class="is-major" style="--p:7.14%"></i><i style="--p:28.57%"></i><i style="--p:50%"></i><i class="is-major" style="--p:64.29%"></i><i style="--p:85.71%"></i></div>'
+  + '<div class="pc-ticks" aria-hidden="true" data-ticks></div>'
   + '</div>'
-  + '<div class="pc-ends"><span>10 lb</span><span>150 lb</span></div>'
+  + '<div class="pc-ends"><span data-end-min>10 lb</span><span data-end-max>150 lb</span></div>'
   + '</div>'
   + '<div class="pc-body">'
   + '<div class="pc-dose"><div class="pc-chews" data-chews></div><div class="pc-dose__t" data-dose></div></div>'
@@ -8107,6 +8111,14 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
 var hbPcWired = new WeakSet();
 window.hbPcInit = function (ctx) {
   var PLANS = { 0: { key: 'once', price: 115, boxes: 1 }, 1: { key: 'monthly', price: 99, boxes: 1 }, 2: { key: 'four', price: 297, boxes: 4 }, 3: { key: 'big', price: 159, boxes: 2 } };
+  // Each formula has its own weight scale. Ticks are marked in pounds, and
+  // a major tick is a point where the dose changes — which is why the cat
+  // scale has none: one chew from 4 lb to 30.
+  var SCALE = {
+    dog: { min: 10, max: 150, def: 45, ticks: [{ lb: 20, major: true }, { lb: 50 }, { lb: 80 }, { lb: 100, major: true }, { lb: 130 }] },
+    cat: { min: 4, max: 30, def: 10, ticks: [{ lb: 10 }, { lb: 15 }, { lb: 20 }, { lb: 25 }] }
+  };
+  var clamp = function (sp, v) { var s = SCALE[sp]; return Math.max(s.min, Math.min(s.max, Number(v) || s.def)); };
   function chew(w, h, img) { return '<span style="width:' + w + 'px;height:' + h + 'px"><img src="/assets/img/purchase/chew.png" alt="" style="width:' + img + 'px;height:' + img + 'px"></span>'; }
   document.querySelectorAll('[data-hb-pc-host]').forEach(function (host) {
     var root = host.firstElementChild;
@@ -8117,12 +8129,13 @@ window.hbPcInit = function (ctx) {
       // First sight of this node (or a hydration clone that kept the markup
       // and lost the listeners): wire it and give it its own state.
       hbPcWired.add(root);
-      S = root.__pc = { sp: 'dog', lb: 45, sel: '1', added: false, wholesale: false, subsOff: false, tradePrice: null, tradeMin: 5 };
+      S = root.__pc = { sp: 'dog', lb: 45, catLb: 10, sel: '1', added: false, wholesale: false, subsOff: false, tradePrice: null, tradeMin: 5 };
       wire(root, S);
     }
     if (ctx) {
       S.sp = ctx.sp === 'cat' ? 'cat' : 'dog';
-      if (ctx.lb != null) S.lb = Math.max(10, Math.min(150, Number(ctx.lb) || 45));
+      if (ctx.lb != null) S.lb = clamp('dog', ctx.lb);
+      if (ctx.catLb != null) S.catLb = clamp('cat', ctx.catLb);
       if (ctx.plan != null) S.sel = String(ctx.plan);
       S.added = !!ctx.added; S.wholesale = !!ctx.wholesale; S.subsOff = !!ctx.subsOff;
       S.tradePrice = ctx.tradePrice || null; S.tradeMin = ctx.tradeMin || 5;
@@ -8136,20 +8149,24 @@ window.hbPcInit = function (ctx) {
     var rows = Array.prototype.slice.call(root.querySelectorAll('.pc-row'));
     var emit = function (name, detail) { root.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); };
     // Dragging re-renders the panel alone; the app hears the weight on release.
-    range.addEventListener('input', function () { S.lb = Number(range.value); render(root, S); });
-    range.addEventListener('change', function () { S.lb = Number(range.value); render(root, S); emit('hb:pc', { lb: S.lb, plan: Number(S.sel) }); });
+    var setLb = function () { if (S.sp === 'cat') S.catLb = Number(range.value); else S.lb = Number(range.value); };
+    range.addEventListener('input', function () { setLb(); render(root, S); });
+    range.addEventListener('change', function () { setLb(); render(root, S); emit('hb:pc', { sp: S.sp, lb: Number(range.value), plan: Number(S.sel) }); });
     rows.forEach(function (r) {
       r.addEventListener('click', function () { S.sel = r.getAttribute('data-plan'); S.added = false; render(root, S); emit('hb:pc', { plan: Number(S.sel) }); });
     });
     cta.addEventListener('click', function () {
-      var c = PLANS[S.sel], cat = S.sp === 'cat', d = window.hbDose(S.sp, S.lb);
-      emit('hb:add-to-cart', { plan: Number(S.sel), key: c.key, price: S.sel === '0' && S.tradePrice ? S.tradePrice : c.price, boxes: c.boxes, weightLb: cat ? null : S.lb, dosePerDay: d });
+      var c = PLANS[S.sel], lb = S.sp === 'cat' ? S.catLb : S.lb;
+      emit('hb:add-to-cart', { sp: S.sp, plan: Number(S.sel), key: c.key, price: S.sel === '0' && S.tradePrice ? S.tradePrice : c.price, boxes: c.boxes, weightLb: lb, dosePerDay: window.hbDose(S.sp, lb) });
     });
   }
 
   function render(root, S) {
     var range = root.querySelector('[data-range]'), lbWrap = root.querySelector('[data-lbwrap]'), chews = root.querySelector('[data-chews]'), doseEl = root.querySelector('[data-dose]'), cta = root.querySelector('[data-cta]');
-    var cat = S.sp === 'cat', d = window.hbDose(S.sp, S.lb), lasts = Math.round(30 / d), big = !cat && d === 1.5 && !S.subsOff && !S.wholesale;
+    var cat = S.sp === 'cat', sc = SCALE[cat ? 'cat' : 'dog'];
+    var lb = clamp(cat ? 'cat' : 'dog', cat ? S.catLb : S.lb);
+    if (cat) S.catLb = lb; else S.lb = lb;
+    var d = window.hbDose(S.sp, lb), lasts = Math.round(30 / d), big = !cat && d === 1.5 && !S.subsOff && !S.wholesale;
     root.setAttribute('data-sp', cat ? 'cat' : 'dog');
     root.querySelector('[data-eyebrow]').textContent = S.eyebrow || '';
     root.querySelector('[data-lede]').textContent = S.lede || '';
@@ -8158,13 +8175,21 @@ window.hbPcInit = function (ctx) {
     if (S.sel === '3' && !big) S.sel = '1';
     if ((S.sel === '1' || S.sel === '3') && (S.subsOff || S.wholesale)) S.sel = '0';
     if (S.sel === '2' && S.wholesale) S.sel = '0';
-    range.value = String(S.lb);
+    var pct = function (v) { return ((v - sc.min) / (sc.max - sc.min)) * 100; };
+    range.min = String(sc.min); range.max = String(sc.max); range.value = String(lb);
     // The track's filled portion is a CSS variable the thumb position sets.
-    var slider = range.parentNode; if (slider && slider.style) slider.style.setProperty('--pct', (((S.lb - 10) / 140) * 100).toFixed(2) + '%');
-    lbWrap.innerHTML = cat ? 'Any weight' : '<b data-lb>' + S.lb + '</b><span>lb</span>';
+    var slider = range.parentNode; if (slider && slider.style) slider.style.setProperty('--pct', pct(lb).toFixed(2) + '%');
+    var ticks = root.querySelector('[data-ticks]'), tkey = cat ? 'cat' : 'dog';
+    if (ticks.__sp !== tkey) {
+      ticks.__sp = tkey;
+      ticks.innerHTML = sc.ticks.map(function (t) { return '<i' + (t.major ? ' class="is-major"' : '') + ' style="--p:' + pct(t.lb).toFixed(2) + '%"></i>'; }).join('');
+    }
+    root.querySelector('[data-end-min]').textContent = sc.min + ' lb';
+    root.querySelector('[data-end-max]').textContent = sc.max + ' lb';
+    lbWrap.innerHTML = '<b data-lb>' + lb + '</b><span>lb</span>';
     chews.innerHTML = d === 0.5 ? chew(25, 50, 50) : d === 1 ? chew(50, 50, 50) : chew(40, 40, 40) + chew(13, 26, 26);
-    doseEl.textContent = cat ? '1 chew a day · any weight'
-      : (d === 0.5 ? '½ chew a day' : d === 1 ? '1 chew a day' : '1½ chews a day') + ' for a ' + S.lb + ' lb dog';
+    doseEl.textContent = (d === 0.5 ? '½ chew a day' : d === 1 ? '1 chew a day' : '1½ chews a day')
+      + ' for a ' + lb + ' lb ' + (cat ? 'cat' : 'dog');
     root.querySelectorAll('.pc-row').forEach(function (r) {
       var k = r.getAttribute('data-plan'), p = PLANS[k], fit = r.querySelector('[data-fit]');
       r.setAttribute('aria-pressed', String(k === S.sel));
@@ -8182,7 +8207,7 @@ window.hbPcInit = function (ctx) {
         ? (lasts >= 30 ? 'A box lasts ' + lasts + ' days' : 'A box lasts ' + lasts + ' days · we ship every ' + lasts)
         : (p.boxes * lasts) + ' days of chews';
     });
-    var c = PLANS[S.sel], price = S.sel === '0' && S.wholesale && S.tradePrice ? S.tradePrice : c.price;
+    var c = PLANS[S.sel] || PLANS[1], price = S.sel === '0' && S.wholesale && S.tradePrice ? S.tradePrice : c.price;
     cta.textContent = S.added ? 'Added — checkout →' : 'Start the ' + (c.boxes * lasts) + ' days · $' + String(price).replace(/\.00$/, '') + ' →';
   }
 };
