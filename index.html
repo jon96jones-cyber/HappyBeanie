@@ -2539,7 +2539,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         </div>
       </section>
 
-      <div data-m="wksec" style="position: relative; margin: 0 -44px 0; padding: 62px 44px 58px; background: #17140F; color: #F5F0E6; border-top: 1px solid #DDD3C0; overflow: hidden;">
+      <div data-m="wksec" style="position: relative; margin: 0 -44px 0; padding: 62px 44px 58px; background: #17140F; color: #F5F0E6; overflow: hidden;">
         <div aria-hidden="true" style="position: absolute; right: -180px; top: -220px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.10), transparent 70%); pointer-events: none;"></div>
         <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(245,240,230,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(245,240,230,0.035) 1px, transparent 1px); background-size: 34px 34px; -webkit-mask-image: radial-gradient(120% 80% at 8% 0%, #000 0%, transparent 74%); mask-image: radial-gradient(120% 80% at 8% 0%, #000 0%, transparent 74%);"></div>
         <!-- The upper half of the FAQ band's corner glow. That band clips its
@@ -6249,10 +6249,33 @@ Component.prototype.renderVals = function () {
     --hb-mono: 'HB Mono Figures', 'DM Mono', ui-monospace, monospace;
 
     position: relative;
-    padding: 78px 44px 62px;
-    background: var(--hb-desk);
+    /* --hb-blend: the hand-off band at the foot of the desk (Jon, Sep 2026).
+       The desk cream eases into the ink of the "What to expect" section
+       below over this height, under the last of the content, so the two
+       sections meet without an edge. Eased stops, not a two-stop ramp,
+       so the mid-tones don't band. */
+    --hb-blend: 320px;
+    padding: 78px 44px calc(62px + var(--hb-blend));
+    /* First layer: the upper half of the next section's corner glow (its
+       620px circle at right -180px / top -220px is clipped at its top edge
+       by overflow: hidden), so the glow starts inside the band rather than
+       switching on at the seam. */
+    background:
+      radial-gradient(438px circle at calc(100% - 130px) calc(100% + 90px), oklch(0.86 0.14 92 / 0.10), transparent 70%),
+      linear-gradient(to bottom,
+        var(--hb-desk) 0,
+        var(--hb-desk) calc(100% - var(--hb-blend)),
+        color-mix(in oklch, var(--hb-desk), var(--hb-ink) 3%) calc(100% - var(--hb-blend) * 0.875),
+        color-mix(in oklch, var(--hb-desk), var(--hb-ink) 10%) calc(100% - var(--hb-blend) * 0.75),
+        color-mix(in oklch, var(--hb-desk), var(--hb-ink) 25%) calc(100% - var(--hb-blend) * 0.625),
+        color-mix(in oklch, var(--hb-desk), var(--hb-ink) 50%) calc(100% - var(--hb-blend) * 0.5),
+        color-mix(in oklch, var(--hb-desk), var(--hb-ink) 75%) calc(100% - var(--hb-blend) * 0.375),
+        color-mix(in oklch, var(--hb-desk), var(--hb-ink) 90%) calc(100% - var(--hb-blend) * 0.25),
+        color-mix(in oklch, var(--hb-desk), var(--hb-ink) 97%) calc(100% - var(--hb-blend) * 0.125),
+        var(--hb-ink) 100%)
+      var(--hb-desk);
     border-top: 1px solid var(--hb-hairline);
-    border-bottom: 1px solid var(--hb-hairline);
+    border-bottom: 0;
     font-family: var(--hb-sans);
     color: var(--hb-ink);
     /* Full bleed. The handoff leaves this out because it depends on the
@@ -6278,7 +6301,22 @@ Component.prototype.renderVals = function () {
       repeating-linear-gradient(90deg, rgba(23,20,15,0.045) 0 1px, transparent 1px 88px),
       repeating-linear-gradient(0deg, rgba(23,20,15,0.045) 0 1px, transparent 1px 88px);
   }
-  .hb-ev::after { background: radial-gradient(62% 52% at 50% 42%, rgba(255,253,247,0.72), transparent 76%); }
+  /* The pool of light, plus the next section's cream grid painted across the
+     whole desk: invisible on cream, it surfaces as the blend band darkens
+     while the ink grid above sinks — so the grid itself changes hands across
+     the seam. Its 0deg/90deg repeats start at the bottom and left edges, the
+     next section's tiles at its top and left, so lines meet at the seam. The
+     mask keeps the band's grid to the same bottom-left ellipse that section
+     masks its own grid with (its top-left, mirrored), and leaves everything
+     above the band alone. */
+  .hb-ev::after {
+    background:
+      radial-gradient(62% 52% at 50% 42%, rgba(255,253,247,0.72), transparent 76%),
+      repeating-linear-gradient(90deg, rgba(245,240,230,0.035) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(0deg, rgba(245,240,230,0.035) 0 1px, transparent 1px 34px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--hb-blend)), transparent calc(100% - var(--hb-blend))), radial-gradient(120% 480px at 8% 100%, #000 0%, transparent 74%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--hb-blend)), transparent calc(100% - var(--hb-blend))), radial-gradient(120% 480px at 8% 100%, #000 0%, transparent 74%);
+  }
   .hb-ev__inner { position: relative; max-width: 1180px; margin: 0 auto; }
 
   .hb-ev__head { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; margin-bottom: 34px; }
@@ -6325,7 +6363,7 @@ Component.prototype.renderVals = function () {
   .hb-ev__note { border-top: 1px solid var(--hb-hairline); padding-top: 18px; font-family: var(--hb-mono); font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.75; text-transform: uppercase; color: var(--hb-muted); margin: 0; max-width: 40em; }
 
   @media (max-width: 900px) {
-    .hb-ev { padding: 56px 22px 42px; }
+    .hb-ev { --hb-blend: 240px; padding: 56px 22px calc(42px + var(--hb-blend)); }
     .hb-ev__head { grid-template-columns: 1fr; align-items: start; gap: 14px; }
     .hb-ev__scope { padding-bottom: 0; }
     .hb-ev__stage { height: 640px; }
