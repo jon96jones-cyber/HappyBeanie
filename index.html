@@ -595,10 +595,16 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
 /* belt */
 .hb-belt { width: 100vw; margin: 40px 0 0 calc(50% - 50vw); }
-.hb-marq { overflow: hidden; margin-bottom: 12px; -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); }
+/* No edge fade: the handoff masked both ends to transparent, which read as
+   blank patches at the sides of the belt. Tiles now run to the edges. */
+.hb-marq { overflow: hidden; margin-bottom: 12px; }
+/* Each track is filled by hbWallInit() to at least twice the viewport, in
+   whole copies of its photo set, so the -50% loop never shows its end; the
+   duration is set there too, from a fixed px/s, so the pace does not change
+   with how many copies a given screen needed. */
 .hb-track { display: flex; gap: 12px; width: max-content; will-change: transform; }
-.hb-track--a { animation: hbBeltL 110s linear infinite; }
-.hb-track--b { animation: hbBeltR 130s linear infinite; }
+.hb-track--a { animation: hbBeltL 60s linear infinite; }
+.hb-track--b { animation: hbBeltR 70s linear infinite; }
 .hb-marq:hover .hb-track { animation-play-state: paused; }
 .hb-tile { position: relative; width: 380px; height: 380px; flex: 0 0 auto; border-radius: 4px; overflow: hidden; background: #E4DBC9; }
 .hb-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -7463,6 +7469,40 @@ window.hbWallInit = function () {
     var ex = root.querySelector('[data-expand]'); if (ex) ex.addEventListener('click', function () { expanded = !expanded; render(); });
     grid.addEventListener('click', function (e) { if (e.target.closest('[data-rev]')) { expanded = !expanded; render(); } });
     render();
+
+    // The photo belt. The handoff duplicated each row's photos once, which
+    // covers a 1280px screen and no more: on a wider one the -50% loop's
+    // half-width falls short of the viewport and the track's end shows as a
+    // blank patch. Each track is rebuilt from its photo set in whole copies —
+    // an even number, so translateX(-50%) still lands on a seam — until half
+    // the track is at least the viewport wide. Speed is fixed in px/s and the
+    // duration derived from it, so the belt moves at the same pace however
+    // many copies the screen needed. Re-done on resize, when the tile width
+    // or the viewport changes.
+    var SPEED = { a: 64, b: 54 };
+    function fillBelt() {
+      root.querySelectorAll('.hb-track').forEach(function (track) {
+        if (!track.__unit) track.__unit = Array.prototype.slice.call(track.children, 0, Math.max(1, Math.floor(track.children.length / 2)));
+        var unit = track.__unit, first = track.firstElementChild;
+        if (!first) return;
+        var tile = first.getBoundingClientRect().width;
+        if (!tile) return;
+        var gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 12;
+        var unitW = unit.length * (tile + gap);
+        var vw = window.innerWidth || document.documentElement.clientWidth;
+        var copies = 2 * Math.max(1, Math.ceil((vw + gap) / unitW));
+        if (track.__copies !== copies) {
+          track.__copies = copies;
+          while (track.firstChild) track.removeChild(track.firstChild);
+          for (var i = 0; i < copies; i++) unit.forEach(function (n) { track.appendChild(n.cloneNode(true)); });
+        }
+        var speed = SPEED[track.classList.contains('hb-track--b') ? 'b' : 'a'];
+        track.style.animationDuration = ((copies * unitW / 2) / speed).toFixed(1) + 's';
+      });
+    }
+    fillBelt();
+    var beltTimer = 0;
+    window.addEventListener('resize', function () { clearTimeout(beltTimer); beltTimer = setTimeout(fillBelt, 150); });
   });
 };
 
