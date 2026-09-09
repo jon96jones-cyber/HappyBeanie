@@ -1203,6 +1203,18 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="flipwrap"]:focus-visible [data-m~="flipface"] { transform: translateY(-100%) !important; }
     [data-m~="flipwrap"]:focus-visible [data-m~="flipback"] { transform: translateY(0) !important; }
     [data-m~="fliparrow"] { display: none; }
+    /* Product buy column, desktop order (Jon, Sep 2026): purchase panel
+       first, straight under the animal picker; the eligibility card under
+       its buy button; then the name, lede and rating; promises; specs. The
+       source order (phones) keeps the name and lede on top. */
+    [data-m~="pdpcol"] { display: flex; flex-direction: column; }
+    [data-m~="pdpcol"] > [data-m~="pdpbatch"] { order: 0; }
+    [data-m~="pdpcol"] > [data-m~="pdpbuy"] { order: 1; }
+    [data-m~="pdpcol"] > [data-m~="pdpqz"] { order: 2; }
+    [data-m~="pdpcol"] > [data-m~="pdphead"] { order: 3; margin: 32px 0 6px !important; }
+    [data-m~="pdpcol"] > [data-m~="pdpguar"] { order: 4; }
+    [data-m~="pdpcol"] > [data-m~="pdpspecs"] { order: 5; }
+    [data-m~="pdpcol"] > [data-m~="pdpqzm"], [data-m~="pdpcol"] > [data-m~="pdpqznote"] { order: 6; }
   }
   /* ---- contact hero: drifting beans + the support chat vignette ---- */
   @keyframes cthDrift { 0%, 100% { transform: translateY(0) rotate(var(--tilt, -18deg)); } 50% { transform: translateY(-18px) rotate(calc(var(--tilt, -18deg) + 12deg)); } }
@@ -2335,17 +2347,13 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
           </div>
           </div>
         </div>
-        <div>
-          <div style="display: flex; flex-wrap: wrap; gap: 26px 30px; align-items: flex-start; margin-bottom: 22px;">
-            <!-- 348, not 300. The eligibility card beside this drops to its own
-                 row once the two stop fitting, and at a 300px basis that hand-off
-                 came too late: between roughly 1160 and 1270 both stayed on one
-                 line and squeezed this column to 307px, pushing the lede to a
-                 third line. 348 is the narrowest the lede can be and still set in
-                 two, so the card now leaves exactly when it has to — and no
-                 earlier, which is why this is not 360: at 360 the card dropped
-                 below even at 1440, where there is comfortably room for both. -->
-            <div style="flex: 1 1 348px; min-width: 0;">
+        <!-- pdpcol: on desktop the column is re-ordered by CSS (Jon, Sep 2026)
+             so the purchase panel sits right under the animal picker, the
+             eligibility card under its buy button, and the name, lede and
+             rating below that. Phones keep this source order. -->
+        <div data-m="pdpcol">
+          <div data-m="pdphead" style="margin-bottom: 22px;">
+            <div style="min-width: 0;">
               <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 14px;">{{ pdpEyebrow }}</div>
               <!-- 15px so the lede sets in two lines rather than three. At 16.5 it
                    needed 429px and the column is 354, so it wrapped a third line
@@ -2360,13 +2368,8 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
                 <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase; color: #6A6055; white-space: nowrap;">1,204 verified owners</span>
               </div>
             </div>
-            <a sc-camel-on-click="{{ goQuiz }}" data-m="qzcard pdpqz" style="flex: 0 1 224px; max-width: 252px; cursor: pointer; display: grid; gap: 10px; padding: 18px 20px 17px; border: 1px solid rgba(23,20,15,0.1); border-radius: 20px; background: #FCFAF4; color: #17140F; box-shadow: 0 22px 40px -26px rgba(23,20,15,0.3), 0 1px 0 rgba(255,255,255,0.9) inset; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease;" style-hover="transform: translateY(-4px); box-shadow: 0 30px 52px -26px rgba(23,20,15,0.36);">
-              <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152);">Before you buy</span>
-              <span style="display: block; font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35;">Is Happy Beanie right for your pet?</span>
-              <span data-m="qzcta" style="display: block; text-align: center; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 12px 14px; border-radius: 999px;">Check eligibility →</span>
-            </a>
           </div>
-          <div data-pre-show style="border: 1px solid oklch(0.86 0.14 92 / 0.55); border-left: 3px solid oklch(0.86 0.14 92); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.1); padding: 14px 16px 15px; margin-bottom: 14px;">
+          <div data-pre-show data-m="pdpbatch" style="border: 1px solid oklch(0.86 0.14 92 / 0.55); border-left: 3px solid oklch(0.86 0.14 92); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.1); padding: 14px 16px 15px; margin-bottom: 14px;">
             <div style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; margin-bottom: 6px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.14 78); animation: qzBlip 1.6s ease-in-out infinite;"></span>Batch 0072 · in production</div>
             <div style="font-size: 13px; line-height: 1.6; color: #554C40;">Order now to reserve your box from this run. Batch 0072 ships in ~4 weeks, as soon as it&rsquo;s formulated and clears testing.</div>
           </div>
@@ -2375,7 +2378,16 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
                Injected and wired by hbPcInit() like the FAQ/dosing widgets —
                it reports plan/weight back through hb:pc and hb:add-to-cart
                (listeners in componentDidMount). -->
-          <div data-hb-pc-host></div>
+          <div data-hb-pc-host data-m="pdpbuy"></div>
+          <!-- Desktop eligibility card: a full-width row under the buy button.
+               Hidden on phones, where pdpqzm below takes over. -->
+          <a sc-camel-on-click="{{ goQuiz }}" data-m="qzcard pdpqz" style="cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 10px 24px; align-items: center; padding: 18px 22px; margin: 14px 0 0; border: 1px solid rgba(23,20,15,0.1); border-radius: 20px; background: #FCFAF4; color: #17140F; box-shadow: 0 22px 40px -26px rgba(23,20,15,0.3), 0 1px 0 rgba(255,255,255,0.9) inset; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease;" style-hover="transform: translateY(-4px); box-shadow: 0 30px 52px -26px rgba(23,20,15,0.36);">
+            <span style="display: block; min-width: 0;">
+              <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 8px;">Before you buy</span>
+              <span style="display: block; font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35;">Is Happy Beanie right for your pet?</span>
+            </span>
+            <span data-m="qzcta" style="display: block; text-align: center; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 12px 22px; border-radius: 999px; white-space: nowrap;">Check eligibility →</span>
+          </a>
           <a sc-camel-on-click="{{ goQuiz }}" data-m="pdpqzm" style="display: none; cursor: pointer; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 15px; border: 1px solid #E0D6C2; border-radius: 3px; background: #F5F0E6; margin: 30px 0 0; color: #17140F;">
             <span style="flex: 1 1 260px; min-width: 0;">
               <span data-m="hmqh" style="display: block; text-align: center; font-weight: 700; font-size: 15px; margin-bottom: 4px;">Not sure Happy Beanie is right for your pet?</span>
@@ -2389,7 +2401,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
             <div style="background: #FCFAF4; padding: 14px 12px; text-align: center;"><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 5px;">Free shipping</div><div style="font-size: 12.5px; line-height: 1.4; color: #554C40;">On every order over $60</div></div>
             <div style="background: #FCFAF4; padding: 14px 12px; text-align: center;"><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 5px;">Cancel anytime</div><div style="font-size: 12.5px; line-height: 1.4; color: #554C40;">One click, no phone call</div></div>
           </div>
-          <div data-m="stack" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #E0D6C2; border-bottom: 1px solid #E0D6C2; margin-bottom: 32px;">
+          <div data-m="stack pdpspecs" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #E0D6C2; border-bottom: 1px solid #E0D6C2; margin-bottom: 32px;">
             <sc-for list="{{ specs }}" as="sp2" hint-placeholder-count="3">
               <div style="padding: 20px 16px 20px 0;">
                 <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 7px;">{{ sp2.k }}</div>
