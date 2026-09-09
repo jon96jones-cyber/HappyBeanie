@@ -705,20 +705,33 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .pc-id__n { font-family: var(--mono); font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .pc-id__lede { margin: 10px 0 0; font-size: 14px; line-height: 1.6; color: #4E463B; max-width: 36em; text-wrap: pretty; }
 .pc-id__lede:empty { display: none; }
-.pc-head { padding: 22px 24px 18px; background: var(--yellow); }
-.pc-head__row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 10px; }
-.pc-head__k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; }
-.pc-lb { font-weight: 700; letter-spacing: -0.05em; font-size: 32px; line-height: 0.9; font-variant-numeric: tabular-nums; }
+/* Head (slider redesign, Jon, Sep 2026): dotted yellow ground that darkens
+   toward its foot, big readout, thick two-tone track, ringed thumb, ticks. */
+.pc-head { position: relative; padding: 26px 24px 20px; background: radial-gradient(rgba(23,20,15,0.09) 1px, transparent 1.2px) 0 0 / 24px 24px, linear-gradient(to bottom, oklch(0.87 0.14 92) 0%, oklch(0.85 0.14 90) 70%, oklch(0.80 0.14 86) 100%); box-shadow: inset 0 -28px 36px -30px rgba(23,20,15,0.45); }
+.pc-head__row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 14px; }
+.pc-head__k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; padding-bottom: 7px; }
+.pc-lb { font-weight: 700; letter-spacing: -0.06em; font-size: 40px; line-height: 0.85; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .pc-lb span { font-family: var(--mono); font-weight: 400; font-size: 11px; letter-spacing: 0.18em; margin-left: 6px; }
-.pc-head input { display: block; width: 100%; height: 26px; accent-color: var(--ink); margin: 0; cursor: pointer; }
-.pc-ends { display: flex; justify-content: space-between; margin-top: 4px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #4A4235; }
-.pc-ends .stock { display: flex; align-items: center; gap: 7px; } .pc-ends .stock i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
+.pc-slider { --r: 13px; --pct: 25%; position: relative; padding-bottom: 14px; }
+.pc-slider input { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 26px; margin: 0; background: transparent; cursor: pointer; outline: none; }
+.pc-slider input::-webkit-slider-runnable-track { height: 7px; border-radius: 999px; background: linear-gradient(90deg, var(--ink) 0 var(--pct), rgba(23,20,15,0.18) var(--pct) 100%); }
+.pc-slider input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; margin-top: -9.5px; border-radius: 50%; background: var(--ink); border: 3px solid #FCFAF4; box-shadow: 0 6px 14px -5px rgba(23,20,15,0.6); }
+.pc-slider input::-moz-range-track { height: 7px; border-radius: 999px; background: rgba(23,20,15,0.18); }
+.pc-slider input::-moz-range-progress { height: 7px; border-radius: 999px; background: var(--ink); }
+.pc-slider input::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--ink); border: 3px solid #FCFAF4; box-shadow: 0 6px 14px -5px rgba(23,20,15,0.6); }
+.pc-slider input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(23,20,15,0.25), 0 6px 14px -5px rgba(23,20,15,0.6); }
+/* Ticks sit on the thumb's travel, which runs from one radius in to one
+   radius short of the far edge. */
+.pc-ticks { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; pointer-events: none; }
+.pc-ticks i { position: absolute; top: 0; left: calc(var(--r) + (100% - 2 * var(--r)) * var(--p) / 100%); width: 1px; height: 6px; margin-left: -0.5px; background: rgba(23,20,15,0.32); }
+.pc-ticks i.is-major { width: 2px; height: 8px; margin-left: -1px; background: var(--ink); }
+.pc-ends { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #4A4235; }
 /* Cats: the formula is dosed flat, so the slider and its end labels go and
    the readout says so (README, Setup_39). */
 .pc[data-sp="cat"] .pc-head__row { margin-bottom: 0; }
-.pc[data-sp="cat"] .pc-head input, .pc[data-sp="cat"] .pc-ends > span:not(.stock) { display: none; }
-.pc[data-sp="cat"] .pc-ends { justify-content: flex-start; margin-top: 12px; }
-.pc[data-sp="cat"] .pc-lb { font-size: 20px; letter-spacing: -0.04em; }
+.pc[data-sp="cat"] .pc-slider, .pc[data-sp="cat"] .pc-ends { display: none; }
+.pc[data-sp="cat"] .pc-lb { font-size: 22px; letter-spacing: -0.04em; line-height: 1; }
+.pc[data-sp="cat"] .pc-head__k { padding-bottom: 2px; }
 .pc-body { padding: 20px 24px 0; }
 .pc-dose { display: grid; grid-template-columns: 56px 1fr; gap: 16px; align-items: center; padding-bottom: 16px; border-bottom: 1px solid rgba(23,20,15,0.12); }
 .pc-chews { display: flex; align-items: flex-end; justify-content: center; gap: 3px; width: 56px; height: 50px; }
@@ -741,7 +754,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .pc-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7; }
 .pc-cta { display: block; width: 100%; padding: 20px; background: var(--ink); color: #F5F0E6; border: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s ease; }
 .pc-cta:hover { background: var(--green); }
-@media (max-width: 600px) { .pc-head { padding: 18px 18px 14px; } .pc-body { padding: 16px 18px 0; } }
+@media (max-width: 600px) { .pc-head { padding: 20px 18px 16px; } .pc-lb { font-size: 34px; } .pc-body { padding: 16px 18px 0; } }
 
 /* Dosing page (designer handoff, Setup_32): hero, calculator, quiz CTA band.
    Vars scoped on .hb-dose like .hb-faq's — the injected wrappers carry the
@@ -8042,10 +8055,16 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<span class="pc-id__rate" data-pre-hide><span class="pc-id__stars" aria-hidden="true">★★★★★</span><span class="pc-id__n">1,204 verified owners</span></span></div>'
   + '<p class="pc-id__lede" data-lede></p>'
   + '</div>'
+  // Slider redesign (Jon, Sep 2026): dotted yellow head, big readout,
+  // thick two-tone track with a ringed thumb, and ticks under it — bold at
+  // the two dose thresholds (20 and 100 lb), light between.
   + '<div class="pc-head">'
   + '<div class="pc-head__row"><div class="pc-head__k">How big is your bean?</div><div class="pc-lb" data-lbwrap><b data-lb>45</b><span>lb</span></div></div>'
+  + '<div class="pc-slider">'
   + '<input type="range" min="10" max="150" step="1" value="45" aria-label="Your dog\'s weight in pounds" data-range>'
-  + '<div class="pc-ends"><span>10 lb</span><span class="stock" data-pre-hide><i></i>In stock · ships in 24h</span><span>150 lb</span></div>'
+  + '<div class="pc-ticks" aria-hidden="true"><i class="is-major" style="--p:7.14%"></i><i style="--p:28.57%"></i><i style="--p:50%"></i><i class="is-major" style="--p:64.29%"></i><i style="--p:85.71%"></i></div>'
+  + '</div>'
+  + '<div class="pc-ends"><span>10 lb</span><span>150 lb</span></div>'
   + '</div>'
   + '<div class="pc-body">'
   + '<div class="pc-dose"><div class="pc-chews" data-chews></div><div class="pc-dose__t" data-dose></div></div>'
@@ -8129,6 +8148,8 @@ window.hbPcInit = function (ctx) {
     if ((S.sel === '1' || S.sel === '3') && (S.subsOff || S.wholesale)) S.sel = '0';
     if (S.sel === '2' && S.wholesale) S.sel = '0';
     range.value = String(S.lb);
+    // The track's filled portion is a CSS variable the thumb position sets.
+    var slider = range.parentNode; if (slider && slider.style) slider.style.setProperty('--pct', (((S.lb - 10) / 140) * 100).toFixed(2) + '%');
     lbWrap.innerHTML = cat ? 'Any weight' : '<b data-lb>' + S.lb + '</b><span>lb</span>';
     chews.innerHTML = d === 0.5 ? chew(25, 50, 50) : d === 1 ? chew(50, 50, 50) : chew(40, 40, 40) + chew(13, 26, 26);
     doseEl.textContent = cat ? '1 chew a day · any weight'
