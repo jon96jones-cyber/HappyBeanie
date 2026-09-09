@@ -747,6 +747,15 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .pc-tag { position: absolute; top: -9px; left: 14px; padding: 3px 8px; background: var(--ink); color: #F5F0E6; font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; border-radius: 2px; opacity: 0; transform: translateY(4px); transition: opacity 0.2s ease, transform 0.2s ease; pointer-events: none; }
 .pc-tag:empty { display: none; }
 .pc-row:hover .pc-tag { opacity: 1; transform: none; }
+/* Touch devices have no hover, so the row's tag ("Most chosen", "Best
+   value", "For big beans") rides the selection instead — otherwise the row
+   the page opens on carries no label at all (Jon, Sep 2026). The rows get a
+   little more air between them there so the chip sits in the gap rather
+   than over the row above. */
+@media (hover: none), (pointer: coarse) {
+  .pc-plans { gap: 14px; }
+  .pc-row[aria-pressed="true"] .pc-tag { opacity: 1; transform: none; }
+}
 .pc-row--big .pc-tag { background: var(--yellow); color: var(--ink); border: 1px solid var(--ink); }
 .pc-name { display: block; font-weight: 700; font-size: 15px; letter-spacing: -0.03em; }
 .pc-fit { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
@@ -8170,7 +8179,7 @@ window.hbPcInit = function (ctx) {
         r.querySelector('[data-tag]').textContent = S.wholesale ? 'Trade account' : '';
       }
       fit.textContent = p.key === 'monthly'
-        ? (lasts === 30 ? 'A box lasts 30 days · lands right on time' : lasts > 30 ? 'A box lasts ' + lasts + ' days · skip every other month' : 'A box lasts ' + lasts + ' days · we ship every ' + lasts)
+        ? (lasts === 30 ? 'A box lasts 30 days' : lasts > 30 ? 'A box lasts ' + lasts + ' days · skip every other month' : 'A box lasts ' + lasts + ' days · we ship every ' + lasts)
         : (p.boxes * lasts) + ' days of chews';
     });
     var c = PLANS[S.sel], price = S.sel === '0' && S.wholesale && S.tradePrice ? S.tradePrice : c.price;
