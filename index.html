@@ -619,8 +619,13 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 @media (max-width: 900px) {
   .hb-wall { padding: 64px 20px; }
   .hb-wall [data-m~="bwinst"] { grid-template-columns: 1fr !important; }
-  .hb-wall [data-m~="bwscore"] { border-right: none !important; border-bottom: 1.5px solid #17140F !important; padding: 24px 20px !important; }
-  .hb-wall [data-m~="bwscore"] > span:first-child { font-size: 52px !important; }
+  /* Phones: the score panel folds into one compact row — the number on the
+     left, stars and the review line stacked beside it — instead of a tall
+     centred block (Jon, Sep 2026). */
+  .hb-wall [data-m~="bwscore"] { display: grid !important; grid-template-columns: auto auto !important; justify-content: center !important; align-items: center !important; column-gap: 16px !important; row-gap: 3px !important; border-right: none !important; border-bottom: 1.5px solid #17140F !important; padding: 12px 16px !important; }
+  .hb-wall [data-m~="bwscore"] > span:first-child { grid-row: 1 / span 2 !important; font-size: 44px !important; line-height: 0.9 !important; }
+  .hb-wall [data-m~="bwscore"] > span:nth-child(2) { justify-self: start !important; }
+  .hb-wall [data-m~="bwscore"] > span:last-child { text-align: left !important; line-height: 1.45 !important; }
   .hb-wall [data-m~="bwinst"] > div:last-child { padding: 10px 14px !important; gap: 0 !important; }
   .hb-wall [data-row] { min-height: 26px !important; padding: 3px 6px !important; gap: 10px !important; grid-template-columns: 28px 1fr 44px 12px !important; }
   .hb-wall [data-m~="bwcards"] { grid-template-columns: 1fr !important; gap: 8px !important; }
