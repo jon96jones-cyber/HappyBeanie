@@ -5098,15 +5098,16 @@ class Component extends DCLogic {
       })(),
       // "What is not inside" chips — one list feeds both placements (homepage
       // band and product page) so they cannot drift. The list is Jon's, from
-      // the Setup_37 design export. Each chip strikes itself through 0.35s
-      // after it rises, and the chips rise 50ms apart.
+      // the Setup_37 design export. Each chip rises 60ms after the last and
+      // strikes itself through from 0.55s on, 110ms apart, so the crossing-out
+      // reads as a sequence rather than a flash.
       notInside: [
         'Artificial preservatives', 'Artificial flavors', 'Artificial colors & dyes',
         'Corn', 'Wheat', 'Soy', 'Added sugar', 'Animal by-products', 'Glycerin fillers', 'Carrageenan'
       ].map((label, i) => ({
         label,
-        chipStyle: { animationDelay: (i * 0.05).toFixed(2) + 's' },
-        strikeStyle: { animationDelay: (0.35 + i * 0.05).toFixed(2) + 's' }
+        chipStyle: { animationDelay: (i * 0.06).toFixed(2) + 's' },
+        strikeStyle: { animationDelay: (0.55 + i * 0.11).toFixed(2) + 's' }
       })),
       // "What is inside" flip cards — species-aware ingredient list with
       // per-card open state, drag handlers and live style objects.
@@ -7525,11 +7526,20 @@ window.hbWallInit = function () {
   });
 };
 
+// Wiring is tracked by node identity, like the FAQ band: the SPA can clone
+// a mounted subtree on re-render, and a clone would carry an armed/in-view
+// attribute without being observed — chips either pre-struck or stuck
+// hidden. A band that is not in the set is wired fresh, its copied "in"
+// state cleared, and the observer decides from where it actually is.
+var hbNzWired = new WeakSet();
 window.hbNzInit = function () {
-  var bands = document.querySelectorAll('.nz:not([data-nz-armed])');
+  var bands = document.querySelectorAll('.nz');
   if (!bands.length) return;
   var io = window.hbNzIo;
   if (!io && 'IntersectionObserver' in window) {
+    // Fires once at least half of the chip grid sits inside the viewport
+    // with the bottom fifth excluded — so the strikes play after the chips
+    // have scrolled well into view, not the moment their top edge appears.
     io = window.hbNzIo = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
@@ -7537,12 +7547,14 @@ window.hbNzInit = function () {
         if (band) band.setAttribute('data-nz-in', '1');
         io.unobserve(e.target);
       });
-    }, { threshold: 0.25 });
+    }, { threshold: 0.5, rootMargin: '0px 0px -20% 0px' });
   }
   bands.forEach(function (band) {
-    band.setAttribute('data-nz-armed', '1');
     var chips = band.querySelector('.nz__chips');
-    if (io && chips) io.observe(chips);
+    if (!chips || hbNzWired.has(chips)) return;
+    hbNzWired.add(chips);
+    band.removeAttribute('data-nz-in');
+    if (io) io.observe(chips);
     else band.setAttribute('data-nz-in', '1');
   });
 };
