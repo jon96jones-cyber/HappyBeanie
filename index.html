@@ -1058,11 +1058,14 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   .nz { position: relative; background: #17140F; color: #F5F0E6; overflow: hidden; text-align: center; }
   .nz--home { padding: 0 44px 96px; }
   .nz--pdp { margin: 0 -44px 0; padding: 84px 44px 88px; }
+  /* The catch section's dot grid used to start on the seam line, which gave
+     the edge away. It now fades in over the first 260px. */
+  #hbCatchWrap > div > div[aria-hidden]:first-child { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 260px), radial-gradient(120% 80% at 50% 10%, #000 0%, transparent 74%) !important; mask-image: linear-gradient(to bottom, transparent 0, #000 260px), radial-gradient(120% 80% at 50% 10%, #000 0%, transparent 74%) !important; -webkit-mask-composite: source-in !important; mask-composite: intersect !important; }
   /* The band hands off to the yellow catch section below through a gradient
      strip rather than a hard edge: ink warming through amber into the same
      yellow the catch is painted, pulled out to the band's edges and down
      over its bottom padding so the last pixel is the catch's first. */
-  .nz--pdp::after { content: ""; display: block; height: 300px; margin: 48px -44px -88px; background: linear-gradient(to bottom, #17140F 0%, oklch(0.26 0.05 92) 28%, oklch(0.44 0.09 92) 50%, oklch(0.64 0.13 92) 68%, oklch(0.78 0.145 92) 84%, oklch(0.85 0.14 92) 96%, oklch(0.86 0.14 92) 100%); }
+  .nz--pdp::after { content: ""; display: block; height: 360px; margin: 40px -44px -88px; background: radial-gradient(75% 95% at 50% 100%, oklch(0.86 0.14 92 / 0.55) 0%, oklch(0.86 0.14 92 / 0) 72%), linear-gradient(to bottom, #17140F 0%, oklch(0.184 0.013 70) 8%, oklch(0.221 0.022 72) 17%, oklch(0.278 0.036 73) 25%, oklch(0.349 0.053 76) 33%, oklch(0.430 0.071 78) 42%, oklch(0.515 0.090 81) 50%, oklch(0.600 0.107 84) 58%, oklch(0.681 0.122 86) 67%, oklch(0.752 0.133 89) 75%, oklch(0.809 0.139 90) 83%, oklch(0.846 0.140 92) 92%, oklch(0.86 0.14 92) 100%); }
   .nz__glow { position: absolute; left: 50%; top: 46%; width: 620px; aspect-ratio: 1; margin: -310px 0 0 -310px; border-radius: 50%; background: radial-gradient(closest-side, oklch(0.86 0.14 92 / 0.16), transparent 70%); filter: blur(30px); pointer-events: none; }
   .nz__in { position: relative; max-width: 1180px; margin: 0 auto; }
   .nz__kicker { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 20px; }
@@ -1088,7 +1091,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   @media (max-width: 900px) {
     .nz--home { padding: 0 20px 64px; }
     .nz--pdp { margin: 0 -20px 0; padding: 56px 20px 64px; }
-    .nz--pdp::after { height: 240px; margin: 36px -20px -64px; }
+    .nz--pdp::after { height: 280px; margin: 28px -20px -64px; }
     .nz__chew img { width: 104px; }
     /* Smaller type and tighter padding so the long chips share a row on a
        phone instead of each taking one. */
@@ -1098,7 +1101,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   }
   @media (max-width: 620px) {
     .nz--pdp { margin: 0 -16px 0; padding: 44px 16px 56px; }
-    .nz--pdp::after { height: 220px; margin: 32px -16px -56px; }
+    .nz--pdp::after { height: 260px; margin: 24px -16px -56px; }
   }
   [data-m~="flipwrap"]:focus-visible { outline: 2px solid #17140F; outline-offset: -2px; }
   [data-m~="flipdark"]:focus-visible { outline-color: #F5F0E6; }
