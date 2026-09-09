@@ -1653,6 +1653,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
        here is a pixel of clearance above the bandana. The sold-out note is
        longer and wraps to two; that state can afford the extra line. */
     [data-m~="catchtagnote"] { margin-top: 6px !important; font-size: 7px !important; letter-spacing: 0.01em !important; line-height: 1.5 !important; }
+    [data-m~="catchcta"] { margin-top: 4px !important; padding: 12px 14px !important; font-size: 10px !important; letter-spacing: 0.14em !important; }
   }
 </style>
 </helmet>
@@ -2507,6 +2508,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
               </div>
               <div data-m="catchtagnote" style="margin-top: 10px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A7F6E; line-height: 1.7;">{{ batchNote }}</div>
             </div>
+            <!-- CTA (Jon, Sep 2026): the same add-to-cart as the sticky bar, so
+                 it carries the plan and cycle the purchase panel is set to. -->
+            <button sc-camel-on-click="{{ barCtaGo }}" data-m="catchcta" style="display: block; width: 100%; margin-top: 2px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 16px 20px; border: none; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-weight: 500; cursor: pointer; box-shadow: 0 16px 30px -18px oklch(0.86 0.14 92 / 0.7); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">{{ barCta }}</button>
           </div>
         </div>
       </div>
