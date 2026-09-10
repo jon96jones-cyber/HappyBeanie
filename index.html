@@ -6265,7 +6265,10 @@ class Component extends DCLogic {
       factsSign: this.state.factsOpen ? '\u2013' : '+',
       toggleFacts: () => this.setState(s => ({ factsOpen: !s.factsOpen })),
       facts: copy.facts,
-      pdpName: isDog ? 'Happy Beans' : 'Happy Beans for Cats',
+      // Buy bar only. The species switch sits beside it and says which animal
+      // this is, so the name no longer repeats it (Jon, Sep 2026) — and the
+      // two sides stop disagreeing in length as you switch.
+      pdpName: 'Happy Beans',
       planRecap: planSel.title + ' · ' + this.money(planSel.price),
       barPct: this.state.pct + '%',
       assurances: [
