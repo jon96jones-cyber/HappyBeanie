@@ -4854,6 +4854,12 @@ class Component extends DCLogic {
     // already reports SPA navigations.
     try {
       if (window.fbq) {
+        // Every value below is the real one. They used to be $115 flat, so a
+        // $99 subscription, a $159 two-box order and a $297 bundle all
+        // reported as $115 — numbers any value-based bidding would later
+        // learn from (Jon, Sep 2026).
+        const M = this.cartMath();
+        const planPrice = [115, 99, 297, 159][this.state.plan] || 115;
         const pg = this.state.page || 'home';
         if (this._fbPage !== pg) {
           if (this._fbPage != null) window.fbq('track', 'PageView');
@@ -4862,25 +4868,30 @@ class Component extends DCLogic {
             window.fbq('track', 'ViewContent', {
               content_type: 'product',
               content_ids: [gaItem],
-              content_name: 'Happy Beans', currency: 'USD', value: 115
+              content_name: 'Happy Beans', currency: 'USD', value: planPrice
             });
-            if (window.gtag) window.gtag('event', 'view_item', { currency: 'USD', value: 115, items: [{ item_id: gaItem, item_name: 'Happy Beans' }] });
+            if (window.gtag) window.gtag('event', 'view_item', { currency: 'USD', value: planPrice, items: [{ item_id: gaItem, item_name: 'Happy Beans' }] });
           }
-          if (pg === 'checkout' && !window.__hbFbIC) { window.__hbFbIC = true; window.fbq('track', 'InitiateCheckout'); }
-          if (pg === 'checkout' && window.gtag && !window.__hbGaBC) { window.__hbGaBC = true; window.gtag('event', 'begin_checkout', { currency: 'USD', value: 115 }); }
+          if (pg === 'checkout' && !window.__hbFbIC) { window.__hbFbIC = true; window.fbq('track', 'InitiateCheckout', { currency: 'USD', value: M.total, num_items: M.totalQty }); }
+          if (pg === 'checkout' && window.gtag && !window.__hbGaBC) { window.__hbGaBC = true; window.gtag('event', 'begin_checkout', { currency: 'USD', value: M.total }); }
           this._fbPage = pg;
         }
         const fbQty = (this.state.cartDog || 0) + (this.state.cartCat || 0);
+        // What the cart is worth, so an add reports the difference it made
+        // rather than a fixed price per box.
+        if (this._fbSub == null) this._fbSub = M.sub;
         if (this._fbQty == null) this._fbQty = fbQty;
         else if (fbQty !== this._fbQty) {
           if (fbQty > this._fbQty) {
-            window.fbq('track', 'AddToCart', { content_type: 'product', currency: 'USD', value: 115 * (fbQty - this._fbQty) });
-            if (window.gtag) window.gtag('event', 'add_to_cart', { currency: 'USD', value: 115 * (fbQty - this._fbQty) });
+            const added = Math.max(0, Math.round((M.sub - this._fbSub) * 100) / 100) || planPrice * (fbQty - this._fbQty);
+            window.fbq('track', 'AddToCart', { content_type: 'product', currency: 'USD', value: added, contents: M.items.map(i => ({ id: i.key, quantity: i.qty, item_price: i.unitPrice })) });
+            if (window.gtag) window.gtag('event', 'add_to_cart', { currency: 'USD', value: added });
             window.__hbFbIC = false;
             window.__hbGaBC = false;
           }
           this._fbQty = fbQty;
         }
+        this._fbSub = M.sub;
       }
     } catch (e) {}
     // First-party analytics — deliberately its own block rather than riding on
@@ -4897,13 +4908,17 @@ class Component extends DCLogic {
           this._trkPage = tp;
         }
         const tq = (this.state.cartDog || 0) + (this.state.cartCat || 0);
+        const tSub = this.cartMath().sub;
+        if (this._trkSub == null) this._trkSub = tSub;
         if (this._trkQty == null) this._trkQty = tq;
         else if (tq !== this._trkQty) {
           if (tq > this._trkQty) {
-            window.hbTrack('add_to_cart', { species: this.state.sp, value: 115 * (tq - this._trkQty) });
+            // Same real value the pixel reports, so the desk and Meta agree.
+            window.hbTrack('add_to_cart', { species: this.state.sp, value: Math.max(0, Math.round((tSub - this._trkSub) * 100) / 100) });
           }
           this._trkQty = tq;
         }
+        this._trkSub = tSub;
       }
     } catch (e) {}
     const page = this.state.page || 'home';
