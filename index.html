@@ -3390,7 +3390,10 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
           <span class="sp"></span>
           <span sc-camel-on-click="{{ goShopping }}" class="lk">← Keep shopping</span>
         </div>
-        <h1 class="hb-h1" data-m="carthead">{{ cartHead }} <em>{{ cartHeadAccent }}</em></h1>
+        <!-- No headline (Jon, Sep 2026): the eyebrow above already names the
+             page and counts the items, so the table starts straight away.
+             The 26px below matches the checkout page. -->
+        <div style="height: 26px;"></div>
 
         <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
           <div class="hb-empty">
@@ -5670,8 +5673,6 @@ class Component extends DCLogic {
       goShopping: () => { this.setState({ added: false }); this.nav('product')(); },
       cartEmpty: M.items.length === 0,
       cartHasItems: M.items.length > 0,
-      cartHead: M.items.length === 0 ? 'Your cart is' : 'Two minutes from',
-      cartHeadAccent: M.items.length === 0 ? 'empty.' : 'the first box.',
       cartItems: M.items.map(i => ({
         slot: i.slot, ph: i.ph, badge: i.badge, name: i.name, planLabel: i.planLabel, qty: String(i.qty),
         // Box photos for the table and the summary (Setup_40).
