@@ -734,11 +734,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hbco .hb-fields input { border: 1px solid var(--line); background: var(--paper); border-radius: 3px; padding: 0 14px; font-family: var(--sans); font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink); height: 48px; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
 .hbco .hb-fields input:focus { border-color: var(--ink); outline: none; box-shadow: 0 0 0 3px oklch(0.86 0.14 92 / 0.35); }
 .hbco .hb-fields .err { font-family: var(--sans); font-size: 12px; letter-spacing: 0; text-transform: none; color: oklch(0.52 0.19 25); line-height: 1.4; }
-.hbco .hb-acct { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 12px; margin-top: 6px; padding: 0; border: none; background: none; text-align: left; cursor: pointer; font-family: var(--sans); font-size: 14px; letter-spacing: 0; text-transform: none; line-height: 1.5; color: var(--body); }
-.hbco .hb-acct .box { width: 18px; height: 18px; flex: 0 0 auto; margin-top: 2px; border: 1.5px solid var(--ink); border-radius: 3px; display: grid; place-items: center; color: #F5F0E6; font-size: 11px; transition: background 0.2s ease; }
-.hbco .hb-acct[aria-checked="true"] .box { background: var(--ink); }
-.hbco .hb-acct[aria-checked="true"] .box::after { content: "\2713"; }
-.hbco .hb-acct b { color: var(--ink); font-weight: 500; }
 @media (max-width: 1180px) { .hbco .hb-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; } .hbco .hb-sum { position: static; } }
 @media (max-width: 900px) {
   .hbco .hb-h1 { font-size: 30px; margin-bottom: 20px; }
@@ -3543,9 +3538,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
                         <span class="err" style="display: {{ cfd.errDisplay }};">{{ cfd.err }}</span>
                       </label>
                     </sc-for>
-                    <!-- Create my account, inside Contact (Setup_40). Same
-                         switch as the panel below, so the two never disagree. -->
-                    <button type="button" class="hb-acct" role="switch" aria-checked="{{ cs.acctChecked }}" sc-camel-on-click="{{ flipAcct }}" style="display: {{ cs.acctShow }};"><span class="box"></span><span><b>Create my account</b> — track every box from the bench to your door, pause or skip the plan yourself, and unlock 15% off with a bandana photo. No password; a one-time code signs you in.</span></button>
                   </div>
                 </div>
               </sc-for>
@@ -5789,9 +5781,6 @@ class Component extends DCLogic {
           shadow: last ? '0 40px 70px -44px rgba(0,0,0,0.85)' : 'none',
           state: done ? 'Complete' : (anyInvalid ? 'Check details' : 'Required'),
           stateColor: done ? 'oklch(0.44 0.07 152)' : (anyInvalid ? 'oklch(0.52 0.19 25)' : '#8A7F6E'),
-          // The account switch rides in Contact, per the handoff.
-          acctShow: sec.n === '01' ? 'flex' : 'none',
-          acctChecked: String(this.state.acctOptIn !== false),
           hasToggle: !!sec.toggle,
           hasFields: fields.length > 0,
           fieldsDisplay: fields.length > 0 ? 'grid' : 'none',
