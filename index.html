@@ -211,9 +211,24 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
   // Remember the email so the account sign-in can pre-fill it after checkout —
   // turns a returning guest's sign-in into "tap continue + enter code".
   try { if (buyer && buyer.email) localStorage.setItem('hb_email', buyer.email); } catch (e) {}
+  // Tell the pixel who this is, so the click that earned the order can be
+  // matched to a person rather than a cookie.
+  try {
+    if (window.hbAm && buyer) {
+      var parts = String(buyer.name || '').trim().split(/\s+/);
+      window.hbAm({ em: buyer.email, fn: parts[0], ln: parts.length > 1 ? parts[parts.length - 1] : '', ct: buyer.city, st: buyer.state, zp: buyer.zip, country: 'us' });
+    }
+  } catch (e) {}
   // Express checkout skips the on-site checkout page, so the InitiateCheckout
   // pixel event fires here at the true handoff (deduped against the page).
-  try { if (window.fbq && !window.__hbFbIC) { window.__hbFbIC = true; window.fbq('track', 'InitiateCheckout'); } } catch (e) {}
+  try {
+    if (!window.__hbFbIC) {
+      window.__hbFbIC = true;
+      var icPrice = [115, 99, 297, 159];
+      var icValue = rows.reduce(function (n, r) { return n + (icPrice[r.plan] || 115) * (r.qty || 1); }, 0);
+      window.hbMeta('InitiateCheckout', { currency: 'USD', value: icValue, num_items: rows.reduce(function (n, r) { return n + (r.qty || 1); }, 0) });
+    }
+  } catch (e) {}
   try { if (window.gtag && !window.__hbGaBC) { window.__hbGaBC = true; window.gtag('event', 'begin_checkout', { currency: 'USD', value: 115 }); } } catch (e) {}
   try { if (window.hbTrack) window.hbTrack('begin_checkout'); } catch (e) {}
   window.location.href = url;
@@ -268,6 +283,75 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
   else toast();
 })();
 
+/* Advanced matching + the Conversions API, both hanging off the pixel below.
+   The problem they solve: a bare pixel hit is an anonymous browser, and Meta
+   has to guess which person it belongs to from a cookie. Every guess that
+   fails is a lead you paid for that never joins an audience, and a purchase
+   that never gets credited to the ad that earned it.
+
+   hbAm(info) remembers whoever we have learned about — the email from the
+   popup, the name and address from checkout — and hands it to the pixel,
+   which hashes it before it leaves the browser. Nothing readable is sent to
+   Meta, and nothing is stored beyond this browser.
+
+   hbMeta(name, params) then fires each event twice: once through the pixel,
+   once through /api/meta from our own server, sharing one event id so Meta
+   counts the pair as one. The second copy is the one that survives content
+   blockers and iOS.
+
+   Purchase is deliberately not here: checkout happens on Shopify's domain,
+   so it comes from the Facebook & Instagram app in Shopify admin instead. */
+window.hbAm = (function () {
+  var KEY = 'hb-am', XID = 'hb-xid';
+  function read() { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } }
+  // A stable id for this browser, so Meta can tie a visitor's events together
+  // even before we know an email. Random, ours, and hashed before it is sent.
+  function xid() {
+    try {
+      var v = localStorage.getItem(XID);
+      if (!v) { v = 'hb' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12); localStorage.setItem(XID, v); }
+      return v;
+    } catch (e) { return null; }
+  }
+  function clean(o) {
+    var out = {};
+    ['em', 'ph', 'fn', 'ln', 'ct', 'st', 'zp', 'country'].forEach(function (k) {
+      var v = o && o[k]; if (v) out[k] = String(v).trim().toLowerCase().slice(0, 320);
+    });
+    return out;
+  }
+  function data() {
+    var d = read(); var id = xid();
+    if (id) d.external_id = id;
+    if (!d.country) d.country = 'us';
+    return d;
+  }
+  function set(info) {
+    var next = read(), add = clean(info), changed = false;
+    Object.keys(add).forEach(function (k) { if (next[k] !== add[k]) { next[k] = add[k]; changed = true; } });
+    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch (e) {}
+    // Re-initialising the same pixel updates what later events carry.
+    if (changed && window.fbq) { try { window.fbq('init', '2580258509080253', data()); } catch (e) {} }
+    return next;
+  }
+  window.hbAmData = data;
+  return set;
+})();
+// Fires one event down both paths under a shared id.
+window.hbMeta = function (name, params) {
+  var id = 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  try { if (window.fbq) window.fbq('track', name, params || {}, { eventID: id }); } catch (e) {}
+  try {
+    var am = window.hbAmData ? window.hbAmData() : {};
+    var body = { name: name, eventId: id, url: location.href };
+    Object.keys(params || {}).forEach(function (k) { body[k] = params[k]; });
+    Object.keys(am).forEach(function (k) { body[k] = am[k]; });
+    var blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
+    if (navigator.sendBeacon) navigator.sendBeacon('/api/meta', blob);
+    else fetch('/api/meta', { method: 'POST', body: blob, keepalive: true });
+  } catch (e) {}
+};
+
 /* Meta pixel — base code. Purchase fires from Shopify's checkout (connect
    this same pixel in the Facebook & Instagram app in Shopify admin); the
    site fires PageView / ViewContent / AddToCart / InitiateCheckout itself
@@ -278,7 +362,7 @@ n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '2580258509080253');
+fbq('init', '2580258509080253', window.hbAmData ? window.hbAmData() : undefined);
 fbq('track', 'PageView');
 }
 </script>
@@ -4572,6 +4656,9 @@ class Component extends DCLogic {
     // wholesale accounts carries the live trade-discount terms so the cart
     // can preview exactly what Shopify's checkout will charge.
     fetch('/api/auth/me').then(r => r.json()).then(j => {
+      if (j && j.in) {
+        try { if (window.hbAm && j.email) window.hbAm({ em: j.email }); } catch (e) {}
+      }
       if (j && j.in) this.setState({
         signedIn: true,
         wholesale: !!j.wholesale,
@@ -4865,14 +4952,14 @@ class Component extends DCLogic {
           if (this._fbPage != null) window.fbq('track', 'PageView');
           if (pg === 'product') {
             const gaItem = this.state.sp === 'cat' ? 'happy-beans-cat' : 'happy-beans-dog';
-            window.fbq('track', 'ViewContent', {
+            window.hbMeta('ViewContent', {
               content_type: 'product',
               content_ids: [gaItem],
               content_name: 'Happy Beans', currency: 'USD', value: planPrice
             });
             if (window.gtag) window.gtag('event', 'view_item', { currency: 'USD', value: planPrice, items: [{ item_id: gaItem, item_name: 'Happy Beans' }] });
           }
-          if (pg === 'checkout' && !window.__hbFbIC) { window.__hbFbIC = true; window.fbq('track', 'InitiateCheckout', { currency: 'USD', value: M.total, num_items: M.totalQty }); }
+          if (pg === 'checkout' && !window.__hbFbIC) { window.__hbFbIC = true; window.hbMeta('InitiateCheckout', { currency: 'USD', value: M.total, num_items: M.totalQty }); }
           if (pg === 'checkout' && window.gtag && !window.__hbGaBC) { window.__hbGaBC = true; window.gtag('event', 'begin_checkout', { currency: 'USD', value: M.total }); }
           this._fbPage = pg;
         }
@@ -4884,7 +4971,7 @@ class Component extends DCLogic {
         else if (fbQty !== this._fbQty) {
           if (fbQty > this._fbQty) {
             const added = Math.max(0, Math.round((M.sub - this._fbSub) * 100) / 100) || planPrice * (fbQty - this._fbQty);
-            window.fbq('track', 'AddToCart', { content_type: 'product', currency: 'USD', value: added, contents: M.items.map(i => ({ id: i.key, quantity: i.qty, item_price: i.unitPrice })) });
+            window.hbMeta('AddToCart', { content_type: 'product', currency: 'USD', value: added, contents: M.items.map(i => ({ id: i.key, quantity: i.qty, item_price: i.unitPrice })) });
             if (window.gtag) window.gtag('event', 'add_to_cart', { currency: 'USD', value: added });
             window.__hbFbIC = false;
             window.__hbGaBC = false;
@@ -5656,7 +5743,8 @@ class Component extends DCLogic {
         }).then(r => r.json().catch(() => ({}))).then(b => {
           if (b && b.ok) {
             this.hbListed(email);
-            try { if (window.fbq) window.fbq('track', 'Lead'); } catch (err) {}
+            try { if (window.hbAm) window.hbAm({ em: email }); } catch (err) {}
+            try { window.hbMeta('Lead'); } catch (err) {}
             try { if (window.gtag) window.gtag('event', 'generate_lead'); } catch (err) {}
         try { if (window.gtag) window.gtag('event', 'generate_lead'); } catch (err) {}
             this.setState({ joinBusy: false, joined: true });
@@ -5850,6 +5938,13 @@ class Component extends DCLogic {
       }),
       placeOrder: () => {
         if (!coReady || tradeBlocked) return;
+        // Hand the pixel the buyer before the redirect, so the ad that
+        // earned this order can be matched to a person.
+        try {
+          const co2 = this.state.co || {};
+          const nm = String(co2.name || '').trim().split(/\s+/);
+          if (window.hbAm) window.hbAm({ em: co2.email, fn: nm[0], ln: nm.length > 1 ? nm[nm.length - 1] : '', ct: co2.city, st: co2.state, zp: co2.zip, country: 'us' });
+        } catch (e) {}
         window.hbShopifyCheckout(
           M.items.map(r => ({ key: r.key, qty: r.qty, plan: r.plan, lb: r.lb, dose: r.dose })),
           { ...this.state.co, wantAccount: this.state.acctOptIn !== false },
@@ -7194,7 +7289,8 @@ Component.prototype.renderVals = function () {
         rStepForm.hidden = true; rStepDone.hidden = false;
         rNo.textContent = 'Close';
         try { if (window.hbTrack) window.hbTrack('popup_subscribed', { species: 'research' }); } catch (err) {}
-        try { if (window.fbq) window.fbq('track', 'Lead'); } catch (err) {}
+        try { if (window.hbAm) window.hbAm({ em: v }); } catch (err) {}
+        try { window.hbMeta('Lead'); } catch (err) {}
         try { if (window.gtag) window.gtag('event', 'generate_lead'); } catch (err) {}
         return;
       }
@@ -7267,7 +7363,8 @@ Component.prototype.renderVals = function () {
         }
         step = 'done';
         try { if (window.hbTrack) window.hbTrack('popup_subscribed'); } catch (err) {}
-        try { if (window.fbq) window.fbq('track', 'Lead'); } catch (err) {}
+        try { if (window.hbAm) window.hbAm({ em: v }); } catch (err) {}
+        try { window.hbMeta('Lead'); } catch (err) {}
         try { if (window.gtag) window.gtag('event', 'generate_lead'); } catch (err) {}
         render();
         return;
