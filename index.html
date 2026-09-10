@@ -165,9 +165,9 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
       line = { merchandiseId: v.onetime, quantity: r.qty };
       if (r.plan === 1) line.sellingPlanId = window.hbSellingPlanFor(r.key, r.lb);
     }
-    // The weight the dose was set for travels with the line, so the order
-    // (and the account) can show which cadence the shopper chose and why.
-    if (r.lb) line.attributes = [{ key: 'Pet weight', value: r.lb + ' lb' }, { key: 'Daily dose', value: r.dose || '' }];
+    // No line attributes: Shopify prints them under the item at checkout, and
+    // the weight and dose read as clutter there (Jon, Sep 2026). The cadence
+    // they set still travels in the selling plan on the line.
     return line;
   });
   const res = await fetch('https://' + cfg.domain + '/api/' + cfg.apiVersion + '/graphql.json', {
