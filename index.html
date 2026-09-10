@@ -5794,8 +5794,12 @@ class Component extends DCLogic {
       orderBtnFg: coReady && !tradeBlocked ? '#17140F' : '#8A7F6E',
       orderBtnCursor: coReady && !tradeBlocked ? 'pointer' : 'not-allowed',
       orderHint: tradeBlocked ? 'Trade accounts order ' + tradeMin + '+ one-time boxes — add ' + tradeShort + ' more in your cart to continue.'
-        : coReady ? 'Payment happens next on our secure checkout.'
-        : (!allFilled ? 'Fill in every contact and shipping field to continue.'
+        // Nothing to say when the form is simply blank or simply done: the
+        // button already reads "Complete the form" or names the amount, and
+        // each section is marked Required or Complete (Jon, Sep 2026). Only
+        // real errors speak here.
+        : coReady ? ''
+        : (!allFilled ? ''
           : (!emailOk ? 'That email doesn’t look right — check it to continue.'
             : (!zipOk ? 'Enter a valid 5-digit ZIP code to continue.'
               : 'Check the highlighted fields to continue.'))),
