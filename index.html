@@ -647,6 +647,119 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hb-wall [data-rev] { display: none !important; }
 .hb-wall [data-rev].is-on { display: flex !important; }
 
+/* Cart + checkout (designer handoff, Setup_40): ruled item table, cream
+   summary card, numbered checkout sections. Vars scoped on .hbco so the
+   short names cannot leak into the rest of the page. */
+.hbco { --ink: #17140F; --cream: #FCFAF4; --paper: #FFFDF7; --body: #4A4235; --muted: #6A6055; --muted-2: #8A7F6E; --yellow: oklch(0.86 0.14 92); --green: oklch(0.44 0.07 152); --green-dk: oklch(0.36 0.055 152); --rule: rgba(23,20,15,0.3); --line: rgba(23,20,15,0.22); --sans: 'DM Sans', system-ui, sans-serif; --mono: 'HB Mono Figures', 'DM Mono', ui-monospace, monospace; font-family: var(--sans); color: var(--ink); }
+.hbco * { box-sizing: border-box; }
+.hbco .hb-in { max-width: 1180px; margin: 0 auto; }
+.hbco .hb-eye { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+.hbco .hb-eye .sp { flex: 1; }
+.hbco .hb-eye a, .hbco .hb-eye .lk { color: var(--muted); text-decoration: none; border-bottom: 1px solid rgba(23,20,15,0.25); white-space: nowrap; cursor: pointer; }
+.hbco .hb-eye .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex: 0 0 auto; }
+.hbco .hb-eye .nw { white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+.hbco .hb-h1 { font-weight: 700; letter-spacing: -0.048em; font-size: clamp(28px, 4vw, 56px); line-height: 0.98; margin: 0 0 40px; max-width: 20em; }
+.hbco .hb-h1 em { font-style: normal; color: var(--green); }
+.hbco .hb-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 0.45fr); gap: 48px; align-items: start; }
+.hbco .hb-btn { display: grid; place-items: center; width: 100%; height: 58px; border: none; border-radius: 3px; background: var(--ink); color: #F5F0E6; font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1); }
+.hbco .hb-btn:hover { background: var(--green-dk); transform: translateY(-2px); }
+.hbco .hb-btn.is-off { background: rgba(23,20,15,0.08); color: var(--muted-2); cursor: not-allowed; transform: none; }
+.hbco .hb-btn--yellow { background: var(--yellow); color: var(--ink); border: 1.5px solid var(--ink); height: 54px; font-size: 11.5px; }
+.hbco .hb-btn--yellow:hover { background: #F5F0E6; }
+.hbco .hb-or { display: flex; align-items: center; gap: 12px; margin: 14px 0 10px; font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); }
+.hbco .hb-or i { flex: 1; height: 1px; background: rgba(23,20,15,0.14); }
+.hbco .hb-or span { white-space: nowrap; }
+.hbco .hb-chips { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.hbco .hb-chips span { padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.hbco .hb-trust { display: flex; flex-wrap: wrap; gap: 14px 40px; margin-top: 28px; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); line-height: 1.7; }
+/* summary card */
+.hbco .hb-sum { position: sticky; top: 96px; padding: 28px 28px 30px; background: var(--cream); border: 1.5px solid var(--ink); border-radius: 4px; }
+.hbco .hb-sum__k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+.hbco .hb-sum__items { display: grid; gap: 14px; padding-bottom: 18px; border-bottom: 1px dashed var(--rule); }
+.hbco .hb-sum__item { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; align-items: center; }
+.hbco .hb-sum__item img { width: 56px; height: 56px; border-radius: 3px; object-fit: cover; display: block; background: #F1EADA; }
+.hbco .hb-sum__item b { font-weight: 700; letter-spacing: -0.02em; font-size: 15px; display: block; }
+.hbco .hb-sum__item small { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.hbco .hb-sum__item .p { font-weight: 700; font-size: 16px; font-variant-numeric: tabular-nums; }
+.hbco .hb-sum__rows { display: grid; gap: 11px; padding: 18px 0; border-bottom: 1px dashed var(--rule); }
+.hbco .hb-sum__rows > div { display: flex; justify-content: space-between; gap: 14px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.hbco .hb-sum__rows .ink { color: var(--ink); } .hbco .hb-sum__rows .grn { color: var(--green); }
+.hbco .hb-sum__note { display: flex; gap: 9px; align-items: flex-start; margin-top: 14px; padding: 12px 14px; border: 1px solid oklch(0.86 0.14 92 / 0.55); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.12); font-size: 11.5px; line-height: 1.55; color: var(--body); }
+.hbco .hb-sum__total { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 20px 0 22px; }
+.hbco .hb-sum__total span:first-child { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.hbco .hb-sum__total span:last-child { font-weight: 700; letter-spacing: -0.055em; font-size: 44px; line-height: 0.9; font-variant-numeric: tabular-nums; }
+.hbco .hb-sum__hint { margin-top: 14px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); line-height: 1.8; text-align: center; }
+/* cart table */
+.hbco .hb-cols { display: grid; grid-template-columns: minmax(0, 1fr) 140px 80px; gap: 24px; padding-bottom: 12px; border-bottom: 1.5px solid var(--ink); font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.hbco .hb-cols span:nth-child(2) { text-align: center; } .hbco .hb-cols span:nth-child(3) { text-align: right; }
+.hbco .hb-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 24px; align-items: center; padding: 22px 0; border-bottom: 1px dashed var(--rule); }
+.hbco .hb-row--gift { padding: 18px 0; }
+.hbco .hb-item { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 20px; align-items: center; min-width: 0; }
+.hbco .hb-item__img { width: 96px; height: 96px; border-radius: 4px; overflow: hidden; background: #EFE8D9; }
+.hbco .hb-item__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hbco .hb-item__gift { width: 96px; height: 60px; border-radius: 4px; background: var(--yellow); display: grid; place-items: center; font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; }
+.hbco .hb-item__badge { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+.hbco .hb-item__name { font-weight: 700; letter-spacing: -0.03em; font-size: 22px; line-height: 1.1; }
+.hbco .hb-item__plan { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+.hbco .hb-item__note { font-size: 14px; line-height: 1.5; color: var(--body); margin-top: 4px; }
+.hbco .hb-toggle { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: #F1EADA; margin-top: 14px; }
+.hbco .hb-toggle button { padding: 7px 14px; border: none; border-radius: 999px; cursor: pointer; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; transition: background 0.2s ease, color 0.2s ease; }
+.hbco .hb-toggle button[aria-pressed="true"] { background: var(--ink); color: #F5F0E6; }
+.hbco .hb-qty { width: 140px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.hbco .hb-qty--gift { text-align: center; font-family: var(--mono); font-size: 12px; color: var(--muted); display: block; }
+.hbco .hb-step { display: inline-flex; align-items: center; border: 1px solid rgba(23,20,15,0.25); border-radius: 999px; height: 38px; background: var(--cream); }
+.hbco .hb-step button { width: 38px; height: 38px; border: none; background: none; font-size: 16px; cursor: pointer; color: var(--ink); border-radius: 999px; }
+.hbco .hb-step button:hover { background: #EAE1CE; }
+.hbco .hb-step span { min-width: 24px; text-align: center; font-family: var(--mono); font-size: 13px; }
+.hbco .hb-remove { border: none; background: none; padding: 0; cursor: pointer; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); }
+.hbco .hb-remove:hover { color: oklch(0.52 0.16 32); }
+.hbco .hb-price { width: 80px; text-align: right; font-weight: 700; letter-spacing: -0.04em; font-size: 24px; font-variant-numeric: tabular-nums; }
+.hbco .hb-price--gift { font-family: var(--mono); font-weight: 400; font-size: 14px; color: var(--green); letter-spacing: 0; }
+.hbco .hb-empty { border: 1.5px solid var(--muted-2); border-radius: 8px; background: var(--cream); padding: 44px 30px 46px; text-align: center; }
+.hbco .hb-empty p { font-size: 16px; line-height: 1.65; color: #554C40; margin: 0 auto 24px; max-width: 30em; }
+.hbco .hb-empty .go { display: inline-block; font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 16px 28px; border-radius: 999px; background: var(--ink); color: #F5F0E6; text-decoration: none; border: none; cursor: pointer; }
+/* checkout form */
+.hbco .hb-express { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.hbco .hb-express button { height: 52px; border: 1.5px solid var(--ink); border-radius: 3px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.2s ease; }
+.hbco .hb-express .shop { background: var(--yellow); color: var(--ink); } .hbco .hb-express .shop:hover { background: #F5F0E6; }
+.hbco .hb-express .apple { background: var(--ink); color: #F5F0E6; } .hbco .hb-express .apple:hover { background: var(--green-dk); }
+.hbco .hb-or--top { margin: 0 0 28px; }
+.hbco .hb-cosec + .hb-cosec { padding-top: 26px; }
+.hbco .hb-cohead { display: grid; grid-template-columns: 34px 1fr auto; gap: 14px; align-items: center; padding-bottom: 12px; border-bottom: 1.5px solid var(--ink); }
+.hbco .hb-cohead .n { width: 34px; height: 24px; border-radius: 3px; background: var(--yellow); display: grid; place-items: center; font-family: var(--mono); font-size: 10px; }
+.hbco .hb-cohead .t { font-weight: 700; letter-spacing: -0.03em; font-size: 20px; }
+.hbco .hb-cohead .s { font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); }
+.hbco .hb-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 18px 0 26px; border-bottom: 1px dashed var(--rule); }
+.hbco .hb-fields label { display: grid; gap: 7px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); min-width: 0; }
+.hbco .hb-fields input { border: 1px solid var(--line); background: var(--paper); border-radius: 3px; padding: 0 14px; font-family: var(--sans); font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink); height: 48px; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+.hbco .hb-fields input:focus { border-color: var(--ink); outline: none; box-shadow: 0 0 0 3px oklch(0.86 0.14 92 / 0.35); }
+.hbco .hb-fields .err { font-family: var(--sans); font-size: 12px; letter-spacing: 0; text-transform: none; color: oklch(0.52 0.19 25); line-height: 1.4; }
+.hbco .hb-acct { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 12px; margin-top: 6px; padding: 0; border: none; background: none; text-align: left; cursor: pointer; font-family: var(--sans); font-size: 14px; letter-spacing: 0; text-transform: none; line-height: 1.5; color: var(--body); }
+.hbco .hb-acct .box { width: 18px; height: 18px; flex: 0 0 auto; margin-top: 2px; border: 1.5px solid var(--ink); border-radius: 3px; display: grid; place-items: center; color: #F5F0E6; font-size: 11px; transition: background 0.2s ease; }
+.hbco .hb-acct[aria-checked="true"] .box { background: var(--ink); }
+.hbco .hb-acct[aria-checked="true"] .box::after { content: "\2713"; }
+.hbco .hb-acct b { color: var(--ink); font-weight: 500; }
+@media (max-width: 1180px) { .hbco .hb-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; } .hbco .hb-sum { position: static; } }
+@media (max-width: 900px) {
+  .hbco .hb-h1 { font-size: 30px; margin-bottom: 20px; }
+  .hbco .hb-cols { display: none; }
+  .hbco .hb-row { grid-template-columns: 1fr; gap: 12px; padding: 16px 0; }
+  .hbco .hb-item { grid-template-columns: 74px minmax(0, 1fr); gap: 14px; }
+  .hbco .hb-item__img { width: 74px; height: 74px; } .hbco .hb-item__gift { width: 74px; height: 48px; }
+  .hbco .hb-item__name { font-size: 17px; }
+  .hbco .hb-toggle { margin-top: 10px; }
+  .hbco .hb-qty { width: auto; flex-direction: row; justify-content: space-between; padding-left: 88px; }
+  .hbco .hb-row--gift .hb-qty, .hbco .hb-price { display: none; }
+  .hbco .hb-trust { gap: 6px 18px; margin-top: 18px; }
+  .hbco .hb-sum { padding: 20px 18px 22px; }
+  .hbco .hb-sum__total span:last-child { font-size: 34px; }
+  .hbco .hb-fields { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px 0 20px; }
+  .hbco .hb-fields label.w { grid-column: auto; }
+  .hbco .hb-fields input { height: 46px; font-size: 16px; }
+  .hbco .hb-cohead .t { font-size: 17px; }
+  .hbco .hb-cosec + .hb-cosec { padding-top: 22px; }
+}
+
 /* belt */
 .hb-belt { width: 100vw; margin: 40px 0 0 calc(50% - 50vw); }
 /* No edge fade: the handoff masked both ends to transparent, which read as
@@ -3276,96 +3389,97 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
   <sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
   <div>
-    <section data-m="pad short barpad cartsec" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 44%, #F2EBDC 100%); padding: 40px 44px 96px; overflow: hidden;">
-      <div aria-hidden="true" data-m="hide" style="position: absolute; left: 0; right: 0; top: 0; height: 420px; overflow: hidden; pointer-events: none;">
-        <div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(23,20,15,0.05) 1px, transparent 1px); background-size: 30px 30px; mask-image: radial-gradient(90% 70% at 50% 0%, #000 8%, transparent 76%); -webkit-mask-image: radial-gradient(90% 70% at 50% 0%, #000 8%, transparent 76%); animation: pdDrift 9s ease-in-out infinite;"></div>
-      </div>
-
-      <div style="position: relative; max-width: 1180px; margin: 0 auto;">
-        <div data-m="carteye" style="display: flex; align-items: center; gap: 12px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 18px;">
-          <span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.44 0.07 152); animation: qzBlip 1.8s ease-in-out infinite;"></span>
-          <span>Your cart</span>
-          <span aria-hidden="true" style="flex: 1; height: 1px; background: #DDD3C0;"></span>
-          <span>{{ cartCount }}</span>
+    <!-- Cart (designer handoff, Setup_40): ruled item table on the left, cream
+         summary card on the right. Bindings are the app's own cart model, so
+         trade pricing, the prelaunch batch notice and the plan the purchase
+         panel chose all still drive what is shown. -->
+    <section class="hbco" data-m="pad short barpad cartsec" style="position: relative; background: #FCFAF4; padding: 40px 44px 96px; overflow: hidden;">
+      <div class="hb-in" style="position: relative;">
+        <div class="hb-eye" data-m="carteye">
+          <span class="dot"></span>
+          <span>Your cart · {{ cartCount }}</span>
+          <span class="sp"></span>
+          <span sc-camel-on-click="{{ goShopping }}" class="lk">← Keep shopping</span>
         </div>
-        <h1 data-m="carthead" style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 4vw, 56px); line-height: 1.02; margin: 0 0 30px; max-width: 20em;">{{ cartHead }} <span style="color: oklch(0.44 0.07 152);">{{ cartHeadAccent }}</span></h1>
+        <h1 class="hb-h1" data-m="carthead">{{ cartHead }} <em>{{ cartHeadAccent }}</em></h1>
 
         <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
-          <div style="border: 1.5px solid #8A7F6E; border-radius: 8px; background: #FCFAF4; padding: 44px 30px 46px; text-align: center; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.3), 0 0 0 5px rgba(138,127,110,0.1);">
-            <p style="font-size: 16px; line-height: 1.65; color: #554C40; margin: 0 auto 24px; max-width: 30em;">Nothing here yet. Pick the formula that matches your animal, or run the two-minute screener first.</p>
-            <div data-m="wrapflex" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-              <button sc-camel-on-click="{{ goProduct }}" data-m="tap" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 16px 28px; border: none; border-radius: 999px; background: #17140F; color: #F5F0E6; cursor: pointer; box-shadow: 0 18px 32px -20px rgba(23,20,15,0.7);" style-hover="background: oklch(0.36 0.055 152);">Shop the formulas →</button>
-              <button sc-camel-on-click="{{ goQuiz }}" data-m="tap" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 16px 28px; border: 1px solid #C9BEA8; border-radius: 999px; background: transparent; color: #17140F; cursor: pointer;" style-hover="border-color: #17140F;">Check eligibility</button>
-            </div>
+          <div class="hb-empty">
+            <p>Nothing here yet. Pick the formula that matches your animal, or run the two-minute screener first.</p>
+            <button sc-camel-on-click="{{ goProduct }}" class="go" type="button">Shop the formulas →</button>
           </div>
         </sc-if>
 
         <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ true }}">
-          <div data-m="stack gap" style="display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 26px; align-items: start;">
-            <div style="display: grid; gap: 12px;">
+          <div class="hb-grid">
+            <div>
+              <div class="hb-cols"><span>Item</span><span>Qty</span><span>Price</span></div>
               <sc-for list="{{ cartItems }}" as="ci" hint-placeholder-count="1">
-                <div data-m="citem" style="display: grid; grid-template-columns: 104px minmax(0, 1fr) auto; gap: 20px; align-items: center; background: #FCFAF4; border: 1px solid rgba(23,20,15,0.12); border-radius: 8px; padding: 16px; box-shadow: 0 22px 42px -30px rgba(23,20,15,0.32), 0 1px 0 rgba(255,255,255,0.9) inset; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease;" style-hover="transform: translateY(-3px); box-shadow: 0 30px 54px -30px rgba(23,20,15,0.36);">
-                  <div data-m="ciimg" style="height: 104px; border-radius: 5px; overflow: hidden; background: #EFE8D9;">
-                    <image-slot id="{{ ci.slot }}" placeholder="{{ ci.ph }}" style="width: 100%; height: 100%;"></image-slot>
-                  </div>
-                  <div style="min-width: 0;">
-                    <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 7px;">{{ ci.badge }}</div>
-                    <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 19px; line-height: 1.15; margin-bottom: 6px;">{{ ci.name }}</div>
-                    <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #6A6055; line-height: 1.5;">{{ ci.planLabel }}</div>
-                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 14px;">
-                      <div style="display: flex; align-items: center; border: 1px solid #D5CAB5; border-radius: 999px; overflow: hidden; background: #F5F0E6;">
-                        <button sc-camel-on-click="{{ ci.dec }}" aria-label="Decrease" style="width: 36px; height: 36px; border: none; background: transparent; cursor: pointer; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 14px; color: #17140F;" style-hover="background: #EAE1CE;">−</button>
-                        <span style="min-width: 26px; text-align: center; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px;">{{ ci.qty }}</span>
-                        <button sc-camel-on-click="{{ ci.inc }}" aria-label="Increase" style="width: 36px; height: 36px; border: none; background: transparent; cursor: pointer; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 14px; color: #17140F;" style-hover="background: #EAE1CE;">+</button>
+                <div class="hb-row">
+                  <div class="hb-item">
+                    <div class="hb-item__img"><img src="{{ ci.img }}" alt="{{ ci.name }}" width="560" height="527" loading="lazy" decoding="async" style="object-position: {{ ci.pos }};"></div>
+                    <div style="min-width: 0;">
+                      <div class="hb-item__badge">{{ ci.badge }}</div>
+                      <div class="hb-item__name">{{ ci.name }}</div>
+                      <div class="hb-item__plan">{{ ci.planLabel }}</div>
+                      <!-- The plan toggle appears only where both plans are on
+                           offer for that line: a bundle or a 2-box order is not
+                           a monthly-or-once choice, and trade accounts order
+                           one-time only. -->
+                      <div class="hb-toggle" style="display: {{ ci.toggleShow }};">
+                        <button type="button" sc-camel-on-click="{{ ci.pickMonthly }}" aria-pressed="{{ ci.monthlyOn }}">Monthly · {{ ci.priceMonthly }}</button>
+                        <button type="button" sc-camel-on-click="{{ ci.pickOnce }}" aria-pressed="{{ ci.onceOn }}">One-time · {{ ci.priceOnce }}</button>
                       </div>
-                      <button sc-camel-on-click="{{ ci.remove }}" style="border: none; background: transparent; cursor: pointer; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; padding: 8px 4px;" style-hover="color: oklch(0.52 0.16 32);">Remove</button>
                     </div>
                   </div>
-                  <div style="text-align: right; align-self: start;">
-                    <div style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.045em; font-size: 24px; line-height: 1;">{{ ci.lineTotal }}</div>
-                    <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E; margin-top: 6px;">{{ ci.unit }}</div>
+                  <div class="hb-qty">
+                    <div class="hb-step">
+                      <button type="button" sc-camel-on-click="{{ ci.dec }}" aria-label="Decrease">−</button>
+                      <span>{{ ci.qty }}</span>
+                      <button type="button" sc-camel-on-click="{{ ci.inc }}" aria-label="Increase">+</button>
+                    </div>
+                    <button class="hb-remove" type="button" sc-camel-on-click="{{ ci.remove }}">Remove</button>
                   </div>
+                  <div class="hb-price">{{ ci.lineTotal }}</div>
                 </div>
               </sc-for>
 
-              <div data-m="citem cgift" style="display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; background: oklch(0.96 0.032 152); border: 1px dashed oklch(0.44 0.07 152); border-radius: 8px; padding: 16px 18px;">
-                <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 7px 10px; border-radius: 999px; white-space: nowrap;">{{ cartGiftTag }}</span>
-                <span style="font-size: 13.5px; line-height: 1.5; color: #17140F;">{{ cartGiftNote }}</span>
-              </div>
-
-              <button sc-camel-on-click="{{ goShopping }}" data-m="tap" style="justify-self: start; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 14px 24px; border: 1px solid #C9BEA8; border-radius: 999px; background: transparent; color: #554C40; cursor: pointer; transition: border-color 0.25s ease, color 0.25s ease;" style-hover="border-color: #17140F; color: #17140F;">← Still shopping</button>
-            </div>
-
-            <div data-m="cartsum" style="position: sticky; top: 96px; border: 1px solid rgba(245,240,230,0.16); border-radius: 8px; background: linear-gradient(#1D1913, #17140F); color: #F5F0E6; padding: 26px 26px 28px; overflow: hidden; box-shadow: 0 40px 70px -40px rgba(0,0,0,0.85);">
-              <div aria-hidden="true" style="position: absolute; right: -70px; top: -90px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.14), transparent 70%); pointer-events: none;"></div>
-              <div style="position: relative; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 18px;">Order summary</div>
-              <div data-pre-show style="position: relative; border: 1px solid oklch(0.86 0.14 92 / 0.4); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.12); padding: 12px 14px 13px; margin-bottom: 16px;">
-                <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 5px;">Batch 0072 · in production</div>
-                <div style="font-size: 12.5px; line-height: 1.55; color: #DED5C4;">Your order reserves a box from this run — it ships in ~4 weeks, as soon as the batch clears testing.</div>
-              </div>
-              <div style="position: relative; display: grid; gap: 0;">
-                <sc-for list="{{ cartTotals }}" as="ct2" hint-placeholder-count="3">
-                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid rgba(245,240,230,0.12); font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: {{ ct2.color }};">
-                    <span>{{ ct2.k }}</span><span style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.03em; font-size: 15px; text-transform: none;">{{ ct2.v }}</span>
+              <div class="hb-row hb-row--gift">
+                <div class="hb-item">
+                  <div class="hb-item__gift">{{ cartGiftTag }}</div>
+                  <div>
+                    <div class="hb-item__name" style="font-size: 17px;">Happy Beanie bandana</div>
+                    <div class="hb-item__note">{{ cartGiftNote }}</div>
                   </div>
-                </sc-for>
-              </div>
-              <div data-m="ctotal" style="position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 18px 0 22px;">
-                <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Total</span>
-                <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.045em; font-size: 34px; line-height: 1;">{{ cartTotal }}</span>
-              </div>
-              <div data-m="express" style="position: relative; display: {{ expressShow }}; margin-bottom: 4px;">
-                <button sc-camel-on-click="{{ expressGo }}" data-m="tap" aria-label="Express checkout with Shop Pay, Apple Pay or Google Pay" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 9px; font-family: 'DM Sans', sans-serif; font-weight: 600; letter-spacing: -0.01em; font-size: 15px; padding: 16px 18px; border: none; border-radius: 999px; background: #5a31f5; color: #ffffff; cursor: pointer; box-shadow: 0 18px 34px -18px rgba(90,49,245,0.85); transition: transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: translateY(-2px);">Express checkout</button>
-                <div style="text-align: center; margin-top: 10px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;">Shop Pay · Apple Pay · Google Pay</div>
-                <div style="display: flex; align-items: center; gap: 12px; margin: 18px 0 16px;">
-                  <span aria-hidden="true" style="flex: 1; height: 1px; background: rgba(245,240,230,0.14);"></span>
-                  <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A7F6E;">or</span>
-                  <span aria-hidden="true" style="flex: 1; height: 1px; background: rgba(245,240,230,0.14);"></span>
                 </div>
+                <div class="hb-qty hb-qty--gift">1</div>
+                <div class="hb-price hb-price--gift">$0</div>
               </div>
-              <button sc-camel-on-click="{{ goCheckout }}" data-m="tap cbtn" style="position: relative; width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: {{ checkoutCtaBg }}; color: {{ checkoutCtaFg }}; cursor: {{ checkoutCtaCursor }}; box-shadow: 0 20px 36px -20px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: {{ checkoutCtaHoverBg }}; transform: translateY(-2px);">{{ checkoutCtaLabel }}</button>
-              <div data-m="ctrust" style="position: relative; margin-top: 16px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E; text-align: center; line-height: 2;"><span data-pre-hide>30-day vet refund · Ships in 24h · Cancel anytime</span><span data-pre-show-inline>30-day vet refund · Batch 0072 reservation · Cancel anytime</span></div>
+
+              <div class="hb-trust"><span>Formulated in Scottsdale, AZ</span><span>Third-party tested</span><span>30-day money-back guarantee</span></div>
             </div>
+
+            <aside class="hb-sum">
+              <div class="hb-sum__k">Order summary</div>
+              <div data-pre-show class="hb-sum__note" style="margin: 0 0 18px;">
+                <span aria-hidden="true" style="flex: 0 0 auto; color: oklch(0.6 0.13 78);">●</span>
+                <span><b style="font-weight: 500;">Batch 0072 · in production.</b> Your order reserves a box from this run — it ships in ~4 weeks, as soon as the batch clears testing.</span>
+              </div>
+              <div class="hb-sum__rows" style="padding-top: 0;">
+                <sc-for list="{{ cartTotals }}" as="ct2" hint-placeholder-count="3">
+                  <div><span>{{ ct2.k }}</span><span class="{{ ct2.cls }}">{{ ct2.v }}</span></div>
+                </sc-for>
+                <div><span>Bandana</span><span class="grn">$0</span></div>
+                <div style="display: {{ nextBoxShow }};"><span>Next box</span><span class="ink">{{ nextBoxDate }} · skip anytime</span></div>
+              </div>
+              <div class="hb-sum__total"><span>Total today</span><span>{{ cartTotal }}</span></div>
+              <button class="hb-btn {{ checkoutCtaOff }}" type="button" sc-camel-on-click="{{ goCheckout }}">{{ checkoutCtaLabel }}</button>
+              <div style="display: {{ expressShow }};">
+                <div class="hb-or"><i></i><span>or</span><i></i></div>
+                <button class="hb-btn hb-btn--yellow" type="button" sc-camel-on-click="{{ expressGo }}">Express checkout ⚡</button>
+                <div class="hb-chips"><span>Shop Pay</span><span>Apple Pay</span><span>Google Pay</span></div>
+              </div>
+            </aside>
           </div>
         </sc-if>
       </div>
@@ -3375,8 +3489,8 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
   <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
   <div>
-    <section data-m="pad short" style="position: relative; background: radial-gradient(120% 70% at 50% 0%, #FDFCF7 0%, #FCFAF4 44%, #F2EBDC 100%); padding: 40px 44px 96px;">
-      <div style="position: relative; max-width: 1180px; margin: 0 auto;">
+    <section class="hbco" data-m="pad short barpad cartsec" style="position: relative; background: #FCFAF4; padding: 40px 44px 96px;">
+      <div class="hb-in" style="position: relative;">
 
         <sc-if value="{{ orderPlaced }}" hint-placeholder-val="{{ false }}">
           <div style="max-width: 720px; margin: 0 auto; text-align: center; border: 1px solid rgba(23,20,15,0.12); border-radius: 8px; background: #FCFAF4; padding: 54px 30px 56px; box-shadow: 0 34px 60px -34px rgba(23,20,15,0.34), 0 1px 0 rgba(255,255,255,0.9) inset;">
@@ -3398,86 +3512,79 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         </sc-if>
 
         <sc-if value="{{ orderPending }}" hint-placeholder-val="{{ true }}">
-          <div style="display: flex; align-items: center; gap: 12px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 18px;">
-            <span sc-camel-on-click="{{ goCart }}" style="cursor: pointer; color: oklch(0.44 0.07 152);">Cart</span><span>/</span><span>Checkout</span>
-            <span aria-hidden="true" style="flex: 1; height: 1px; background: #DDD3C0;"></span>
-            <span>Secure · encrypted</span>
+          <div class="hb-eye">
+            <span sc-camel-on-click="{{ goCart }}" class="lk">Cart</span><span>/</span><span style="color: #17140F;">Checkout</span>
+            <span class="sp"></span>
+            <span class="nw"><span class="dot"></span>Secure · encrypted</span>
           </div>
-          <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 4vw, 52px); line-height: 1.02; margin: 0 0 30px;">One screen, <span style="color: oklch(0.44 0.07 152);">then done.</span></h1>
+          <h1 class="hb-h1">One screen, <em>then done.</em></h1>
 
-          <div data-m="stack gap" style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 26px; align-items: start;">
-            <div style="display: grid; gap: 0; border: 1px solid rgba(245,240,230,0.14); border-radius: 10px; overflow: hidden; background: linear-gradient(168deg, #1D1913 0%, #14110B 100%); box-shadow: 0 40px 70px -44px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.05) inset;">
-              <sc-for list="{{ checkoutSections }}" as="cs" hint-placeholder-count="3">
-                <div data-m="cosec" style="position: relative; overflow: hidden; background: {{ cs.bg }}; border: 0; border-top: {{ cs.borderTop }}; border-radius: {{ cs.radius }}; padding: {{ cs.padTop }} 26px 28px; color: #F5F0E6; box-shadow: {{ cs.shadow }};">
-                  <div aria-hidden="true" style="position: absolute; left: -90px; top: -130px; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.09), transparent 70%); opacity: {{ cs.glow }}; pointer-events: none;"></div>
-                  <div data-m="cosechead" style="position: relative; display: flex; align-items: center; gap: 12px; margin-bottom: 22px;">
-                    <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; background: oklch(0.86 0.14 92); padding: 5px 9px; border-radius: 3px;">{{ cs.n }}</span>
-                    <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 19px;">{{ cs.title }}</span>
-                    <span aria-hidden="true" style="flex: 1; min-width: 16px; height: 1px; background: rgba(245,240,230,0.16);"></span>
-                    <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: {{ cs.stateColor }};">{{ cs.state }}</span>
+          <div class="hb-grid">
+            <div>
+              <div style="display: {{ expressShow }};">
+                <div class="hb-express">
+                  <button type="button" class="shop" sc-camel-on-click="{{ expressGo }}">Shop Pay</button>
+                  <button type="button" class="apple" sc-camel-on-click="{{ expressGo }}">Apple Pay</button>
+                </div>
+                <div class="hb-or hb-or--top"><i></i><span>or fill in the form</span><i></i></div>
+              </div>
+
+              <sc-for list="{{ checkoutSections }}" as="cs" hint-placeholder-count="2">
+                <div class="hb-cosec">
+                  <div class="hb-cohead">
+                    <span class="n">{{ cs.n }}</span>
+                    <span class="t">{{ cs.title }}</span>
+                    <span class="s" style="color: {{ cs.stateColor }};">{{ cs.state }}</span>
                   </div>
-                  <sc-if value="{{ cs.hasToggle }}" hint-placeholder-val="{{ false }}">
-                    <label data-m="tap" style="position: relative; display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 0 2px; font-size: 14.5px; color: #DED5C4;">
-                      <input type="checkbox" checked="{{ cs.toggleMark }}" sc-camel-on-change="{{ cs.flipSame }}" style="position: absolute; width: 1px; height: 1px; opacity: 0;">
-                      <span aria-hidden="true" style="position: relative; width: 20px; height: 20px; flex: 0 0 auto; border: 1px solid {{ cs.toggleBorder }}; border-radius: 5px; background: {{ cs.toggleDot }}; transition: background 0.22s ease, border-color 0.22s ease;">
-                        <span style="position: absolute; left: 4px; top: 5px; opacity: {{ cs.toggleMark }}; transition: opacity 0.2s ease;">
-                          <svg width="11" height="9" sc-camel-view-box="0 0 11 9" fill="none"><path d="M1 4.6 4 7.5 10 1" stroke="#17140F" sc-camel-stroke-width="2" sc-camel-stroke-linecap="round" sc-camel-stroke-linejoin="round"></path></svg>
-                        </span>
-                      </span>
-                      <span>{{ cs.toggleLabel }}</span>
-                    </label>
-                  </sc-if>
-                  <div data-m="stack" style="position: relative; display: {{ cs.fieldsDisplay }}; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: {{ cs.fieldsGap }};">
+                  <div class="hb-fields">
                     <sc-for list="{{ cs.fields }}" as="cfd" hint-placeholder-count="4">
-                      <label data-m="cofield" style="display: grid; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; grid-column: {{ cfd.span }};">{{ cfd.label }}
-                        <input value="{{ cfd.value }}" sc-camel-on-change="{{ cfd.set }}" placeholder="{{ cfd.ph }}" inputmode="{{ cfd.mode }}" style="border: 1px solid {{ cfd.inputBorder }}; background: rgba(245,240,230,0.05); border-radius: 5px; padding: 14px 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; letter-spacing: 0; text-transform: none; color: #F5F0E6; min-height: 50px; transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;" style-focus="border-color: oklch(0.86 0.14 92); outline: none; background: rgba(245,240,230,0.08); box-shadow: 0 0 0 3px oklch(0.86 0.14 92 / 0.14);">
-                        <span style="display: {{ cfd.errDisplay }}; font-family: 'DM Sans', sans-serif; font-size: 12px; letter-spacing: 0; text-transform: none; color: oklch(0.72 0.17 25); line-height: 1.4;">{{ cfd.err }}</span>
+                      <label class="{{ cfd.wide }}" style="grid-column: {{ cfd.span }};">{{ cfd.label }}
+                        <input value="{{ cfd.value }}" sc-camel-on-change="{{ cfd.set }}" inputmode="{{ cfd.mode }}" style="border-color: {{ cfd.inputBorder }};">
+                        <span class="err" style="display: {{ cfd.errDisplay }};">{{ cfd.err }}</span>
                       </label>
                     </sc-for>
+                    <!-- Create my account, inside Contact (Setup_40). Same
+                         switch as the panel below, so the two never disagree. -->
+                    <button type="button" class="hb-acct" role="switch" aria-checked="{{ cs.acctChecked }}" sc-camel-on-click="{{ flipAcct }}" style="display: {{ cs.acctShow }};"><span class="box"></span><span><b>Create my account</b> — track every box from the bench to your door, pause or skip the plan yourself, and unlock 15% off with a bandana photo. No password; a one-time code signs you in.</span></button>
                   </div>
                 </div>
               </sc-for>
+
+              <div class="hb-trust"><span>Formulated in Scottsdale, AZ</span><span>Third-party tested</span><span>30-day money-back guarantee</span></div>
             </div>
 
-            <div data-m="cartsumwrap" style="align-self: stretch;">
-            <div data-m="cartsum" style="position: sticky; top: 96px; border: 1px solid rgba(245,240,230,0.16); border-radius: 10px; background: linear-gradient(#1D1913, #17140F); color: #F5F0E6; padding: 26px 26px 28px; overflow: hidden; box-shadow: 0 40px 70px -40px rgba(0,0,0,0.85);">
-              <div aria-hidden="true" style="position: absolute; right: -70px; top: -90px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.14), transparent 70%); pointer-events: none;"></div>
-              <div style="position: relative; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 18px;">Order summary</div>
-              <div data-pre-show style="position: relative; border: 1px solid oklch(0.86 0.14 92 / 0.4); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.12); padding: 12px 14px 13px; margin-bottom: 16px;">
-                <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 5px;">Batch 0072 · in production</div>
-                <div style="font-size: 12.5px; line-height: 1.55; color: #DED5C4;">Your order reserves a box from this run — it ships in ~4 weeks, as soon as the batch clears testing.</div>
-              </div>
-              <div style="position: relative; display: grid; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid rgba(245,240,230,0.12);">
+            <aside class="hb-sum">
+              <div class="hb-sum__k">Order summary</div>
+              <div class="hb-sum__items">
                 <sc-for list="{{ cartItems }}" as="cl" hint-placeholder-count="1">
-                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px;">
-                    <span style="font-size: 13.5px; line-height: 1.4; color: #DED5C4;">{{ cl.summaryLine }}
-                      <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase; color: {{ cl.planColor }}; margin-top: 4px;">{{ cl.planShort }}</span>
-                    </span>
-                    <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.03em; font-size: 15px; white-space: nowrap;">{{ cl.lineTotal }}</span>
+                  <div class="hb-sum__item">
+                    <img src="{{ cl.img }}" alt="{{ cl.name }}" width="560" height="527" loading="lazy" decoding="async" style="object-position: {{ cl.pos }};">
+                    <div><b>{{ cl.name }}</b><small>{{ cl.planShort }} × {{ cl.qty }}</small></div>
+                    <div class="p">{{ cl.lineTotal }}</div>
                   </div>
                 </sc-for>
               </div>
-              <div style="position: relative; display: {{ subNoteDisplay }}; align-items: flex-start; gap: 9px; margin-top: 14px; padding: 12px 14px; border: 1px solid oklch(0.86 0.14 92 / 0.28); border-radius: 6px; background: oklch(0.86 0.14 92 / 0.06);">
-                <span aria-hidden="true" style="flex: 0 0 auto; font-size: 13px; line-height: 1.3; color: oklch(0.86 0.14 92);">↻</span>
-                <span style="font-size: 11.5px; line-height: 1.55; color: #C9BFAE;">{{ subNote }}</span>
+              <div data-pre-show class="hb-sum__note">
+                <span aria-hidden="true" style="flex: 0 0 auto; color: oklch(0.6 0.13 78);">●</span>
+                <span><b style="font-weight: 500;">Batch 0072 · in production.</b> Your order reserves a box from this run — it ships in ~4 weeks, as soon as the batch clears testing.</span>
               </div>
-              <div style="position: relative; display: grid; gap: 0;">
+              <div class="hb-sum__rows">
                 <sc-for list="{{ cartTotals }}" as="ct3" hint-placeholder-count="3">
-                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid rgba(245,240,230,0.12); font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: {{ ct3.color }};">
-                    <span>{{ ct3.k }}</span><span style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.03em; font-size: 15px; text-transform: none;">{{ ct3.v }}</span>
-                  </div>
+                  <div><span>{{ ct3.k }}</span><span class="{{ ct3.cls }}">{{ ct3.v }}</span></div>
                 </sc-for>
+                <div><span>Bandana</span><span class="grn">$0</span></div>
+                <div style="display: {{ nextBoxShow }};"><span>Renews</span><span class="ink">{{ nextBoxDate }} · skip anytime</span></div>
               </div>
-              <div data-m="ctotal" style="position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 18px 0 22px;">
-                <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E;">Total</span>
-                <span style="font-family: 'DM Sans', sans-serif; font-weight: 500; letter-spacing: -0.045em; font-size: 34px; line-height: 1;">{{ cartTotal }}</span>
+              <div class="hb-sum__note" style="display: {{ subNoteDisplay }};">
+                <span aria-hidden="true" style="flex: 0 0 auto;">↻</span>
+                <span>{{ subNote }}</span>
               </div>
-              <button sc-camel-on-click="{{ placeOrder }}" disabled="{{ orderDisabled }}" data-m="tap" style="position: relative; width: 100%; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px; border: none; border-radius: 999px; background: {{ orderBtnBg }}; color: {{ orderBtnFg }}; cursor: {{ orderBtnCursor }}; box-shadow: 0 20px 36px -20px rgba(0,0,0,0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: translateY(-2px);">{{ orderBtnLabel }}</button>
-              <div style="position: relative; margin-top: 16px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: {{ orderHintColor }}; line-height: 1.6;">{{ orderHint }}</div>
-            </div>
-            </div>
+              <div class="hb-sum__total"><span>Total today</span><span>{{ cartTotal }}</span></div>
+              <button class="hb-btn {{ orderBtnOff }}" type="button" sc-camel-on-click="{{ placeOrder }}" disabled="{{ orderDisabled }}">{{ orderBtnLabel }}</button>
+              <div class="hb-sum__hint" style="color: {{ orderHintColor }};">{{ orderHint }}<br>Ships in 24h from Scottsdale, AZ</div>
+            </aside>
 
-            <div data-m="acctpanel" style="grid-column: 1 / -1; position: relative; overflow: hidden; border: 1px solid rgba(245,240,230,0.14); border-radius: 10px; background: linear-gradient(168deg, #1D1913 0%, #14110B 100%); color: #F5F0E6; padding: 30px 32px 32px; box-shadow: 0 40px 70px -44px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.05) inset;">
+<div data-m="acctpanel" style="grid-column: 1 / -1; position: relative; overflow: hidden; border: 1px solid rgba(245,240,230,0.14); border-radius: 10px; background: linear-gradient(168deg, #1D1913 0%, #14110B 100%); color: #F5F0E6; padding: 30px 32px 32px; box-shadow: 0 40px 70px -44px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.05) inset;">
               <div aria-hidden="true" style="position: absolute; right: -110px; top: -150px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, oklch(0.86 0.14 92 / 0.13), transparent 70%); pointer-events: none;"></div>
               <div data-m="acctsplit" style="position: relative; display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.28fr); gap: 34px; align-items: center;">
 
@@ -5578,6 +5685,19 @@ class Component extends DCLogic {
       cartHeadAccent: M.items.length === 0 ? 'empty.' : 'the first box.',
       cartItems: M.items.map(i => ({
         slot: i.slot, ph: i.ph, badge: i.badge, name: i.name, planLabel: i.planLabel, qty: String(i.qty),
+        // Box photos for the table and the summary (Setup_40).
+        img: i.key === 'cat' ? '/assets/img/cart/cat-box.webp' : '/assets/img/cart/dog-box.webp',
+        pos: i.key === 'cat' ? '30% 50%' : '62% 50%',
+        // The monthly/one-time toggle is only true for a line that is on one
+        // of those two plans. A bundle or a 2-box order is neither, and trade
+        // accounts buy one-time only, so there the plan line stands alone.
+        toggleShow: (i.plan === 0 || i.plan === 1) && !this.state.wholesale && !window.hbSubsPaused() ? 'inline-flex' : 'none',
+        monthlyOn: String(i.plan === 1),
+        onceOn: String(i.plan === 0),
+        priceMonthly: this.money(99),
+        priceOnce: this.money(115),
+        pickMonthly: () => this.setState(i.key === 'cat' ? { cartPlanCat: 1, ordered: false } : { cartPlanDog: 1, ordered: false }),
+        pickOnce: () => this.setState(i.key === 'cat' ? { cartPlanCat: 0, ordered: false } : { cartPlanDog: 0, ordered: false }),
         unit: this.money(i.unitPrice) + ' each',
         lineTotal: this.money(i.line),
         summaryLine: i.name + ' × ' + i.qty,
@@ -5592,17 +5712,28 @@ class Component extends DCLogic {
       hasSubscription: M.items.some(i => i.plan === 1 || i.plan === 3),
       subNote: 'Subscriptions renew automatically at the same price, on the cadence shown above. Skip, pause, or cancel anytime from your account — no fees.',
       subNoteDisplay: M.items.some(i => i.plan === 1 || i.plan === 3) ? 'flex' : 'none',
+      // When the next box lands: the cadence of the first subscription line
+      // in the cart, counted from today.
+      ...(() => {
+        const sub = M.items.find(i => i.plan === 1 || i.plan === 3);
+        if (!sub) return { nextBoxShow: 'none', nextBoxDate: '' };
+        const days = sub.plan === 3 ? 40 : (sub.key === 'dog' ? window.hbBoxDays('dog', sub.lb) : 30);
+        const d = new Date(); d.setDate(d.getDate() + days);
+        return { nextBoxShow: 'flex', nextBoxDate: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) };
+      })(),
+      checkoutCtaOff: tradeBlocked ? 'is-off' : '',
+      orderBtnOff: (!coReady || tradeBlocked) ? 'is-off' : '',
       cartTotals: [
-        { k: 'Subtotal', v: this.money(M.sub), color: '#8A7F6E' },
+        { k: 'Subtotal', v: this.money(M.sub), color: '#8A7F6E', cls: 'ink' },
         ...(M.tradeApplied ? [{
           k: M.totalQty >= (this.state.trade.minQty || 5)
             ? 'Trade pricing · ' + this.pctLabel(this.state.trade.pct) + ' off applied'
             : 'Trade price shown · minimum ' + (this.state.trade.minQty || 5) + ' boxes',
-          v: '', color: 'oklch(0.72 0.16 152)' }] : []),
+          v: '', color: 'oklch(0.72 0.16 152)', cls: 'grn' }] : []),
         ...(!M.tradeApplied && this.state.trade && M.items.length ? [{
           k: 'Trade pricing · one-time orders of ' + (this.state.trade.minQty || 5) + '+ only',
-          v: '', color: 'oklch(0.72 0.16 152)' }] : []),
-        { k: 'Shipping', v: M.ship ? '$' + M.ship : 'Free', color: '#8A7F6E' }
+          v: '', color: 'oklch(0.72 0.16 152)', cls: 'grn' }] : []),
+        { k: 'Shipping', v: M.ship ? '$' + M.ship : 'Free', color: '#8A7F6E', cls: M.ship ? 'ink' : 'grn' }
       ],
       cartTotal: this.money(M.total),
       cartGiftTag: 'Free gift',
@@ -5641,7 +5772,8 @@ class Component extends DCLogic {
           else if (f.key === 'zip') { bad = !empty && !zipOk; if (bad) err = 'Enter a 5-digit ZIP code'; }
           return { ...f, ph: '', invalid: bad, err: err,
             errDisplay: bad ? 'block' : 'none',
-            inputBorder: bad ? 'oklch(0.62 0.19 25)' : 'rgba(245,240,230,0.18)' };
+            wide: f.span === 'span 2' ? 'w' : '',
+            inputBorder: bad ? 'oklch(0.62 0.19 25)' : 'rgba(23,20,15,0.22)' };
         });
         const anyEmpty = fields.some(f => String(f.value || '').trim().length === 0);
         const anyInvalid = fields.some(f => f.invalid);
@@ -5654,7 +5786,10 @@ class Component extends DCLogic {
           glow: first ? 1 : 0,
           shadow: last ? '0 40px 70px -44px rgba(0,0,0,0.85)' : 'none',
           state: done ? 'Complete' : (anyInvalid ? 'Check details' : 'Required'),
-          stateColor: done ? 'oklch(0.86 0.14 92)' : (anyInvalid ? 'oklch(0.7 0.18 25)' : '#8A7F6E'),
+          stateColor: done ? 'oklch(0.44 0.07 152)' : (anyInvalid ? 'oklch(0.52 0.19 25)' : '#8A7F6E'),
+          // The account switch rides in Contact, per the handoff.
+          acctShow: sec.n === '01' ? 'flex' : 'none',
+          acctChecked: String(this.state.acctOptIn !== false),
           hasToggle: !!sec.toggle,
           hasFields: fields.length > 0,
           fieldsDisplay: fields.length > 0 ? 'grid' : 'none',
