@@ -976,6 +976,32 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 @media (hover: hover) and (pointer: fine) { .pc-cta:hover { background: var(--green); } }
 @media (max-width: 600px) { .pc-id { padding: 18px 18px 16px; } .pc-id__lede { font-size: 13.5px; margin-top: 9px; } .pc-head { padding: 20px 18px 16px; } .pc-lb { font-size: 34px; } .pc-body { padding: 16px 18px 0; } }
 
+/* Species bar, product page only (Jon, Sep 2026). The dog/cat pick at the
+   top of that page changes everything below it — formula, dosing, nutrition
+   label, ingredient profile, the evidence desk — but the picker that sets it
+   scrolls away inside the first screen, so from there down there is nothing
+   saying which animal you are reading about.
+
+   It rides inside the sticky header as its own wrapped row rather than as a
+   second sticky element below it: a separate one would need the header's
+   height as a top offset, and that height changes with the breakpoint and
+   with the wrapping of the header's own contents. As a row inside, it
+   follows for free.
+
+   The negative margins bleed it to the header's edges; --hb-hpx/--hb-hpy
+   carry the header's own padding so the bleed tracks it across
+   breakpoints. They live here rather than on the header's style attribute
+   because an inline custom property beats every media query that would
+   narrow it. */
+[data-m~="hdr"] { --hb-hpx: 44px; --hb-hpy: 20px; }
+.hbsp { flex: 1 0 100%; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 calc(-1 * var(--hb-hpx, 44px)) calc(-1 * var(--hb-hpy, 20px)); padding: 9px var(--hb-hpx, 44px) 10px; border-top: 1px solid #E4DBC9; }
+.hbsp__label { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap; }
+.hbsp__pills { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid #DDD3C0; border-radius: 999px; background: #FCFAF4; }
+.hbsp__pill { touch-action: manipulation; -webkit-appearance: none; appearance: none; border: none; cursor: pointer; border-radius: 999px; padding: 7px 16px; background: transparent; color: #6A6055; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; transition: background 0.22s ease, color 0.22s ease; }
+.hbsp__pill[aria-pressed="true"] { background: #17140F; color: #F5F0E6; }
+@media (hover: hover) and (pointer: fine) { .hbsp__pill[aria-pressed="false"]:hover { color: #17140F; } }
+@media (max-width: 420px) { .hbsp { gap: 9px; } .hbsp__label { font-size: 8px; letter-spacing: 0.14em; } .hbsp__pill { padding: 7px 13px; font-size: 9px; } }
+
 /* Mobile menu (designer handoff, Setup_41): full-screen cream overlay with
    two photo tiles, ruled rows and a pinned cart bar. It replaces the old
    drop-down list of eight identical links.
@@ -1760,6 +1786,8 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="hdr"] { padding-top: 11px !important; padding-bottom: 11px !important; gap: 8px 14px !important; }
     [data-m~="hdrmark"] > span:first-child { font-size: 19px !important; }
     [data-m~="hdrmark"] > span:last-child { font-size: 8px !important; letter-spacing: 0.14em !important; }
+    /* Keep the species bar's bleed matched to the header's own padding. */
+    [data-m~="hdr"] { --hb-hpx: 20px; --hb-hpy: 11px; }
     [data-m~="hdrbtn"] { width: 38px !important; height: 38px !important; gap: 4px !important; }
     [data-m~="hdrbtn"] > span { width: 17px !important; }
     [data-m~="navpanel"] { padding: 4px 20px 16px !important; animation: navDrop 0.28s cubic-bezier(0.2,0.7,0.2,1) both; box-shadow: 0 22px 30px -26px rgba(23,20,15,0.6); }
@@ -1865,6 +1893,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="acctfine"] { font-size: 9px !important; margin-top: 16px !important; }
     [data-m~="acctfine"] br { display: none !important; }
     [data-m~="pad"]   { padding-left: 16px !important; padding-right: 16px !important; }
+    [data-m~="hdr"]   { --hb-hpx: 16px; }
     [data-m~="short"] { padding-top: 44px !important; padding-bottom: 44px !important; }
     [data-m~="gap"]   { gap: 22px !important; }
     [data-m~="inset"] { padding: 26px 17px !important; }
@@ -2047,6 +2076,16 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <span style="position: absolute; top: -1px; right: -3px; min-width: 19px; height: 19px; padding: 0 5px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: oklch(0.88 0.15 96); border: 1px solid #17140F; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.02em; color: #17140F; animation: checkPop 0.4s cubic-bezier(0.2,0.7,0.2,1) both;">{{ cartQty }}</span>
       </sc-if>
     </button>
+    <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+      <div class="hbsp" data-m="spbar">
+        <span class="hbsp__label">Showing</span>
+        <span class="hbsp__pills" role="group" aria-label="Choose the animal this page describes">
+          <sc-for list="{{ spBar }}" as="sb" hint-placeholder-count="2">
+            <button sc-camel-on-click="{{ sb.pick }}" class="hbsp__pill" type="button" aria-pressed="{{ sb.on }}">{{ sb.label }}</button>
+          </sc-for>
+        </span>
+      </div>
+    </sc-if>
   </header>
 
   <!-- Outside the header on purpose: the header's backdrop-filter makes it a
@@ -5456,6 +5495,13 @@ class Component extends DCLogic {
     };
     return {
       accent,
+      // The sticky header's species bar on the product page. Same switch as
+      // the picker at the top, kept in reach after that picker scrolls away.
+      spBar: speciesDefs.map(s => ({
+        label: s.label,
+        on: this.state.sp === s.key ? 'true' : 'false',
+        pick: () => this.setState({ sp: s.key, plan: this.state.wholesale ? 0 : 1, added: false })
+      })),
       species: speciesDefs.map(s => ({
         label: s.label,
         meta: s.meta,
