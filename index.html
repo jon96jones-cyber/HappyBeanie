@@ -6465,7 +6465,11 @@ Component.prototype.renderVals = function () {
   .hb-ev__note { border-top: 1px solid var(--hb-hairline); padding-top: 18px; font-family: var(--hb-mono); font-size: 9.5px; letter-spacing: 0.1em; line-height: 1.75; text-transform: uppercase; color: var(--hb-muted); margin: 0; max-width: 40em; }
 
   @media (max-width: 900px) {
-    .hb-ev { --hb-blend: 240px; padding: 56px 22px calc(42px + var(--hb-blend)); }
+    /* Shorter hand-off on phones (Jon, Sep 2026): the desk's content ends at
+       the funding note, so the band below it reads as dead space on a small
+       screen. 150px is enough run for the ramp to stay smooth and cuts the
+       empty stretch by more than half. */
+    .hb-ev { --hb-blend: 150px; padding: 56px 22px calc(16px + var(--hb-blend)); }
     .hb-ev__head { grid-template-columns: 1fr; align-items: start; gap: 14px; }
     .hb-ev__scope { padding-bottom: 0; }
     .hb-ev__stage { height: 640px; }
@@ -7209,6 +7213,28 @@ Component.prototype.renderVals = function () {
     if (returnTo && returnTo.focus) { try { returnTo.focus({ preventScroll: true }); } catch (e) {} }
     returnTo = null;
     if (trap) { trap = false; try { history.back(); } catch (e) {} }
+    // Popping the trap entry hands the browser back a history entry it saved a
+    // scroll offset for, and Safari restores that offset — which threw the
+    // reader up the page the moment they declined (Jon, Sep 2026). The page
+    // cannot have moved while the card was open, so put it back where it was.
+    keepScroll();
+  }
+
+  // Holds the page at the offset the card opened on, for the fraction of a
+  // second in which the browser may restore its own. Gives up the moment the
+  // reader scrolls themselves, so it can never fight a real gesture.
+  function keepScroll() {
+    var tries = 0, done = false;
+    var give = function () { done = true; window.removeEventListener('touchstart', give, true); window.removeEventListener('wheel', give, true); };
+    window.addEventListener('touchstart', give, true);
+    window.addEventListener('wheel', give, true);
+    var tick = function () {
+      if (done) return;
+      if (Math.abs((window.pageYOffset || document.documentElement.scrollTop || 0) - openY) > 2) window.scrollTo(0, openY);
+      if (++tries < 8) requestAnimationFrame(tick); else give();
+    };
+    requestAnimationFrame(tick);
+    setTimeout(give, 400);
   }
   document.getElementById('hbNo').addEventListener('click', close);
   // Clicking the scrim deliberately does NOT close it any more: declining has
@@ -7319,7 +7345,7 @@ Component.prototype.renderVals = function () {
   // One spare history entry while the card is open, so the phone's back
   // gesture closes the popup instead of navigating the page underneath —
   // the swipe that used to land people back on the homepage mid-ask.
-  var trap = false;
+  var trap = false, openY = 0;
   window.addEventListener('popstate', function () {
     if (pop.hasAttribute('data-on')) { trap = false; close(); }
   });
@@ -7327,6 +7353,9 @@ Component.prototype.renderVals = function () {
   function open() {
     if (pop.hasAttribute('data-on')) return;
     returnTo = document.activeElement;
+    // Where the page is standing. Scroll is locked from here until it closes,
+    // so this is where it must still be afterwards — see keepScroll().
+    openY = window.pageYOffset || document.documentElement.scrollTop || 0;
     lockScroll();
     try { history.pushState({ hbPopTrap: 1 }, '', location.href); trap = true; } catch (e) {}
     // First touch gets the research ask; anyone this browser has popped at
