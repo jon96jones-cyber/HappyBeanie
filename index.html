@@ -976,6 +976,50 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 @media (hover: hover) and (pointer: fine) { .pc-cta:hover { background: var(--green); } }
 @media (max-width: 600px) { .pc-id { padding: 18px 18px 16px; } .pc-id__lede { font-size: 13.5px; margin-top: 9px; } .pc-head { padding: 20px 18px 16px; } .pc-lb { font-size: 34px; } .pc-body { padding: 16px 18px 0; } }
 
+/* Mobile menu (designer handoff, Setup_41): full-screen cream overlay with
+   two photo tiles, ruled rows and a pinned cart bar. It replaces the old
+   drop-down list of eight identical links.
+
+   The overlay is always in the DOM rather than mounted by an sc-if: the
+   open state rides interpolated style values instead, so the transition
+   plays on the way out as well as the way in. It is display:none above the
+   header's own breakpoint, so desktop never pays for it. */
+.hbm-menu { position: fixed; inset: 0; z-index: 70; display: none; flex-direction: column; background: #F5F0E6; transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1), visibility 0.28s; overscroll-behavior: contain; }
+.hbm-menu * { box-sizing: border-box; }
+.hbm-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 22px 16px; }
+.hbm-head__mark { display: flex; align-items: baseline; gap: 9px; }
+.hbm-head__mark b { font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.045em; font-size: 23px; color: #17140F; }
+.hbm-head__mark span { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; }
+.hbm-close { flex: none; width: 42px; height: 42px; display: grid; place-items: center; border: 1.5px solid #17140F; border-radius: 3px; background: transparent; color: #17140F; font-size: 19px; line-height: 1; cursor: pointer; touch-action: manipulation; }
+.hbm-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+.hbm-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 4px 22px 0; }
+.hbm-tile { position: relative; height: 176px; border-radius: 4px; overflow: hidden; background: #17140F; display: block; cursor: pointer; }
+.hbm-tile > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.92; }
+.hbm-tile--dog > img { object-position: 62% 26%; }
+.hbm-tile--cat > img { object-position: 26% 26%; }
+.hbm-tile__scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(23,20,15,0.85) 30%, transparent 70%); }
+.hbm-tile__label { position: absolute; left: 14px; bottom: 13px; color: #F5F0E6; }
+.hbm-tile__label > span:first-child { display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.86 0.14 92); margin-bottom: 4px; }
+.hbm-tile__label > span:last-child { display: block; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.04em; font-size: 21px; }
+
+.hbm-rows { display: grid; padding: 20px 22px 0; }
+.hbm-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; min-height: 52px; padding: 14px 0; border-bottom: 1px solid rgba(23,20,15,0.12); font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 20px; color: #17140F; cursor: pointer; }
+.hbm-row:last-child { border-bottom: none; }
+.hbm-row > span:last-child { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; color: #8A7F6E; }
+
+.hbm-sub { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 16px 22px 14px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
+.hbm-sub > a { color: #6A6055; padding: 6px 0; cursor: pointer; }
+
+/* The bar is pinned below the scroller, so it stays put while the rows
+   scroll. max() keeps it clear of the home indicator on a modern iPhone. */
+.hbm-cart { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin: 0 22px; margin-bottom: max(22px, env(safe-area-inset-bottom)); min-height: 56px; padding: 0 18px; background: #17140F; color: #F5F0E6; border-radius: 3px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; }
+.hbm-cart > span:last-child { color: oklch(0.86 0.14 92); }
+
+@media (max-width: 900px) { .hbm-menu { display: flex; } }
+@media (max-width: 380px) { .hbm-tile { height: 152px; } .hbm-row { font-size: 18px; min-height: 48px; } }
+@media (prefers-reduced-motion: reduce) { .hbm-menu { transition: none; } }
+
 /* Dosing page (designer handoff, Setup_32): hero, calculator, quiz CTA band.
    Vars scoped on .hb-dose like .hb-faq's — the injected wrappers carry the
    class, so nothing leaks into the rest of the page. */
@@ -2001,18 +2045,48 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <span style="position: absolute; top: -1px; right: -3px; min-width: 19px; height: 19px; padding: 0 5px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: oklch(0.88 0.15 96); border: 1px solid #17140F; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.02em; color: #17140F; animation: checkPop 0.4s cubic-bezier(0.2,0.7,0.2,1) both;">{{ cartQty }}</span>
       </sc-if>
     </button>
-    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
-      <div data-m="navpanel" style="position: absolute; top: 100%; left: 0; right: 0; background: #F5F0E6; border-bottom: 1px solid #DDD3C0; padding: 8px 20px 22px; display: grid; gap: 1px;">
-        <sc-for list="{{ mobileLinks }}" as="ml" hint-placeholder-count="4">
-          <a sc-camel-on-click="{{ ml.go }}" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">{{ ml.label }}</a>
-        </sc-for>
-        <a href="account.html" style="padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F; border-bottom: 1px solid #E4DBC9;">{{ acctLabel }}</a>
-        <sc-if value="{{ cartAdded }}" hint-placeholder-val="{{ false }}">
-          <a sc-camel-on-click="{{ goCart }}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 2px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 24px; color: #17140F;">Your cart<span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152);">{{ cartCount }}</span></a>
-        </sc-if>
-      </div>
-    </sc-if>
   </header>
+
+  <!-- Outside the header on purpose: the header's backdrop-filter makes it a
+       containing block for fixed children, which would trap this overlay
+       inside the header's own box instead of covering the screen. -->
+  <nav data-m="hbmenu" class="hbm-menu" aria-label="Menu" aria-hidden="{{ menuHidden }}" style="opacity: {{ menuOp }}; visibility: {{ menuVis }}; transform: {{ menuTf }};">
+    <div class="hbm-head">
+      <span class="hbm-head__mark"><b>happy beanie</b><span>Hormone care</span></span>
+      <button sc-camel-on-click="{{ closeMenu }}" class="hbm-close" type="button" aria-label="Close menu" data-hbm-close>&times;</button>
+    </div>
+
+    <div class="hbm-scroll">
+      <div class="hbm-tiles">
+        <a sc-camel-on-click="{{ goDog }}" class="hbm-tile hbm-tile--dog">
+          <img src="assets/img/cart/dog-box.webp" alt="" loading="lazy" decoding="async">
+          <span class="hbm-tile__scrim"></span>
+          <span class="hbm-tile__label"><span>Shop</span><span>For dogs</span></span>
+        </a>
+        <a sc-camel-on-click="{{ goCat }}" class="hbm-tile hbm-tile--cat">
+          <img src="assets/img/cart/cat-box.webp" alt="" loading="lazy" decoding="async">
+          <span class="hbm-tile__scrim"></span>
+          <span class="hbm-tile__label"><span>Shop</span><span>For cats</span></span>
+        </a>
+      </div>
+
+      <div class="hbm-rows">
+        <a sc-camel-on-click="{{ goDosing }}" class="hbm-row"><span>Dosing guide</span><span>&rarr;</span></a>
+        <a sc-camel-on-click="{{ goQuiz }}" class="hbm-row"><span>Is it right for my pet?</span><span>&rarr;</span></a>
+        <a sc-camel-on-click="{{ goAbout }}" class="hbm-row"><span>About our lab</span><span>&rarr;</span></a>
+        <a sc-camel-on-click="{{ goContact }}" class="hbm-row"><span>Contact us</span><span>&rarr;</span></a>
+        <a href="track.html" class="hbm-row"><span>Track my order</span><span>&rarr;</span></a>
+      </div>
+
+      <div class="hbm-sub">
+        <a sc-camel-on-click="{{ goCerts }}">Lab certificates</a>
+        <a href="account.html">{{ acctLabel }}</a>
+        <a sc-camel-on-click="{{ goFaq }}">FAQ</a>
+      </div>
+    </div>
+
+    <a sc-camel-on-click="{{ goCart }}" class="hbm-cart"><span>Your cart</span><span>{{ menuCart }}</span></a>
+  </nav>
 
   <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
   <div>
@@ -4911,6 +4985,7 @@ class Component extends DCLogic {
     requestAnimationFrame(() => this.fitFacts());
     const _pg = this.state.page || 'home';
     if (this._popPage !== _pg) { this._popPage = _pg; this.popPageChanged(_pg); }
+    this.syncMenu();
     // The catch section mounts and unmounts with the product page.
     try { if (window.hbCatchTick) window.hbCatchTick(); } catch (e) {}
     try { if (window.hbRateScan) window.hbRateScan(); } catch (e) {}
@@ -5054,6 +5129,56 @@ class Component extends DCLogic {
       tradePrice: tradeUnit, tradeMin: (s.trade && s.trade.minQty) || 5,
       eyebrow: eyebrow, lede: lede
     };
+  }
+
+  // The mobile menu's side effects, which live outside the render: the page
+  // behind must not scroll while the overlay covers it, Escape must close it,
+  // and focus has to move into the overlay and back to the button after.
+  //
+  // Only overflow is used to lock the page. Pinning the body with
+  // position: fixed also works, but it drops the scroll position and the page
+  // jumps back to it on close — the same fault we fixed on the bean popup.
+  syncMenu() {
+    const on = !!this.state.menuOpen;
+    // The menu starts closed, so an unset flag means closed — not "unknown".
+    // Reading it as unknown and skipping the first pass would swallow the
+    // opening toggle, since this hook does not run on mount.
+    const was = !!this._menuWas;
+    if (on === was) return;
+    this._menuWas = on;
+    try {
+      const b = document.body;
+      if (on) {
+        // Hiding the body's overflow leaves the viewport with nothing to
+        // scroll, and the browser clamps the position to the top. Closing
+        // would then drop the reader back at the top of the page, so the
+        // position is put back — unless the menu took them somewhere else,
+        // where nav() has already scrolled to the top on purpose.
+        this._menuY = window.scrollY;
+        this._menuPage = this.state.page || 'home';
+        this._menuOverflow = b.style.overflow;
+        b.style.overflow = 'hidden';
+      } else {
+        b.style.overflow = this._menuOverflow || '';
+        if ((this.state.page || 'home') === this._menuPage) window.scrollTo(0, this._menuY || 0);
+      }
+    } catch (e) {}
+    if (!this._menuKeys) {
+      this._menuKeys = true;
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.state.menuOpen) this.setState({ menuOpen: false });
+      });
+    }
+    // The overlay is still visibility: hidden on the frame the state flips —
+    // the transition has not started — and a hidden element cannot take
+    // focus, so the call is retried for a few frames until it lands.
+    let tries = 0;
+    const aim = () => {
+      const el = on ? document.querySelector('[data-hbm-close]') : document.querySelector('[data-m~="hdrbtn"]');
+      try { if (el && el.focus) el.focus({ preventScroll: true }); } catch (e) {}
+      if (el && document.activeElement !== el && tries++ < 20) requestAnimationFrame(aim);
+    };
+    requestAnimationFrame(aim);
   }
 
   nav(page) {
@@ -5436,10 +5561,30 @@ class Component extends DCLogic {
         color: page === p.key ? 'oklch(0.44 0.07 152)' : '#17140F',
         rule: page === p.key ? 'oklch(0.44 0.07 152)' : 'transparent'
       })),
-      mobileLinks: [
-        ...pages.map(p => ({ label: p.label, go: this.nav(p.key) })),
-        { label: 'Eligibility', go: this.nav('quiz') }
-      ],
+      goDosing: this.nav('dosing'),
+      goQuiz: this.nav('quiz'),
+      // The mobile menu's tiles pick the species on the way to the product
+      // page, the way the shop cards do, so the panel opens on the right one.
+      goDog: () => { this.setState({ sp: 'dog' }); this.nav('product')(); },
+      goCat: () => { this.setState({ sp: 'cat' }); this.nav('product')(); },
+      // There is no FAQ page — the band is injected into four of them. The
+      // dosing page is the one it belongs beside, so the link lands there and
+      // scrolls down to it once the page has rendered.
+      goFaq: () => {
+        this.nav('dosing')();
+        let tries = 0;
+        const find = () => {
+          const host = document.querySelector('[data-hb-faq-host]');
+          if (host) { host.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+          if (tries++ < 40) requestAnimationFrame(find);
+        };
+        requestAnimationFrame(find);
+      },
+      closeMenu: () => this.setState({ menuOpen: false }),
+      menuHidden: this.state.menuOpen ? 'false' : 'true',
+      menuOp: this.state.menuOpen ? '1' : '0',
+      menuVis: this.state.menuOpen ? 'visible' : 'hidden',
+      menuTf: this.state.menuOpen ? 'none' : 'translateY(-8px)',
       shopCards: shopDefs.map(s => {
         const on = this.state.sp === s.key;
         return { ...s,
@@ -5704,6 +5849,11 @@ class Component extends DCLogic {
       cartIsBoth: this.state.cartDog > 0 && this.state.cartCat > 0,
       cartCount: (this.state.cartDog + this.state.cartCat) === 1 ? '1 item' : (this.state.cartDog + this.state.cartCat) + ' items',
       cartQty: String(this.state.cartDog + this.state.cartCat),
+      // The mobile menu's pinned bar. It stays put when the cart is empty so
+      // the menu keeps its shape, and says so rather than showing a total.
+      menuCart: (this.state.cartDog + this.state.cartCat) > 0
+        ? ((this.state.cartDog + this.state.cartCat) === 1 ? '1 item' : (this.state.cartDog + this.state.cartCat) + ' items') + ' · ' + this.money(M.total) + ' →'
+        : 'Empty →',
       cartCta: () => {
         if (this.state.added) { this.nav('cart')(); return; }
         this.setState(st => st.sp === 'cat'
