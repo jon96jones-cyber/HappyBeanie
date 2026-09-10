@@ -661,11 +661,17 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hbco .hb-h1 { font-weight: 700; letter-spacing: -0.048em; font-size: clamp(28px, 4vw, 56px); line-height: 0.98; margin: 0 0 40px; max-width: 20em; }
 .hbco .hb-h1 em { font-style: normal; color: var(--green); }
 .hbco .hb-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 0.45fr); gap: 48px; align-items: start; }
-.hbco .hb-btn { display: grid; place-items: center; width: 100%; height: 58px; border: none; border-radius: 3px; background: var(--ink); color: #F5F0E6; font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1); }
-.hbco .hb-btn:hover { background: var(--green-dk); transform: translateY(-2px); }
+.hbco .hb-btn { touch-action: manipulation; display: grid; place-items: center; width: 100%; height: 58px; border: none; border-radius: 3px; background: var(--ink); color: #F5F0E6; font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1); }
+@media (hover: hover) and (pointer: fine) {
+  .hbco .hb-btn:hover { background: var(--green-dk); transform: translateY(-2px); }
+  .hbco .hb-btn--yellow:hover { background: #F5F0E6; }
+  .hbco .hb-express .shop:hover { background: #F5F0E6; }
+  .hbco .hb-express .apple:hover { background: var(--green-dk); }
+  .hbco .hb-step button:hover { background: #EAE1CE; }
+  .hbco .hb-remove:hover { color: oklch(0.52 0.16 32); }
+}
 .hbco .hb-btn.is-off { background: rgba(23,20,15,0.08); color: var(--muted-2); cursor: not-allowed; transform: none; }
 .hbco .hb-btn--yellow { background: var(--yellow); color: var(--ink); border: 1.5px solid var(--ink); height: 54px; font-size: 11.5px; }
-.hbco .hb-btn--yellow:hover { background: #F5F0E6; }
 .hbco .hb-or { display: flex; align-items: center; gap: 12px; margin: 14px 0 10px; font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted-2); }
 .hbco .hb-or i { flex: 1; height: 1px; background: rgba(23,20,15,0.14); }
 .hbco .hb-or span { white-space: nowrap; }
@@ -711,11 +717,9 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hbco .hb-qty { width: 140px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .hbco .hb-qty--gift { text-align: center; font-family: var(--mono); font-size: 12px; color: var(--muted); display: block; }
 .hbco .hb-step { display: inline-flex; align-items: center; border: 1px solid rgba(23,20,15,0.25); border-radius: 999px; height: 38px; background: var(--cream); }
-.hbco .hb-step button { width: 38px; height: 38px; border: none; background: none; font-size: 16px; cursor: pointer; color: var(--ink); border-radius: 999px; }
-.hbco .hb-step button:hover { background: #EAE1CE; }
+.hbco .hb-step button { touch-action: manipulation; width: 38px; height: 38px; border: none; background: none; font-size: 16px; cursor: pointer; color: var(--ink); border-radius: 999px; }
 .hbco .hb-step span { min-width: 24px; text-align: center; font-family: var(--mono); font-size: 13px; }
 .hbco .hb-remove { border: none; background: none; padding: 0; cursor: pointer; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); }
-.hbco .hb-remove:hover { color: oklch(0.52 0.16 32); }
 .hbco .hb-price { width: 80px; text-align: right; font-weight: 700; letter-spacing: -0.04em; font-size: 24px; font-variant-numeric: tabular-nums; }
 .hbco .hb-price--gift { font-family: var(--mono); font-weight: 400; font-size: 14px; color: var(--green); letter-spacing: 0; }
 .hbco .hb-empty { border: 1.5px solid var(--muted-2); border-radius: 8px; background: var(--cream); padding: 44px 30px 46px; text-align: center; }
@@ -723,9 +727,8 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hbco .hb-empty .go { display: inline-block; font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 16px 28px; border-radius: 999px; background: var(--ink); color: #F5F0E6; text-decoration: none; border: none; cursor: pointer; }
 /* checkout form */
 .hbco .hb-express { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.hbco .hb-express button { height: 52px; border: 1.5px solid var(--ink); border-radius: 3px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.2s ease; }
-.hbco .hb-express .shop { background: var(--yellow); color: var(--ink); } .hbco .hb-express .shop:hover { background: #F5F0E6; }
-.hbco .hb-express .apple { background: var(--ink); color: #F5F0E6; } .hbco .hb-express .apple:hover { background: var(--green-dk); }
+.hbco .hb-express button { touch-action: manipulation; height: 52px; border: 1.5px solid var(--ink); border-radius: 3px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.2s ease; }
+.hbco .hb-express .shop { background: var(--yellow); color: var(--ink); } .hbco .hb-express .apple { background: var(--ink); color: #F5F0E6; }
 .hbco .hb-or--top { margin: 0 0 28px; }
 .hbco .hb-cosec + .hb-cosec { padding-top: 26px; }
 .hbco .hb-cohead { display: grid; grid-template-columns: 34px 1fr auto; gap: 14px; align-items: center; padding-bottom: 12px; border-bottom: 1.5px solid var(--ink); }
@@ -859,12 +862,12 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .pc-chews span { display: block; overflow: hidden; flex: 0 0 auto; } .pc-chews img { display: block; object-fit: contain; }
 .pc-dose__t { font-weight: 700; letter-spacing: -0.04em; font-size: 20px; line-height: 1.05; }
 .pc-plans { display: grid; gap: 6px; padding: 16px 0 18px; }
-.pc-row { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; text-align: left; padding: 13px 16px; background: transparent; border: 1.5px solid rgba(23,20,15,0.16); border-radius: 4px; cursor: pointer; font-family: var(--sans); color: var(--ink); transition: background 0.2s ease, border-color 0.2s ease; }
+.pc-row { touch-action: manipulation; position: relative; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; text-align: left; padding: 13px 16px; background: transparent; border: 1.5px solid rgba(23,20,15,0.16); border-radius: 4px; cursor: pointer; font-family: var(--sans); color: var(--ink); transition: background 0.2s ease, border-color 0.2s ease; }
 .pc-row[aria-pressed="true"] { background: oklch(0.86 0.14 92 / 0.28); border-color: var(--ink); }
 .pc-row[hidden] { display: none; }
 .pc-tag { position: absolute; top: -9px; left: 14px; padding: 3px 8px; background: var(--ink); color: #F5F0E6; font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; border-radius: 2px; opacity: 0; transform: translateY(4px); transition: opacity 0.2s ease, transform 0.2s ease; pointer-events: none; }
 .pc-tag:empty { display: none; }
-.pc-row:hover .pc-tag { opacity: 1; transform: none; }
+@media (hover: hover) and (pointer: fine) { .pc-row:hover .pc-tag { opacity: 1; transform: none; } }
 /* Touch devices have no hover, so the row's tag ("Most chosen", "Best
    value", "For big beans") rides the selection instead — otherwise the row
    the page opens on carries no label at all (Jon, Sep 2026). The rows get a
@@ -882,8 +885,8 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .pc-save { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--green); margin-top: 2px; }
 .pc-save:empty { display: none; }
 .pc-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7; }
-.pc-cta { display: block; width: 100%; padding: 20px; background: var(--ink); color: #F5F0E6; border: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s ease; }
-.pc-cta:hover { background: var(--green); }
+.pc-cta { touch-action: manipulation; display: block; width: 100%; padding: 20px; background: var(--ink); color: #F5F0E6; border: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s ease; }
+@media (hover: hover) and (pointer: fine) { .pc-cta:hover { background: var(--green); } }
 @media (max-width: 600px) { .pc-id { padding: 18px 18px 16px; } .pc-id__lede { font-size: 13.5px; margin-top: 9px; } .pc-head { padding: 20px 18px 16px; } .pc-lb { font-size: 34px; } .pc-body { padding: 16px 18px 0; } }
 
 /* Dosing page (designer handoff, Setup_32): hero, calculator, quiz CTA band.
@@ -8277,7 +8280,7 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '</div></div>'
   + '<button class="pc-cta" type="button" data-cta>Start the 30 days · $99 →</button>'
   + '</div>';
-var hbPcWired = new WeakSet();
+var hbPcWired = new WeakSet(), hbPcDelegated = false;
 window.hbPcInit = function (ctx) {
   var PLANS = { 0: { key: 'once', price: 115, boxes: 1 }, 1: { key: 'monthly', price: 99, boxes: 1 }, 2: { key: 'four', price: 297, boxes: 4 }, 3: { key: 'big', price: 159, boxes: 2 } };
   // Each formula has its own weight scale. Ticks are marked in pounds, and
@@ -8299,7 +8302,7 @@ window.hbPcInit = function (ctx) {
       // and lost the listeners): wire it and give it its own state.
       hbPcWired.add(root);
       S = root.__pc = { sp: 'dog', lb: 45, catLb: 10, sel: '1', added: false, wholesale: false, subsOff: false, tradePrice: null, tradeMin: 5 };
-      wire(root, S);
+      wire();
     }
     if (ctx) {
       S.sp = ctx.sp === 'cat' ? 'cat' : 'dog';
@@ -8313,20 +8316,46 @@ window.hbPcInit = function (ctx) {
     render(root, S);
   });
 
-  function wire(root, S) {
-    var range = root.querySelector('[data-range]'), cta = root.querySelector('[data-cta]');
-    var rows = Array.prototype.slice.call(root.querySelectorAll('.pc-row'));
-    var emit = function (name, detail) { root.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); };
+  // Listeners live on the document, not on the panel's own nodes (Jon, Sep
+  // 2026: on a phone the buy button lit up but did nothing until a second
+  // tap). A render can hand the host a fresh copy of the subtree, and a tap
+  // that started on the old button then had nowhere to land — the listener
+  // had gone with the node it was attached to. Delegation cannot go stale:
+  // whichever copy is on the page is the one the tap reaches, and state is
+  // read off the panel root, so nothing depends on when it was wired.
+  function wire() {
+    if (hbPcDelegated) return;
+    hbPcDelegated = true;
+    var stateOf = function (t) {
+      var root = t && t.closest ? t.closest('[data-pc]') : null;
+      return root && root.__pc ? root : null;
+    };
+    var emit = function (root, name, detail) { root.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); };
+    var setLb = function (S, v) { if (S.sp === 'cat') S.catLb = Number(v); else S.lb = Number(v); };
     // Dragging re-renders the panel alone; the app hears the weight on release.
-    var setLb = function () { if (S.sp === 'cat') S.catLb = Number(range.value); else S.lb = Number(range.value); };
-    range.addEventListener('input', function () { setLb(); render(root, S); });
-    range.addEventListener('change', function () { setLb(); render(root, S); emit('hb:pc', { sp: S.sp, lb: Number(range.value), plan: Number(S.sel) }); });
-    rows.forEach(function (r) {
-      r.addEventListener('click', function () { S.sel = r.getAttribute('data-plan'); S.added = false; render(root, S); emit('hb:pc', { plan: Number(S.sel) }); });
+    document.addEventListener('input', function (e) {
+      var root = stateOf(e.target); if (!root || !e.target.matches('[data-range]')) return;
+      setLb(root.__pc, e.target.value); render(root, root.__pc);
     });
-    cta.addEventListener('click', function () {
-      var c = PLANS[S.sel], lb = S.sp === 'cat' ? S.catLb : S.lb;
-      emit('hb:add-to-cart', { sp: S.sp, plan: Number(S.sel), key: c.key, price: S.sel === '0' && S.tradePrice ? S.tradePrice : c.price, boxes: c.boxes, weightLb: lb, dosePerDay: window.hbDose(S.sp, lb) });
+    document.addEventListener('change', function (e) {
+      var root = stateOf(e.target); if (!root || !e.target.matches('[data-range]')) return;
+      var S = root.__pc; setLb(S, e.target.value); render(root, S);
+      emit(root, 'hb:pc', { sp: S.sp, lb: S.sp === 'cat' ? S.catLb : S.lb, plan: Number(S.sel) });
+    });
+    document.addEventListener('click', function (e) {
+      var root = stateOf(e.target); if (!root) return;
+      var S = root.__pc;
+      var row = e.target.closest('.pc-row');
+      if (row && root.contains(row)) {
+        S.sel = row.getAttribute('data-plan'); S.added = false;
+        render(root, S); emit(root, 'hb:pc', { plan: Number(S.sel) });
+        return;
+      }
+      var cta = e.target.closest('[data-cta]');
+      if (cta && root.contains(cta)) {
+        var c = PLANS[S.sel] || PLANS[1], lb = S.sp === 'cat' ? S.catLb : S.lb;
+        emit(root, 'hb:add-to-cart', { sp: S.sp, plan: Number(S.sel), key: c.key, price: S.sel === '0' && S.tradePrice ? S.tradePrice : c.price, boxes: c.boxes, weightLb: lb, dosePerDay: window.hbDose(S.sp, lb) });
+      }
     });
   }
 
