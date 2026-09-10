@@ -976,30 +976,26 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 @media (hover: hover) and (pointer: fine) { .pc-cta:hover { background: var(--green); } }
 @media (max-width: 600px) { .pc-id { padding: 18px 18px 16px; } .pc-id__lede { font-size: 13.5px; margin-top: 9px; } .pc-head { padding: 20px 18px 16px; } .pc-lb { font-size: 34px; } .pc-body { padding: 16px 18px 0; } }
 
-/* Species bar, product page only (Jon, Sep 2026). The dog/cat pick at the
+/* Species switch, product page only (Jon, Sep 2026). The dog/cat pick at the
    top of that page changes everything below it — formula, dosing, nutrition
    label, ingredient profile, the evidence desk — but the picker that sets it
-   scrolls away inside the first screen, so from there down there is nothing
-   saying which animal you are reading about.
+   scrolls away inside the first screen, so from there down there was nothing
+   saying which animal you were reading about.
 
-   It rides inside the sticky header as its own wrapped row rather than as a
-   second sticky element below it: a separate one would need the header's
-   height as a top offset, and that height changes with the breakpoint and
-   with the wrapping of the header's own contents. As a row inside, it
-   follows for free.
-
-   The negative margins bleed it to the header's edges; --hb-hpx/--hb-hpy
-   carry the header's own padding so the bleed tracks it across
-   breakpoints. They live here rather than on the header's style attribute
-   because an inline custom property beats every media query that would
-   narrow it. */
-[data-m~="hdr"] { --hb-hpx: 44px; --hb-hpy: 20px; }
-.hbsp { flex: 1 0 100%; display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 calc(-1 * var(--hb-hpx, 44px)) calc(-1 * var(--hb-hpy, 20px)); padding: 9px var(--hb-hpx, 44px) 10px; border-top: 1px solid #E4DBC9; }
+   It lives in the sticky buy bar rather than the header, which suits the
+   timing: that bar slides up once you are past the first screen, which is
+   exactly when the picker is gone. The bar is ink, so the pills invert —
+   cream fills the chosen one, and the brand yellow is left to the buy
+   button alone rather than having the two compete. */
+.hbsp { display: flex; align-items: center; gap: 12px; }
 .hbsp__label { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap; }
-.hbsp__pills { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid #DDD3C0; border-radius: 999px; background: #FCFAF4; }
-.hbsp__pill { touch-action: manipulation; -webkit-appearance: none; appearance: none; border: none; cursor: pointer; border-radius: 999px; padding: 7px 16px; background: transparent; color: #6A6055; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; transition: background 0.22s ease, color 0.22s ease; }
-.hbsp__pill[aria-pressed="true"] { background: #17140F; color: #F5F0E6; }
-@media (hover: hover) and (pointer: fine) { .hbsp__pill[aria-pressed="false"]:hover { color: #17140F; } }
+.hbsp__pills { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid rgba(245,240,230,0.24); border-radius: 999px; background: rgba(245,240,230,0.06); }
+.hbsp__pill { touch-action: manipulation; -webkit-appearance: none; appearance: none; border: none; cursor: pointer; border-radius: 999px; padding: 7px 16px; background: transparent; color: #B9AF9C; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; transition: background 0.22s ease, color 0.22s ease; }
+.hbsp__pill[aria-pressed="true"] { background: #F5F0E6; color: #17140F; }
+@media (hover: hover) and (pointer: fine) { .hbsp__pill[aria-pressed="false"]:hover { color: #F5F0E6; } }
+/* Phones hide the bar's product block, so the switch takes the whole first
+   line above the full-width buy button instead of sitting beside it. */
+@media (max-width: 900px) { .hbsp--bar { flex: 1 0 100%; justify-content: center; } }
 @media (max-width: 420px) { .hbsp { gap: 9px; } .hbsp__label { font-size: 8px; letter-spacing: 0.14em; } .hbsp__pill { padding: 7px 13px; font-size: 9px; } }
 
 /* Mobile menu (designer handoff, Setup_41): full-screen cream overlay with
@@ -1786,8 +1782,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="hdr"] { padding-top: 11px !important; padding-bottom: 11px !important; gap: 8px 14px !important; }
     [data-m~="hdrmark"] > span:first-child { font-size: 19px !important; }
     [data-m~="hdrmark"] > span:last-child { font-size: 8px !important; letter-spacing: 0.14em !important; }
-    /* Keep the species bar's bleed matched to the header's own padding. */
-    [data-m~="hdr"] { --hb-hpx: 20px; --hb-hpy: 11px; }
     [data-m~="hdrbtn"] { width: 38px !important; height: 38px !important; gap: 4px !important; }
     [data-m~="hdrbtn"] > span { width: 17px !important; }
     [data-m~="navpanel"] { padding: 4px 20px 16px !important; animation: navDrop 0.28s cubic-bezier(0.2,0.7,0.2,1) both; box-shadow: 0 22px 30px -26px rgba(23,20,15,0.6); }
@@ -1893,7 +1887,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     [data-m~="acctfine"] { font-size: 9px !important; margin-top: 16px !important; }
     [data-m~="acctfine"] br { display: none !important; }
     [data-m~="pad"]   { padding-left: 16px !important; padding-right: 16px !important; }
-    [data-m~="hdr"]   { --hb-hpx: 16px; }
     [data-m~="short"] { padding-top: 44px !important; padding-bottom: 44px !important; }
     [data-m~="gap"]   { gap: 22px !important; }
     [data-m~="inset"] { padding: 26px 17px !important; }
@@ -2076,16 +2069,6 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
         <span style="position: absolute; top: -1px; right: -3px; min-width: 19px; height: 19px; padding: 0 5px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: oklch(0.88 0.15 96); border: 1px solid #17140F; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.02em; color: #17140F; animation: checkPop 0.4s cubic-bezier(0.2,0.7,0.2,1) both;">{{ cartQty }}</span>
       </sc-if>
     </button>
-    <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
-      <div class="hbsp" data-m="spbar">
-        <span class="hbsp__label">Showing</span>
-        <span class="hbsp__pills" role="group" aria-label="Choose the animal this page describes">
-          <sc-for list="{{ spBar }}" as="sb" hint-placeholder-count="2">
-            <button sc-camel-on-click="{{ sb.pick }}" class="hbsp__pill" type="button" aria-pressed="{{ sb.on }}">{{ sb.label }}</button>
-          </sc-for>
-        </span>
-      </div>
-    </sc-if>
   </header>
 
   <!-- Outside the header on purpose: the header's backdrop-filter makes it a
@@ -2995,13 +2978,21 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
     <div class="hb-buybar" data-m="pad" style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; transform: translateY(110%); opacity: 0; transition: transform 0.35s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease; background: rgba(23,20,15,0.96); backdrop-filter: blur(10px); border-top: 1px solid rgba(245,240,230,0.16); padding: 14px 44px;">
       <div aria-hidden="true" class="hb-progress" style="position: absolute; left: 0; top: 0; height: 2px; width: 0%; background: oklch(0.86 0.14 92); transition: width 0.12s linear;"></div>
-      <div data-m="gap" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 1180px; margin: 0 auto;">
+      <div data-m="gap wrapflex" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 1180px; margin: 0 auto;">
         <div data-m="hide" style="display: flex; align-items: center; gap: 14px;">
           <div style="width: 46px; height: 46px; border-radius: 3px; overflow: hidden; flex: 0 0 auto;"><img src="/assets/img/pdp-dog.webp" alt="Happy Beans for Dogs" width="1264" height="848" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: {{ pdpDogShow }}; object-fit: cover; object-position: center;"><img src="/assets/img/pdp-cat.webp" alt="Happy Beans for Cats" width="1264" height="848" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: {{ pdpCatShow }}; object-fit: cover; object-position: center;"></div>
           <div>
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 20px; color: #F5F0E6; line-height: 1.1;">{{ pdpName }}</div>
             <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;"><span data-pre-hide>Ships within 24 hours</span><span data-pre-show-inline>Batch 0072 · ships in ~4 weeks</span></div>
           </div>
+        </div>
+        <div class="hbsp hbsp--bar">
+          <span class="hbsp__label">Showing</span>
+          <span class="hbsp__pills" role="group" aria-label="Choose the animal this page describes">
+            <sc-for list="{{ spBar }}" as="sb" hint-placeholder-count="2">
+              <button sc-camel-on-click="{{ sb.pick }}" class="hbsp__pill" type="button" aria-pressed="{{ sb.on }}">{{ sb.label }}</button>
+            </sc-for>
+          </span>
         </div>
         <div data-m="wrapflex w100" style="display: flex; align-items: center; gap: 14px; justify-content: flex-end; flex: 1 1 auto;">
           <div sc-camel-on-click="{{ pickBest }}" data-m="hide" style="display: flex; align-items: center; gap: 14px; padding: 9px 16px 9px 14px; border: 1px solid {{ bestBorder }}; border-radius: 3px; background: {{ bestBg }}; cursor: pointer; transition: border-color 0.25s ease, background 0.25s ease;" style-hover="border-color: oklch(0.86 0.14 92);">
