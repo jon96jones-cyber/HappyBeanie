@@ -1019,7 +1019,41 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hbsp--bar .hbsp__pill[aria-pressed="true"] { background: #F5F0E6; color: #17140F; }
 @media (hover: hover) and (pointer: fine) { .hbsp--bar .hbsp__pill[aria-pressed="false"]:hover { color: #F5F0E6; } }
 
-@media (max-width: 900px) { .hbsp--top { display: flex; } .hbsp--bar { display: none; } }
+/* Phones: two rows at rest, one row once the page moves (Jon, Sep 2026).
+   The switch is absolutely positioned inside the header and the header
+   reserves its height as bottom padding, so both states are laid out the
+   same way and only lengths change — a flex row that wraps and unwraps
+   snaps between the two positions instead of travelling between them.
+
+   Collapsed, the wordmark fades out and the switch takes its place, inset
+   on the right to clear the menu button. Losing the wordmark is deliberate:
+   the switch plus the button leaves no room for it at phone widths, and the
+   menu carries the wordmark anyway. */
+@media (max-width: 900px) {
+  .hbsp--bar { display: none; }
+  .hbsp--top {
+    display: flex; position: absolute; left: 0; right: 0; bottom: 0; height: 41px;
+    margin: 0; padding: 0; justify-content: center;
+    transition: left 0.32s cubic-bezier(0.2,0.7,0.2,1), right 0.32s cubic-bezier(0.2,0.7,0.2,1),
+                transform 0.32s cubic-bezier(0.2,0.7,0.2,1), border-color 0.25s ease;
+  }
+  /* The reserved band, applied only while the page is at rest — collapsed,
+     the header falls back to its normal padding, so it keeps whatever this
+     breakpoint already uses instead of a second hard-coded number.
+     header[...] rather than [...]: two later !important rules set the
+     header's padding, and an element+attribute selector outranks their bare
+     attribute one whatever the source order. */
+  header[data-m~="hdrsp"] { transition: padding-bottom 0.32s cubic-bezier(0.2,0.7,0.2,1); }
+  :root:not([data-hbscroll="1"]) header[data-m~="hdrsp"] { padding-bottom: 52px !important; }
+  [data-m~="hdrsp"] [data-m~="hdrmark"] { transition: opacity 0.24s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1); }
+
+  /* Up by the padding the header just gave back, to sit level with the button. */
+  :root[data-hbscroll="1"] .hbsp--top { left: var(--hb-hpx, 20px); right: calc(var(--hb-hpx, 20px) + 46px); transform: translateY(-7px); border-top-color: transparent; }
+  :root[data-hbscroll="1"] [data-m~="hdrsp"] [data-m~="hdrmark"] { opacity: 0; transform: translateY(-6px); pointer-events: none; }
+}
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+  .hbsp--top, [data-m~="hdrsp"], [data-m~="hdrsp"] [data-m~="hdrmark"] { transition: none; }
+}
 @media (max-width: 420px) { .hbsp { gap: 9px; } .hbsp__label { font-size: 8px; letter-spacing: 0.14em; } .hbsp__pill { padding: 7px 13px; font-size: 9px; } }
 
 /* Mobile menu (designer handoff, Setup_41): full-screen cream overlay with
@@ -2013,7 +2047,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
   <div data-m="ticker {{ qzChrome }}" style="background: #17140F; color: #DED5C4; text-align: center; padding: 10px 16px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;">Formulated in Scottsdale, AZ · Third-party tested · 30-day refund window</div>
 
-  <header data-m="pad hdr {{ qzHdr }}" style="position: sticky; top: 0; z-index: 60; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 20px 44px; background: rgba(245,240,230,0.93); backdrop-filter: blur(10px); border-bottom: 1px solid #DDD3C0;">
+  <header data-m="pad hdr {{ qzHdr }} {{ spHdr }}" style="position: sticky; top: 0; z-index: 60; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 20px 44px; background: rgba(245,240,230,0.93); backdrop-filter: blur(10px); border-bottom: 1px solid #DDD3C0;">
     <div sc-camel-on-click="{{ goHome }}" data-m="hdrmark" style="display: flex; align-items: baseline; gap: 9px; cursor: pointer;">
       <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 23px; letter-spacing: -0.045em; white-space: nowrap;">happy bean<span style="position: relative;"><span style="position: absolute; left: 50%; top: 0.26em; width: 0.19em; height: 0.135em; margin-left: -0.095em; border-radius: 46% 54% 50% 50% / 58% 42% 58% 42%; background: oklch(0.8 0.13 92); transform: rotate(-18deg);"></span><span style="position: relative; z-index: 1;">ı</span></span>e</span>
       <span style="display: inline-flex; gap: 0.5em; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-weight: 400; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap;"><span>hormone</span><span>care</span></span>
@@ -4932,6 +4966,14 @@ class Component extends DCLogic {
       // there rebuilt the app mid-tap, eating the first tap on mobile.
       // componentDidUpdate re-applies after renders so the two never drift.
       if (show !== this._barOn) { this._barOn = show; this.applyBar(); }
+      // Phones collapse the product page's two-row header into one as soon as
+      // the page moves: the wordmark fades and the species switch rises into
+      // its place beside the menu button. The flag rides on <html>, not on a
+      // rendered node — the framework rebuilds its own elements and would
+      // drop an attribute set on them mid-scroll. All of the movement is CSS
+      // from here.
+      const sc = window.scrollY > 10;
+      if (sc !== this._hdrTight) { this._hdrTight = sc; doc.setAttribute('data-hbscroll', sc ? '1' : '0'); }
       if (pct >= POP_SCROLL) this.maybePop('scroll');
     };
     window.addEventListener('scroll', this.onScroll, { passive: true });
@@ -5615,6 +5657,9 @@ class Component extends DCLogic {
           })
         };
       })(),
+      // Marks the header as the one carrying the species switch, so the
+      // phone-only collapse below touches no other page.
+      spHdr: page === 'product' ? 'hdrsp' : '',
       qzChrome: page === 'quiz' ? 'qzhidebar' : '',
       qzHdr: page === 'quiz' ? 'qzstatic' : '',
       menuOpen: this.state.menuOpen,
