@@ -686,12 +686,15 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hbco .hb-sum__rows .ink { color: var(--ink); } .hbco .hb-sum__rows .grn { color: var(--green); }
 .hbco .hb-sum__note { display: flex; gap: 9px; align-items: flex-start; margin-top: 14px; padding: 12px 14px; border: 1px solid oklch(0.86 0.14 92 / 0.55); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.12); font-size: 11.5px; line-height: 1.55; color: var(--body); }
 .hbco .hb-sum__total { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 20px 0 22px; }
-.hbco .hb-sum__total span:first-child { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
-.hbco .hb-sum__total span:last-child { font-weight: 700; letter-spacing: -0.055em; font-size: 44px; line-height: 0.9; font-variant-numeric: tabular-nums; }
+/* Direct children only: the framework wraps each bound value in a span of
+   its own, and a descendant selector reached inside the total's cell and
+   painted the amount muted (Jon, Sep 2026). */
+.hbco .hb-sum__total > span:first-child { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.hbco .hb-sum__total > span:last-child { font-weight: 700; letter-spacing: -0.055em; font-size: 44px; line-height: 0.9; font-variant-numeric: tabular-nums; color: var(--ink); }
 .hbco .hb-sum__hint { margin-top: 14px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); line-height: 1.8; text-align: center; }
 /* cart table */
 .hbco .hb-cols { display: grid; grid-template-columns: minmax(0, 1fr) 140px 80px; gap: 24px; padding-bottom: 12px; border-bottom: 1.5px solid var(--ink); font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
-.hbco .hb-cols span:nth-child(2) { text-align: center; } .hbco .hb-cols span:nth-child(3) { text-align: right; }
+.hbco .hb-cols > span:nth-child(2) { text-align: center; } .hbco .hb-cols > span:nth-child(3) { text-align: right; }
 .hbco .hb-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 24px; align-items: center; padding: 22px 0; border-bottom: 1px dashed var(--rule); }
 .hbco .hb-row--gift { padding: 18px 0; }
 .hbco .hb-item { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 20px; align-items: center; min-width: 0; }
