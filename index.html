@@ -1011,11 +1011,13 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hbw__plaque > span:last-child { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 18px; letter-spacing: 0.12em; color: #F5F0E6; background: #17140F; padding: 3px 10px; border-radius: 2px; border: 1px solid rgba(245,240,230,0.2); }
 .hbw__wheel { position: relative; width: 330px; max-width: 100%; aspect-ratio: 1; }
 .hbw__wheel > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 26px 40px rgba(23,20,15,0.5)); }
-.hbw__hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 36%; aspect-ratio: 1; border-radius: 50%; background: #17140F; border: 3px solid oklch(0.86 0.14 92); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 10px; z-index: 2; }
+.hbw__hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 36%; aspect-ratio: 1; border-radius: 50%; background: #17140F; border: 3px solid oklch(0.86 0.14 92); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px; z-index: 2; }
 .hbw__hub > p { margin: 0; color: #F5F0E6; font-weight: 700; font-size: 15px; line-height: 1.1; letter-spacing: -0.03em; }
-.hbw__spin { min-width: 68px; height: 26px; padding: 0 14px; border: none; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; cursor: pointer; touch-action: manipulation; animation: hbwPulse 1.4s ease-in-out infinite; }
+.hbw__spin { position: relative; width: 100%; max-width: 260px; margin-top: 20px; height: 50px; padding: 0 22px; border: none; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; cursor: pointer; touch-action: manipulation; animation: hbwPulse 1.6s ease-in-out infinite; }
 .hbw__spin[disabled] { cursor: default; opacity: 0.45; animation: none; }
-.hbw__note { position: relative; margin-top: 18px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.86 0.14 92); text-align: center; }
+.hbw__spin[hidden] { display: none; }
+.hbw__note:empty { display: none; }
+.hbw__note { position: relative; margin-top: 14px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.86 0.14 92); text-align: center; }
 .hbw__panel { position: relative; width: 100%; max-width: 380px; margin-top: 20px; color: #F5F0E6; text-align: center; }
 .hbw__panel > div { animation: hbwIn 0.4s cubic-bezier(0.2,0.7,0.2,1) both; }
 .hbw__panel[hidden], .hbw__step[hidden] { display: none; }
@@ -1035,9 +1037,14 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .hbw__close { display: block; width: 100%; margin-top: 14px; padding: 12px 0 2px; background: none; border: none; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; cursor: pointer; }
 @media (hover: hover) and (pointer: fine) { .hbw__close:hover { color: #F5F0E6; } }
 @media (max-width: 560px) {
-  .hbw__stage { padding: 22px 18px 20px; }
-  .hbw__wheel { width: 268px; }
-  .hbw__plaques { margin-bottom: 16px; }
+  /* The wheel carries its own labels, and they scale with it — at 268px the
+     tile text was down at about 8px and unreadable (Jon, Sep 2026). The
+     stage gives back most of its side padding so the wheel can take the
+     width instead. */
+  .hbw__stage { padding: 18px 10px 18px; }
+  .hbw__wheel { width: 100%; max-width: 340px; }
+  .hbw__plaques { margin-bottom: 14px; }
+  .hbw__panel, .hbw__spin, .hbw__note, .hbw__close { padding-left: 8px; padding-right: 8px; }
   .hbw__mark { padding: 10px 14px; } .hbw__mark > span { font-size: 18px; }
   .hbw__plaque { min-width: 112px; padding: 8px 12px; } .hbw__plaque > span:last-child { font-size: 15px; }
   .hbw__hub > p { font-size: 13px; }
@@ -7508,11 +7515,15 @@ Component.prototype.renderVals = function () {
       </svg>
         <div class="hbw__hub">
           <p id="hbwHubText">Spin for a<br>mystery prize</p>
-          <button class="hbw__spin" id="hbwSpin" type="button">Spin</button>
         </div>
       </div>
 
-      <div class="hbw__note" id="hbwNote">Tap spin in the centre</div>
+      <!-- The button sits under the wheel rather than inside the hub: at the
+           hub's size it could only be a 26px pill, and it was competing with
+           the line it was asking you to read. Out here it can be a real
+           target, and the hub keeps the offer to itself. -->
+      <button class="hbw__spin" id="hbwSpin" type="button">Spin</button>
+      <div class="hbw__note" id="hbwNote"></div>
 
       <div class="hbw__panel">
         <div class="hbw__step" id="hbwStepEmail" hidden>
@@ -7827,9 +7838,11 @@ Component.prototype.renderVals = function () {
     wSend.disabled = false; wSend.textContent = 'Reveal \u2192';
     wStepEmail.hidden = true; wStepReveal.hidden = true;
     wConfetti.hidden = true; wConfetti.innerHTML = '';
-    wSpinBtn.disabled = false; wSpinBtn.textContent = 'Spin';
+    wSpinBtn.disabled = false; wSpinBtn.hidden = false; wSpinBtn.textContent = 'Spin';
     wHubText.innerHTML = 'Spin for a<br>mystery prize';
-    wNote.textContent = 'Tap spin in the centre';
+    // The button says what to do, so the line under it stays quiet until the
+    // button has gone and there is something else to report.
+    wNote.textContent = '';
     wPlaqueK.textContent = 'Mystery prize'; wPlaqueV.textContent = '? ? ? ?';
     wNo.textContent = 'No thanks, I don\u2019t want to save money';
     wLights(false);
@@ -7851,7 +7864,7 @@ Component.prototype.renderVals = function () {
   function wSpin() {
     if (wSpinning || wStage !== 'spin') return;
     wSpinning = true;
-    wSpinBtn.disabled = true; wSpinBtn.textContent = '\u2026';
+    wSpinBtn.disabled = true;
     wNote.textContent = 'Spinning\u2026';
     wLights(true);
     // Six full turns, then stop with the grand sliver under the pointer. The
@@ -7871,7 +7884,7 @@ Component.prototype.renderVals = function () {
       wPlaqueK.textContent = 'You landed on';
       wPlaqueV.textContent = 'GRAND PRIZE';
       wHubText.innerHTML = 'Grand<br>prize';
-      wSpinBtn.textContent = '\u2713';
+      wSpinBtn.hidden = true;
       wNote.textContent = 'Enter your email to reveal it';
       wStepEmail.hidden = false;
       setTimeout(function () { try { wInput.focus({ preventScroll: true }); } catch (e) {} }, 120);
