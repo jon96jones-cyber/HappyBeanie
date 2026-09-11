@@ -983,6 +983,70 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 @media (hover: hover) and (pointer: fine) { .pc-cta:hover { background: var(--green); } }
 @media (max-width: 600px) { .pc-id { padding: 18px 18px 16px; } .pc-id__lede { font-size: 13.5px; margin-top: 9px; } .pc-head { padding: 20px 18px 16px; } .pc-lb { font-size: 34px; } .pc-body { padding: 16px 18px 0; } }
 
+/* Spin-to-win popup (designer handoff, Jon, Sep 2026). Replaces the research
+   card as the only capture popup; the bean card is paused because it gave the
+   same 10% from a second place.
+
+   The wheel is a fixed SVG that we rotate; the wedges never move relative to
+   each other, so landing is a matter of choosing the final angle. The bulbs
+   are two interleaved rings animated on opposite halves of the same cycle,
+   which is what reads as a chase rather than a blink. */
+@keyframes hbwIn { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes hbwPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes hbwBulbA { 0%, 44% { opacity: 1; filter: drop-shadow(0 0 5px oklch(0.86 0.14 92)); } 50%, 94% { opacity: 0.28; filter: none; } 100% { opacity: 1; filter: drop-shadow(0 0 5px oklch(0.86 0.14 92)); } }
+@keyframes hbwBulbB { 0%, 44% { opacity: 0.28; filter: none; } 50%, 94% { opacity: 1; filter: drop-shadow(0 0 5px oklch(0.86 0.14 92)); } 100% { opacity: 0.28; filter: none; } }
+@keyframes hbwConfetti { 0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 100% { transform: translateY(420px) rotate(540deg); opacity: 0; } }
+#hbPopup[data-mode="wheel"] { background: #17140F; border-color: oklch(0.86 0.14 92 / 0.5); max-width: 520px; }
+.hbw { position: relative; font-family: 'DM Sans', system-ui, sans-serif; }
+.hbw * { box-sizing: border-box; }
+.hbw__stage { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 30px 26px; background: #17140F; overflow: hidden; }
+.hbw__glow { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 120%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, oklch(0.86 0.14 92 / 0.22), transparent 70%); filter: blur(28px); pointer-events: none; }
+.hbw__confetti { position: absolute; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+.hbw__confetti > span { position: absolute; top: -10px; width: 7px; height: 11px; animation: hbwConfetti 1.6s ease-in both; }
+.hbw__plaques { position: relative; display: grid; grid-template-columns: auto auto; gap: 8px; align-items: stretch; margin-bottom: 22px; }
+.hbw__mark { padding: 12px 18px; background: oklch(0.86 0.14 92); border: 1.5px solid #17140F; border-radius: 4px 4px 4px 14px; box-shadow: 0 10px 22px -12px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.4); display: flex; flex-direction: column; justify-content: center; }
+.hbw__mark > span { font-weight: 700; letter-spacing: -0.04em; font-size: 22px; line-height: 0.95; color: #17140F; }
+.hbw__plaque { padding: 10px 16px; background: #2A2419; border: 1.5px solid oklch(0.86 0.14 92); border-radius: 4px 14px 4px 4px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; min-width: 132px; }
+.hbw__plaque > span:first-child { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.86 0.14 92); }
+.hbw__plaque > span:last-child { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 18px; letter-spacing: 0.12em; color: #F5F0E6; background: #17140F; padding: 3px 10px; border-radius: 2px; border: 1px solid rgba(245,240,230,0.2); }
+.hbw__wheel { position: relative; width: 330px; max-width: 100%; aspect-ratio: 1; }
+.hbw__wheel > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 26px 40px rgba(23,20,15,0.5)); }
+.hbw__hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 36%; aspect-ratio: 1; border-radius: 50%; background: #17140F; border: 3px solid oklch(0.86 0.14 92); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 10px; z-index: 2; }
+.hbw__hub > p { margin: 0; color: #F5F0E6; font-weight: 700; font-size: 15px; line-height: 1.1; letter-spacing: -0.03em; }
+.hbw__spin { min-width: 68px; height: 26px; padding: 0 14px; border: none; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; cursor: pointer; touch-action: manipulation; animation: hbwPulse 1.4s ease-in-out infinite; }
+.hbw__spin[disabled] { cursor: default; opacity: 0.45; animation: none; }
+.hbw__note { position: relative; margin-top: 18px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.86 0.14 92); text-align: center; }
+.hbw__panel { position: relative; width: 100%; max-width: 380px; margin-top: 20px; color: #F5F0E6; text-align: center; }
+.hbw__panel > div { animation: hbwIn 0.4s cubic-bezier(0.2,0.7,0.2,1) both; }
+.hbw__panel[hidden], .hbw__step[hidden] { display: none; }
+.hbw__lede { font-size: 14.5px; line-height: 1.55; color: #B9AF9C; margin: 0 0 14px; text-wrap: pretty; }
+.hbw__form { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.hbw__input { height: 48px; padding: 0 14px; border: 1px solid rgba(245,240,230,0.25); border-radius: 3px; background: #1E1A14; font-family: 'DM Sans', sans-serif; font-size: 15px; color: #F5F0E6; min-width: 0; }
+.hbw__input:focus { border-color: oklch(0.86 0.14 92); outline: none; box-shadow: 0 0 0 3px oklch(0.86 0.14 92 / 0.25); }
+.hbw__submit { height: 48px; padding: 0 18px; border: none; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500; cursor: pointer; white-space: nowrap; touch-action: manipulation; }
+.hbw__submit[disabled] { opacity: 0.55; cursor: default; }
+.hbw__ticket { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 16px; border: 1.5px dashed oklch(0.86 0.14 92); border-radius: 3px; background: #1E1A14; margin-bottom: 10px; }
+.hbw__ticket > span { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 14px; letter-spacing: 0.14em; color: #F5F0E6; }
+.hbw__copy { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.86 0.14 92); background: none; border: none; padding: 0; cursor: pointer; border-bottom: 1px solid oklch(0.86 0.14 92 / 0.4); }
+.hbw__cta { display: grid; place-items: center; height: 50px; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; text-decoration: none; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; }
+.hbw__fine { margin-top: 10px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A7F6E; }
+.hbw__err { margin: 10px 0 0; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; line-height: 1.5; color: oklch(0.6 0.2 25); }
+.hbw__err[hidden] { display: none; }
+.hbw__close { display: block; width: 100%; margin-top: 14px; padding: 12px 0 2px; background: none; border: none; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; cursor: pointer; }
+@media (hover: hover) and (pointer: fine) { .hbw__close:hover { color: #F5F0E6; } }
+@media (max-width: 560px) {
+  .hbw__stage { padding: 22px 18px 20px; }
+  .hbw__wheel { width: 268px; }
+  .hbw__plaques { margin-bottom: 16px; }
+  .hbw__mark { padding: 10px 14px; } .hbw__mark > span { font-size: 18px; }
+  .hbw__plaque { min-width: 112px; padding: 8px 12px; } .hbw__plaque > span:last-child { font-size: 15px; }
+  .hbw__hub > p { font-size: 13px; }
+  .hbw__form { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hbw__spin, .hbw__panel > div, .hbw__confetti > span { animation: none !important; }
+}
+
 /* Species switch, product page only (Jon, Sep 2026). The dog/cat pick at the
    top of that page changes everything below it — formula, dosing, nutrition
    label, ingredient profile, the evidence desk — but the picker that sets it
@@ -7336,6 +7400,144 @@ Component.prototype.renderVals = function () {
 
     <button class="hb-research__close" id="hbRNo" type="button">No thanks, I&rsquo;ll take your word for it</button>
   </div>
+
+  <!-- Spin to win. The wheel itself is fixed; hbwRotor is rotated to land it,
+       and the two bulb rings chase while it turns. Three stages live in here:
+       the wheel, the email ask, and the reveal. -->
+  <div id="hbWheel" class="hbw" style="display:none;">
+    <div class="hbw__stage">
+      <span class="hbw__glow" aria-hidden="true"></span>
+      <div class="hbw__confetti" id="hbwConfetti" aria-hidden="true" hidden></div>
+
+      <div class="hbw__plaques">
+        <div class="hbw__mark"><span>Happy Beanie</span><span>Spin to Win</span></div>
+        <div class="hbw__plaque"><span id="hbwPlaqueK">Mystery prize</span><span id="hbwPlaqueV">? ? ? ?</span></div>
+      </div>
+
+      <div class="hbw__wheel">
+      <svg viewBox="-16 -16 412 412" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 26px 40px rgba(23,20,15,0.5));">
+      <g id="hbwRotor" style="transform-origin: 190px 190px;">
+      <circle cx="190" cy="190" r="190" fill="#17140F"></circle>
+      <circle cx="190" cy="190" r="188" fill="none" stroke="oklch(0.86 0.14 92)" stroke-width="1.5" opacity="0.6"></circle>
+      <path d="M 202.28 14.43 A 176 176 0 0 1 271.18 33.84 L 225.98 120.79 A 78 78 0 0 0 195.44 112.19 Z" fill="oklch(0.86 0.14 92)" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="218.66" y="66.13" fill="#17140F" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(-74.27 218.66 66.13)">SMALL</text>
+      <text x="231.18" y="69.66" fill="#17140F" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(-74.27 231.18 69.66)">PRIZE</text>
+      <path d="M 271.18 33.84 A 176 176 0 0 1 326.65 79.08 L 250.56 140.84 A 78 78 0 0 0 225.98 120.79 Z" fill="#FCFAF4" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="265.62" y="87.79" fill="#17140F" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(-50.8 265.62 87.79)">FREE</text>
+      <text x="275.69" y="96.01" fill="#17140F" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(-50.8 275.69 96.01)">GIFT</text>
+      <path d="M 326.65 79.08 A 176 176 0 0 1 359.52 142.67 L 265.13 169.02 A 78 78 0 0 0 250.56 140.84 Z" fill="oklch(0.44 0.07 152)" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="300.07" y="126.36" fill="#F5F0E6" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(-27.33 300.07 126.36)">SORRY</text>
+      <text x="306.03" y="137.9" fill="#F5F0E6" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(-27.33 306.03 137.9)">TRY AGAIN</text>
+      <path d="M 359.52 142.67 A 176 176 0 0 1 364.34 214.09 L 267.27 200.68 A 78 78 0 0 0 265.13 169.02 Z" fill="#2A2419" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="316.31" y="175.45" fill="#F5F0E6" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(-3.87 316.31 175.45)">FREE</text>
+      <text x="317.18" y="188.42" fill="#F5F0E6" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(-3.87 317.18 188.42)">SHIP</text>
+      <path d="M 364.34 214.09 A 176 176 0 0 1 340.33 281.52 L 256.62 230.56 A 78 78 0 0 0 267.27 200.68 Z" fill="oklch(0.86 0.14 92)" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="311.65" y="226.95" fill="#17140F" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(19.6 311.65 226.95)">BIG</text>
+      <text x="307.29" y="239.2" fill="#17140F" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(19.6 307.29 239.2)">PRIZE</text>
+      <path d="M 340.33 281.52 A 176 176 0 0 1 291.45 333.82 L 234.96 253.74 A 78 78 0 0 0 256.62 230.56 Z" fill="#FCFAF4" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="286.88" y="272.34" fill="#17140F" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(43.07 286.88 272.34)">SMALL</text>
+      <text x="278" y="281.84" fill="#17140F" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(43.07 278 281.84)">PRIZE</text>
+      <path d="M 291.45 333.82 A 176 176 0 0 1 225.79 362.32 L 205.86 266.37 A 78 78 0 0 0 234.96 253.74 Z" fill="oklch(0.44 0.07 152)" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="246.08" y="304.11" fill="#F5F0E6" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(66.53 246.08 304.11)">FREE</text>
+      <text x="234.15" y="309.28" fill="#F5F0E6" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(66.53 234.15 309.28)">GIFT</text>
+      <path d="M 225.79 362.32 A 176 176 0 0 1 154.21 362.32 L 174.14 266.37 A 78 78 0 0 0 205.86 266.37 Z" fill="#2A2419" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="196" y="317" fill="#F5F0E6" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(90 196 317)">SORRY</text>
+      <text x="183" y="317" fill="#F5F0E6" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(90 183 317)">TRY AGAIN</text>
+      <path d="M 154.21 362.32 A 176 176 0 0 1 88.55 333.82 L 145.04 253.74 A 78 78 0 0 0 174.14 266.37 Z" fill="oklch(0.86 0.14 92)" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="133.92" y="304.11" fill="#17140F" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(293.47 133.92 304.11)">SMALL</text>
+      <text x="145.85" y="309.28" fill="#17140F" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(293.47 145.85 309.28)">PRIZE</text>
+      <path d="M 88.55 333.82 A 176 176 0 0 1 39.67 281.52 L 123.38 230.56 A 78 78 0 0 0 145.04 253.74 Z" fill="#FCFAF4" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="93.12" y="272.34" fill="#17140F" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(316.93 93.12 272.34)">FREE</text>
+      <text x="102" y="281.84" fill="#17140F" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(316.93 102 281.84)">SHIP</text>
+      <path d="M 39.67 281.52 A 176 176 0 0 1 15.66 214.09 L 112.73 200.68 A 78 78 0 0 0 123.38 230.56 Z" fill="oklch(0.44 0.07 152)" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="68.35" y="226.95" fill="#F5F0E6" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(340.4 68.35 226.95)">BIG</text>
+      <text x="72.71" y="239.2" fill="#F5F0E6" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(340.4 72.71 239.2)">PRIZE</text>
+      <path d="M 15.66 214.09 A 176 176 0 0 1 20.48 142.67 L 114.87 169.02 A 78 78 0 0 0 112.73 200.68 Z" fill="#2A2419" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="63.69" y="175.45" fill="#F5F0E6" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(363.87 63.69 175.45)">SMALL</text>
+      <text x="62.82" y="188.42" fill="#F5F0E6" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(363.87 62.82 188.42)">PRIZE</text>
+      <path d="M 20.48 142.67 A 176 176 0 0 1 53.35 79.08 L 129.44 140.84 A 78 78 0 0 0 114.87 169.02 Z" fill="oklch(0.86 0.14 92)" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="79.93" y="126.36" fill="#17140F" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(387.33 79.93 126.36)">FREE</text>
+      <text x="73.97" y="137.9" fill="#17140F" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(387.33 73.97 137.9)">GIFT</text>
+      <path d="M 53.35 79.08 A 176 176 0 0 1 108.82 33.84 L 154.02 120.79 A 78 78 0 0 0 129.44 140.84 Z" fill="#FCFAF4" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="114.38" y="87.79" fill="#17140F" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(410.8 114.38 87.79)">SORRY</text>
+      <text x="104.31" y="96.01" fill="#17140F" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(410.8 104.31 96.01)">TRY AGAIN</text>
+      <path d="M 108.82 33.84 A 176 176 0 0 1 177.72 14.43 L 184.56 112.19 A 78 78 0 0 0 154.02 120.79 Z" fill="oklch(0.44 0.07 152)" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="161.34" y="66.13" fill="#F5F0E6" style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(434.27 161.34 66.13)">FREE</text>
+      <text x="148.82" y="69.66" fill="#F5F0E6" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; opacity: 0.85; text-anchor: middle; dominant-baseline: middle;" transform="rotate(434.27 148.82 69.66)">SHIP</text>
+      <path d="M 177.72 14.43 A 176 176 0 0 1 202.28 14.43 L 195.44 112.19 A 78 78 0 0 0 184.56 112.19 Z" fill="oklch(0.55 0.19 32)" stroke="#17140F" stroke-width="1.5"></path>
+      <text x="190" y="63" fill="#F5F0E6" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 7px; letter-spacing: 1.2px; text-anchor: middle; dominant-baseline: middle;" transform="rotate(-90 190 63)">GRAND PRIZE</text>
+      <g id="hbwBulbA">
+      <circle cx="190" cy="7" r="3" fill="#FCFAF4"></circle>
+      <circle cx="260.03" cy="20.93" r="3" fill="#FCFAF4"></circle>
+      <circle cx="319.4" cy="60.6" r="3" fill="#FCFAF4"></circle>
+      <circle cx="359.07" cy="119.97" r="3" fill="#FCFAF4"></circle>
+      <circle cx="373" cy="190" r="3" fill="#FCFAF4"></circle>
+      <circle cx="359.07" cy="260.03" r="3" fill="#FCFAF4"></circle>
+      <circle cx="319.4" cy="319.4" r="3" fill="#FCFAF4"></circle>
+      <circle cx="260.03" cy="359.07" r="3" fill="#FCFAF4"></circle>
+      <circle cx="190" cy="373" r="3" fill="#FCFAF4"></circle>
+      <circle cx="119.97" cy="359.07" r="3" fill="#FCFAF4"></circle>
+      <circle cx="60.6" cy="319.4" r="3" fill="#FCFAF4"></circle>
+      <circle cx="20.93" cy="260.03" r="3" fill="#FCFAF4"></circle>
+      <circle cx="7" cy="190" r="3" fill="#FCFAF4"></circle>
+      <circle cx="20.93" cy="119.97" r="3" fill="#FCFAF4"></circle>
+      <circle cx="60.6" cy="60.6" r="3" fill="#FCFAF4"></circle>
+      <circle cx="119.97" cy="20.93" r="3" fill="#FCFAF4"></circle>
+      </g>
+      <g id="hbwBulbB">
+      <circle cx="225.7" cy="10.52" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="291.67" cy="37.84" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="342.16" cy="88.33" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="369.48" cy="154.3" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="369.48" cy="225.7" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="342.16" cy="291.67" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="291.67" cy="342.16" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="225.7" cy="369.48" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="154.3" cy="369.48" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="88.33" cy="342.16" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="37.84" cy="291.67" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="10.52" cy="225.7" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="10.52" cy="154.3" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="37.84" cy="88.33" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="88.33" cy="37.84" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      <circle cx="154.3" cy="10.52" r="3" fill="oklch(0.86 0.14 92)"></circle>
+      </g>
+      </g>
+      <path d="M 176 -10 L 204 -10 L 190 30 Z" fill="oklch(0.55 0.19 32)" stroke="#17140F" stroke-width="1.5"></path>
+      <circle cx="190" cy="-4" r="5" fill="#FCFAF4" stroke="#17140F" stroke-width="1.5"></circle>
+      </svg>
+        <div class="hbw__hub">
+          <p id="hbwHubText">Spin for a<br>mystery prize</p>
+          <button class="hbw__spin" id="hbwSpin" type="button">Spin</button>
+        </div>
+      </div>
+
+      <div class="hbw__note" id="hbwNote">Tap spin in the centre</div>
+
+      <div class="hbw__panel">
+        <div class="hbw__step" id="hbwStepEmail" hidden>
+          <p class="hbw__lede">Drop your email and we&rsquo;ll reveal it &mdash; and send it to you, so no screenshot needed.</p>
+          <form class="hbw__form" id="hbwForm" novalidate>
+            <input class="hbw__input" id="hbwEmail" type="email" name="email" placeholder="you@email.com" autocomplete="email" aria-label="Email address">
+            <button class="hbw__submit" id="hbwSend" type="submit">Reveal &rarr;</button>
+          </form>
+          <p class="hbw__err" id="hbwErr" role="alert" hidden></p>
+        </div>
+
+        <div class="hbw__step" id="hbwStepReveal" hidden>
+          <p class="hbw__lede" id="hbwPrizeBody"></p>
+          <div class="hbw__ticket" id="hbwTicket">
+            <span id="hbwCode"></span>
+            <button class="hbw__copy" id="hbwCopy" type="button">Copy</button>
+          </div>
+          <a class="hbw__cta" id="hbwCta" href="/product">Use it on my first box &rarr;</a>
+          <div class="hbw__fine" id="hbwFine">Applied at checkout</div>
+        </div>
+      </div>
+
+      <button class="hbw__close" id="hbwNo" type="button">No thanks, I don&rsquo;t want to save money</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -7362,9 +7564,22 @@ Component.prototype.renderVals = function () {
   var rSend = document.getElementById('hbRSend'), rErr = document.getElementById('hbRErr');
   var rFine = document.getElementById('hbRFine'), rNo = document.getElementById('hbRNo');
   var rDigits = rRoot.querySelectorAll('[data-rdigits] .hb-research__digit');
+  var wRoot = document.getElementById('hbWheel');
+  var wRotor = document.getElementById('hbwRotor'), wBulbA = document.getElementById('hbwBulbA'), wBulbB = document.getElementById('hbwBulbB');
+  var wSpinBtn = document.getElementById('hbwSpin'), wHubText = document.getElementById('hbwHubText');
+  var wNote = document.getElementById('hbwNote'), wPlaqueK = document.getElementById('hbwPlaqueK'), wPlaqueV = document.getElementById('hbwPlaqueV');
+  var wStepEmail = document.getElementById('hbwStepEmail'), wStepReveal = document.getElementById('hbwStepReveal');
+  var wForm = document.getElementById('hbwForm'), wInput = document.getElementById('hbwEmail'), wSend = document.getElementById('hbwSend');
+  var wErr = document.getElementById('hbwErr'), wBody = document.getElementById('hbwPrizeBody');
+  var wTicket = document.getElementById('hbwTicket'), wCode = document.getElementById('hbwCode');
+  var wCopy = document.getElementById('hbwCopy'), wCta = document.getElementById('hbwCta'), wFine = document.getElementById('hbwFine');
+  var wConfetti = document.getElementById('hbwConfetti'), wNo = document.getElementById('hbwNo');
   var rStepForm = rRoot.querySelector('[data-rstep="form"]'), rStepDone = rRoot.querySelector('[data-rstep="done"]');
   var mainParts = ['hbBar', 'hbHead', 'hbStage', 'hbFoot'].map(function (id) { return document.getElementById(id); });
   var rMode = false, rDone = false, rTimers = [], rRaf = 0;
+  // Wheel state. wStage is 'spin' | 'email' | 'reveal'; wDone marks a capture,
+  // so closing after one is not counted as a dismissal.
+  var wMode = false, wStage = 'spin', wSpinning = false, wDone = false, wAngle = 0, wTimer = null, wCodeVal = '';
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var step = 'feed', drag = null, busy = false, returnTo = null;
@@ -7386,9 +7601,15 @@ Component.prototype.renderVals = function () {
     pop.setAttribute('data-step-now', step);
     // Two skins share the shell: the designer's research card, or the bean.
     // The research card manages its own two steps with data-rstep.
-    if (rMode) pop.setAttribute('data-mode', 'research'); else pop.removeAttribute('data-mode');
-    mainParts.forEach(function (el) { el.style.display = rMode ? 'none' : ''; });
+    if (wMode) pop.setAttribute('data-mode', 'wheel');
+    else if (rMode) pop.setAttribute('data-mode', 'research');
+    else pop.removeAttribute('data-mode');
+    // Three skins share the shell now. The wheel and the research card each
+    // replace the bean's own chrome entirely.
+    mainParts.forEach(function (el) { el.style.display = (rMode || wMode) ? 'none' : ''; });
     rRoot.style.display = rMode ? 'block' : 'none';
+    wRoot.style.display = wMode ? 'block' : 'none';
+    if (wMode) return;
     bean.style.display = step === 'feed' ? 'block' : 'none';
     mouth.style.display = step === 'feed' ? 'block' : 'none';
     mouth.style.opacity = step === 'feed' ? '.5' : '0';
@@ -7594,6 +7815,146 @@ Component.prototype.renderVals = function () {
   });
   rNo.addEventListener('click', close);
 
+  // ---- spin to win -------------------------------------------------------
+  // Geometry matches the SVG exactly: fifteen equal wedges plus an 8 degree
+  // sliver at the top, which is the grand prize. GRAND is that sliver's index.
+  var W_SLIVER = 8, W_WEDGES = 15, W_SEG = (360 - W_SLIVER) / W_WEDGES, W_GRAND = 15;
+
+  function wReset() {
+    wStage = 'spin'; wSpinning = false; wDone = false; wCodeVal = '';
+    if (wTimer) { clearTimeout(wTimer); wTimer = null; }
+    wInput.value = ''; wErr.hidden = true; wErr.textContent = '';
+    wSend.disabled = false; wSend.textContent = 'Reveal \u2192';
+    wStepEmail.hidden = true; wStepReveal.hidden = true;
+    wConfetti.hidden = true; wConfetti.innerHTML = '';
+    wSpinBtn.disabled = false; wSpinBtn.textContent = 'Spin';
+    wHubText.innerHTML = 'Spin for a<br>mystery prize';
+    wNote.textContent = 'Tap spin in the centre';
+    wPlaqueK.textContent = 'Mystery prize'; wPlaqueV.textContent = '? ? ? ?';
+    wNo.textContent = 'No thanks, I don\u2019t want to save money';
+    wLights(false);
+    // Rest on a plain wedge so the grand-prize sliver is not already sitting
+    // under the pointer before the first spin.
+    var centre = W_SLIVER / 2 + 5 * W_SEG + W_SEG / 2;
+    wAngle = 360 - centre;
+    if (wRotor) { wRotor.style.transition = 'none'; wRotor.style.transformOrigin = '190px 190px'; wRotor.style.transform = 'rotate(' + wAngle + 'deg)'; }
+  }
+
+  // Two rings on opposite halves of one cycle — that offset is what reads as a
+  // chase rather than a blink. Fast while it turns, slow and steady after.
+  function wLights(on, slow) {
+    var dur = slow ? '0.9s' : '0.42s';
+    wBulbA.style.animation = on ? 'hbwBulbA ' + dur + ' steps(1, end) infinite' : 'none';
+    wBulbB.style.animation = on ? 'hbwBulbB ' + dur + ' steps(1, end) infinite' : 'none';
+  }
+
+  function wSpin() {
+    if (wSpinning || wStage !== 'spin') return;
+    wSpinning = true;
+    wSpinBtn.disabled = true; wSpinBtn.textContent = '\u2026';
+    wNote.textContent = 'Spinning\u2026';
+    wLights(true);
+    // Six full turns, then stop with the grand sliver under the pointer. The
+    // jitter keeps the stop from looking machine-perfect every time without
+    // ever leaving the sliver.
+    var jitter = (Math.random() * 2 - 1) * (W_SLIVER / 2) * 0.6;
+    wAngle = wAngle - (wAngle % 360) + 360 * 6 + 360 + jitter;
+    if (wRotor) {
+      wRotor.style.transition = reduced ? 'none' : 'transform 4.4s cubic-bezier(0.12, 0.8, 0.1, 1)';
+      wRotor.style.transform = 'rotate(' + wAngle + 'deg)';
+    }
+    try { if (window.hbTrack) window.hbTrack('popup_fed', { species: 'wheel' }); } catch (e) {}
+    wTimer = setTimeout(function () {
+      wSpinning = false;
+      wStage = 'email';
+      wLights(false);
+      wPlaqueK.textContent = 'You landed on';
+      wPlaqueV.textContent = 'GRAND PRIZE';
+      wHubText.innerHTML = 'Grand<br>prize';
+      wSpinBtn.textContent = '\u2713';
+      wNote.textContent = 'Enter your email to reveal it';
+      wStepEmail.hidden = false;
+      setTimeout(function () { try { wInput.focus({ preventScroll: true }); } catch (e) {} }, 120);
+    }, reduced ? 200 : 4500);
+  }
+
+  wSpinBtn.addEventListener('click', wSpin);
+  wNo.addEventListener('click', close);
+
+  wCopy.addEventListener('click', function () {
+    if (!wCodeVal) return;
+    try { if (navigator.clipboard) navigator.clipboard.writeText(wCodeVal); } catch (e) {}
+    wCopy.textContent = 'Copied';
+    setTimeout(function () { wCopy.textContent = 'Copy'; }, 1600);
+  });
+
+  // The prize has to be real at the till. The code comes from the same
+  // endpoint the old bean popup used — minted per address, one order, with an
+  // expiry — rather than a fixed string the checkout would refuse.
+  wForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (busy) return;
+    var v = (wInput.value || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) {
+      wErr.textContent = 'That address doesn\u2019t look right \u2014 check it and try again.';
+      wErr.hidden = false; wInput.focus();
+      return;
+    }
+    wErr.hidden = true;
+    busy = true; wSend.disabled = true; wSend.textContent = 'Sending';
+    fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: v, source: 'popup' })
+    }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (b) {
+      busy = false; wSend.disabled = false; wSend.textContent = 'Reveal \u2192';
+      if (!b || !b.ok) {
+        wErr.textContent = (b && b.error === 'bad_email')
+          ? 'That address doesn\u2019t look right \u2014 check it and try again.'
+          : 'That didn\u2019t go through. Try again in a moment, or email hello@happybeanie.com.';
+        wErr.hidden = false;
+        return;
+      }
+      try { localStorage.setItem(LIST_KEY, '1'); localStorage.setItem('hb-email', v.toLowerCase()); } catch (err) {}
+      wDone = true; wStage = 'reveal';
+      wStepEmail.hidden = true; wStepReveal.hidden = false;
+      wPlaqueK.textContent = 'Your prize'; wPlaqueV.textContent = '10% OFF';
+      wNote.textContent = '';
+      wLights(true, true);
+      if (b.code) {
+        wCodeVal = b.code;
+        wCode.textContent = b.code;
+        wTicket.hidden = false;
+        wBody.textContent = b.emailed === false
+          ? 'Ten percent off your first box, any plan. Write this one down \u2014 the email didn\u2019t go through, so the code here is the only copy.'
+          : 'Ten percent off your first box, any plan. It\u2019s on its way to your inbox too.';
+        wFine.textContent = b.expires ? 'Yours alone \u00b7 one order \u00b7 expires ' + b.expires : 'Applied at checkout';
+        wFine.hidden = false;
+      } else {
+        // On the list, but no code. Saying "check your inbox" would point at
+        // an email that carries nothing.
+        wTicket.hidden = true; wFine.hidden = true;
+        wBody.textContent = 'You\u2019re on the list \u2014 but your code didn\u2019t generate. Email hello@happybeanie.com and we\u2019ll send one over.';
+      }
+      if (!reduced) {
+        var cols = ['#17140F', '#FCFAF4', 'oklch(0.44 0.07 152)', '#F0C64B'], html = '';
+        for (var i = 0; i < 28; i++) {
+          html += '<span style="left:' + (i * 3.6 + 2) + '%;background:' + cols[i % 4] + ';animation-delay:' + ((i % 7) * 0.08) + 's"></span>';
+        }
+        wConfetti.innerHTML = html; wConfetti.hidden = false;
+      }
+      try { if (window.hbTrack) window.hbTrack('popup_subscribed', { species: 'wheel' }); } catch (err) {}
+      try { if (window.hbAm) window.hbAm({ em: v }); } catch (err) {}
+      try { window.hbMeta('Lead'); } catch (err) {}
+      try { if (window.gtag) window.gtag('event', 'generate_lead'); } catch (err) {}
+    }).catch(function () {
+      busy = false; wSend.disabled = false; wSend.textContent = 'Reveal \u2192';
+      wErr.textContent = 'That didn\u2019t go through. Try again in a moment, or email hello@happybeanie.com.';
+      wErr.hidden = false;
+    });
+  });
+
+
   document.getElementById('hbForm').addEventListener('submit', function (e) {
     e.preventDefault();
     if (busy) return;
@@ -7727,7 +8088,9 @@ Component.prototype.renderVals = function () {
     // and hb-list suppresses this for good anyway.
     rTimers.forEach(clearTimeout); rTimers = [];
     if (rRaf) { cancelAnimationFrame(rRaf); rRaf = 0; }
-    var subscribed = rMode ? rDone : step === 'done';
+    var subscribed = wMode ? wDone : rMode ? rDone : step === 'done';
+    if (wTimer) { clearTimeout(wTimer); wTimer = null; }
+    wLights(false);
     if (!subscribed) {
       try {
         var prev = JSON.parse(localStorage.getItem(DISMISS_KEY) || 'null');
@@ -7736,7 +8099,10 @@ Component.prototype.renderVals = function () {
       } catch (e) {}
       // species carries WHERE they bailed: the research card, the bean, or
       // the email ask after feeding her.
-      try { if (window.hbTrack) window.hbTrack('popup_declined', { species: rMode ? 'research' : step }); } catch (e) {}
+      // species carries WHERE they bailed — for the wheel that is the stage
+      // they were on, which separates "never spun" from "spun, would not give
+      // an address". Those are different problems with different fixes.
+      try { if (window.hbTrack) window.hbTrack('popup_declined', { species: wMode ? 'wheel-' + wStage : rMode ? 'research' : step }); } catch (e) {}
     }
     if (returnTo && returnTo.focus) { try { returnTo.focus({ preventScroll: true }); } catch (e) {} }
     returnTo = null;
@@ -7890,14 +8256,19 @@ Component.prototype.renderVals = function () {
     // before gets the bean and the code — the two-offer ladder. hb-seen is
     // the marker; pre-existing hb-pop records count as seen too, so nobody
     // who already met the bean is greeted like a stranger.
-    var seen = null;
-    try { seen = localStorage.getItem('hb-seen') || localStorage.getItem(DISMISS_KEY); } catch (e) {}
-    var mode = seen ? 'bean' : 'research';
-    try { var q = new URLSearchParams(location.search).get('popmode'); if (q === 'bean' || q === 'research') mode = q; } catch (e) {}
+    // One offer, one card (Jon, Sep 2026). The wheel replaced the research
+    // ask, and the bean card is paused because it handed out the same 10%
+    // from a second place — two popups competing to give away one discount.
+    // Both are still in the page and still reachable with ?popmode=, so
+    // turning either back on is a one-word change here.
+    var mode = 'wheel';
+    try { var q = new URLSearchParams(location.search).get('popmode'); if (q === 'bean' || q === 'research' || q === 'wheel') mode = q; } catch (e) {}
     try { localStorage.setItem('hb-seen', '1'); } catch (e) {}
     // The desk's popup funnel starts here: shown → fed → captured/declined.
     try { if (window.hbTrack) window.hbTrack('popup_shown', { species: mode }); } catch (e) {}
     rMode = mode === 'research'; rDone = false;
+    wMode = mode === 'wheel';
+    if (wMode) wReset();
     step = 'feed';
     if (rMode) {
       rStepForm.hidden = false; rStepDone.hidden = true;
