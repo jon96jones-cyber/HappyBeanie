@@ -3943,7 +3943,12 @@ const POP_ON = true;
 // Capture-popup timing, kept in one place so the rules can be read at a glance
 // instead of being reconstructed from three listeners.
 const POP_FLOOR = 5000;    // scroll and exit-intent hold off this long after load
-const POP_DWELL = 12000;   // ...and on its own, it opens at this mark
+// 12s was reaching people on their way out: of 193 first-touch impressions in
+// the week to Sep 11, 16 subscribed and 39 declined — the other 138 left the
+// page with the card open, having neither taken it nor dismissed it. The ask
+// converts well for anyone who engages at all (16 of those 55). The problem
+// was that it arrived after attention had gone, so it arrives earlier now.
+const POP_DWELL = 7000;    // ...and on its own, it opens at this mark
 const POP_SCROLL = 40;     // engaged-by-depth, percent of the page
 // Quiet period after each dismissal, in days — one rung per time they have
 // said no. A flat interval treats a first "not now" the same as a fourth,
