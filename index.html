@@ -221,15 +221,22 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
   } catch (e) {}
   // Express checkout skips the on-site checkout page, so the InitiateCheckout
   // pixel event fires here at the true handoff (deduped against the page).
+  // The cart's real value is worked out once and both reporters use it: GA4
+  // was still sending a flat $115 here after Meta stopped, so a $297 bundle
+  // and a $99 subscription reached Analytics as the same number.
+  var icValue = 0, icQty = 0;
+  try {
+    var icPrice = [115, 99, 297, 159];
+    icValue = rows.reduce(function (n, r) { return n + (icPrice[r.plan] || 115) * (r.qty || 1); }, 0);
+    icQty = rows.reduce(function (n, r) { return n + (r.qty || 1); }, 0);
+  } catch (e) {}
   try {
     if (!window.__hbFbIC) {
       window.__hbFbIC = true;
-      var icPrice = [115, 99, 297, 159];
-      var icValue = rows.reduce(function (n, r) { return n + (icPrice[r.plan] || 115) * (r.qty || 1); }, 0);
-      window.hbMeta('InitiateCheckout', { currency: 'USD', value: icValue, num_items: rows.reduce(function (n, r) { return n + (r.qty || 1); }, 0) });
+      window.hbMeta('InitiateCheckout', { currency: 'USD', value: icValue, num_items: icQty });
     }
   } catch (e) {}
-  try { if (window.gtag && !window.__hbGaBC) { window.__hbGaBC = true; window.gtag('event', 'begin_checkout', { currency: 'USD', value: 115 }); } } catch (e) {}
+  try { if (window.gtag && !window.__hbGaBC) { window.__hbGaBC = true; window.gtag('event', 'begin_checkout', { currency: 'USD', value: icValue }); } } catch (e) {}
   try { if (window.hbTrack) window.hbTrack('begin_checkout'); } catch (e) {}
   window.location.href = url;
 };

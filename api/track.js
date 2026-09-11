@@ -82,15 +82,26 @@ module.exports = async function handler(req, res) {
     const utm = b.utm || {};
     // First beacon of a visit writes the acquisition detail; later ones only
     // move last_seen forward, so the landing page and source stay as they were.
+    //
+    // The three funnel flags are set on BOTH paths, and that matters. Beacons
+    // are sendBeacon calls — separate requests, landing in separate function
+    // invocations that race. A visit that opens on the product page fires
+    // pageview and view_product together, and if the view_product beacon is
+    // the one that wins the insert, a column list without it writes the row
+    // with the flag false; the pageview then updates `false or false` and the
+    // product view is gone for good. The desk reads these flags, so those
+    // visits simply stopped appearing as having seen a product.
     await db.withSchema(() => sql`
       insert into sessions (
         session_id, visitor_id, landing_path, referrer,
-        utm_source, utm_medium, utm_campaign, ref_code, device, country, region, city, pageviews, internal
+        utm_source, utm_medium, utm_campaign, ref_code, device, country, region, city, pageviews, internal,
+        viewed_product, added_to_cart, began_checkout
       ) values (
         ${sid}, ${vid}, ${path}, ${str(b.ref, 255)},
         ${str(utm.source, 120)}, ${str(utm.medium, 120)}, ${str(utm.campaign, 120)},
         ${str(b.refCode, 40)}, ${db.deviceOf(req.headers['user-agent'])}, ${country}, ${region}, ${city},
-        ${name === 'pageview' ? 1 : 0}, ${internal}
+        ${name === 'pageview' ? 1 : 0}, ${internal},
+        ${name === 'view_product'}, ${name === 'add_to_cart'}, ${name === 'begin_checkout'}
       )
       on conflict (session_id) do update set
         last_seen      = now(),
