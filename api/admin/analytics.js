@@ -144,10 +144,23 @@ module.exports = async function handler(req, res) {
             count(distinct session_id) filter (where name = 'popup_subscribed' and species = 'research')  as r_subscribed,
             count(distinct session_id) filter (where name = 'popup_declined' and species = 'research')    as r_declined,
             count(distinct session_id) filter (where name = 'popup_shown' and (species is null or species = 'bean')) as b_shown,
-            count(distinct session_id) filter (where name = 'popup_fed')                                  as b_fed,
-            count(distinct session_id) filter (where name = 'popup_subscribed' and (species is null or species <> 'research')) as b_subscribed,
+            -- Both of these named no species until the wheel arrived, which
+            -- fires the same two event names with species 'wheel'. Left open
+            -- they counted every spin as a bean fed and every wheel capture
+            -- as a bean capture.
+            count(distinct session_id) filter (where name = 'popup_fed' and (species is null or species = 'bean'))        as b_fed,
+            count(distinct session_id) filter (where name = 'popup_subscribed' and (species is null or species = 'bean')) as b_subscribed,
             count(distinct session_id) filter (where name = 'popup_declined' and species = 'feed')        as declined_feed,
-            count(distinct session_id) filter (where name = 'popup_declined' and species = 'email')       as declined_email
+            count(distinct session_id) filter (where name = 'popup_declined' and species = 'email')       as declined_email,
+            -- Spin to win. A decline carries the stage it happened on, which
+            -- separates never spinning from spinning and not handing over an
+            -- address — different problems, different fixes.
+            count(distinct session_id) filter (where name = 'popup_shown' and species = 'wheel')          as w_shown,
+            count(distinct session_id) filter (where name = 'popup_fed' and species = 'wheel')            as w_spun,
+            count(distinct session_id) filter (where name = 'popup_subscribed' and species = 'wheel')     as w_subscribed,
+            count(distinct session_id) filter (where name = 'popup_declined' and species = 'wheel-spin')   as w_dec_spin,
+            count(distinct session_id) filter (where name = 'popup_declined' and species = 'wheel-email')  as w_dec_email,
+            count(distinct session_id) filter (where name = 'popup_declined' and species = 'wheel-reveal') as w_dec_reveal
           from events
           where name like 'popup%' and ts >= ${since}::timestamptz
             and (${until}::timestamptz is null or ts < ${until}::timestamptz)
@@ -198,6 +211,8 @@ module.exports = async function handler(req, res) {
       },
       popup: (function (p) {
         return {
+          wheel: { shown: n(p.w_shown), spun: n(p.w_spun), subscribed: n(p.w_subscribed),
+                   declinedSpin: n(p.w_dec_spin), declinedEmail: n(p.w_dec_email), declinedReveal: n(p.w_dec_reveal) },
           research: { shown: n(p.r_shown), subscribed: n(p.r_subscribed), declined: n(p.r_declined) },
           bean: { shown: n(p.b_shown), fed: n(p.b_fed), subscribed: n(p.b_subscribed),
                   declinedFeed: n(p.declined_feed), declinedEmail: n(p.declined_email) }

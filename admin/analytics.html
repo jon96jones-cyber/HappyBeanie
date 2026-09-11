@@ -441,12 +441,26 @@ tr:last-child td { border-bottom:none; }
              '<div class="bar"><div class="fill" style="width:' + Math.max(pct, s[1] ? 1 : 0) + '%"></div></div>' +
              '<div class="n">' + s[1] + ' <span>' + pct + '%</span></div></div>';
     }
-    var rp = pop.research || {}, bp = pop.bean || {};
+    var rp = pop.research || {}, bp = pop.bean || {}, wp = pop.wheel || {};
     var beanDeclined = (bp.declinedFeed || 0) + (bp.declinedEmail || 0);
     // Decline rate is declines over shown — the share of people who saw the
     // card and said no thanks, not a share of all visits.
     function rate(declined, shown) { return Math.round((declined / Math.max(1, shown)) * 100) + '% of shown'; }
+    var wheelDeclined = (wp.declinedSpin || 0) + (wp.declinedEmail || 0) + (wp.declinedReveal || 0);
+    // The wheel is the live popup, so it leads. The two below it are paused
+    // and stay only for their history.
     $('funnel').innerHTML = steps.map(stepRow).join('') +
+      '<div class="fdiv">Spin to win · 10% code</div>' +
+      [['Shown', wp.shown || 0], ['Spun the wheel', wp.spun || 0], ['Email captured', wp.subscribed || 0]].map(stepRow).join('') +
+      ((wp.shown || 0)
+        // Where they stopped is the whole point of this line: closing without
+        // spinning is a different problem from spinning and then refusing the
+        // email ask, and the fixes are nothing alike.
+        ? '<div class="fnote">' + wheelDeclined + ' declined · ' + rate(wheelDeclined, wp.shown) +
+          ' — ' + (wp.declinedSpin || 0) + ' before spinning, ' + (wp.declinedEmail || 0) + ' at the email ask, ' + (wp.declinedReveal || 0) + ' after the reveal' +
+          ((wp.spun || 0) ? ' · ' + Math.round(((wp.subscribed || 0) / Math.max(1, wp.spun)) * 100) + '% of spinners gave an address' : '') +
+          '</div>'
+        : '') +
       '<div class="fdiv">Research popup · first touch</div>' +
       [['Shown', rp.shown || 0], ['Email captured', rp.subscribed || 0]].map(stepRow).join('') +
       ((rp.shown || 0) ? '<div class="fnote">' + (rp.declined || 0) + ' declined · ' + rate(rp.declined || 0, rp.shown) + '</div>' : '') +
