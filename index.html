@@ -1125,14 +1125,26 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
      width instead. */
   /* The close button gets a band of its own up top: at phone width the
      plaques reach far enough right to sit under it otherwise. */
-  .hbw__stage { padding: 52px 10px 18px; }
-  .hbw__wheel { width: 100%; max-width: 340px; }
-  .hbw__plaques { margin-bottom: 14px; }
+  .hbw__stage { padding: 40px 10px 14px; }
+  /* Height, not just width (Jon, Sep 2026 — the card read as too much of the
+     screen on a phone). A fixed pixel wheel took the same room on a short
+     phone as a tall one, which is how an iPhone SE ended up handing the card
+     86% of its screen. Tying the cap to dvh as well means the wheel gives way
+     on the screens that cannot spare the height and holds its size on the
+     ones that can — and the trade stays above the ~268px floor where the tile
+     text stopped being readable. */
+  .hbw__wheel { width: 100%; max-width: min(300px, 42dvh); }
+  .hbw__plaques { margin-bottom: 8px; }
   .hbw__panel, .hbw__spin, .hbw__note { padding-left: 8px; padding-right: 8px; }
-  .hbw__x { right: 8px; top: 8px; }
-  .hbw__mark { padding: 10px 14px; } .hbw__mark > span { font-size: 18px; }
-  .hbw__plaque { min-width: 112px; padding: 8px 12px; } .hbw__plaque > span:last-child { font-size: 15px; }
-  .hbw__hub > p { font-size: 13px; }
+  .hbw__x { right: 6px; top: 6px; width: 32px; height: 32px; font-size: 17px; }
+  .hbw__mark { padding: 7px 12px; } .hbw__mark > span { font-size: 15px; }
+  .hbw__plaque { min-width: 100px; padding: 6px 10px; gap: 3px; }
+  .hbw__plaque > span:last-child { font-size: 13px; padding: 2px 8px; }
+  .hbw__hub > p { font-size: 12px; }
+  .hbw__spin { margin-top: 12px; height: 44px; }
+  .hbw__panel { margin-top: 12px; }
+  .hbw__note { margin-top: 8px; }
+  .hbw__input, .hbw__submit { height: 44px; }
   /* The card must not grow when the email step replaces the spin button
      (Jon, Sep 2026). Two things made it: the lede, which repeats the line
      already sitting above it in the note, and the form stacking into two
@@ -1142,6 +1154,20 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   #hbwStepEmail .hbw__lede { display: none; }
   .hbw__form { grid-template-columns: minmax(0, 1fr) auto; }
   .hbw__submit { padding: 0 14px; }
+}
+/* A short phone — SE class — carries the same chrome as a tall one against
+   about 180 fewer pixels, which is why it keeps the largest share of its
+   screen. The wheel is already at its floor here (the dvh cap has it near
+   268px, below which the tile text stops being readable), so what is left to
+   give is the padding around it. */
+@media (max-width: 560px) and (max-height: 720px) {
+  .hbw__stage { padding: 34px 10px 12px; }
+  .hbw__x { right: 5px; top: 5px; width: 30px; height: 30px; }
+  .hbw__mark { padding: 5px 10px; } .hbw__mark > span { font-size: 14px; }
+  .hbw__plaque { padding: 5px 9px; } .hbw__plaque > span:last-child { font-size: 12px; }
+  .hbw__plaques { margin-bottom: 6px; }
+  .hbw__spin { margin-top: 10px; }
+  .hbw__panel { margin-top: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hbw__spin, .hbw__panel > div, .hbw__confetti > span { animation: none !important; }
