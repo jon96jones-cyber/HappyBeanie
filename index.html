@@ -7186,9 +7186,12 @@ Component.prototype.renderVals = function () {
   @media (max-width: 900px) {
     /* Shorter hand-off on phones (Jon, Sep 2026): the desk's content ends at
        the funding note, so the band below it reads as dead space on a small
-       screen. 150px is enough run for the ramp to stay smooth and cuts the
-       empty stretch by more than half. */
-    .hb-ev { --hb-blend: 150px; padding: 56px 22px calc(16px + var(--hb-blend)); }
+       screen. 150px still left 184px of nothing between the note and the next
+       heading — a fifth of the screen — because the ramp reaches near-black
+       well before the seam and then sits there. 84px keeps enough run for the
+       nine eased stops to stay smooth while the fade arrives at the seam
+       instead of waiting at it. */
+    .hb-ev { --hb-blend: 84px; padding: 56px 22px calc(8px + var(--hb-blend)); }
     .hb-ev__head { grid-template-columns: 1fr; align-items: start; gap: 14px; }
     .hb-ev__scope { padding-bottom: 0; }
     .hb-ev__stage { height: 640px; }
