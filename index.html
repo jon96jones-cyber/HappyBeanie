@@ -1052,7 +1052,15 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
   .hbw__mark { padding: 10px 14px; } .hbw__mark > span { font-size: 18px; }
   .hbw__plaque { min-width: 112px; padding: 8px 12px; } .hbw__plaque > span:last-child { font-size: 15px; }
   .hbw__hub > p { font-size: 13px; }
-  .hbw__form { grid-template-columns: 1fr; }
+  /* The card must not grow when the email step replaces the spin button
+     (Jon, Sep 2026). Two things made it: the lede, which repeats the line
+     already sitting above it in the note, and the form stacking into two
+     rows. Without them the step costs about what the button freed, so the
+     popup stays the size it opened at instead of stretching down the
+     screen. Desktop has the room and keeps both. */
+  #hbwStepEmail .hbw__lede { display: none; }
+  .hbw__form { grid-template-columns: minmax(0, 1fr) auto; }
+  .hbw__submit { padding: 0 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hbw__spin, .hbw__panel > div, .hbw__confetti > span { animation: none !important; }
