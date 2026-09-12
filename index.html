@@ -1001,9 +1001,13 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 .pc-id__stars { font-size: 11px; line-height: 1; letter-spacing: 2.5px; color: oklch(0.72 0.14 78); }
 .pc-id__n { font-family: var(--mono); font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .pc-id__lede { margin: 10px 0 0; font-size: 14px; line-height: 1.6; color: #4E463B; max-width: 36em; text-wrap: pretty; }
-.pc-id__lede:empty { display: none; }
-.pc-id__more { display: inline-block; margin-top: 11px; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--green); text-decoration: none; border-bottom: 1px solid rgba(23,20,15,0.22); padding-bottom: 2px; }
-.pc-id__more:hover { border-bottom-color: var(--green); }
+/* Hidden only when there is no copy at all — the paragraph now also carries
+   the ingredient-list link, so :empty would never match on its own. */
+.pc-id__lede[data-blank] { display: none; }
+/* Reads as the closing sentence of the lede, not a button: same face, size and
+   colour as the paragraph around it, marked only by the underline. */
+.pc-id__more { color: inherit; text-decoration: underline; text-underline-offset: 2px; text-decoration-color: rgba(23,20,15,0.35); }
+.pc-id__more:hover { text-decoration-color: currentColor; }
 /* Head (slider redesign, Jon, Sep 2026): dotted yellow ground that darkens
    toward its foot, big readout, thick two-tone track, ringed thumb, ticks. */
 .pc-head { position: relative; padding: 26px 24px 20px; background: radial-gradient(rgba(23,20,15,0.09) 1px, transparent 1.2px) 0 0 / 24px 24px, linear-gradient(to bottom, oklch(0.87 0.14 92) 0%, oklch(0.85 0.14 90) 70%, oklch(0.80 0.14 86) 100%); box-shadow: inset 0 -28px 36px -30px rgba(23,20,15,0.45); }
@@ -2540,11 +2544,10 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
       </div>
       <div>
         <div data-m="hmeye" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 18px;">{{ pdpEyebrow }}</div>
-        <p data-m="hmbody" style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 14px; max-width: 32em;">{{ pdpBody }}</p>
         <!-- A host marked data-pc-plain hides the panel's own identity strip
-             because the copy is already here, so the link has to be here too
-             or those hosts lose it. -->
-        <a href="#inside" data-hb-inside style="display: inline-block; margin: 0 0 30px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: oklch(0.44 0.07 152); text-decoration: none; border-bottom: 1px solid rgba(23,20,15,0.22); padding-bottom: 2px;">See full ingredient list here</a>
+             because the copy is already here, so the closing link belongs here
+             too — inline, as the last sentence of the same paragraph. -->
+        <p data-m="hmbody" style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 0 32px; max-width: 32em;">{{ pdpBody }} <a href="#inside" data-hb-inside style="color: inherit; text-decoration: underline; text-underline-offset: 2px; text-decoration-color: rgba(23,20,15,0.35);">See full ingredient list here</a></p>
         <div data-m="stack hmspecs" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid #E0D6C2; border-bottom: 1px solid #E0D6C2; margin-bottom: 34px;">
           <sc-for list="{{ specs }}" as="sp" hint-placeholder-count="3">
             <div style="padding: 20px 16px 20px 0;">
@@ -9205,12 +9208,12 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<div class="pc-id">'
   + '<div class="pc-id__row"><span class="pc-id__k" data-eyebrow></span>'
   + '<span class="pc-id__rate" data-pre-hide><span class="pc-id__stars" aria-hidden="true">★★★★★</span><span class="pc-id__n">1,204 verified owners</span></span></div>'
-  + '<p class="pc-id__lede" data-lede></p>'
-  // Its own element rather than part of the lede: the lede is written with
-  // textContent (see data-lede below), which would flatten an anchor to dead
-  // text. Scrolling is handled by a delegated listener so it survives the
-  // panel being re-injected.
-  + '<a class="pc-id__more" href="#inside" data-hb-inside>See full ingredient list here</a>'
+  // The last sentence is a link, so the copy is a text span plus an inline
+  // anchor inside the one paragraph — the lede is written with textContent
+  // (see data-lede below) and an anchor placed in it would be flattened to
+  // dead text. Scrolling is delegated so it survives the panel re-rendering.
+  + '<p class="pc-id__lede"><span data-lede></span> '
+  + '<a class="pc-id__more" href="#inside" data-hb-inside>See full ingredient list here</a></p>'
   + '</div>'
   // Slider redesign (Jon, Sep 2026): dotted yellow head, big readout,
   // thick two-tone track with a ringed thumb, and ticks under it — bold at
@@ -9338,6 +9341,10 @@ window.hbPcInit = function (ctx) {
     root.setAttribute('data-sp', cat ? 'cat' : 'dog');
     root.querySelector('[data-eyebrow]').textContent = S.eyebrow || '';
     root.querySelector('[data-lede]').textContent = S.lede || '';
+    // No copy means no paragraph — otherwise the link would be left stranded
+    // on its own where the lede used to be.
+    var ledeP = root.querySelector('.pc-id__lede');
+    if (ledeP) { if (S.lede) ledeP.removeAttribute('data-blank'); else ledeP.setAttribute('data-blank', ''); }
     // Selections that are no longer on offer settle where the app's picker
     // does: the subscription, then one-time.
     if (S.sel === '3' && !big) S.sel = '1';
