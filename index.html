@@ -30,10 +30,6 @@
      Product carries its own `url` naming the product page rather than implying
      the page it was found on is that product.
 
-     Availability is fixed at InStock because static markup cannot read
-     window.HB_PRELAUNCH — if prelaunch is ever switched back on (index.html
-     line ~83), change these two to https://schema.org/PreOrder by hand.
-
      Names, SKUs and price are kept in sync with /google-product-feed.tsv. -->
 <script type="application/ld+json">
 {
@@ -172,34 +168,12 @@ window.hbSellingPlanFor = function (species, lb) {
   var chews = window.hbDose('dog', lb);
   return chews === 0.5 ? (sp.d60 || d30) : chews === 1.5 ? (sp.d20 || d30) : d30;
 };
-// PRELAUNCH MODE — one switch for the whole site. While on:
-//   · bean wall, star ratings, review counts and stat strips are hidden
-//   · every ships-in-24h claim reads "reserve from Batch NNNN" instead
-//   · small-batch "boxes left" counters are held back (previous run's data)
-//   · Subscribe & save follows its own switch, `subs`, below
-// LAUNCH DAY: set on to false and deploy. All of the above reverts in that
-// one change — wall and ratings return, 24h copy returns, live counters
-// return. Nothing else to flip.
-// Batch number and ETA below appear in a few hardcoded copy spots too — if
-// they change, search the file for the old values.
-//
-// subs — Subscribe & save, on its own switch so it can reopen without
-// dragging the rest of prelaunch with it. False pauses it: the plan card is
-// filtered out of both pickers, any subscription line in a cart is charged
-// as one-time, and a notice says it returns when the batch ships. The reason
-// it was ever paused: a contract opened during prelaunch bills its second
-// month right as the first box arrives. Open it only when that is acceptable.
-// One thing this switch no longer reaches: the Product structured data in the
-// <head> is static, so its availability does not follow `on`. Flipping this
-// back to true means changing both schema.org/InStock values up there by hand.
-window.HB_PRELAUNCH = { on: false, subs: true, batch: '0072', eta: '~4 weeks' };
-// One reading of the switch, so the gates below can't drift apart. Paused
-// only while prelaunch is on and subs is off — once prelaunch ends,
-// subscriptions are open regardless of what subs says.
-window.hbSubsPaused = function () {
-  var P = window.HB_PRELAUNCH || {};
-  return !!P.on && !P.subs;
-};
+// Subscribe & save was paused once, during the prelaunch window, because a
+// contract opened then would bill its second month as the first box arrived.
+// The store ships to order now and subscriptions are open, so this is false
+// and the branches reading it are dormant. Kept as a function rather than
+// deleted so the pause can be reinstated in one line if a run sells out.
+window.hbSubsPaused = function () { return false; };
 // First-party analytics — powers the live desk at /admin/analytics.
 // Cookie-free by design: the session id lives in sessionStorage and dies with
 // the tab, and the server only ever stores a daily-rotating hash for counting.
@@ -252,12 +226,6 @@ window.hbTrack = (function () {
   else start();
   return send;
 })();
-if (window.HB_PRELAUNCH.on) {
-  document.documentElement.className += ' hb-prelaunch';
-}
-if (!window.hbSubsPaused()) {
-  document.documentElement.className += ' hb-subs-open';
-}
 window.hbShopifyCheckout = async function (rows, buyer, opts) {
   const cfg = window.HB_SHOPIFY;
   if (!cfg.token || cfg.token.indexOf('PLACEHOLDER') !== -1) {
@@ -697,22 +665,6 @@ if (!window.__hbInternal) {
    area — then the real color returns the moment the image lands. */
 image-slot:not([data-filled]) { color: transparent !important; }
 
-/* Prelaunch mode (window.HB_PRELAUNCH). Elements marked data-pre-show /
-   data-pre-show-inline exist only for the prelaunch window; data-pre-hide
-   blocks disappear while it's on. Driven by the hb-prelaunch class the head
-   config script sets before first paint, so nothing flashes. */
-[data-pre-show], [data-pre-show-inline] { display: none !important; }
-html.hb-prelaunch [data-pre-show] { display: block !important; }
-html.hb-prelaunch [data-pre-show-inline] { display: inline !important; }
-html.hb-prelaunch [data-pre-hide] { display: none !important; }
-/* Subscribe & save has its own switch inside prelaunch (HB_PRELAUNCH.subs).
-   data-subs-hide marks the copy that only makes sense while it is paused —
-   it goes away the moment subscriptions reopen, prelaunch or not. */
-html.hb-subs-open [data-subs-hide] { display: none !important; }
-/* That 18px under the product lede spaces it from the rating chip. The
-   chip is hidden while prelaunch is on, so the margin would otherwise
-   stack onto the row gap below it. Comes back with the chip. */
-html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
 /* FAQ card carousel (designer handoff, Setup_31). Scoped under .hb-faq; the
    section renders as the site's dark inset band inside each page's container. */
@@ -2589,7 +2541,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
           </span>
           <span data-m="qzcta" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152); white-space: nowrap;">Check eligibility →</span>
         </a>
-        <div data-pre-hide data-m="hmbatch" style="display: {{ batchShow }}; border: 1px solid #E0D6C2; border-radius: 3px; background: #FCFAF4; padding: 18px 22px 20px; margin-bottom: 30px;">
+        <div data-m="hmbatch" style="display: {{ batchShow }}; border: 1px solid #E0D6C2; border-radius: 3px; background: #FCFAF4; padding: 18px 22px 20px; margin-bottom: 30px;">
           <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px 18px; flex-wrap: wrap; margin-bottom: 12px;">
             <span style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ batchPulse }}; animation: qzBlip 1.6s ease-in-out infinite;"></span>Small batch · current run</span>
             <span style="font-family: 'DM Sans', sans-serif; font-size: 13.5px; letter-spacing: -0.01em; color: {{ batchNumColor }};"><b style="font-weight: 700; font-size: 15px; letter-spacing: -0.02em;">{{ batchLeft }}</b> of {{ batchTotal }} boxes left</span>
@@ -2675,7 +2627,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
     <div data-m="wrapflex" style="max-width: 1180px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px 20px;">
       <div data-m="hide" style="display: flex; align-items: baseline; gap: 12px;">
         <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.03em; font-size: 17px; color: #F5F0E6;">Happy Beanie</span>
-        <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;"><span data-pre-hide>One chew daily · ships in 24h</span><span data-pre-show-inline>Batch 0072 · reserving now</span></span>
+        <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;"><span>One chew daily · ships in 24h</span></span>
       </div>
       <button sc-camel-on-click="{{ goProduct }}" data-m="tap w100" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 16px 30px; border: none; border-radius: 999px; background: oklch(0.86 0.14 92); color: #17140F; font-weight: 500; cursor: pointer; white-space: nowrap; box-shadow: 0 16px 30px -18px oklch(0.86 0.14 92 / 0.7); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">Start with a box →</button>
     </div>
@@ -2767,7 +2719,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
           </div>
         </sc-for>
       </div>
-      <div data-pre-hide data-m="stack" style="max-width: 1180px; margin: 42px auto 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 4px; overflow: hidden; text-align: center;">
+      <div data-m="stack" style="max-width: 1180px; margin: 42px auto 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 4px; overflow: hidden; text-align: center;">
         <div style="background: #FCFAF4; padding: 22px 20px;"><div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1; margin-bottom: 8px;">4.9★</div><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.5; color: #6A6055;">From 1,204 verified owners</div></div>
         <div style="background: #FCFAF4; padding: 22px 20px;"><div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1; margin-bottom: 8px;">100%</div><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.5; color: #6A6055;">Of lots third-party tested</div></div>
         <div style="background: #FCFAF4; padding: 22px 20px;"><div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 27px; line-height: 1; margin-bottom: 8px;">10</div><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.5; color: #6A6055;">Ingredients, nothing else</div></div>
@@ -2957,16 +2909,13 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
                    needed 429px and the column is 354, so it wrapped a third line
                    everywhere on desktop. -->
               <p data-m="pdplede" style="font-size: 15px; line-height: 1.65; color: #4E463B; margin: 0 0 18px; max-width: 26em; text-wrap: pretty;">{{ pdpBody }}</p>
-              <div data-pre-hide style="display: inline-flex; align-items: center; gap: 10px;">
+              <div style="display: inline-flex; align-items: center; gap: 10px;">
                 <span style="display: inline-flex; gap: 2.5px; align-items: center;"><span style="font-size: 11px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span style="font-size: 11px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span style="font-size: 11px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span style="font-size: 11px; line-height: 1; color: oklch(0.72 0.14 78);">★</span><span style="font-size: 11px; line-height: 1; color: oklch(0.72 0.14 78);">★</span></span>
                 <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase; color: #6A6055; white-space: nowrap;">1,204 verified owners</span>
               </div>
             </div>
           </div>
-          <div data-pre-show data-m="pdpbatch" style="border: 1px solid oklch(0.86 0.14 92 / 0.55); border-left: 3px solid oklch(0.86 0.14 92); border-radius: 4px; background: oklch(0.86 0.14 92 / 0.1); padding: 14px 16px 15px; margin-bottom: 14px;">
-            <div style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #17140F; margin-bottom: 6px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.14 78); animation: qzBlip 1.6s ease-in-out infinite;"></span>Batch 0072 · in production</div>
-            <div style="font-size: 13px; line-height: 1.6; color: #554C40;">Order now to reserve your box from this run. Batch 0072 ships in ~4 weeks, as soon as it&rsquo;s formulated and clears testing.</div>
-          </div>
+          
           <!-- Purchase panel (Setup_39): weight slider, dose readout, plan
                rows and the CTA, replacing the old "Choose your supply" list.
                Injected and wired by hbPcInit() like the FAQ/dosing widgets —
@@ -3110,7 +3059,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
             </div>
             <div style="display: {{ batchShow }};">
               <div data-m="catchtagrow" style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px 18px; flex-wrap: wrap; margin-bottom: 9px;">
-                <span style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B9AF9C;"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ batchPulse }}; animation: qzBlip 1.6s ease-in-out infinite;"></span>Batch 0072 · current run</span>
+                <span style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B9AF9C;"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ batchPulse }}; animation: qzBlip 1.6s ease-in-out infinite;"></span>Small batch · current run</span>
                 <span style="font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: -0.01em; color: {{ batchNumColorDark }};"><b style="font-weight: 700; font-size: 15px; letter-spacing: -0.02em;">{{ batchLeft }}</b> of {{ batchTotal }} boxes left</span>
               </div>
               <div style="height: 6px; border-radius: 999px; background: rgba(245,240,230,0.16); overflow: hidden;">
@@ -3237,7 +3186,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
               <button sc-camel-on-click="{{ cartCta }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 20px 36px; border: none; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 38px -22px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">{{ cartLabel }}</button>
               <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;">{{ planRecap }}</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.72 0.08 152);"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.72 0.08 152);"></span><span data-pre-hide>Order today, ships within 24 hours from Scottsdale</span><span data-pre-show-inline>Order today to reserve from Batch 0072 · ships in ~4 weeks</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.72 0.08 152);"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.72 0.08 152);"></span><span>Order today, ships within 24 hours from Scottsdale</span></div>
             <p style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; line-height: 1.6; color: #8A7F6E; margin: 14px 0 0;">Terms and conditions apply. <a href="policies/refunds.html#guarantee" target="_blank" rel="noopener" style="color: oklch(0.72 0.08 152); text-decoration: none; border-bottom: 1px solid oklch(0.72 0.08 152 / 0.45);">Read the guarantee terms</a></p>
           </div>
           <div data-m="auto" style="height: 320px; border-radius: 4px; overflow: hidden; box-shadow: 0 26px 60px rgba(0,0,0,0.5);">
@@ -3254,7 +3203,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
           <div style="width: 46px; height: 46px; border-radius: 3px; overflow: hidden; flex: 0 0 auto;"><img src="/assets/img/pdp-dog.webp" alt="Happy Beans for Dogs" width="1264" height="848" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: {{ pdpDogShow }}; object-fit: cover; object-position: center;"><img src="/assets/img/pdp-cat.webp" alt="Happy Beans for Cats" width="1264" height="848" loading="lazy" decoding="async" style="width: 100%; height: 100%; display: {{ pdpCatShow }}; object-fit: cover; object-position: center;"></div>
           <div>
             <div style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 20px; color: #F5F0E6; line-height: 1.1;">{{ pdpName }}</div>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;"><span data-pre-hide>Ships within 24 hours</span><span data-pre-show-inline>Batch 0072 · ships in ~4 weeks</span></div>
+            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;"><span>Ships within 24 hours</span></div>
           </div>
         </div>
         <div class="hbsp hbsp--bar">
@@ -3918,10 +3867,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
 
             <aside class="hb-sum">
               <div class="hb-sum__k">Order summary</div>
-              <div data-pre-show class="hb-sum__note" style="margin: 0 0 18px;">
-                <span aria-hidden="true" style="flex: 0 0 auto; color: oklch(0.6 0.13 78);">●</span>
-                <span><b style="font-weight: 500;">Batch 0072 · in production.</b> Your order reserves a box from this run — it ships in ~4 weeks, as soon as the batch clears testing.</span>
-              </div>
+              
               <div class="hb-sum__rows" style="padding-top: 0;">
                 <sc-for list="{{ cartTotals }}" as="ct2" hint-placeholder-count="3">
                   <div><span>{{ ct2.k }}</span><span class="{{ ct2.cls }}">{{ ct2.v }}</span></div>
@@ -3957,7 +3903,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
               <svg width="26" height="26" sc-camel-view-box="0 0 26 26" fill="none" style="position: absolute; left: 15px; top: 15px;"><path d="M2 13.5 9 20 24 4" stroke="#FCFAF4" sc-camel-stroke-width="2.6" sc-camel-stroke-linecap="round" sc-camel-stroke-linejoin="round"></path></svg>
             </div>
             <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 16px;">Order confirmed</div>
-            <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.6vw, 46px); line-height: 1.05; margin: 0 0 16px;"><span data-pre-hide>It ships in the morning.</span><span data-pre-show-inline>Your box is reserved.</span></h1>
+            <h1 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.6vw, 46px); line-height: 1.05; margin: 0 0 16px;"><span>It ships in the morning.</span></h1>
             <p style="font-size: 16px; line-height: 1.7; color: #554C40; margin: 0 auto 26px; max-width: 32em; text-wrap: pretty;">{{ orderNote }}</p>
             <div data-m="stack" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #E0D6C2; border: 1px solid #E0D6C2; border-radius: 6px; overflow: hidden; margin-bottom: 28px;">
               <div style="background: #FCFAF4; padding: 16px 12px;"><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; margin-bottom: 6px;">Order</div><div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 13px;">{{ orderId }}</div></div>
@@ -4019,10 +3965,7 @@ html.hb-prelaunch [data-m~="pdplede"] { margin-bottom: 0 !important; }
                   </div>
                 </sc-for>
               </div>
-              <div data-pre-show class="hb-sum__note">
-                <span aria-hidden="true" style="flex: 0 0 auto; color: oklch(0.6 0.13 78);">●</span>
-                <span><b style="font-weight: 500;">Batch 0072 · in production.</b> Your order reserves a box from this run — it ships in ~4 weeks, as soon as the batch clears testing.</span>
-              </div>
+              
               <div class="hb-sum__rows">
                 <sc-for list="{{ cartTotals }}" as="ct3" hint-placeholder-count="3">
                   <div><span>{{ ct3.k }}</span><span class="{{ ct3.cls }}">{{ ct3.v }}</span></div>
@@ -4744,7 +4687,7 @@ class Component extends DCLogic {
     // While Subscribe & save is paused, any subscription line (picker default,
     // saved cart) becomes one-time so nobody is billed a second month before
     // their first box arrives; bundles stay — they're a single charge.
-    // Reverts with HB_PRELAUNCH.subs.
+    // Reverts when hbSubsPaused() goes back to false.
     if (window.hbSubsPaused()) rows.forEach(r => { if (r.plan === 1 || r.plan === 3) r.plan = 0; });
     // Trade accounts see their own per-box rate on every one-time line, same
     // as the product page (terms live from /api/auth/me — what checkout's
@@ -5964,28 +5907,12 @@ class Component extends DCLogic {
       // counts come from /api/batch and only appear once it has loaded.
       tickerItems: (() => {
         const r = this.state.batch;
-        const PRE = window.HB_PRELAUNCH || {};
         const live = [];
         if (r && r.dog && typeof r.dog.remaining === 'number') {
           live.push({ label: r.dog.remaining.toLocaleString('en-US') + ' of ' + r.dog.total.toLocaleString('en-US') + ' dog boxes left' });
         }
         if (r && r.cat && typeof r.cat.remaining === 'number') {
           live.push({ label: r.cat.remaining.toLocaleString('en-US') + ' of ' + r.cat.total.toLocaleString('en-US') + ' cat boxes left' });
-        }
-        if (PRE.on) {
-          // The live "boxes left" counts belong to the previous run — hold
-          // them back until the new batch is actually on the shelf.
-          return [
-            { label: 'Batch ' + PRE.batch + ' · in production' }
-          ].concat([
-            { label: 'Reserving now · ships in ' + PRE.eta },
-            { label: 'Every lot third-party tested' },
-            { label: 'cGMP · Scottsdale, AZ' },
-            { label: 'Human-grade · made in USA' },
-            { label: 'Free shipping over $60' },
-            { label: '30-day refund window' },
-            { label: 'Cancel anytime, one click' }
-          ]);
         }
         return [
           { label: 'Lot HB-0426 released' }
@@ -6314,12 +6241,8 @@ class Component extends DCLogic {
       orderPlaced: this.state.ordered,
       orderPending: !this.state.ordered,
       orderId: this.state.orderId,
-      orderEta: (window.HB_PRELAUNCH || {}).on
-        ? '~4 weeks · Batch 0072'
-        : '2–4 business days',
-      orderNote: (window.HB_PRELAUNCH || {}).on
-        ? 'Your box is reserved from Batch 0072, which is in production now. It ships in about 4 weeks, as soon as the batch clears third-party testing — a confirmation is on the way by email, and we’ll email again the day it ships.'
-        : 'We formulate to order, so your chews are blended fresh and leave Scottsdale in the morning. A confirmation and the lot number for your batch are on the way by email.',
+      orderEta: '2–4 business days',
+      orderNote: 'We formulate to order, so your chews are blended fresh and leave Scottsdale in the morning. A confirmation and the lot number for your batch are on the way by email.',
       checkoutSections: [
         { n: '01', title: 'Contact', fields: [
           { key: 'email', label: 'Email', value: co.email, set: this.setCo('email'), mode: 'email', span: 'span 2' },
@@ -9236,7 +9159,7 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   // there. Text is read from that block so the two can never differ.
   + '<div class="pc-id">'
   + '<div class="pc-id__row"><span class="pc-id__k" data-eyebrow></span>'
-  + '<span class="pc-id__rate" data-pre-hide><span class="pc-id__stars" aria-hidden="true">★★★★★</span><span class="pc-id__n">1,204 verified owners</span></span></div>'
+  + '<span class="pc-id__rate"><span class="pc-id__stars" aria-hidden="true">★★★★★</span><span class="pc-id__n">1,204 verified owners</span></span></div>'
   // The last sentence is a link, so the copy is a text span plus an inline
   // anchor inside the one paragraph — the lede is written with textContent
   // (see data-lede below) and an anchor placed in it would be flattened to
@@ -9278,7 +9201,6 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<span><span class="pc-name">Buy 3, get 1 free</span><span class="pc-fit" data-fit></span></span>'
   + '<span style="text-align:right"><span class="pc-price">$297</span><span class="pc-save">–$163</span></span>'
   + '</button>'
-  + '<div class="pc-note" data-pre-show data-subs-hide>Subscribe &amp; save returns when Batch 0072 ships</div>'
   + '</div></div>'
   + '<button class="pc-cta" type="button" data-cta>Start the 30 days · $99 →</button>'
   + '</div>';
