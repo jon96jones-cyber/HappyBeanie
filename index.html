@@ -20,6 +20,102 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.happybeanie.com/assets/og-image-8.jpg">
+<!-- Structured data, deliberately static rather than built by script.
+     The consumers this exists for — AI answer and shopping engines — read the
+     raw HTML and do not run JavaScript, so anything injected at runtime is
+     invisible to exactly the crawlers that need it. Googlebot renders and sees
+     it either way.
+
+     One <head> serves every SPA route (see the rewrite in vercel.json), so each
+     Product carries its own `url` naming the product page rather than implying
+     the page it was found on is that product.
+
+     Availability is fixed at InStock because static markup cannot read
+     window.HB_PRELAUNCH — if prelaunch is ever switched back on (index.html
+     line ~83), change these two to https://schema.org/PreOrder by hand.
+
+     Names, SKUs and price are kept in sync with /google-product-feed.tsv. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.happybeanie.com/#organization",
+      "name": "Happy Beanie",
+      "legalName": "Bio Active Group LLC",
+      "url": "https://www.happybeanie.com/",
+      "description": "Peptide-infused daily care for dogs and cats, formulated and third-party tested in Scottsdale, Arizona.",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.happybeanie.com/assets/email-logo.png",
+        "width": 420,
+        "height": 136
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Scottsdale",
+        "addressRegion": "AZ",
+        "addressCountry": "US"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "hello@happybeanie.com",
+        "availableLanguage": "English"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.happybeanie.com/#website",
+      "url": "https://www.happybeanie.com/",
+      "name": "Happy Beanie",
+      "inLanguage": "en-US",
+      "publisher": { "@id": "https://www.happybeanie.com/#organization" }
+    },
+    {
+      "@type": "Product",
+      "@id": "https://www.happybeanie.com/#product-dog",
+      "name": "Happy Beanie Dog Supplement Soft Chews — Hip & Joint, Mobility, Immune Support for Senior Dogs, 30 Count",
+      "description": "Daily supplement soft chew for dogs, 10–150 lb, dosed by weight. 30 chews per box. Made in Scottsdale, Arizona, and third-party tested lot by lot.",
+      "url": "https://www.happybeanie.com/product",
+      "image": "https://www.happybeanie.com/assets/img/pdp-dog.webp",
+      "sku": "HB-DOG-30",
+      "brand": { "@type": "Brand", "name": "Happy Beanie" },
+      "manufacturer": { "@id": "https://www.happybeanie.com/#organization" },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://www.happybeanie.com/product",
+        "priceCurrency": "USD",
+        "price": "115.00",
+        "availability": "https://schema.org/InStock",
+        "itemCondition": "https://schema.org/NewCondition",
+        "seller": { "@id": "https://www.happybeanie.com/#organization" }
+      }
+    },
+    {
+      "@type": "Product",
+      "@id": "https://www.happybeanie.com/#product-cat",
+      "name": "Happy Beanie Cat Supplement Soft Chews — Hip & Joint, Digestive, Urinary Support for Senior Cats, 30 Count",
+      "description": "Daily supplement soft chew for cats. One chew a day at any weight, 30 chews per box. Made in Scottsdale, Arizona, and third-party tested lot by lot.",
+      "url": "https://www.happybeanie.com/product",
+      "image": "https://www.happybeanie.com/assets/img/pdp-cat.webp",
+      "sku": "HB-CAT-30",
+      "brand": { "@type": "Brand", "name": "Happy Beanie" },
+      "manufacturer": { "@id": "https://www.happybeanie.com/#organization" },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://www.happybeanie.com/product",
+        "priceCurrency": "USD",
+        "price": "115.00",
+        "availability": "https://schema.org/InStock",
+        "itemCondition": "https://schema.org/NewCondition",
+        "seller": { "@id": "https://www.happybeanie.com/#organization" }
+      }
+    }
+  ]
+}
+</script>
 <script>
 // When mobile Safari restores this page from its back-forward cache (bfcache),
 // it can show a frozen snapshot from an earlier deploy (stale copy/layout).
@@ -80,6 +176,9 @@ window.hbSellingPlanFor = function (species, lb) {
 // as one-time, and a notice says it returns when the batch ships. The reason
 // it was ever paused: a contract opened during prelaunch bills its second
 // month right as the first box arrives. Open it only when that is acceptable.
+// One thing this switch no longer reaches: the Product structured data in the
+// <head> is static, so its availability does not follow `on`. Flipping this
+// back to true means changing both schema.org/InStock values up there by hand.
 window.HB_PRELAUNCH = { on: false, subs: true, batch: '0072', eta: '~4 weeks' };
 // One reading of the switch, so the gates below can't drift apart. Paused
 // only while prelaunch is on and subs is off — once prelaunch ends,
@@ -394,43 +493,6 @@ if (!window.__hbInternal) {
     document.head.appendChild(s);
   })();
 }
-</script>
-<script>
-/* Product structured data for /product — Google Merchant Center's landing-page
-   checks read this to match the feed's price and availability, so the price
-   here is the one-time price (the only one a feed may list) and availability
-   follows the prelaunch switch. Keep in sync with /google-product-feed.tsv. */
-(function () {
-  if (location.pathname.replace(/\/+$/, '') !== '/product') return;
-  var sp = 'dog';
-  try { var q = new URLSearchParams(location.search).get('sp'); if (q === 'cat') sp = 'cat'; } catch (e) {}
-  var pre = !!(window.HB_PRELAUNCH && window.HB_PRELAUNCH.on);
-  var data = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: sp === 'cat'
-      ? 'Happy Beanie Cat Supplement Soft Chews — Hip & Joint, Digestive, Urinary Support for Senior Cats, 30 Count'
-      : 'Happy Beanie Dog Supplement Soft Chews — Hip & Joint, Mobility, Immune Support for Senior Dogs, 30 Count',
-    description: sp === 'cat'
-      ? 'Daily supplement soft chew for cats. One chew a day, 30 chews per box. Made in Scottsdale, Arizona, and third-party tested lot by lot.'
-      : 'Daily supplement soft chew for dogs, 10–150 lb, dosed by weight. 30 chews per box. Made in Scottsdale, Arizona, and third-party tested lot by lot.',
-    image: 'https://www.happybeanie.com/assets/img/pdp-' + sp + '.webp',
-    brand: { '@type': 'Brand', name: 'Happy Beanie' },
-    sku: sp === 'cat' ? 'HB-CAT-30' : 'HB-DOG-30',
-    offers: {
-      '@type': 'Offer',
-      url: 'https://www.happybeanie.com/product?sp=' + sp,
-      priceCurrency: 'USD',
-      price: '115.00',
-      availability: pre ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock',
-      itemCondition: 'https://schema.org/NewCondition'
-    }
-  };
-  var s = document.createElement('script');
-  s.type = 'application/ld+json';
-  s.textContent = JSON.stringify(data);
-  document.head.appendChild(s);
-})();
 </script>
 <script>
 /* Product-page catch animation. The section only exists while the product
