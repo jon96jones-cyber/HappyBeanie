@@ -7666,7 +7666,7 @@ Component.prototype.renderVals = function () {
   var rMode = false, rDone = false, rTimers = [], rRaf = 0;
   // Wheel state. wStage is 'spin' | 'email' | 'reveal'; wDone marks a capture,
   // so closing after one is not counted as a dismissal.
-  var wMode = false, wStage = 'spin', wSpinning = false, wDone = false, wAngle = 0, wTimer = null, wCodeVal = '';
+  var wMode = false, wStage = 'spin', wSpinning = false, wDone = false, wAngle = 0, wTimer = null, wArcTimer = null, wCodeVal = '';
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var step = 'feed', drag = null, busy = false, returnTo = null;
@@ -7910,6 +7910,7 @@ Component.prototype.renderVals = function () {
   function wReset() {
     wStage = 'spin'; wSpinning = false; wDone = false; wCodeVal = '';
     if (wTimer) { clearTimeout(wTimer); wTimer = null; }
+    if (wArcTimer) { clearTimeout(wArcTimer); wArcTimer = null; }
     wInput.value = ''; wErr.hidden = true; wErr.textContent = '';
     wSend.disabled = false; wSend.textContent = 'Reveal \u2192';
     wStepEmail.hidden = true; wStepReveal.hidden = true;
@@ -7963,10 +7964,22 @@ Component.prototype.renderVals = function () {
     var jitter = (Math.random() * 2 - 1) * (W_SLIVER / 2) * 0.6;
     wAngle = wAngle - (wAngle % 360) + 360 * 6 + 360 + jitter;
     if (wRotor) {
-      wRotor.style.transition = reduced ? 'none' : 'transform 4.4s cubic-bezier(0.12, 0.8, 0.1, 1)';
+      // The old curve had a very long tail: the wheel dropped to a readable
+      // crawl at 1.8s and then kept turning another 176 degrees over 2.7
+      // seconds, which is the whole window in which a label can be watched
+      // rotating through upside down. This one still eases out, but settles
+      // shortly after it becomes readable — 69 degrees over half a second.
+      wRotor.style.transition = reduced ? 'none' : 'transform 4s cubic-bezier(0.05, 0.6, 0.8, 1)';
       wRotor.style.transform = 'rotate(' + wAngle + 'deg)';
     }
     try { if (window.hbTrack) window.hbTrack('popup_fed', { species: 'wheel' }); } catch (e) {}
+    // Swap to the landed arcs while the wheel is still a blur — about 600
+    // degrees a second at this mark, against the 150 or so where the labels
+    // become readable. Doing it at the stop instead left every label facing
+    // the wrong way through the whole slow-down and then jumped them into
+    // place, which is the part that looked broken.
+    clearTimeout(wArcTimer);
+    wArcTimer = setTimeout(function () { wArcs(true); }, reduced ? 0 : 900);
     wTimer = setTimeout(function () {
       wSpinning = false;
       wStage = 'email';
@@ -7975,11 +7988,10 @@ Component.prototype.renderVals = function () {
       wPlaqueV.textContent = 'GRAND PRIZE';
       wHubText.innerHTML = 'Grand<br>prize';
       wSpinBtn.hidden = true;
-      wArcs(true);
       wNote.textContent = 'Enter your email to reveal it';
       wStepEmail.hidden = false;
       setTimeout(function () { try { wInput.focus({ preventScroll: true }); } catch (e) {} }, 120);
-    }, reduced ? 200 : 4500);
+    }, reduced ? 200 : 4100);
   }
 
   wSpinBtn.addEventListener('click', wSpin);
@@ -8194,6 +8206,7 @@ Component.prototype.renderVals = function () {
     if (rRaf) { cancelAnimationFrame(rRaf); rRaf = 0; }
     var subscribed = wMode ? wDone : rMode ? rDone : step === 'done';
     if (wTimer) { clearTimeout(wTimer); wTimer = null; }
+    if (wArcTimer) { clearTimeout(wArcTimer); wArcTimer = null; }
     wLights(false);
     if (!subscribed) {
       try {
