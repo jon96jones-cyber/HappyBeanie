@@ -950,6 +950,8 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .hbco .hb-eye .nw { white-space: nowrap; display: flex; align-items: center; gap: 8px; }
 .hbco .hb-h1 { font-weight: 700; letter-spacing: -0.048em; font-size: clamp(28px, 4vw, 56px); line-height: 0.98; margin: 0 0 40px; max-width: 20em; }
 .hbco .hb-h1 em { font-style: normal; color: var(--green); }
+.hbco .hb-grid--cart > .hb-sum { grid-column: 2; grid-row: 1 / span 2; }
+.hbco .hb-grid--cart > .hb-trust--cart { grid-column: 1; grid-row: 2; }
 .hbco .hb-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 0.45fr); gap: 48px; align-items: start; }
 .hbco .hb-btn { touch-action: manipulation; display: grid; place-items: center; width: 100%; height: 58px; border: none; border-radius: 3px; background: var(--ink); color: #F5F0E6; font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; cursor: pointer; text-decoration: none; transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1); }
 @media (hover: hover) and (pointer: fine) {
@@ -1030,7 +1032,14 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .hbco .hb-fields input { border: 1px solid var(--line); background: var(--paper); border-radius: 3px; padding: 0 14px; font-family: var(--sans); font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink); height: 48px; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
 .hbco .hb-fields input:focus { border-color: var(--ink); outline: none; box-shadow: 0 0 0 3px oklch(0.86 0.14 92 / 0.35); }
 .hbco .hb-fields .err { font-family: var(--sans); font-size: 12px; letter-spacing: 0; text-transform: none; color: oklch(0.52 0.19 25); line-height: 1.4; }
-@media (max-width: 1180px) { .hbco .hb-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; } .hbco .hb-sum { position: static; } }
+@media (max-width: 1180px) {
+  .hbco .hb-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .hbco .hb-sum { position: static; }
+  /* One column: placement goes back to source order, which puts the badges
+     after the summary card and therefore after the checkout buttons. */
+  .hbco .hb-grid--cart > .hb-sum,
+  .hbco .hb-grid--cart > .hb-trust--cart { grid-column: auto; grid-row: auto; }
+}
 @media (max-width: 900px) {
   .hbco .hb-h1 { font-size: 30px; margin-bottom: 20px; }
   .hbco .hb-cols { display: none; }
@@ -1041,9 +1050,26 @@ image-slot:not([data-filled]) { color: transparent !important; }
   .hbco .hb-toggle { margin-top: 10px; }
   .hbco .hb-qty { width: auto; flex-direction: row; justify-content: space-between; padding-left: 88px; }
   .hbco .hb-row--gift .hb-qty, .hbco .hb-price { display: none; }
+  /* Cart on a phone (Jon, Sep 2026): the checkout buttons sat below the fold
+     on landing — 778px down a 844px screen, and 132px past the bottom on a
+     short one. Nothing above them earns that much room, so the summary card
+     gives back its padding and the run-up tightens. The trust badges moved
+     under the buttons in the markup, which is most of the saving on its own. */
   .hbco .hb-trust { gap: 6px 18px; margin-top: 18px; }
-  .hbco .hb-sum { padding: 20px 18px 22px; }
-  .hbco .hb-sum__total span:last-child { font-size: 34px; }
+  .hbco .hb-trust--cart { margin-top: 22px; justify-content: center; text-align: center; gap: 6px 16px; }
+  .hbco .hb-gap { height: 14px !important; }
+  .hbco .hb-grid { gap: 22px; }
+  .hbco .hb-row { padding: 13px 0; }
+  .hbco .hb-item__note { font-size: 13px; line-height: 1.45; }
+  .hbco .hb-sum { padding: 15px 16px 17px; }
+  .hbco .hb-sum__k { margin-bottom: 11px; }
+  .hbco .hb-sum__rows { gap: 8px; padding: 12px 0; }
+  .hbco .hb-sum__total { padding: 13px 0 15px; }
+  .hbco .hb-sum__total span:last-child { font-size: 30px; }
+  .hbco .hb-btn { height: 52px; }
+  .hbco .hb-btn--yellow { height: 50px; }
+  .hbco .hb-or { margin: 10px 0 8px; }
+  .hbco .hb-chips { margin-top: 8px; }
   .hbco .hb-fields { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px 0 20px; }
   .hbco .hb-fields label.w { grid-column: auto; }
   .hbco .hb-fields input { height: 46px; font-size: 16px; }
@@ -3962,7 +3988,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <!-- No headline (Jon, Sep 2026): the eyebrow above already names the
              page and counts the items, so the table starts straight away.
              The 26px below matches the checkout page. -->
-        <div style="height: 26px;"></div>
+        <div class="hb-gap" style="height: 26px;"></div>
 
         <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
           <div class="hb-empty">
@@ -3972,7 +3998,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
         </sc-if>
 
         <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ true }}">
-          <div class="hb-grid">
+          <div class="hb-grid hb-grid--cart">
             <div>
               <div class="hb-cols"><span>Item</span><span>Qty</span><span>Price</span></div>
               <sc-for list="{{ cartItems }}" as="ci" hint-placeholder-count="1">
@@ -4017,7 +4043,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
                 <div class="hb-price hb-price--gift">$0</div>
               </div>
 
-              <div class="hb-trust"><span>Formulated in Scottsdale, AZ</span><span>Third-party tested</span><span>30-day money-back guarantee</span></div>
             </div>
 
             <aside class="hb-sum">
@@ -4038,6 +4063,12 @@ image-slot:not([data-filled]) { color: transparent !important; }
                 <div class="hb-chips"><span>Shop Pay</span><span>Apple Pay</span><span>Google Pay</span></div>
               </div>
             </aside>
+
+            <!-- Third child of the two-column grid on purpose: desktop places
+                 it at row 2 column 1, still under the items, exactly where it
+                 was. A phone has one column, so it stacks last — below the
+                 checkout buttons rather than above them (Jon, Sep 2026). -->
+            <div class="hb-trust hb-trust--cart"><span>Formulated in Scottsdale, AZ</span><span>Third-party tested</span><span>30-day money-back guarantee</span></div>
           </div>
         </sc-if>
       </div>
