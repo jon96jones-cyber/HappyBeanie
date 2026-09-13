@@ -3429,23 +3429,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
         </div>
       </div>
     </section>
-    <!-- "The people in the room" — hidden on request, not removed; delete
-         `display: none` to bring the team section back. -->
-    <section data-m="pad short" style="display: none; position: relative; background: radial-gradient(110% 80% at 80% 0%, #F4EEE1 0%, #EDE6D8 50%, #E5DCCA 100%); padding: 96px 44px;">
-      <div style="position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;">
-        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.4vw, 48px); line-height: 1.05; margin: 0 0 44px;">The people <span style="color: oklch(0.44 0.07 152);">in the room.</span></h2>
-        <div data-m="stack gap" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px;">
-          <sc-for list="{{ team }}" as="tm" hint-placeholder-count="3">
-            <div style="background: #FCFAF4; border: 1px solid rgba(23,20,15,0.1); border-radius: 8px; padding: 14px 14px 26px; box-shadow: 0 30px 54px -34px rgba(23,20,15,0.36), 0 6px 14px -10px rgba(23,20,15,0.14), 0 1px 0 rgba(255,255,255,0.9) inset; transition: transform 0.35s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.35s ease;" style-hover="transform: translateY(-5px); box-shadow: 0 42px 70px -34px rgba(23,20,15,0.42), 0 8px 18px -10px rgba(23,20,15,0.18);">
-              <div data-m="tmimg" style="height: 320px; border-radius: 5px; overflow: hidden; margin-bottom: 20px; background: #EFE8D9;"><image-slot id="{{ tm.slot }}" placeholder="{{ tm.ph }}" style="width: 100%; height: 100%;"></image-slot></div>
-              <h3 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: 25px; margin: 0 8px 6px;">{{ tm.name }}</h3>
-              <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 12px;">{{ tm.role }}</div>
-              <p style="font-size: 14px; line-height: 1.65; color: #554C40; margin: 0 8px;">{{ tm.body }}</p>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-    </section>
 
     <!-- FAQ band runs full-bleed and flush: the old beige 92px padding framed
          it in strips, so the section is now just the band and its top rule. -->
@@ -3574,7 +3557,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
                       <input value="{{ fLicense }}" sc-camel-on-change="{{ setLicense }}" placeholder="AZ-12345" style="border: 1px solid #E0D6C2; background: #FCFAF4; border-radius: 0; padding: 15px 16px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 14px; letter-spacing: 0.04em; color: #17140F;" style-focus="outline: none; border-color: #17140F;">
                     </label>
                   </div>
-                  <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; line-height: 1.6; color: #8A7F6E;">Routed to vet@happybeanie.com, not the general inbox. Packet includes formulation sheets, assay history and clinic pricing.</div>
+                  <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; line-height: 1.6; color: #8A7F6E;">Routed to our veterinary desk, not the general inbox. Packet includes formulation sheets, assay history and clinic pricing.</div>
                 </div>
               </sc-if>
               <label style="display: grid; gap: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0; text-transform: none; color: #6A6055;">
@@ -3719,7 +3702,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
               <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: {{ pn.markColor }};">{{ pn.mark }}</span>
             </div>
           </sc-for>
-          <p style="font-size: 12px; line-height: 1.6; color: #8A7F6E; margin: 22px 0 0;">Signed by Marcus Vance on release. Results apply to the lot named above. Retained samples are held for 24 months and available for re-test on request.</p>
+          <p style="font-size: 12px; line-height: 1.6; color: #8A7F6E; margin: 22px 0 0;">Results apply to the lot named above. Retained samples are held for 24 months and available for re-test on request.</p>
         </div>
       </div>
     </sc-if>
@@ -4487,14 +4470,7 @@ class Component extends DCLogic {
         east: steelSide,
         prevents: 'An unsigned jar leaving the room',
         body: 'Jars are filled, capped, dated and initialled by the person who made them, then a retain from the lot leaves the same day for an independent laboratory.',
-        meta: 'Signed by name · retain pulled per lot' },
-      { key: "Beanie's bed", no: '07', x: 17, y: 88, w: 74, d: 52, h: 16,
-        top: 'radial-gradient(circle at 50% 50%, #C6A98A, #A6825E)',
-        south: 'linear-gradient(180deg,#B08F6C,#8A6B4C)',
-        east: 'linear-gradient(180deg,#A98868,#856546)',
-        prevents: 'Us forgetting who this is for',
-        body: 'Beanie was fourteen when the first stack was built for her. Her bed stays in the corner of a cleanroom, which is a cheap way to remember all of this is for an animal on a floor somewhere.',
-        meta: 'Est. 2008 · still in the corner' }
+        meta: 'Signed by name · retain pulled per lot' }
     ];
   }
 
@@ -5632,31 +5608,6 @@ class Component extends DCLogic {
     };
   }
 
-  evRecs() {
-    return [
-        { year: '2022', title: 'One dog', body: 'Jon, our owner, began giving his goldendoodle Summer a wide range of vitamins that would eventually turn into our proprietary Happy Beanie formula.',
-          evLabel: 'Literature review', evFinding: 'Formulation began as a reading exercise: which repair-signalling ingredients had controlled canine trials behind them, and which had only marketing.', evCite: 'Internal formulation memo · 2022', hasLink: false },
-        { year: '2023', title: 'Twelve dogs', body: 'Vet friends ask for boxes. First stability and assay work runs on a borrowed bench.',
-          evLabel: 'Peer-reviewed trial', evFinding: 'A double-blind, placebo-controlled trial of elk velvet antler powder in 38 dogs with osteoarthrosis found gait, daily-life performance and owner-rated vitality all improved on the active powder but not on placebo, with no abnormalities on blood analysis.', evCite: 'Moreau M, Dupuis J, Bonneau NH, Lécuyer M. Can Vet J. 2004;45(2):133–9. PMID 15025149', hasLink: true, evHref: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC548602/' },
-        { year: '2024', title: 'Two species', body: 'The feline dose curve is finished and the Scottsdale suite goes cGMP licensed.',
-          evLabel: 'Peer-reviewed trial', evFinding: 'A double-blind, randomised, placebo-controlled crossover trial of a green-lipped mussel powder supplement in 32 dogs and 16 cats with mild to moderate osteoarthritis found veterinarian-scored staging improved from baseline in dogs, and grooming, activity level, playfulness and stair-climbing improved in cats.', evCite: 'Corbee RJ, et al. Vet Med Sci. 2022;8(3):1025–35. PMID 35274496', hasLink: true, evHref: 'https://pubmed.ncbi.nlm.nih.gov/35274496/' },
-        { year: '2026', title: 'Two formulations', body: 'Happy Beans for Dogs and for Cats, every lot published with a third-party certificate of analysis.',
-          evLabel: 'Ongoing', evFinding: 'A 90-day owner-reported outcome survey runs continuously; results and sample size are published with each release.', evCite: 'Owner survey, n=412 · updated quarterly', hasLink: false }
-      ].map((t, i) => {
-        const meta = [
-          { grade: 'Level V', design: 'Narrative review', n: '18 papers' },
-          { grade: 'Level I', design: 'Double-blind RCT', n: 'n = 38 dogs' },
-          { grade: 'Level II', design: 'Crossover RCT', n: 'n = 32 dogs · 16 cats' },
-          { grade: 'Level IV', design: 'Observational', n: 'n = 412' }
-        ][i];
-        const top = meta.grade === 'Level I' || meta.grade === 'Level II';
-        return { ...t, ...meta, rec: 'Rec-0' + (i + 1), abEv: i !== 0,
-          strength: ['45%', '92%', '74%', '68%'][i],
-          gradeColor: top ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
-          gradeBorder: top ? 'oklch(0.86 0.14 92 / 0.6)' : 'rgba(245,240,230,0.25)',
-          evColor: t.hasLink ? 'oklch(0.86 0.14 92)' : '#8A7F6E' };
-      });
-  }
   renderVals() {
     const accent = this.props.accent ?? 'oklch(0.86 0.14 92)';
     const page = this.state.page;
@@ -5852,12 +5803,6 @@ class Component extends DCLogic {
         { k: 'Quality', v: 'Human-grade · made in USA' },
         { k: 'The ritual', v: 'One chew, every morning' }
       ],
-      facts: [
-        { k: 'Peptide complex (proprietary)', v: 'Proprietary †' },
-        { k: 'Elk liver, freeze-dried', v: 'Proprietary †' },
-        { k: 'Marine collagen fragments', v: 'Proprietary †' },
-        { k: 'Zinc (as gluconate)', v: '36% DV' }
-      ],
       other: 'Other ingredients: chickpea flour, cane molasses, glycerin, coconut oil, sea salt, natural chicken flavor, lecithin, sorbic acid.'
     } : {
       eyebrow: 'Happy Beans™ · For Cats',
@@ -5874,12 +5819,6 @@ class Component extends DCLogic {
         { k: 'Format', v: 'Soft chew · 30-day box' },
         { k: 'Quality', v: 'Copper-free · made in USA' },
         { k: 'The ritual', v: 'One chew, every morning' }
-      ],
-      facts: [
-        { k: 'Peptide complex (feline)', v: 'Proprietary †' },
-        { k: 'Taurine', v: 'Proprietary †' },
-        { k: 'Marine collagen fragments', v: 'Proprietary †' },
-        { k: 'Vitamin E (as tocopherol)', v: '40% DV' }
       ],
       other: 'Other ingredients: purified water, salmon oil, glycerin, inulin, natural tuna flavor, tocopherols, potassium sorbate. Contains no copper or added iron.'
     };
@@ -6044,35 +5983,6 @@ class Component extends DCLogic {
           ctaFg: on ? '#F5F0E6' : '#17140F'
         };
       }),
-      abChapters: this.evRecs().map((r, i) => {
-        const on = (this.state.abRec || 0) === i;
-        return { year: r.year, title: r.title,
-          pick: () => this.setState({ abRec: i }),
-          bg: on ? '#231F17' : 'transparent',
-          border: on ? 'rgba(245,240,230,0.34)' : 'rgba(245,240,230,0.14)',
-          shadow: on ? '0 22px 40px -30px rgba(0,0,0,0.9)' : 'none',
-          lift: on ? 'translateY(-2px)' : 'translateY(0)',
-          railScale: on ? 1 : 0,
-          yearColor: on ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
-          titleColor: on ? '#F5F0E6' : '#B9AF9C' };
-      }),
-      abSel: (() => {
-        const i = this.state.abRec || 0;
-        const scale = ['One dog', 'Twelve dogs', 'Two species', 'Two formulations'][i];
-        return { ...this.evRecs()[i], chapNo: '0' + (i + 1), scale };
-      })(),
-      evRecords: this.evRecs().map((r, i) => {
-        const on = (this.state.evRec || 0) === i;
-        return { ...r,
-          pick: () => this.setState({ evRec: i }),
-          bg: on ? '#221E17' : '#17140F',
-          rule: on ? r.gradeColor : 'transparent',
-          ruleScale: on ? 1 : 0,
-          recColor: on ? '#DED5C4' : '#8A7F6E',
-          titleColor: on ? '#F5F0E6' : '#B9AF9C' };
-      }),
-      evSel: (() => { const r = this.evRecs()[this.state.evRec || 0]; return { ...r, glow: r.gradeColor }; })(),
-      evGlow: this.evRecs()[this.state.evRec || 0].grade === 'Level I' ? 'oklch(0.86 0.14 92 / 0.16)' : 'oklch(0.72 0.08 152 / 0.14)',
       compare: compareRows,
       dosing: dosingRows,
       // Hero ticker — facts a buyer can act on, not status filler. The two run
@@ -6571,23 +6481,9 @@ class Component extends DCLogic {
       pdpName: 'Happy Beans',
       planRecap: planSel.title + ' · ' + this.money(planSel.price),
       barPct: this.state.pct + '%',
-      assurances: [
-        { k: '30 days', v: 'Full refund if you do not see a change — opened boxes included, no return shipment.' },
-        { k: 'Made to order', v: 'Blended and shipped within 48 hours of your order, never warehoused.' },
-        { k: 'Ask first', v: 'Every ingredient is screened against your animal\u2019s prescriptions in our eligibility quiz, free.' }
-      ],
       wkRows: wkRows,
       // "Try it risk-free" — the buy box sits at the top of the product page.
       wkCta: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
-      inside: (isDog ? [
-        { n: '01 Signalling', title: 'Peptide complex', amount: 'In every chew', body: 'Copper tripeptide, collagen fragments and signal amino acids — short enough to reach tissue, specific enough to instruct it.' },
-        { n: '02 Nutrition', title: 'Whole-food carriers', amount: 'Elk liver + zinc', body: 'The cofactors repair actually spends: heme iron, B12, vitamin A and zinc from organ sources rather than isolates.' },
-        { n: '03 Delivery', title: 'Cold-blended chew', amount: 'Stability tested to 24 months', body: 'Blended below 40°C, pH buffered, sealed away from light and air so the label dose survives the shelf.' }
-      ] : [
-        { n: '01 Signalling', title: 'Feline peptide complex', amount: 'In every chew', body: 'Copper-free by design, dosed to a faster clearance rate — collagen fragments and signal amino acids only.' },
-        { n: '02 Nutrition', title: 'Taurine-forward carriers', amount: 'Taurine + vitamin E', body: 'Built around the amino acid cats cannot make enough of, with salmon oil for absorption and no added iron.' },
-        { n: '03 Delivery', title: 'Soft chew', amount: 'Stability tested to 18 months', body: 'A soft chew built for feline palates, scored down the middle so a half dose is exact during the first week.' }
-      ]).map((x, i) => ({ ...x, delay: i * 110 })),
       benefits: [
         'Supports brain, heart & joint health',
         'Cellular antioxidant defense',
@@ -6600,12 +6496,6 @@ class Component extends DCLogic {
         'Lean muscle maintenance',
         'Cartilage & connective tissue support'
       ].map((label, i) => ({ label, n: (i + 1 < 10 ? '0' : '') + (i + 1) })),
-      timeline: this.evRecs(),
-      team: [
-        { name: 'Marcus Vance', role: 'Founder · formulation', body: 'Fifteen years in human sterile prep. Owns every formulation decision and signs each release.', slot: 'hbv2-team1', ph: 'Founder portrait' },
-        { name: 'Dr. Priya Raman, DVM', role: 'Veterinary lead', body: 'Sets the dose curves by species and reviews every claim before it reaches a label.', slot: 'hbv2-team2', ph: 'Veterinarian portrait' },
-        { name: 'Lena Ortiz', role: 'Quality & lots', body: 'Runs assay scheduling, COA publishing, and the recall drill nobody hopes to need.', slot: 'hbv2-team3', ph: 'Quality lead portrait' }
-      ],
       standards: [
         { n: '01', title: 'Assay before release', body: 'No lot ships on faith. If the numbers come back off spec, the batch is destroyed — we have done it twice.' },
         { n: '02', title: 'Dose by body weight', body: 'If we cannot dose a species honestly, we do not sell to it yet. That is why there are two products, not ten.' },
@@ -6656,23 +6546,6 @@ class Component extends DCLogic {
       // this, dot and pulse ring both.
       deskColor: deskOpen ? 'oklch(0.72 0.17 145)' : 'oklch(0.6 0.2 28)',
       deskStatus: deskOpen ? 'Desk open · support team on shift' : 'Desk closed · replies resume ' + desk.resume,
-      contactBlocks: [
-        { k: 'Email', v: 'hello@happybeanie.com', note: 'Answered by our support team, weekdays inside one business day.', copyable: true },
-        { k: 'Phone', v: '(480) 555-2263', note: 'Mon–Fri, 8am–5pm MST. Dosing questions welcome.', copyable: true },
-        { k: 'Veterinary line', v: 'vet@happybeanie.com', note: 'Formulation data, COAs and clinic pricing for practices.', copyable: true },
-        { k: 'The lab', v: '4120 N Marshall Way, Scottsdale, AZ', note: 'Tours by appointment. Yes, you can bring your bean.', copyable: false }
-      ].map(cb => ({
-        k: cb.k, v: cb.v, note: cb.note,
-        cursor: cb.copyable ? 'pointer' : 'default',
-        bg: this.state.copied === cb.k ? '#EDE6D8' : '#F5F0E6',
-        hint: this.state.copied === cb.k ? 'Copied' : (cb.copyable ? 'Click to copy' : ''),
-        hintOpacity: this.state.copied === cb.k ? 1 : 0.55,
-        copy: cb.copyable ? () => {
-          if (navigator.clipboard) navigator.clipboard.writeText(cb.v).catch(() => {});
-          this.setState({ copied: cb.k });
-          setTimeout(() => this.setState(s => (s.copied === cb.k ? { copied: '' } : null)), 1600);
-        } : () => {}
-      })),
       sent: this.state.sent,
       notSent: !this.state.sent,
       submitForm: () => {
@@ -6736,25 +6609,6 @@ class Component extends DCLogic {
       coa: this.state.coa || {},
       coaStatusColor: (this.state.coa && this.state.coa.status === 'Released') ? 'oklch(0.44 0.07 152)' : '#8A7F6E',
       coaPanels: this.state.coa ? this.state.coa.panels : [],
-      layers: [
-        { n: '01', title: 'The nutritional layer', accent: '| Whole-food carriers', tag: 'Organic-certified inputs', slot: 'hbv2-layer2', ph: 'Raw whole-food inputs, overhead', body: 'Good signals need good fuel. Every chew carries the nutrients a body draws on to repair itself — B12, iron, zinc, taurine and vitamin A — and they come from real whole-food sources, never synthetic shortcuts.', chips: ['Wide Vitamin Scale', 'Complex B Vitamins'] },
-        { n: '02', title: 'The signalling layer', accent: '| Bioactive peptides', tag: 'Short-chain · route-matched', slot: 'hbv2-layer1', ph: 'Peptide vials on light table', body: 'Peptides are the body\u2019s instruction set — chains short enough to reach tissue and specific enough to tell it what to do. Our proprietary peptide blend ensures the longevity of connective tissue and joints.', chips: ['Collagen fragments', 'Signal amino acids'] },
-        { n: '03', title: 'The delivery layer', accent: '| How it stays intact', tag: 'Stability tested to 180 days', slot: 'hbv2-layer3', ph: 'Sealed pack, cold-blend line', body: 'Every batch is blended cold, never overheated, and sealed in light-proof packaging that keeps air out. Due to this engineering, Happy Beanie has a shelf life up to 6 months.', chips: ['Cold blend', 'Lot-coded'] }
-      ].map((l, i) => {
-        const on = this.state.layer === i;
-        return { ...l,
-          open: () => this.setState({ layer: i }),
-          bg: on ? '#211D16' : 'rgba(245,240,230,0.02)',
-          border: on ? 'rgba(245,240,230,0.3)' : 'rgba(245,240,230,0.13)',
-          shadow: on ? '0 26px 60px rgba(0,0,0,0.55)' : '0 1px 0 rgba(245,240,230,0.04)',
-          lift: on ? 'translateY(-3px)' : 'translateY(0)',
-          maxHeight: on ? '360px' : '0px',
-          bodyOpacity: on ? 1 : 0,
-          ghostOpacity: on ? 1 : 0.35,
-          rule: on ? 'oklch(0.86 0.14 92)' : 'rgba(245,240,230,0.25)',
-          numColor: on ? 'oklch(0.86 0.14 92)' : '#8A7F6E'
-        };
-      }),
       credentials: [
         { n: '15 yrs', label: 'Sterile formulation' },
         { n: '100%', label: 'Lots with COAs' },
