@@ -77,7 +77,14 @@ module.exports = async function handler(req, res) {
   // No token, no traffic to Meta. The page never waits on this either way, so
   // an unconfigured deploy behaves exactly like a configured one from the
   // storefront's side.
-  if (!token) return res.status(204).end();
+  //
+  // It used to return silently, which made a disabled relay and a working one
+  // identical in the logs — invocations with no errors read as success when
+  // they actually meant nothing was being sent at all. Say it out loud.
+  if (!token) {
+    console.error('[meta-capi] META_CAPI_TOKEN is not set on this deployment — no events are reaching Meta');
+    return res.status(204).end();
+  }
 
   try {
     const b = readBody(req);
@@ -141,6 +148,11 @@ module.exports = async function handler(req, res) {
       let why = '';
       try { const j = await r.json(); why = (j.error && (j.error.message || j.error.type)) || ''; } catch (e) {}
       console.error('[meta-capi]', name, r.status, why);
+    } else {
+      // One line per accepted event. Low volume, and it is the only positive
+      // evidence the relay is alive — an absence of errors is not the same
+      // thing, which is exactly how this went unnoticed the first time.
+      console.log('[meta-capi] sent', name);
     }
     return res.status(204).end();
   } catch (err) {
