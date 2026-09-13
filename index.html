@@ -1212,7 +1212,29 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .pc-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7; }
 .pc-cta { touch-action: manipulation; display: block; width: 100%; padding: 20px; background: var(--ink); color: #F5F0E6; border: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s ease; }
 @media (hover: hover) and (pointer: fine) { .pc-cta:hover { background: var(--green); } }
-@media (max-width: 600px) { .pc-id { padding: 18px 18px 16px; } .pc-id__lede { font-size: 13.5px; margin-top: 9px; } .pc-head { padding: 20px 18px 16px; } .pc-lb { font-size: 34px; } .pc-body { padding: 16px 18px 0; } }
+/* The panel on a phone (Jon, Sep 2026): it stood 763px, 90% of an iPhone 14
+   screen, so reading from the lede to the buy button was most of a scroll.
+   Nothing here is removed — every plan, the slider, the dose line and the
+   copy all stay. It is padding, leading and a slightly smaller bean, taken a
+   few pixels at a time from all six blocks rather than gutting one. */
+@media (max-width: 600px) {
+  .pc-id { padding: 14px 16px 12px; }
+  .pc-id__lede { font-size: 13px; line-height: 1.5; margin-top: 8px; }
+  .pc-head { padding: 15px 16px 12px; }
+  .pc-head__row { margin-bottom: 10px; }
+  .pc-head__k { padding-bottom: 5px; }
+  .pc-lb { font-size: 32px; }
+  .pc-slider { padding-bottom: 11px; }
+  .pc-body { padding: 13px 16px 0; }
+  /* The bean and its line: a smaller chew still reads at a glance. */
+  .pc-dose { grid-template-columns: 46px 1fr; gap: 12px; padding-bottom: 12px; }
+  .pc-chews { width: 46px; height: 42px; }
+  .pc-dose__t { font-size: 18px; }
+  /* The 14px row gap stays — the "Most chosen" chip sits in it on touch. */
+  .pc-plans { padding: 13px 0 14px; }
+  .pc-row { padding: 11px 14px; }
+  .pc-cta { padding: 17px; }
+}
 
 /* Spin-to-win popup (designer handoff, Jon, Sep 2026). Replaces the research
    card as the only capture popup; the bean card is paused because it gave the
