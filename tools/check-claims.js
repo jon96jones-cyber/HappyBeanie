@@ -112,6 +112,40 @@ if (!ld) {
   });
 }
 
+function listFor(species) {
+  // insideList is `sp === 'cat' ? [ ...cat... ] : [ ...dog... ]`.
+  const block = html.match(/insideList:\s*\(this\.state\.sp === 'cat' \?([\s\S]*?)\)\.map\(/);
+  if (!block) return null;
+  const [cat, dog] = block[1].split(/\]\s*:\s*\[/);
+  const names = (chunk) => [...chunk.matchAll(/name:\s*'([^']+)'/g)].map((m) => m[1]);
+  return species === 'cat' ? names(cat) : names(dog);
+}
+
+// The ingredient panel exists twice: as the tiles the page renders from
+// insideList, and as activeIngredient properties in the static JSON-LD, which
+// is the copy anything that does not run JavaScript actually reads. They are
+// generated from the same source, and they have to stay that way — a crawler
+// being told a formula the page does not show is worse than it being told
+// nothing.
+if (ld) {
+  const graph = JSON.parse(ld)['@graph'] || [];
+  [['HB-DOG-30', 'dog'], ['HB-CAT-30', 'cat']].forEach(([sku, species]) => {
+    const p = graph.find((n) => n.sku === sku);
+    if (!p) return;
+    const panel = (listFor(species) || []).join(' | ');
+    const schema = (p.additionalProperty || [])
+      .filter((x) => x.propertyID === 'activeIngredient')
+      .sort((a, b) => a.position - b.position)
+      .map((x) => x.name.replace(/\s*\(.*\)$/, ''));
+    if (!schema.length) {
+      return fail('CONFLICT', sku, 'no activeIngredient properties — crawlers that do not run JS cannot see the formula');
+    }
+    if (schema.join(' | ') !== panel) {
+      fail('CONFLICT', sku, `the structured data and the on-page panel list different formulas\n    panel:  ${panel}\n    schema: ${schema.join(' | ')}`);
+    }
+  });
+}
+
 // The shipping policy and the storefront both state a dispatch time.
 const shipping = read('policies/shipping.html');
 if (/24\s*h(ours)?/i.test(prose) && !/next business (morning|day)|24\s*h/i.test(shipping)) {
@@ -123,14 +157,6 @@ if (/24\s*h(ours)?/i.test(prose) && !/next business (morning|day)|24\s*h/i.test(
 // list. The formulas are not identical, so a line written for one page can be
 // false on the other — that is exactly how green-lipped mussel ended up on
 // the dog page.
-function listFor(species) {
-  // insideList is `sp === 'cat' ? [ ...cat... ] : [ ...dog... ]`.
-  const block = html.match(/insideList:\s*\(this\.state\.sp === 'cat' \?([\s\S]*?)\)\.map\(/);
-  if (!block) return null;
-  const [cat, dog] = block[1].split(/\]\s*:\s*\[/);
-  const names = (chunk) => [...chunk.matchAll(/name:\s*'([^']+)'/g)].map((m) => m[1]);
-  return species === 'cat' ? names(cat) : names(dog);
-}
 
 // The claim copy is defined per species in the same object as the list.
 const ledes = [...html.matchAll(/eyebrow: 'Happy Beans[^']*· For (Dogs|Cats)'[\s\S]{0,600}?body: '([^']+)'/g)]
