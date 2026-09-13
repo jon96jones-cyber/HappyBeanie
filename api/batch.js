@@ -14,7 +14,7 @@ const API_VERSION = process.env.SHOPIFY_ADMIN_API_VERSION || '2025-07';
 
 const BATCH_START = process.env.BATCH_START || '2026-08-13T00:00:00-07:00';
 // Each species runs its own batch. OFFSET is boxes already gone when tracking
-// began (pre-orders, samples, holdbacks) — a tracker opens at TOTAL − OFFSET
+// began (samples, holdbacks) — a tracker opens at TOTAL − OFFSET
 // and drains from that species' real orders after that.
 const RUNS = {
   dog: {

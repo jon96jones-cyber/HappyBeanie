@@ -50,11 +50,23 @@ const prose = html
   [/Batch\s*0072/i, 'the prelaunch batch number'],
   [/\bin production\b/i, '"in production" — the store ships to order'],
   [/reserving now|reserve your box|box is reserved/i, 'prelaunch reservation copy'],
-  [/HB_PRELAUNCH|data-pre-show|data-pre-hide|hb-prelaunch/, 'prelaunch machinery']
+  [/HB_PRELAUNCH|data-pre-show|data-pre-hide|hb-prelaunch/, 'prelaunch machinery'],
+  [/\bpre-?orders?\b/i, 'pre-order copy — the store sells from stock']
 ].forEach(([rx, what]) => {
   const m = prose.match(rx);
   if (m) fail('STALE', 'index.html', `${what} — found ${JSON.stringify(m[0])}`);
 });
+
+// Pre-ordering was removed in Sep 2026 and is not coming back while the store
+// ships to order. These two make its return loud rather than quiet: a feed row
+// that says preorder, or an availability_date column, which only ever has a
+// meaning alongside preorder or backorder.
+if (/\bpreorder\b|\bbackorder\b/i.test(read('google-product-feed.tsv'))) {
+  fail('STALE', 'google-product-feed.tsv', 'a row is on pre-order or back-order');
+}
+if (/\bavailability_date\b/.test(read('google-product-feed.tsv'))) {
+  fail('STALE', 'google-product-feed.tsv', 'availability_date is back — it only means something for pre-order or back-order');
+}
 
 // -------------------------------------------------------------- CONFLICT ----
 // The Google feed and the site describe the same two products to the same
