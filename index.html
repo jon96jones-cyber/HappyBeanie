@@ -297,46 +297,6 @@ window.addEventListener('pageshow', function (e) {
 // injected HTML the SPA re-renders; a handler bound to the node would not
 // survive that. Falls back to #formula, which is the same panel on the pages
 // that carry the other copy of it.
-// Fits the comparison chart's fixed 1080px canvas to whatever width it has.
-// Scaling rather than reflowing is deliberate: the design places its rows
-// absolutely, so re-laying it out would be redrawing it. The host gets the
-// scaled height because a transform does not affect layout — without it the
-// section would reserve the unscaled 1084px and leave a hole beneath.
-//
-// The floor is where the design's 22px row labels reach about 12px. Under it
-// the host scrolls sideways instead, which keeps the chart readable on a
-// phone at the cost of a swipe.
-window.hbCmpFit = function () {
-  var K_FLOOR = 0.55, W = 1080;
-  var hosts = document.querySelectorAll('[data-hb-cmp]');
-  for (var i = 0; i < hosts.length; i++) {
-    var host = hosts[i], inner = host.querySelector('[data-hb-cmp-scale]');
-    if (!inner) continue;
-    var cs = getComputedStyle(host);
-    var avail = host.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    if (!(avail > 0)) continue;
-    var k = Math.min(1, Math.max(K_FLOOR, avail / W));
-    host.style.setProperty('--cmp-k', k.toFixed(4));
-    // offsetHeight is the unscaled box; the transform is applied after layout.
-    host.style.setProperty('--cmp-h', Math.ceil(inner.offsetHeight * k) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + 'px');
-  }
-};
-(function () {
-  var t = 0;
-  var run = function () { try { window.hbCmpFit(); } catch (e) {} };
-  var soon = function () { clearTimeout(t); t = setTimeout(run, 60); };
-  window.addEventListener('resize', soon);
-  window.addEventListener('orientationchange', soon);
-  // The chart's height changes when the reveal panel opens, and the SPA
-  // re-renders the subtree, so watch rather than fire once.
-  if (typeof MutationObserver !== 'undefined') {
-    new MutationObserver(soon).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['style'] });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
-  else run();
-  setTimeout(run, 400);
-  setTimeout(run, 1200);
-})();
 document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest && e.target.closest('[data-hb-inside]');
   if (!a) return;
@@ -964,17 +924,15 @@ image-slot:not([data-filled]) { color: transparent !important; }
    host by hbWallInit(), like the FAQ band. On the product page the host
    sits inside the padded #inside section, so it pulls itself out to the
    edges the same way the "What to expect" band does. */
-/* Comparison chart host (Jon's design, Sep 2026). The design is a fixed
-   1080px canvas, so it is scaled rather than reflowed — every proportion in
-   it survives at any width. --cmp-k and the host height are written by
-   hbCmpFit(); the fallbacks here mean it still renders 1:1 before that runs.
-   Below the floor the host scrolls sideways instead of shrinking type into
-   illegibility. */
-.hb-cmp { background: #141414; padding: 56px 44px 64px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; height: var(--cmp-h, auto); }
-.hb-cmp__scale { width: 1080px; transform-origin: top left; transform: scale(var(--cmp-k, 1)); }
-@media (max-width: 900px) { .hb-cmp { padding: 34px 20px 40px; } }
-@media (max-width: 600px) { .hb-cmp { padding: 26px 14px 30px; } }
-@media (prefers-reduced-motion: reduce) { .hb-cmp * { transition: none !important; } }
+/* The reset the design was authored under. Its own bundle carries
+   `* { margin: 0; padding: 0; box-sizing: border-box }`, and every other
+   section here scopes the same thing (.hb-wall, .hbco, .pc, .hbw and the
+   rest). Without it the card borders sat outside the declared boxes and the
+   reveal panel overran the band it is clipped to — visible at phone width,
+   where the 1px borders are a larger share of a scaled-down layout. */
+[data-m~="cmpsec"] * { box-sizing: border-box; }
+@media (max-width: 900px) { [data-m~="cmpsec"] { padding: 40px 20px 44px !important; } }
+@media (max-width: 600px) { [data-m~="cmpsec"] { padding: 28px 14px 32px !important; } }
 .hb-wall { background: #EDE6D8; padding: 96px 44px; border-top: 1px solid #DDD3C0; overflow: hidden; }
 .hb-wall * { box-sizing: border-box; }
 .hb-wall [data-row] { transition: background 0.2s ease; }
@@ -3353,96 +3311,85 @@ image-slot:not([data-filled]) { color: transparent !important; }
       <!-- The bean wall: reviews + photo belt, injected by hbWallInit(). -->
       <div class="hb-wallhost--pdp" data-hb-wall-host></div>
 
-      <!-- Comparison chart (Jon's design, Sep 2026). Dropped in as authored:
-           a fixed 1080px canvas with absolutely placed rows, which is why it
-           lives inside a scaling host rather than being reflowed. hbCmpFit()
-           at the foot of this file sets the scale from the available width
-           and gives the host the scaled height, so the design keeps every
-           internal proportion at any viewport instead of being re-laid-out.
-           Below the scale floor the host scrolls sideways rather than
-           shrinking the type past reading size. -->
-      <div class="hb-cmp" data-hb-cmp>
-        <div class="hb-cmp__scale" data-hb-cmp-scale>
-        <section style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start;">
+      <!-- Comparison chart (Jon's design, Sep 2026). Fluid by construction:
+           the design declares its own container-type: inline-size wrapper and
+           sizes everything in cqw, so it scales itself with the column and
+           needs nothing from us but the band around it. -->
+      <section data-m="cmpsec" style="position: relative; background: #141414; padding: 64px 44px 72px;">
+      <div style="font-family: 'Montserrat', system-ui, sans-serif; container-type: inline-size; width: 100%; max-width: 1080px; margin: 0 auto;">
+      <div style="position: relative; width: 100cqw; height: {{ cmpArtH }}; background: #141414; color: #FFFFFF; overflow: hidden; transition: height 0.55s cubic-bezier(0.2,0.7,0.2,1);">
+            <div style="position: absolute; left: 3.333cqw; top: 1.852cqw; width: 37.037cqw; height: 42.593cqw;"><img src="/assets/img/compare/dog.png" alt="" style="display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom;"></div>
 
-          <div id="4a" style="display: grid; gap: 14px;">
-            <div style="position: relative; width: 1080px; height: {{ cmpArtH }}; background: #141414; color: #FFFFFF; overflow: hidden; transition: height 0.55s cubic-bezier(0.2,0.7,0.2,1);">
-              <div style="position: absolute; left: 36px; top: 20px; width: 400px; height: 460px;"><img src="/assets/img/compare/dog.png" alt="" style="display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom;"></div>
+            <div style="position: absolute; left: 35.185cqw; right: 3.704cqw; top: 8.519cqw; text-align: center; font-weight: 800; text-transform: uppercase; font-size: 4.074cqw; line-height: 1.16; letter-spacing: 0.005em;">
+              <div style="white-space: nowrap;">Your dog deserves a</div>
+              <div style="color: #F0B43C; white-space: nowrap;">better longevity stack</div>
+            </div>
 
-              <div style="position: absolute; left: 380px; right: 40px; top: 92px; text-align: center; font-weight: 800; text-transform: uppercase; font-size: 44px; line-height: 1.16; letter-spacing: 0.005em;">
-                <div style="white-space: nowrap;">Your dog deserves a</div>
-                <div style="color: #F0B43C; white-space: nowrap;">better longevity stack</div>
+            <div style="position: absolute; left: 3.333cqw; right: 3.333cqw; top: 23.704cqw; bottom: {{ cmpTableBottom }}; transition: bottom 0.55s cubic-bezier(0.2,0.7,0.2,1); display: grid; grid-template-columns: 37.5% 1fr 1fr; grid-template-rows: 20.741cqw repeat(7, minmax(0, 1fr));">
+              <div></div>
+              <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-bottom: none; border-radius: 2.037cqw 0 0 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; align-items: center; padding: 2.037cqw 1.852cqw 1.852cqw; gap: 0.556cqw; transition: background 0.35s ease, box-shadow 0.35s ease;" style-hover="background: #383838; box-shadow: inset 0 0 0 1px rgba(240,180,60,0.45), 0 0 3.704cqw -1.296cqw rgba(240,180,60,0.4);">
+                <div style="width: 13.889cqw; height: 9.259cqw; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.12) rotate(-4deg);"><img src="/assets/img/compare/hb-chew.png" alt="" style="display: block; width: 100%; height: 100%; object-fit: contain;"></div>
+                <img src="/assets/img/compare/hb-wordmark.png" alt="happy beanie" style="display: block; width: 24.074cqw; height: auto;">
+              </div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-bottom: none; border-radius: 0 2.037cqw 0 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; align-items: center; padding: 2.037cqw 1.852cqw 1.852cqw; gap: 0.556cqw; transition: opacity 0.35s ease;" style-hover="opacity: 0.68;">
+                <div style="width: 13.889cqw; height: 9.259cqw; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.12) rotate(-4deg);"><img src="/assets/img/compare/jope-chews.png" alt="" style="display: block; width: 100%; height: 100%; object-fit: contain;"></div>
+                <span style="font-weight: 400; font-size: 3.704cqw; letter-spacing: 0.01em; line-height: 1;">Jope</span>
               </div>
 
-              <div style="position: absolute; left: 36px; right: 36px; top: 256px; bottom: {{ cmpTableBottom }}; transition: bottom 0.55s cubic-bezier(0.2,0.7,0.2,1); display: grid; grid-template-columns: 37.5% 1fr 1fr; grid-template-rows: 224px repeat(7, minmax(0, 1fr));">
-                <div></div>
-                <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-bottom: none; border-radius: 22px 0 0 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; align-items: center; padding: 22px 20px 20px; gap: 6px; transition: background 0.35s ease, box-shadow 0.35s ease;" style-hover="background: #383838; box-shadow: inset 0 0 0 1px rgba(240,180,60,0.45), 0 0 40px -14px rgba(240,180,60,0.4);">
-                  <div style="width: 150px; height: 100px; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.12) rotate(-4deg);"><img src="/assets/img/compare/hb-chew.png" alt="" style="display: block; width: 100%; height: 100%; object-fit: contain;"></div>
-                  <img src="/assets/img/compare/hb-wordmark.png" alt="happy beanie" style="display: block; width: 260px; height: auto;">
-                </div>
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-bottom: none; border-radius: 0 22px 0 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; justify-items: center; align-items: center; padding: 22px 20px 20px; gap: 6px; transition: opacity 0.35s ease;" style-hover="opacity: 0.68;">
-                  <div style="width: 150px; height: 100px; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: scale(1.12) rotate(-4deg);"><img src="/assets/img/compare/jope-chews.png" alt="" style="display: block; width: 100%; height: 100%; object-fit: contain;"></div>
-                  <span style="font-weight: 400; font-size: 40px; letter-spacing: 0.01em; line-height: 1;">Jope</span>
-                </div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-radius: 2.037cqw 0 0 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 2.222cqw; font-weight: 500; font-size: 2.037cqw; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">Omega-3 blend</div>
+              <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 2.407cqw; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 2.407cqw rgba(240,180,60,0.55);">400mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 2.222cqw; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">200mg</div>
 
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-radius: 22px 0 0 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 24px; font-weight: 500; font-size: 22px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">Omega-3 blend</div>
-                <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 26px; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 26px rgba(240,180,60,0.55);">400mg</div>
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 24px; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">200mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 2.222cqw; font-weight: 500; font-size: 2.037cqw; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">EPA</div>
+              <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 2.407cqw; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 2.407cqw rgba(240,180,60,0.55);">300mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 2.222cqw; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">59mg</div>
 
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 24px; font-weight: 500; font-size: 22px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">EPA</div>
-                <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 26px; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 26px rgba(240,180,60,0.55);">300mg</div>
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 24px; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">59mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 2.222cqw; font-weight: 500; font-size: 2.037cqw; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">DHA</div>
+              <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 2.407cqw; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 2.407cqw rgba(240,180,60,0.55);">300mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 2.222cqw; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">39mg</div>
 
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 24px; font-weight: 500; font-size: 22px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">DHA</div>
-                <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 26px; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 26px rgba(240,180,60,0.55);">300mg</div>
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 24px; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">39mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 2.222cqw; font-weight: 500; font-size: 2.037cqw; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">MCT oil</div>
+              <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 2.407cqw; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 2.407cqw rgba(240,180,60,0.55);">100mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 2.222cqw; color: #FFFFFF;">–</div>
 
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 24px; font-weight: 500; font-size: 22px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">MCT oil</div>
-                <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 26px; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 26px rgba(240,180,60,0.55);">100mg</div>
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 24px; color: #FFFFFF;">–</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 2.222cqw; font-weight: 500; font-size: 2.037cqw; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">Curcumin</div>
+              <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 2.407cqw; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 2.407cqw rgba(240,180,60,0.55);">100mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 2.222cqw; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">50mg</div>
 
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 24px; font-weight: 500; font-size: 22px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">Curcumin</div>
-                <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 26px; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 26px rgba(240,180,60,0.55);">100mg</div>
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 24px; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">50mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 2.222cqw; font-weight: 500; font-size: 2.037cqw; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">UC-II collagen</div>
+              <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 2.407cqw; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 2.407cqw rgba(240,180,60,0.55);">40mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 2.222cqw; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">20mg</div>
 
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 24px; font-weight: 500; font-size: 22px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">UC-II collagen</div>
-                <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 26px; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 26px rgba(240,180,60,0.55);">40mg</div>
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 24px; color: #E5322D; transition: background 0.3s ease, opacity 0.3s ease;" style-hover="background: rgba(229,50,45,0.12); opacity: 0.72;">20mg</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; border-radius: 0 0 0 2.037cqw; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 2.222cqw; font-weight: 500; font-size: 2.037cqw; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">Preservatives, soy,<br>seed oils</div>
+              <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 2.407cqw; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 2.407cqw rgba(240,180,60,0.55);">None</div>
+              <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; border-radius: 0 0 2.037cqw 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 400; font-size: 2.222cqw; line-height: 1.3;"><span style="color: #E5322D;">All three</span><span style="font-size: 1.852cqw;">on the label</span></div>
+            </div>
 
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-right: none; border-top: none; border-radius: 0 0 0 22px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 24px; font-weight: 500; font-size: 22px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; transition: color 0.3s ease, letter-spacing 0.3s ease;" style-hover="color: #F0B43C; letter-spacing: 0.06em;">Preservatives, soy,<br>seed oils</div>
-                <div style="background: #2E2E2E; border: 1px solid rgba(255,255,255,0.45); border-top: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 26px; color: #F0B43C; transition: background 0.3s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), text-shadow 0.3s ease;" style-hover="background: #3B3B3B; transform: scale(1.12); text-shadow: 0 0 26px rgba(240,180,60,0.55);">None</div>
-                <div style="border: 1px solid rgba(255,255,255,0.45); border-left: none; border-top: none; border-radius: 0 0 22px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 400; font-size: 24px; line-height: 1.3;"><span style="color: #E5322D;">All three</span><span style="font-size: 20px;">on the label</span></div>
+            <div style="position: absolute; left: 3.333cqw; right: 3.333cqw; bottom: 4.074cqw; height: {{ cmpBandH }}; border: 1px solid rgba(240,180,60,0.5); border-radius: 2.037cqw; background: linear-gradient(180deg, rgba(240,180,60,0.08), rgba(240,180,60,0.02)); overflow: hidden; transition: height 0.55s cubic-bezier(0.2,0.7,0.2,1);">
+              <div sc-camel-on-click="{{ cmpToggle }}" style="height: 8.148cqw; display: flex; align-items: center; justify-content: center; gap: 1.852cqw; cursor: pointer; user-select: none; transition: background 0.3s ease;" style-hover="background: rgba(240,180,60,0.09);">
+                <span style="font-weight: 700; font-size: 2.407cqw; letter-spacing: -0.01em; text-transform: uppercase;">{{ cmpRevealLabel }}</span>
+                <span style="width: 3.889cqw; height: 3.889cqw; flex: 0 0 3.889cqw; border: 1px solid rgba(240,180,60,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 2.778cqw; line-height: 1; color: #F0B43C; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1); transform: {{ cmpChevron }};">+</span>
               </div>
-
-              <div style="position: absolute; left: 36px; right: 36px; bottom: 44px; height: {{ cmpBandH }}; border: 1px solid rgba(240,180,60,0.5); border-radius: 22px; background: linear-gradient(180deg, rgba(240,180,60,0.08), rgba(240,180,60,0.02)); overflow: hidden; transition: height 0.55s cubic-bezier(0.2,0.7,0.2,1);">
-                <div sc-camel-on-click="{{ cmpToggle }}" style="height: 88px; display: flex; align-items: center; justify-content: center; gap: 20px; cursor: pointer; user-select: none; transition: background 0.3s ease;" style-hover="background: rgba(240,180,60,0.09);">
-                  <span style="font-weight: 700; font-size: 26px; letter-spacing: -0.01em; text-transform: uppercase;">{{ cmpRevealLabel }}</span>
-                  <span style="width: 42px; height: 42px; flex: 0 0 42px; border: 1px solid rgba(240,180,60,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 30px; line-height: 1; color: #F0B43C; transition: transform 0.45s cubic-bezier(0.2,0.7,0.2,1); transform: {{ cmpChevron }};">+</span>
-                </div>
-                <div style="border-top: 1px solid rgba(240,180,60,0.35); display: grid; grid-template-columns: 246px minmax(0, 1fr); align-items: center; gap: 30px; padding: 26px 30px;">
-                <div style="border-right: 1px solid rgba(255,255,255,0.22); padding-right: 26px;">
-                  <div style="font-weight: 800; font-size: 70px; line-height: 0.9; color: #F0B43C; letter-spacing: -0.02em;">+7</div>
-                  <div style="font-weight: 500; font-size: 20px; line-height: 1.25; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.02em;">ingredients Jope<br>doesn’t carry</div>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 18px;">
-                  <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 14px 16px; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-3px); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 21px; letter-spacing: -0.01em; color: #F0B43C;">Turkey Tail</div><div style="font-weight: 400; font-size: 15px; line-height: 1.3; color: #BDBDBD; margin-top: 3px;">Immune regulation</div></div>
-                  <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 14px 16px; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-3px); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 21px; letter-spacing: -0.01em; color: #F0B43C;">Elk Velvet Antler</div><div style="font-weight: 400; font-size: 15px; line-height: 1.3; color: #BDBDBD; margin-top: 3px;">Joint repair &amp; mobility</div></div>
-                  <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 14px 16px; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-3px); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 21px; letter-spacing: -0.01em; color: #F0B43C;">Elk Liver</div><div style="font-weight: 400; font-size: 15px; line-height: 1.3; color: #BDBDBD; margin-top: 3px;">Vitamin A &amp; iron</div></div>
-                  <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 14px 16px; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-3px); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 21px; letter-spacing: -0.01em; color: #F0B43C;">CoQ10</div><div style="font-weight: 400; font-size: 15px; line-height: 1.3; color: #BDBDBD; margin-top: 3px;">Cardiac &amp; mitochondrial</div></div>
-                  <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 14px 16px; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-3px); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 21px; letter-spacing: -0.01em; color: #F0B43C;">L-Carnitine</div><div style="font-weight: 400; font-size: 15px; line-height: 1.3; color: #BDBDBD; margin-top: 3px;">Lean muscle &amp; fat metabolism</div></div>
-                  <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 14px 16px; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-3px); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 21px; letter-spacing: -0.01em; color: #F0B43C;">B-Complex</div><div style="font-weight: 400; font-size: 15px; line-height: 1.3; color: #BDBDBD; margin-top: 3px;">Energy &amp; nerve function</div></div>
-                  <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 14px 16px; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-3px); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 21px; letter-spacing: -0.01em; color: #F0B43C;">Blueberry Polyphenols</div><div style="font-weight: 400; font-size: 15px; line-height: 1.3; color: #BDBDBD; margin-top: 3px;">Antioxidant defense</div></div>
-                  <div style="border: 1px dashed rgba(255,255,255,0.22); border-radius: 12px; padding: 14px 16px; display: grid; align-content: center;"><div style="font-weight: 400; font-size: 15px; line-height: 1.35; color: #8A8A8A;">Ten ingredients total,<br>one chew a day.</div></div>
-                </div>
-                </div>
+              <div style="border-top: 1px solid rgba(240,180,60,0.35); display: grid; grid-template-columns: 22.778cqw minmax(0, 1fr); align-items: center; gap: 2.778cqw; padding: 2.407cqw 2.778cqw;">
+              <div style="border-right: 1px solid rgba(255,255,255,0.22); padding-right: 2.407cqw;">
+                <div style="font-weight: 800; font-size: 6.481cqw; line-height: 0.9; color: #F0B43C; letter-spacing: -0.02em;">+7</div>
+                <div style="font-weight: 500; font-size: 1.852cqw; line-height: 1.25; margin-top: 0.926cqw; text-transform: uppercase; letter-spacing: 0.02em;">ingredients Jope<br>doesn’t carry</div>
               </div>
-        </div>
-
-          </div>
-
-        </section>
-        </div>
+              <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.296cqw 1.667cqw;">
+                <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 1.111cqw; padding: 1.296cqw 1.481cqw; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-0.278cqw); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 1.944cqw; letter-spacing: -0.01em; color: #F0B43C;">Turkey Tail</div><div style="font-weight: 400; font-size: 1.389cqw; line-height: 1.3; color: #BDBDBD; margin-top: 0.278cqw;">Immune regulation</div></div>
+                <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 1.111cqw; padding: 1.296cqw 1.481cqw; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-0.278cqw); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 1.944cqw; letter-spacing: -0.01em; color: #F0B43C;">Elk Velvet Antler</div><div style="font-weight: 400; font-size: 1.389cqw; line-height: 1.3; color: #BDBDBD; margin-top: 0.278cqw;">Joint repair &amp; mobility</div></div>
+                <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 1.111cqw; padding: 1.296cqw 1.481cqw; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-0.278cqw); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 1.944cqw; letter-spacing: -0.01em; color: #F0B43C;">Elk Liver</div><div style="font-weight: 400; font-size: 1.389cqw; line-height: 1.3; color: #BDBDBD; margin-top: 0.278cqw;">Vitamin A &amp; iron</div></div>
+                <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 1.111cqw; padding: 1.296cqw 1.481cqw; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-0.278cqw); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 1.944cqw; letter-spacing: -0.01em; color: #F0B43C;">CoQ10</div><div style="font-weight: 400; font-size: 1.389cqw; line-height: 1.3; color: #BDBDBD; margin-top: 0.278cqw;">Cardiac &amp; mitochondrial</div></div>
+                <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 1.111cqw; padding: 1.296cqw 1.481cqw; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-0.278cqw); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 1.944cqw; letter-spacing: -0.01em; color: #F0B43C;">L-Carnitine</div><div style="font-weight: 400; font-size: 1.389cqw; line-height: 1.3; color: #BDBDBD; margin-top: 0.278cqw;">Lean muscle &amp; fat metabolism</div></div>
+                <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 1.111cqw; padding: 1.296cqw 1.481cqw; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-0.278cqw); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 1.944cqw; letter-spacing: -0.01em; color: #F0B43C;">B-Complex</div><div style="font-weight: 400; font-size: 1.389cqw; line-height: 1.3; color: #BDBDBD; margin-top: 0.278cqw;">Energy &amp; nerve function</div></div>
+                <div style="background: #1F1F1F; border: 1px solid rgba(255,255,255,0.16); border-radius: 1.111cqw; padding: 1.296cqw 1.481cqw; display: grid; align-content: center; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), background 0.3s ease, border-color 0.3s ease;" style-hover="transform: translateY(-0.278cqw); background: #262626; border-color: rgba(240,180,60,0.55);"><div style="font-weight: 700; font-size: 1.944cqw; letter-spacing: -0.01em; color: #F0B43C;">Blueberry Polyphenols</div><div style="font-weight: 400; font-size: 1.389cqw; line-height: 1.3; color: #BDBDBD; margin-top: 0.278cqw;">Antioxidant defense</div></div>
+                <div style="border: 1px dashed rgba(255,255,255,0.22); border-radius: 1.111cqw; padding: 1.296cqw 1.481cqw; display: grid; align-content: center;"><div style="font-weight: 400; font-size: 1.389cqw; line-height: 1.35; color: #8A8A8A;">Ten ingredients total,<br>one chew a day.</div></div>
+              </div>
+              </div>
+            </div>
       </div>
+      </div>
+      </section>
 
       <!-- The evidence pile. Replaces the tabbed record card that stood here.
            Only the shell is templated: the papers are built imperatively by
@@ -6046,16 +5993,16 @@ class Component extends DCLogic {
       pdpHeadItalic: copy.italic,
       pdpBody: copy.body,
 
-      // Comparison chart. These are the design's own values, lifted from the
-      // renderVals() it shipped with — not derived. The card, the reveal band
-      // and the table's offset from the card's bottom all change together so
-      // the table stays put while the panel opens beneath it.
-      cmpArtH: this.state.cmpOpen ? '1546px' : '1228px',
-      cmpTableBottom: this.state.cmpOpen ? '474px' : '156px',
-      cmpBandH: this.state.cmpOpen ? '406px' : '88px',
+      // Comparison chart. Straight from the renderVals() the design shipped
+      // with — container-query units, so the whole thing scales with the
+      // column and these stay correct at any width.
+      cmpArtH: this.state.cmpOpen ? '143.148cqw' : '113.704cqw',
+      cmpTableBottom: this.state.cmpOpen ? '43.889cqw' : '14.444cqw',
+      cmpBandH: this.state.cmpOpen ? '37.593cqw' : '8.148cqw',
       cmpChevron: this.state.cmpOpen ? 'rotate(135deg)' : 'none',
       cmpRevealLabel: this.state.cmpOpen ? 'Hide the rest of the formula' : 'Reveal 7 more ingredients',
       cmpToggle: () => this.setState({ cmpOpen: !this.state.cmpOpen }),
+
       pdpDogShow: isDog ? 'block' : 'none',
       pdpCatShow: isDog ? 'none' : 'block',
       pdpCollage: copy.thumbs.map(t => ({ ...t, col: 'auto', row: '2' })),
