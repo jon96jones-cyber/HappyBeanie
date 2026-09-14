@@ -931,6 +931,14 @@ image-slot:not([data-filled]) { color: transparent !important; }
    reveal panel overran the band it is clipped to — visible at phone width,
    where the 1px borders are a larger share of a scaled-down layout. */
 [data-m~="cmpsec"] * { box-sizing: border-box; }
+/* Full bleed. The chart is a dark slab whose edge gradients only read as a
+   blend if the slab reaches the page edges — inset by the parent's padding it
+   leaves cream strips down both sides and the gradients fade into nothing.
+   Same negative margins the bean wall host above it uses, matched to the
+   product section's padding at each breakpoint. */
+[data-m~="cmpsec"] { margin: 0 -44px; }
+@media (max-width: 900px) { [data-m~="cmpsec"] { margin: 0 -20px; } }
+@media (max-width: 620px) { [data-m~="cmpsec"] { margin: 0 -16px; } }
 .hb-wall { background: #EDE6D8; padding: 96px 44px; border-top: 1px solid #DDD3C0; overflow: hidden; }
 .hb-wall * { box-sizing: border-box; }
 .hb-wall [data-row] { transition: background 0.2s ease; }
@@ -3316,9 +3324,9 @@ image-slot:not([data-filled]) { color: transparent !important; }
            nothing around it — no section, no background, no padding. -->
       <div data-m="cmpsec">
       <div style="font-family: 'Montserrat', system-ui, sans-serif; position: relative; width: 100%; background: #141414;">
-        <span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 150px; z-index: 2; background: linear-gradient(180deg, #F2EBDC 0%, rgba(242,235,220,0.55) 26%, rgba(20,20,20,0) 100%); pointer-events: none;"></span>
-        <span aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 110px; z-index: 2; background: linear-gradient(0deg, #F2EBDC 0%, rgba(242,235,220,0.55) 26%, rgba(20,20,20,0) 100%); pointer-events: none;"></span>
-        <div style="position: relative; z-index: 1; container-type: inline-size; width: 100%; max-width: 1080px; margin: 0 auto; padding: 150px 0 110px;">
+        <span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 150px; z-index: 2; background: linear-gradient(180deg, #EBE3D1 0%, rgba(235,227,209,0.94) 12%, rgba(235,227,209,0.78) 26%, rgba(235,227,209,0.54) 42%, rgba(235,227,209,0.30) 58%, rgba(235,227,209,0.13) 74%, rgba(235,227,209,0.04) 88%, rgba(235,227,209,0) 100%); pointer-events: none;"></span>
+        <span aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 110px; z-index: 2; background: linear-gradient(0deg, #EBE3D1 0%, rgba(235,227,209,0.94) 12%, rgba(235,227,209,0.78) 26%, rgba(235,227,209,0.54) 42%, rgba(235,227,209,0.30) 58%, rgba(235,227,209,0.13) 74%, rgba(235,227,209,0.04) 88%, rgba(235,227,209,0) 100%); pointer-events: none;"></span>
+        <div style="position: relative; z-index: 1; container-type: inline-size; width: 100%; max-width: 960px; margin: 0 auto; padding: 150px 0 110px;">
       <div style="position: relative; width: 100cqw; height: {{ cmpArtH }}; background: #141414; color: #FFFFFF; overflow: hidden; transition: height 0.55s cubic-bezier(0.2,0.7,0.2,1);">
             <div style="position: absolute; left: 3.333cqw; top: 1.852cqw; width: 37.037cqw; height: 42.593cqw;"><img src="/assets/img/compare/dog.png" alt="" style="display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom;"></div>
 
