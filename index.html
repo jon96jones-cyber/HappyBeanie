@@ -373,18 +373,6 @@ window.hbDose = function (species, lb) {
   return w < 20 ? 0.5 : w <= 100 ? 1 : 1.5;
 };
 window.hbBoxDays = function (species, lb) { return Math.round(30 / window.hbDose(species, lb)); };
-// Comparison chart geometry, in the design's own 1080px units.
-//   CMP_H_SHUT  the card closed          CMP_BAND  the reveal band closed
-//   CMP_TBOT    table offset from the card's bottom when closed
-//   CMP_GROW    how much the panel adds when it opens
-// The card, the band and the table offset all move by CMP_GROW together,
-// which is what keeps the table and the band's top edge still while the
-// panel opens under them.
-// CMP_GROW is measured, not estimated: the reveal panel's natural height is
-// 411px, so the band gains 323 over its closed 88. An earlier guess of 216
-// left the last row of ingredient cards clipped by the host's overflow.
-var CMP_H_SHUT = 1084, CMP_TBOT = 156, CMP_BAND = 88, CMP_GROW = 323;
-var CMP_H_OPEN = CMP_H_SHUT + CMP_GROW;
 window.hbSellingPlanFor = function (species, lb) {
   var sp = (window.HB_SHOPIFY && window.HB_SHOPIFY.sellingPlans) || {};
   var d30 = sp.d30 || window.HB_SHOPIFY.sellingPlan;
@@ -6058,17 +6046,15 @@ class Component extends DCLogic {
       pdpHeadItalic: copy.italic,
       pdpBody: copy.body,
 
-      // Comparison chart. The design animates three heights together: the
-      // card, the reveal band, and the table's distance from the card's
-      // bottom. The band grows downward by exactly what the card gains, and
-      // the table's offset grows by the same amount, so the table and the
-      // band's top edge both stay put while the panel opens beneath them.
-      // Measured against the design's own geometry — see hbCmpFit().
-      cmpArtH: this.state.cmpOpen ? CMP_H_OPEN + 'px' : CMP_H_SHUT + 'px',
-      cmpTableBottom: this.state.cmpOpen ? (CMP_TBOT + CMP_GROW) + 'px' : CMP_TBOT + 'px',
-      cmpBandH: this.state.cmpOpen ? (CMP_BAND + CMP_GROW) + 'px' : CMP_BAND + 'px',
-      cmpChevron: this.state.cmpOpen ? 'rotate(45deg)' : 'none',
-      cmpRevealLabel: this.state.cmpOpen ? 'Hide' : 'See what else is inside',
+      // Comparison chart. These are the design's own values, lifted from the
+      // renderVals() it shipped with — not derived. The card, the reveal band
+      // and the table's offset from the card's bottom all change together so
+      // the table stays put while the panel opens beneath it.
+      cmpArtH: this.state.cmpOpen ? '1546px' : '1228px',
+      cmpTableBottom: this.state.cmpOpen ? '474px' : '156px',
+      cmpBandH: this.state.cmpOpen ? '406px' : '88px',
+      cmpChevron: this.state.cmpOpen ? 'rotate(135deg)' : 'none',
+      cmpRevealLabel: this.state.cmpOpen ? 'Hide the rest of the formula' : 'Reveal 7 more ingredients',
       cmpToggle: () => this.setState({ cmpOpen: !this.state.cmpOpen }),
       pdpDogShow: isDog ? 'block' : 'none',
       pdpCatShow: isDog ? 'none' : 'block',
