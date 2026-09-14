@@ -931,8 +931,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
    reveal panel overran the band it is clipped to — visible at phone width,
    where the 1px borders are a larger share of a scaled-down layout. */
 [data-m~="cmpsec"] * { box-sizing: border-box; }
-@media (max-width: 900px) { [data-m~="cmpsec"] { padding: 40px 20px 44px !important; } }
-@media (max-width: 600px) { [data-m~="cmpsec"] { padding: 28px 14px 32px !important; } }
 .hb-wall { background: #EDE6D8; padding: 96px 44px; border-top: 1px solid #DDD3C0; overflow: hidden; }
 .hb-wall * { box-sizing: border-box; }
 .hb-wall [data-row] { transition: background 0.2s ease; }
@@ -3311,12 +3309,16 @@ image-slot:not([data-filled]) { color: transparent !important; }
       <!-- The bean wall: reviews + photo belt, injected by hbWallInit(). -->
       <div class="hb-wallhost--pdp" data-hb-wall-host></div>
 
-      <!-- Comparison chart (Jon's design, Sep 2026). Fluid by construction:
-           the design declares its own container-type: inline-size wrapper and
-           sizes everything in cqw, so it scales itself with the column and
-           needs nothing from us but the band around it. -->
-      <section data-m="cmpsec" style="position: relative; background: #141414; padding: 64px 44px 72px;">
-      <div style="font-family: 'Montserrat', system-ui, sans-serif; container-type: inline-size; width: 100%; max-width: 1080px; margin: 0 auto;">
+      <!-- Comparison chart (Jon's design, Sep 2026). Self-contained: the
+           export brings its own background, its own padding, the two cream
+           edge gradients that blend it into the page, and a container-query
+           wrapper that scales the whole thing with the column. It needs
+           nothing around it — no section, no background, no padding. -->
+      <div data-m="cmpsec">
+      <div style="font-family: 'Montserrat', system-ui, sans-serif; position: relative; width: 100%; background: #141414;">
+        <span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 150px; z-index: 2; background: linear-gradient(180deg, #F2EBDC 0%, rgba(242,235,220,0.55) 26%, rgba(20,20,20,0) 100%); pointer-events: none;"></span>
+        <span aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 110px; z-index: 2; background: linear-gradient(0deg, #F2EBDC 0%, rgba(242,235,220,0.55) 26%, rgba(20,20,20,0) 100%); pointer-events: none;"></span>
+        <div style="position: relative; z-index: 1; container-type: inline-size; width: 100%; max-width: 1080px; margin: 0 auto; padding: 150px 0 110px;">
       <div style="position: relative; width: 100cqw; height: {{ cmpArtH }}; background: #141414; color: #FFFFFF; overflow: hidden; transition: height 0.55s cubic-bezier(0.2,0.7,0.2,1);">
             <div style="position: absolute; left: 3.333cqw; top: 1.852cqw; width: 37.037cqw; height: 42.593cqw;"><img src="/assets/img/compare/dog.png" alt="" style="display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom;"></div>
 
@@ -3388,8 +3390,9 @@ image-slot:not([data-filled]) { color: transparent !important; }
               </div>
             </div>
       </div>
+        </div>
       </div>
-      </section>
+      </div>
 
       <!-- The evidence pile. Replaces the tabbed record card that stood here.
            Only the shell is templated: the papers are built imperatively by
