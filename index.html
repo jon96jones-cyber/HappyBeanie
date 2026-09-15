@@ -679,15 +679,108 @@ if (!window.__hbInternal) {
     return narrow ? { dog: 0, cat: 0 } : { dog: 12, cat: 16 };
   }
 
-  // The finished state: pets up, chews gone, tag showing. Used for anyone who
-  // asked for reduced motion, so they get the picture without the movement.
+  // The chews used to fall until the dog ate them: they shrank to nothing about
+  // three quarters through the section, and the rest of the scroll played out
+  // over an empty frame. They now stop partway down and stay put for whatever
+  // is left of the section (Jon, Sep 2026).
+  //
+  // How far down the stage the lowest chew is allowed to get. The fall itself is
+  // untouched — it runs the same distance on the same curve it always did — and
+  // this only stops it early, which is what was asked for: not lower than here,
+  // and stay there. On a short window the chews are already at the mark when
+  // they start, so they simply hold from the top of the section.
+  //
+  // It has to be a place on the screen rather than a distance, because the same
+  // number of pixels lands somewhere quite different on a short window than a
+  // tall one, and this is a composition — the chews sit above the dog's chest
+  // wherever the picture is drawn.
+  var FLOOR_PCT = 0.42;
+
+  // The point in the fall that reaches the mark. Solved off the rendered page
+  // rather than written down, because what has to land on the mark is the
+  // lowest chew's bottom edge, and that sits somewhere inside a box being
+  // scaled and tumbled — its offset from the drop is not a constant, so the
+  // drop cannot be converted into this. Re-solved whenever the viewport
+  // changes.
+  var capFall = 1;
+  var solvedFor = '';
+
+  // Paint the frame a given fall progress would produce, so it can be measured.
+  // Only ever called with tick() about to repaint the real one.
+  function paintFall(f) {
+    set('hbCatchChews', 'translateY(' + (-2 + 30 * f) + 'vh) scale(' + (1 - 0.22 * f) + ')');
+    for (var i = 0; i < 3; i++) {
+      set('hbCatchChew' + (i + 1), 'translateY(' + (i * 6) + 'px) rotate(' + ((i - 1) * 14 + 120 * f) + 'deg)', 1);
+    }
+  }
+
+  function lowestChew() {
+    var lo = null;
+    for (var i = 1; i <= 3; i++) {
+      var n = document.getElementById('hbCatchChew' + i);
+      if (!n) continue;
+      var b = n.getBoundingClientRect();
+      if (!lo || b.bottom > lo.bottom) lo = b;
+    }
+    return lo;
+  }
+
+  // Find where the fall has to stop: walk it and keep the last step whose lowest
+  // chew is still above the mark.
+  //
+  // The mark is measured down the sticky stage rather than down the window,
+  // even though the two are the same box once it pins. They are not the same
+  // while the reader is anywhere else on the page, and this gets solved on
+  // whichever tick first finds the section laid out — which is usually one of
+  // those. Against the window it produced a stopping point thousands of pixels
+  // out.
+  function solveFloor() {
+    var box = document.getElementById('hbCatchChews');
+    var stage = box && box.offsetParent;
+    if (!stage) return false;
+    var st = stage.getBoundingClientRect();
+    // The SPA has the section in the document before it has a box to measure:
+    // the ids resolve, the rects come back all zeroes, and an answer taken from
+    // that is silently wrong rather than obviously missing. Wait for real
+    // geometry instead of caching nothing.
+    if (!st.height) return false;
+    var mark = st.top + FLOOR_PCT * st.height;
+
+    var cap = 0, ok = false;
+    for (var i = 0; i <= 60; i++) {
+      var f = i / 60;
+      paintFall(f);
+      var lo = lowestChew();
+      if (!lo || !lo.height) return false;
+      ok = true;
+      if (lo.bottom > mark) break;
+      cap = f;
+    }
+    if (!ok) return false;
+    capFall = cap;
+    return true;
+  }
+
+  function ensureFloor() {
+    var key = window.innerWidth + 'x' + window.innerHeight;
+    if (key === solvedFor) return;
+    var was = capFall;
+    // Only remember the answer once it came from something measurable; an
+    // early tick keeps the previous stopping point and tries again on the next.
+    if (solveFloor()) solvedFor = key;
+    else capFall = was;
+  }
+
+  // The finished state: pets up, chews resting above the nose, tag showing.
+  // Used for anyone who asked for reduced motion, so they get the picture
+  // without the movement.
   function rest() {
     var e = ends();
     set('hbCatchHead', 'translateY(-70px)', 0);
     set('hbCatchDog', 'translateY(' + e.dog + '%) rotate(0deg)');
     set('hbCatchCat', 'translateY(' + e.cat + '%) rotate(0deg)');
-    set('hbCatchChews', 'translateY(28vh) scale(0.78)');
-    for (var i = 1; i <= 3; i++) set('hbCatchChew' + i, 'scale(0)', 0);
+    ensureFloor();
+    paintFall(capFall);
     set('hbCatchTag', 'translateY(0px)', 1);
   }
 
@@ -695,6 +788,7 @@ if (!window.__hbInternal) {
     var wrap = document.getElementById('hbCatchWrap');
     if (!wrap) return;
     if (REDUCED) { rest(); return; }
+    ensureFloor();
 
     var r = wrap.getBoundingClientRect();
     var span = Math.max(1, r.height - window.innerHeight);
@@ -711,13 +805,11 @@ if (!window.__hbInternal) {
     var cat = ease(seg(0.22, 0.72));
     set('hbCatchCat', 'translateY(' + (100 - (100 - end.cat) * cat) + '%) rotate(' + (-5 + 5 * cat) + 'deg)');
 
-    var fall = ease(seg(0.06, 0.62));
-    set('hbCatchChews', 'translateY(' + (-2 + 30 * fall) + 'vh) scale(' + (1 - 0.22 * fall) + ')');
-    [seg(0.56, 0.66), seg(0.60, 0.70), seg(0.64, 0.74)].forEach(function (e, i) {
-      set('hbCatchChew' + (i + 1),
-        'translateY(' + (i * 6 - 40 * e) + 'px) rotate(' + ((i - 1) * 14 + 120 * fall) + 'deg) scale(' + (1 - e) + ')',
-        1 - e);
-    });
+    // Stopped at the mark, so every frame from there to the end of the section
+    // paints the chews in that same spot. Capping the progress rather than the
+    // drop freezes the tumble and the shrink along with it, so they settle
+    // instead of spinning in place.
+    paintFall(Math.min(capFall, ease(seg(0.06, 0.62))));
 
     var tag = ease(seg(0.72, 0.90));
     set('hbCatchTag', 'translateY(' + (40 - 40 * tag) + 'px)', tag);
