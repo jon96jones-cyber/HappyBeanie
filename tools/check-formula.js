@@ -114,10 +114,41 @@ if (arr && txt) {
   }
 }
 
+// ---- one name for the collagen, everywhere it is the product's own ---------
+// It used to be called three different things: UC-II(R) Collagen in the grid,
+// Collagen Peptide II on the dog label, Collagen Peptide Blend on the cat's.
+// Outside readers noticed. These are the shapes that must not come back.
+//
+// Two places legitimately say something else and are left alone:
+//   - the certificate of analysis panel, which reproduces a third-party lab's
+//     test line and is not ours to reword;
+//   - the research summaries, which describe what a published study used.
+// Both are listed here so the exception is visible rather than silently
+// skipped. Anything else is drift.
+const ALLOWED_OTHER = [
+  "'Collagen peptide blend, identity'",          // COA panel, Sonoran Analytical
+  "'Collagen peptides taken by mouth survived",  // study result
+  'undenatured type II collagen',                // study result
+  'UNDENATURED_TYPE_II_COLLAGEN',                // study URL
+  "'Collagen is a protein load"                  // renal caution body text
+];
+const STALE = ['Collagen Peptide II', 'Collagen Peptide Blend'];
+for (const bad of STALE) {
+  if (html.includes(bad)) fail.push(`the collagen is still called "${bad}" somewhere; it is UC-II\u00ae Collagen Peptide now`);
+}
+// A bare "UC-II collagen" with no "peptide" after it is the other way it drifts.
+const bareRe = /UC-II(\u00ae)?\s+([Cc])ollagen(?!\s+[Pp]eptide)/g;
+let bm;
+while ((bm = bareRe.exec(html))) {
+  const ctx = html.slice(Math.max(0, bm.index - 60), bm.index + 60);
+  if (ALLOWED_OTHER.some(a => ctx.includes(a))) continue;
+  fail.push(`"${bm[0].trim()}" at offset ${bm.index} is missing "peptide": ...${ctx.replace(/\s+/g, ' ').trim()}...`);
+}
+
 if (fail.length) {
   console.error('check-formula: the product page states its formula in more than one place and they disagree.\n');
   fail.forEach(f => console.error('  - ' + f));
   console.error('\nFix the copy that is wrong; do not just silence this.');
   process.exit(1);
 }
-console.log(`check-formula: dog ${arr.dog.length}, cat ${arr.cat.length} — grid, plain text and JSON-LD all agree.`);
+console.log(`check-formula: dog ${arr.dog.length}, cat ${arr.cat.length} — grid, plain text and JSON-LD all agree; one name for the collagen.`);
