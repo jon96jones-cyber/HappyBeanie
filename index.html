@@ -268,13 +268,6 @@
         },
         {
           "@type": "PropertyValue",
-          "propertyID": "activeIngredient",
-          "position": 10,
-          "name": "Chamomile Extract",
-          "value": "Calming & digestive comfort"
-        },
-        {
-          "@type": "PropertyValue",
           "propertyID": "servingSize",
           "name": "Serving size",
           "value": "One soft chew. 30 chews per box."
@@ -2723,7 +2716,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
   <section id="formula" data-m="pad short" style="position: relative; background: #17140F; color: #F5F0E6; padding: 78px 44px 88px; overflow: hidden;">
     <div style="max-width: 1180px; margin: 0 auto;">
       <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 20px;">What is inside</div>
-      <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em; color: #F5F0E6;">10 ingredients, 20 benefits, <span style="color: oklch(0.86 0.14 92);">one chew.</span></h2>
+      <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em; color: #F5F0E6;">{{ insideCount }} ingredients, {{ insideBenefits }} benefits, <span style="color: oklch(0.86 0.14 92);">one chew.</span></h2>
       <div style="position: relative; border: 1.5px solid rgba(245,240,230,0.24); border-radius: 6px; background: #1E1A14; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(0,0,0,0.7), 0 0 0 5px rgba(245,240,230,0.04);">
         <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(245,240,230,0.16); background: rgba(245,240,230,0.04); font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B9AF9C;">
           <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Fully Transparent Ingredient Profile</span>
@@ -3303,7 +3296,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
     <section id="inside" data-m="pad short" style="position: relative; background: #17140F; color: #F5F0E6; padding: 88px 44px 0; overflow: hidden;">
       <div style="max-width: 1180px; margin: 0 auto;">
         <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 20px;">What is inside</div>
-        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em; color: #F5F0E6;">10 ingredients, 20 benefits, <span style="color: oklch(0.86 0.14 92);">one chew.</span></h2>
+        <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(28px, 3.2vw, 46px); line-height: 1.05; margin: 0 0 30px; max-width: 22em; color: #F5F0E6;">{{ insideCount }} ingredients, {{ insideBenefits }} benefits, <span style="color: oklch(0.86 0.14 92);">one chew.</span></h2>
         <div style="position: relative; border: 1.5px solid rgba(245,240,230,0.24); border-radius: 6px; background: #1E1A14; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(0,0,0,0.7), 0 0 0 5px rgba(245,240,230,0.04);">
           <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(245,240,230,0.16); background: rgba(245,240,230,0.04); font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B9AF9C;">
             <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Fully Transparent Ingredient Profile</span>
@@ -3325,7 +3318,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <li>L-Carnitine — Fat metabolism &amp; lean muscle maintenance</li>
             <li>UC-II® Collagen Peptide — Cartilage &amp; connective tissue</li>
           </ul>
-          <h3>Happy Beanie cat formula — 10 active ingredients</h3>
+          <h3>Happy Beanie cat formula — 9 active ingredients</h3>
           <ul>
             <li>Omega-3 EPA/DHA (Salmon oil) — Brain, heart, joints &amp; inflammation</li>
             <li>Taurine — Heart muscle function, eye health &amp; nervous system</li>
@@ -3336,7 +3329,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
             <li>B-Complex (B12 · B6 · Riboflavin) — Energy metabolism &amp; nerve function</li>
             <li>CoQ10 (Ubiquinol) — Cardiac energy &amp; mitochondrial support</li>
             <li>L-Carnitine — Fat metabolism &amp; lean muscle maintenance</li>
-            <li>Chamomile Extract — Calming &amp; digestive comfort</li>
           </ul>
         </div>
           <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: rgba(245,240,230,0.16);">
@@ -4174,7 +4166,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <sc-if value="{{ qzCanBuy }}" hint-placeholder-val="{{ false }}">
           <div style="margin: 40px 0 40px;">
             <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">What is inside</div>
-            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(26px, 3vw, 40px); line-height: 1.05; color: #17140F; margin: 0 0 26px; max-width: 22em;">10 ingredients, 20 benefits, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
+            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(26px, 3vw, 40px); line-height: 1.05; color: #17140F; margin: 0 0 26px; max-width: 22em;">{{ insideCount }} ingredients, {{ insideBenefits }} benefits, <span style="color: oklch(0.44 0.07 152);">one chew.</span></h2>
             <div style="position: relative; border: 1.5px solid #8A7F6E; border-radius: 6px; background: #FCFAF4; overflow: hidden; box-shadow: 0 26px 50px -34px rgba(23,20,15,0.32), 0 0 0 5px rgba(138,127,110,0.1);">
               <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(23,20,15,0.14); background: rgba(23,20,15,0.03); font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6A6055;">
                 <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Benefit profile · {{ qzBuyName }}</span>
@@ -6157,9 +6149,9 @@ class Component extends DCLogic {
         const is3d = this.state.pdpView === '3d';
         const ready = this.state.pdpReady;
         const factsAll = isDog
-          ? ['Omega-3 EPA/DHA', 'Turkey Tail', 'Elk Liver', 'B-Complex', 'L-Carnitine', 'Green-Lipped Mussel',
-             'Curcumin', 'Elk Velvet Antler', 'Polyphenols', 'CoQ10', 'UC-II® Collagen Peptide']
-          : ['Omega-3 EPA/DHA', 'Green-Lipped Mussel', 'Polyphenols', 'B-Complex', 'L-Carnitine',
+          ? ['Omega-3 EPA/DHA', 'Turkey Tail', 'Elk Blend', 'B-Complex', 'L-Carnitine', 'Green-Lipped Mussel',
+             'Curcumin', 'Blueberry Polyphenols', 'CoQ10', 'UC-II® Collagen Peptide']
+          : ['Omega-3 EPA/DHA', 'Green-Lipped Mussel', 'Blueberry Polyphenols', 'B-Complex', 'L-Carnitine',
              'Taurine', 'UC-II® Collagen Peptide', 'Organic Cranberry Extract', 'CoQ10'];
         // Three columns reading down each in turn, filled four rows at a time
         // like the dog label, so both species' labels stand the same height;
@@ -6344,6 +6336,13 @@ class Component extends DCLogic {
       })),
       // "What is inside" flip cards — species-aware ingredient list with
       // per-card open state, drag handlers and live style objects.
+      // The headline over the grid used to hard-code ten, which was true of the
+      // dog formula and only of the dog formula — the cat's is nine. These two
+      // are written out rather than counted off insideList because the list is
+      // built inline below and is not in scope yet; tools/check-formula.js
+      // fails the build if either stops matching the list it describes.
+      insideCount: (this.state.sp === 'cat' ? 9 : 10),
+      insideBenefits: (this.state.sp === 'cat' ? 18 : 20),
       insideList: (this.state.sp === 'cat' ? [
         { name: 'Omega-3 EPA/DHA', sub: 'Salmon oil', benefit: 'Brain, heart, joints & inflammation' },
         { name: 'Taurine', sub: '', benefit: 'Heart muscle function, eye health & nervous system' },
@@ -6353,8 +6352,7 @@ class Component extends DCLogic {
         { name: 'Organic Cranberry Extract', sub: '', benefit: 'Urinary tract support & antioxidant protection' },
         { name: 'B-Complex', sub: 'B12 · B6 · Riboflavin', benefit: 'Energy metabolism & nerve function' },
         { name: 'CoQ10', sub: 'Ubiquinol', benefit: 'Cardiac energy & mitochondrial support' },
-        { name: 'L-Carnitine', sub: '', benefit: 'Fat metabolism & lean muscle maintenance' },
-        { name: 'Chamomile Extract', sub: '', benefit: 'Calming & digestive comfort' }
+        { name: 'L-Carnitine', sub: '', benefit: 'Fat metabolism & lean muscle maintenance' }
       ] : [
         { name: 'Omega-3 EPA/DHA', sub: 'Salmon oil · MCT oil', benefit: 'Brain, heart, joints & inflammation' },
         { name: 'Curcumin', sub: '', benefit: 'Anti-inflammatory & antioxidant' },
@@ -6969,12 +6967,12 @@ const QZ_QUESTIONS = [
       { speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'The dog formula\u2019s immune layer is a mushroom extract at a functional dose. The cat formula is mushroom-free.') } ] },
     { v: 'beef', label: 'Beef', meta: '' },
     { v: 'organ', label: 'Organ meat or game', meta: '', flags: [{ speciesOnly: 'dog', ...QZ_F('caution', 'Elk Liver (freeze-dried)', 'Pri. 05', 'The dog formula carries freeze-dried elk liver. Game and organ meat sit close enough to it to matter — introduce at half dose for a week and watch for itching or loose stool.') }] },
-    { v: 'ragweed', label: 'Ragweed, daisy or pollen sensitivity', meta: 'Chamomile is in the same botanical family', flags: [QZ_F('caution', 'Chamomile Extract', 'Dog Pri. 12 · Cat Pri. 11', 'Chamomile is an Asteraceae botanical and can cross-react with ragweed-family allergies. Start at half dose and watch the face and ears for 48 hours.')] } ] },
+ ] },
   { id: 'meds', kind: 'multi', eyebrow: 'Question 06 · Medication', title: 'Is your pet on any of these medications?', help: 'This is the most important question on the screener. Select everything currently prescribed, including anything given seasonally.', options: [
     { v: 'none', label: 'No medication at all', meta: 'Nothing prescription, nothing daily', exclusive: true },
     { v: 'anticoag', label: 'Blood thinner or anticoagulant', meta: 'Clopidogrel, warfarin, aspirin therapy', flags: [QZ_F('caution', 'Omega-3 · Curcumin · CoQ10', 'Pri. 01 · 02 · 09', 'Three inputs independently affect platelet function and clotting time. Read this one carefully and decide deliberately before the first chew — this is not a start-and-see-how-it-goes situation.')] },
     { v: 'immuno', label: 'Immunosuppressant or long-term steroid', meta: 'Cyclosporine, prednisone, Atopica', flags: [{ speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'The dog formula\u2019s mushroom layer is an immune modulator and works directly against a drug prescribed to suppress immunity. These two pull in opposite directions — weigh that carefully before stacking them.') }] },
-    { v: 'sedative', label: 'Sedative, anti-anxiety or anticonvulsant', meta: 'Trazodone, gabapentin, phenobarbital, fluoxetine', flags: [QZ_F('caution', 'Chamomile · L-Carnitine', 'Pri. 12 · 10', 'Chamomile is mildly sedating and can deepen drowsiness; carnitine can shift seizure-medication levels. Weigh both against your pet’s current medication before adding.')] },
+    { v: 'sedative', label: 'Sedative, anti-anxiety or anticonvulsant', meta: 'Trazodone, gabapentin, phenobarbital, fluoxetine', flags: [QZ_F('caution', 'L-Carnitine', 'Pri. 10', 'Carnitine can shift seizure-medication levels. Weigh it against your pet’s current medication before adding.')] },
     { v: 'thyroid', label: 'Thyroid or cardiac medication', meta: 'Levothyroxine, pimobendan, methimazole', flags: [QZ_F('caution', 'CoQ10 · L-Carnitine', 'Pri. 09 · 10', 'Both inputs act on cardiac energy metabolism. Beneficial in many cases — just account for them before any dose adjustments.')] },
     { v: 'daily', label: 'Any other daily oral medication', meta: 'Given by mouth on a schedule' } ] },
   { id: 'conditions', kind: 'multi', eyebrow: 'Question 07 · History', title: 'Has your pet been diagnosed with any of these?', help: 'Select everything on record, past or present. A resolved episode still matters — pancreatitis and obstruction both recur.', options: [

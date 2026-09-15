@@ -114,6 +114,25 @@ if (arr && txt) {
   }
 }
 
+// ---- the headline count over the grid -------------------------------------
+// "N ingredients, 2N benefits" is written out in the view model because the
+// list is not in scope where it is declared. Hold it to the list here.
+if (arr) {
+  const want = { dog: arr.dog.length, cat: arr.cat.length };
+  const m = html.match(/insideCount:\s*\(this\.state\.sp === 'cat' \? (\d+) : (\d+)\)/);
+  const b = html.match(/insideBenefits:\s*\(this\.state\.sp === 'cat' \? (\d+) : (\d+)\)/);
+  if (!m) fail.push('could not find insideCount in the view model');
+  else {
+    if (+m[1] !== want.cat) fail.push(`insideCount says ${m[1]} for cat, the list has ${want.cat}`);
+    if (+m[2] !== want.dog) fail.push(`insideCount says ${m[2]} for dog, the list has ${want.dog}`);
+  }
+  if (!b) fail.push('could not find insideBenefits in the view model');
+  else {
+    if (+b[1] !== want.cat * 2) fail.push(`insideBenefits says ${b[1]} for cat, expected ${want.cat * 2}`);
+    if (+b[2] !== want.dog * 2) fail.push(`insideBenefits says ${b[2]} for dog, expected ${want.dog * 2}`);
+  }
+}
+
 // ---- one name for the collagen, everywhere it is the product's own ---------
 // It used to be called three different things: UC-II(R) Collagen in the grid,
 // Collagen Peptide II on the dog label, Collagen Peptide Blend on the cat's.
