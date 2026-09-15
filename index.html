@@ -1193,6 +1193,15 @@ image-slot:not([data-filled]) { color: transparent !important; }
    whole copies of its photo set, so the -50% loop never shows its end; the
    duration is set there too, from a fixed px/s, so the pace does not change
    with how many copies a given screen needed. */
+/* Off-screen but genuinely present: read by screen readers, by crawlers, and
+   by the AI assistants customers paste this page into. The ingredient grid is
+   built by JavaScript from a species-switched array, so to anything that does
+   not run scripts the page's only plain-text ingredient list was the
+   comparison chart's seven-name "ingredients Jope doesn't carry" column — which
+   is exactly how outside readers came away with seven of ten and no cat
+   formula at all. This is the same content the grid shows, in the same order,
+   for both species at once. */
+.hb-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .hb-track { display: flex; gap: 12px; width: max-content; will-change: transform; }
 .hb-track--a { animation: hbBeltL 60s linear infinite; }
 .hb-track--b { animation: hbBeltR 70s linear infinite; }
@@ -3299,6 +3308,37 @@ image-slot:not([data-filled]) { color: transparent !important; }
           <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; border-bottom: 1px solid rgba(245,240,230,0.16); background: rgba(245,240,230,0.04); font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B9AF9C;">
             <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.72 0.16 152); animation: qzBlip 1.6s ease-in-out infinite;"></span>Fully Transparent Ingredient Profile</span>
           </div>
+        <!-- The formula in plain text, for every reader that never runs the
+             script that builds the grid below. Kept in step with insideList by
+             tools/check-formula.js, which fails if the two drift apart. -->
+        <div class="hb-sr" data-hb-formula>
+          <h3>Happy Beanie dog formula — 10 active ingredients</h3>
+          <ul>
+            <li>Omega-3 EPA/DHA (Salmon oil · MCT oil) — Brain, heart, joints &amp; inflammation</li>
+            <li>Curcumin — Anti-inflammatory &amp; antioxidant</li>
+            <li>Turkey Tail (Mushroom extract) — Immune regulation</li>
+            <li>Elk Blend (Velvet antler · freeze-dried liver) — Joint repair, whole-food vitamin A &amp; iron</li>
+            <li>Green-Lipped Mussel (Powder) — Joint repair &amp; mobility</li>
+            <li>Blueberry Polyphenols — Cellular antioxidant defense</li>
+            <li>B-Complex (B12 · B6 · Riboflavin) — Energy metabolism &amp; nerve function</li>
+            <li>CoQ10 (Ubiquinol) — Cardiac energy &amp; mitochondrial support</li>
+            <li>L-Carnitine — Fat metabolism &amp; lean muscle maintenance</li>
+            <li>UC-II® Collagen — Cartilage &amp; connective tissue</li>
+          </ul>
+          <h3>Happy Beanie cat formula — 10 active ingredients</h3>
+          <ul>
+            <li>Omega-3 EPA/DHA (Salmon oil) — Brain, heart, joints &amp; inflammation</li>
+            <li>Taurine — Heart muscle function, eye health &amp; nervous system</li>
+            <li>Green-Lipped Mussel (Powder) — Joint repair &amp; mobility</li>
+            <li>UC-II® Collagen — Cartilage &amp; connective tissue</li>
+            <li>Blueberry Polyphenols — Cellular antioxidant defense</li>
+            <li>Organic Cranberry Extract — Urinary tract support &amp; antioxidant protection</li>
+            <li>B-Complex (B12 · B6 · Riboflavin) — Energy metabolism &amp; nerve function</li>
+            <li>CoQ10 (Ubiquinol) — Cardiac energy &amp; mitochondrial support</li>
+            <li>L-Carnitine — Fat metabolism &amp; lean muscle maintenance</li>
+            <li>Chamomile Extract — Calming &amp; digestive comfort</li>
+          </ul>
+        </div>
           <div data-m="bnrows" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: rgba(245,240,230,0.16);">
             <sc-for list="{{ insideList }}" as="ig" hint-placeholder-count="10">
               <div data-m="flipwrap flipdark" tabindex="0" data-open="{{ ig.openFlag }}" sc-camel-on-click="{{ ig.tap }}" style="position: relative; height: 84px; overflow: hidden; background: #1E1A14; outline: none;"><span data-m="fliparrow" style="{{ ig.trackStyleDark }}" sc-camel-on-pointer-down="{{ ig.down }}" sc-camel-on-pointer-move="{{ ig.move }}" sc-camel-on-pointer-up="{{ ig.up }}" sc-camel-on-pointer-cancel="{{ ig.up }}"><span style="{{ ig.fillStyleDark }}"></span><span style="{{ ig.knobStyleDark }}"></span></span>
