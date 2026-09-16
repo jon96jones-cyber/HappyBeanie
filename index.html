@@ -1650,7 +1650,9 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .hbm-menu { position: fixed; inset: 0; z-index: 70; display: none; flex-direction: column; background: #F5F0E6; transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.2,0.7,0.2,1), visibility 0.28s; overscroll-behavior: contain; }
 .hbm-menu * { box-sizing: border-box; }
 .hbm-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 22px 16px; }
-.hbm-head__mark { display: flex; align-items: baseline; gap: 9px; }
+.hbm-head__mark { display: flex; align-items: baseline; gap: 9px; background: none; border: 0; padding: 0; margin: 0; font: inherit; text-align: left; cursor: pointer; }
+.hbm-head__mark:focus { outline: none; }
+.hbm-head__mark:focus-visible { outline: 2px solid #17140F; outline-offset: 4px; border-radius: 2px; }
 .hbm-head__mark b { font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.045em; font-size: 23px; color: #17140F; }
 .hbm-head__mark span { font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; }
 .hbm-close { flex: none; width: 42px; height: 42px; display: grid; place-items: center; border: 1.5px solid #17140F; border-radius: 3px; background: transparent; color: #17140F; font-size: 19px; line-height: 1; cursor: pointer; touch-action: manipulation; }
@@ -2730,7 +2732,12 @@ image-slot:not([data-filled]) { color: transparent !important; }
        inside the header's own box instead of covering the screen. -->
   <nav data-m="hbmenu" class="hbm-menu" aria-label="Menu" aria-hidden="{{ menuHidden }}" style="opacity: {{ menuOp }}; visibility: {{ menuVis }}; transform: {{ menuTf }};">
     <div class="hbm-head">
-      <span class="hbm-head__mark"><b>happy beanie</b><span>Hormone care</span></span>
+      <!-- The wordmark goes home, the way it does in the header. A real button
+           rather than the header's clickable div: this panel is an overlay
+           people tab through, so the one control up here that is not the close
+           button should be reachable and announced like one. nav() already
+           closes the menu, so this needs no second handler. -->
+      <button type="button" class="hbm-head__mark" sc-camel-on-click="{{ goHome }}" aria-label="Happy Beanie — go to the home page"><b>happy beanie</b><span>Hormone care</span></button>
       <button sc-camel-on-click="{{ closeMenu }}" class="hbm-close" type="button" aria-label="Close menu" data-hbm-close>&times;</button>
     </div>
 
@@ -8369,20 +8376,28 @@ Component.prototype.renderVals = function () {
     var jitter = (Math.random() * 2 - 1) * (W_SLIVER / 2) * 0.6;
     wAngle = wAngle - (wAngle % 360) + 360 * 6 + 360 + jitter;
     if (wRotor) {
-      // The old curve had a very long tail: the wheel dropped to a readable
-      // crawl at 1.8s and then kept turning another 176 degrees over 2.7
-      // seconds, which is the whole window in which a label can be watched
-      // rotating through upside down. This one still eases out, but settles
-      // shortly after it becomes readable — 69 degrees over half a second.
-      wRotor.style.transition = reduced ? 'none' : 'transform 4s cubic-bezier(0.05, 0.6, 0.8, 1)';
+      // Two failure modes, and this curve sits between them.
+      //
+      // The original had a very long tail: readable at 1.8s, then another 176
+      // degrees over 2.7 seconds, which is a long time to watch a label rotate
+      // through upside down. The fix overcorrected — it held near full speed
+      // and then stopped, 23 degrees over a quarter second, which is not a
+      // wheel slowing down, it is a wheel being switched off (Jon: "it lands
+      // on grand prize too fast").
+      //
+      // This one coasts: about 128 degrees over 1.9 seconds after it becomes
+      // readable, roughly a third of a turn to watch it settle. Measured off
+      // the curve rather than guessed — see spincurve.js in the scratchpad.
+      wRotor.style.transition = reduced ? 'none' : 'transform 5.5s cubic-bezier(0.08, 0.62, 0.42, 1)';
       wRotor.style.transform = 'rotate(' + wAngle + 'deg)';
     }
     try { if (window.hbTrack) window.hbTrack('popup_fed', { species: 'wheel' }); } catch (e) {}
-    // Swap to the landed arcs while the wheel is still a blur — about 600
-    // degrees a second at this mark, against the 150 or so where the labels
-    // become readable. Doing it at the stop instead left every label facing
-    // the wrong way through the whole slow-down and then jumped them into
-    // place, which is the part that looked broken.
+    // Swap to the landed arcs while the wheel is still a blur — 819 degrees a
+    // second at this mark on the current curve, against the 150 or so where
+    // the labels become readable. Doing it at the stop instead left every
+    // label facing the wrong way through the whole slow-down and then jumped
+    // them into place, which is the part that looked broken. The longer curve
+    // is still well clear of readable here, so this mark did not have to move.
     clearTimeout(wArcTimer);
     wArcTimer = setTimeout(function () { wArcs(true); }, reduced ? 0 : 900);
     wTimer = setTimeout(function () {
@@ -8396,7 +8411,7 @@ Component.prototype.renderVals = function () {
       wNote.textContent = 'Enter your email to reveal it';
       wStepEmail.hidden = false;
       setTimeout(function () { try { wInput.focus({ preventScroll: true }); } catch (e) {} }, 120);
-    }, reduced ? 200 : 4100);
+    }, reduced ? 200 : 5600);
   }
 
   wSpinBtn.addEventListener('click', wSpin);
