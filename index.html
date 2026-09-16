@@ -4564,6 +4564,24 @@ const POP_AUTH_WAIT = 9000;
 // Pages the popup must never interrupt. Two of them are converting; the quiz
 // already asks for the address itself, and asking twice reads as a shakedown.
 const POP_NEVER = ['cart', 'checkout', 'quiz'];
+// Which card each page asks with (Jon, Sep 2026). The wheel is the product
+// page's alone — it is the one page where someone is looking at the thing and
+// a discount is the right ask. Everywhere else the research card is back,
+// because on a page about dosing or the certificates the reader is weighing
+// the evidence, and an offer to read the studies fits that better than a
+// spin for 10% off.
+//
+// A page that is in neither list gets no popup at all, which is why this is a
+// map and not a flag: shop is the one such page, and leaving it out of both
+// was deliberate rather than forgotten.
+const POP_MODE = {
+  product: 'wheel',
+  home: 'research',
+  dosing: 'research',
+  certs: 'research',
+  about: 'research',
+  contact: 'research'
+};
 
 class Component extends DCLogic {
   state = { igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', topic: 0, sent: false, pct: 0,
@@ -4641,7 +4659,11 @@ class Component extends DCLogic {
     if (!POP_ON) return no('switched off in the build');
     if (!window.HBPop) return no('the popup component is missing — this page is an older deploy');
     if (this._popShown || window.HBPop.isOpen()) return;
-    if (this._popForce) { this._popShown = true; window.HBPop.open(); return; }
+    if (this._popForce) {
+      this._popShown = true;
+      window.HBPop.open(POP_MODE[this.state.page || 'home'] || 'wheel');
+      return;
+    }
     // The floor is there to stop a fast scroll or a stray cursor firing this
     // the instant the page paints. The dwell timer is already a time gate, so
     // it is exempt — otherwise the two are set to the same mark and a
@@ -4649,6 +4671,8 @@ class Component extends DCLogic {
     if (kind !== 'dwell' && (!this._popBorn || Date.now() - this._popBorn < POP_FLOOR)) return;
     const page = this.state.page || 'home';
     if (POP_NEVER.indexOf(page) !== -1) return no('the ' + page + ' page is never interrupted');
+    const popMode = POP_MODE[page];
+    if (!popMode) return no('no card is assigned to the ' + page + ' page');
     // The product page used to be held back to exit-intent, and then to a 70%
     // scroll on touch. Both are gone: the dwell timer does the work,
     // every time, so those branches were unreachable, and an unreachable rule
@@ -4693,7 +4717,7 @@ class Component extends DCLogic {
     this._popShown = true;
     this._popLastOpen = Date.now();
     this._popLastPage = page;
-    window.HBPop.open();
+    window.HBPop.open(popMode);
   }
 
   // Arriving at the product page re-arms the popup. Navigation here is
@@ -8742,7 +8766,7 @@ Component.prototype.renderVals = function () {
     if (pop.hasAttribute('data-on')) { trap = false; close(); }
   });
 
-  function open() {
+  function open(want) {
     if (pop.hasAttribute('data-on')) return;
     returnTo = document.activeElement;
     // Where the page is standing. Scroll is locked from here until it closes,
@@ -8754,12 +8778,15 @@ Component.prototype.renderVals = function () {
     // before gets the bean and the code — the two-offer ladder. hb-seen is
     // the marker; pre-existing hb-pop records count as seen too, so nobody
     // who already met the bean is greeted like a stranger.
-    // One offer, one card (Jon, Sep 2026). The wheel replaced the research
-    // ask, and the bean card is paused because it handed out the same 10%
-    // from a second place — two popups competing to give away one discount.
-    // Both are still in the page and still reachable with ?popmode=, so
-    // turning either back on is a one-word change here.
-    var mode = 'wheel';
+    // Which card to show is the caller's decision, because the caller is the
+    // one that knows what page this is — see POP_MODE. The wheel is the
+    // fallback for anything that opens the popup without saying.
+    //
+    // The bean card stays paused: it handed out the same 10% the wheel does,
+    // from a second place. It is still in the page and still reachable with
+    // ?popmode=bean, as are the other two, which is also how to look at one
+    // from a page that does not normally show it.
+    var mode = (want === 'bean' || want === 'research' || want === 'wheel') ? want : 'wheel';
     try { var q = new URLSearchParams(location.search).get('popmode'); if (q === 'bean' || q === 'research' || q === 'wheel') mode = q; } catch (e) {}
     try { localStorage.setItem('hb-seen', '1'); } catch (e) {}
     // The desk's popup funnel starts here: shown → fed → captured/declined.
