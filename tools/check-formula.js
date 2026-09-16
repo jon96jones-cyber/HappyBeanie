@@ -18,6 +18,7 @@ const SRC = path.join(__dirname, '..', 'index.html');
 const html = fs.readFileSync(SRC, 'utf8');
 
 const fail = [];
+let chartWhere = null;
 
 // ---- insideList: the array the grid renders from ------------------------
 // Both species live in one ternary, cat first. Slice from the property to the
@@ -141,11 +142,25 @@ if (arr) {
 // It has been wrong before: it reached ten by splitting the elk blend in two
 // and leaving green-lipped mussel out altogether, which is how outside readers
 // came away with the wrong list.
+//
+// The chart can also be parked out of the page (see parked/comparison-chart.html).
+// Follow it there rather than going quiet: a parked chart is still copy that
+// will be pasted back or turned into an image, and it drifting from the formula
+// while nobody is checking is exactly how it went wrong the first time.
 if (arr) {
-  const at = html.indexOf('data-m="cmpsec"');
-  if (at === -1) fail.push('could not find the comparison chart');
+  const PARKED = path.join(__dirname, '..', 'parked', 'comparison-chart.html');
+  let src = html, where = 'on the page';
+  let at = html.indexOf('data-m="cmpsec"');
+  if (at === -1 && fs.existsSync(PARKED)) {
+    src = fs.readFileSync(PARKED, 'utf8');
+    at = src.indexOf('data-m="cmpsec"');
+    where = 'parked';
+  }
+  if (at === -1) fail.push('could not find the comparison chart, on the page or parked');
   else {
-    const blk = html.slice(at, html.indexOf('<!--', at + 10));
+    chartWhere = where;
+    const stop = src.indexOf('<!--', at + 10);
+    const blk = src.slice(at, stop === -1 ? src.length : stop);
     const listed = [...blk.matchAll(/color: #F0B43C;">([^<]{2,40})</g)].map(m => m[1].trim());
     const plus = (blk.match(/>\+(\d+)</) || [])[1];
     if (plus === undefined) fail.push('the chart no longer states a "+N" count');
@@ -209,4 +224,4 @@ if (fail.length) {
   console.error('\nFix the copy that is wrong; do not just silence this.');
   process.exit(1);
 }
-console.log(`check-formula: dog ${arr.dog.length}, cat ${arr.cat.length} — grid, plain text and JSON-LD all agree; one name for the collagen.`);
+console.log(`check-formula: dog ${arr.dog.length}, cat ${arr.cat.length} — grid, plain text and JSON-LD all agree; one name for the collagen; comparison chart ${chartWhere} and adding up.`);
