@@ -613,6 +613,26 @@ window.hbAm = (function () {
 //
 // Returns nothing at all when the pixel is off for this browser, so the
 // opt-out covers the handoff too rather than leaking round the side of it.
+// Hold on to the click the moment it lands. The rebuild below reads this
+// rather than the URL, because the URL does not survive: this is a single-page
+// app, so by the time anyone reaches checkout the address bar says /cart and
+// the fbclid is long gone. Reading it live meant the fallback only ever worked
+// for someone who checked out without moving, which is nobody — and the case
+// it exists for is a blocked pixel, where there is no cookie to fall back to
+// either. Measured, not assumed: before this, a click followed by one
+// navigation arrived at Shopify with no ids at all.
+//
+// Stored with the time of the click, not the time of the order, because that
+// timestamp is part of what Meta matches on. Ninety days, the same life Meta
+// gives the _fbc cookie.
+(function () {
+  try {
+    if (window.__hbNoFb) return;
+    var cl = new URLSearchParams(location.search).get('fbclid');
+    if (cl) localStorage.setItem('hb_fbclid', JSON.stringify({ v: cl, t: Date.now() }));
+  } catch (e) {}
+})();
+
 window.hbFbIds = function () {
   if (window.__hbNoFb) return {};
   var out = {};
@@ -624,8 +644,11 @@ window.hbFbIds = function () {
     out.fbp = read('_fbp');
     out.fbc = read('_fbc');
     if (!out.fbc) {
-      var cl = new URLSearchParams(location.search).get('fbclid');
-      if (cl) out.fbc = 'fb.1.' + Date.now() + '.' + cl;
+      var saved = null;
+      try { saved = JSON.parse(localStorage.getItem('hb_fbclid') || 'null'); } catch (e) {}
+      if (saved && saved.v && (Date.now() - saved.t) < 90 * 864e5) {
+        out.fbc = 'fb.1.' + saved.t + '.' + saved.v;
+      }
     }
   } catch (e) {}
   Object.keys(out).forEach(function (k) { if (!out[k]) delete out[k]; });
