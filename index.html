@@ -422,6 +422,16 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
       query: 'mutation cartCreate($input: CartInput!) { cartCreate(input: $input) { cart { checkoutUrl } userErrors { field message } } }',
       variables: { input: (function () {
         const input = { lines: lines };
+        // Cookies do not cross from happybeanie.com to Shopify's checkout, so
+        // the Meta click ids ride over as cart attributes and the custom pixel
+        // on the far side reads them back off the order. Underscore-prefixed,
+        // which is Shopify's convention for attributes the customer should not
+        // be shown.
+        try {
+          const fb = window.hbFbIds ? window.hbFbIds() : {};
+          const attrs = Object.keys(fb).map(k => ({ key: '_' + k, value: String(fb[k]) }));
+          if (attrs.length) input.attributes = attrs;
+        } catch (e) {}
         // Wholesale accounts: their trade code (restricted to their customer
         // segment) is attached here so checkout prices without any typing.
         if (opts && opts.discountCode) input.discountCodes = [opts.discountCode];
@@ -590,6 +600,38 @@ window.hbAm = (function () {
   return set;
 })();
 // Fires one event down both paths under a shared id.
+// The click that earned the order. Meta writes _fbc from the fbclid on the
+// landing URL and _fbp as a browser id, both scoped to happybeanie.com — and
+// the order is placed on Shopify's domain, where neither cookie exists. That
+// gap is why purchases come back unattributed: the server event that Shopify
+// sends has no click id in it, so Meta cannot tie the sale to the ad that
+// earned it. Read them here so they can travel with the cart.
+//
+// _fbc is rebuilt from fbclid when the cookie is not there yet. The pixel
+// writes that cookie asynchronously and a visitor who clicks an ad and goes
+// straight to checkout can beat it; Meta's format is fb.1.<ms>.<fbclid>.
+//
+// Returns nothing at all when the pixel is off for this browser, so the
+// opt-out covers the handoff too rather than leaking round the side of it.
+window.hbFbIds = function () {
+  if (window.__hbNoFb) return {};
+  var out = {};
+  try {
+    var read = function (k) {
+      var m = document.cookie.match(new RegExp('(?:^|;\\s*)' + k + '=([^;]*)'));
+      return m ? decodeURIComponent(m[1]) : null;
+    };
+    out.fbp = read('_fbp');
+    out.fbc = read('_fbc');
+    if (!out.fbc) {
+      var cl = new URLSearchParams(location.search).get('fbclid');
+      if (cl) out.fbc = 'fb.1.' + Date.now() + '.' + cl;
+    }
+  } catch (e) {}
+  Object.keys(out).forEach(function (k) { if (!out[k]) delete out[k]; });
+  return out;
+};
+
 window.hbMeta = function (name, params) {
   var id = 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
   try { if (window.fbq) window.fbq('track', name, params || {}, { eventID: id }); } catch (e) {}

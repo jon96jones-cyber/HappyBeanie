@@ -23,6 +23,11 @@
 //   META_PIXEL_ID       — optional, defaults to the pixel in the page.
 //   META_TEST_EVENT_CODE — optional. Set it while watching Events Manager →
 //                         Test events, then remove it.
+//   META_OWN_PURCHASE   — optional, and dangerous to set carelessly. Lets this
+//                         relay accept Purchase from the Shopify custom pixel
+//                         (see shopify/custom-pixel-purchase.js). Only set it
+//                         once the Facebook & Instagram channel has stopped
+//                         sending its own, or every order counts twice.
 const crypto = require('crypto');
 
 const GRAPH = 'https://graph.facebook.com/v21.0/';
@@ -31,6 +36,16 @@ const DEFAULT_PIXEL = '2580258509080253';
 // Only events the site actually fires. A stray or spoofed body cannot invent
 // event names in the account.
 const NAMES = ['ViewContent', 'AddToCart', 'InitiateCheckout', 'Lead', 'CompleteRegistration', 'Search', 'PageView'];
+
+// Purchase is the exception, and it is off unless META_OWN_PURCHASE is set.
+//
+// Shopify's Facebook & Instagram channel sends its own Purchase from checkout,
+// with an event_id this relay has no way to know. Two Purchases per order with
+// different ids do not collapse — Meta counts both, revenue doubles, and every
+// campaign optimises against a number that is not real. So the two sources are
+// mutually exclusive: turn the channel's purchase tracking off first, then set
+// this, in that order. Nothing here can detect the overlap for you.
+const OWN_PURCHASE = 'Purchase';
 
 function readBody(req) {
   if (req.body && typeof req.body === 'object') return req.body;
@@ -69,8 +84,20 @@ function clientIp(req) {
   return fwd.split(',')[0].trim() || null;
 }
 
+// The checkout half of this runs inside Shopify's custom-pixel sandbox, which
+// is a different origin, so the browser preflights the request and drops the
+// response without these.
+function cors(res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400');
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
+  cors(res);
+  if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).end();
 
   const token = process.env.META_CAPI_TOKEN;
@@ -89,7 +116,17 @@ module.exports = async function handler(req, res) {
   try {
     const b = readBody(req);
     const name = str(b.name, 40);
-    if (!name || NAMES.indexOf(name) === -1) return res.status(204).end();
+    const ownsPurchase = !!process.env.META_OWN_PURCHASE;
+    const allowed = name === OWN_PURCHASE ? ownsPurchase : NAMES.indexOf(name) !== -1;
+    if (!name || !allowed) {
+      // Say why, once, rather than dropping it into the same silence as a
+      // spoofed event name — a checkout wired up and quietly ignored looks
+      // exactly like one that is working.
+      if (name === OWN_PURCHASE) {
+        console.warn('[meta-capi] Purchase received but META_OWN_PURCHASE is not set — ignoring. Turn off the Shopify channel\'s purchase tracking first, then set it.');
+      }
+      return res.status(204).end();
+    }
 
     const user = {
       em: normEmail(b.em),
@@ -126,7 +163,10 @@ module.exports = async function handler(req, res) {
     const event = {
       event_name: name,
       event_time: Math.floor(Date.now() / 1000),
-      // Shared with the pixel's fbq call so Meta counts the pair once.
+      // Shared with the pixel's fbq call so Meta counts the pair once. A
+      // Purchase carries the order name instead, which is stable: the pixel
+      // can fire twice for one order — a refresh of the thank-you page, a
+      // retry — and both copies collapse into one.
       event_id: str(b.eventId, 80) || crypto.randomUUID(),
       event_source_url: str(b.url, 500),
       action_source: 'website',
