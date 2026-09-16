@@ -133,6 +133,45 @@ if (arr) {
   }
 }
 
+// ---- the comparison chart's arithmetic -------------------------------------
+// The chart names the dog formula in two halves: a few rows compared against
+// Jope by dose, then the rest as "+N ingredients Jope doesn't carry", closing
+// with a total. Three numbers that have to agree with each other and with the
+// formula, and none of them recomputes itself — the chart is hand-built markup.
+// It has been wrong before: it reached ten by splitting the elk blend in two
+// and leaving green-lipped mussel out altogether, which is how outside readers
+// came away with the wrong list.
+if (arr) {
+  const at = html.indexOf('data-m="cmpsec"');
+  if (at === -1) fail.push('could not find the comparison chart');
+  else {
+    const blk = html.slice(at, html.indexOf('<!--', at + 10));
+    const listed = [...blk.matchAll(/color: #F0B43C;">([^<]{2,40})</g)].map(m => m[1].trim());
+    const plus = (blk.match(/>\+(\d+)</) || [])[1];
+    if (plus === undefined) fail.push('the chart no longer states a "+N" count');
+    else if (+plus !== listed.length) {
+      fail.push(`the chart says "+${plus}" but lists ${listed.length} ingredients`);
+    }
+    // Every name it lists has to be something actually in the dog chew.
+    const dogNames = arr.dog.map(r => r.name);
+    for (const n of listed) {
+      if (!dogNames.some(d => d.toLowerCase().startsWith(n.toLowerCase()))) {
+        fail.push(`the chart lists "${n}", which is not in the dog formula`);
+      }
+    }
+    // And the total it closes with has to be the formula's length.
+    const WORDS = { nine: 9, ten: 10, eleven: 11, twelve: 12 };
+    const tm = blk.match(/([A-Za-z]+) ingredients total/i);
+    if (!tm) fail.push('the chart no longer states an "N ingredients total"');
+    else {
+      const said = WORDS[tm[1].toLowerCase()] !== undefined ? WORDS[tm[1].toLowerCase()] : Number(tm[1]);
+      if (said !== arr.dog.length) {
+        fail.push(`the chart says "${tm[1]} ingredients total" but the dog formula has ${arr.dog.length}`);
+      }
+    }
+  }
+}
+
 // ---- one name for the collagen, everywhere it is the product's own ---------
 // It used to be called three different things: UC-II(R) Collagen in the grid,
 // Collagen Peptide II on the dog label, Collagen Peptide Blend on the cat's.
