@@ -655,6 +655,46 @@ window.hbFbIds = function () {
   return out;
 };
 
+// ?fbcheck=1 — show what would ride along to Shopify, and why if nothing will.
+//
+// Written because a test order came back with no click id and there was no way
+// to tell which of the two causes it was: the pixel switched off for this
+// browser, or this browser never having seen the fbclid. Both look identical
+// from the order, and guessing between them costs another test order.
+(function () {
+  try {
+    if (new URLSearchParams(location.search).get('fbcheck') !== '1') return;
+    var show = function () {
+      var ids = window.hbFbIds ? window.hbFbIds() : {};
+      var saved = null;
+      try { saved = JSON.parse(localStorage.getItem('hb_fbclid') || 'null'); } catch (e) {}
+      var ck = function (k) {
+        var m = document.cookie.match(new RegExp('(?:^|;\\s*)' + k + '=([^;]*)'));
+        return m ? decodeURIComponent(m[1]) : null;
+      };
+      var rows = [
+        ['pixel', window.__hbNoFb ? 'OFF for this browser — visit /?nofb=0' : 'on'],
+        ['_fbc cookie', ck('_fbc') || 'none'],
+        ['_fbp cookie', ck('_fbp') || 'none'],
+        ['saved fbclid', saved && saved.v ? saved.v : 'none — land on a ?fbclid=… url'],
+        ['goes to shopify', Object.keys(ids).length ? JSON.stringify(ids) : 'NOTHING']
+      ];
+      var d = document.createElement('div');
+      d.setAttribute('role', 'status');
+      d.style.cssText = 'position:fixed;left:16px;bottom:16px;max-width:min(560px,calc(100vw - 32px));' +
+        'z-index:2147483647;background:#17140F;color:#F5F0E6;font-size:11px;line-height:1.7;' +
+        'padding:14px 16px;border-radius:3px;font-family:ui-monospace,monospace;word-break:break-all;' +
+        'box-shadow:0 18px 34px -20px rgba(23,20,15,0.6)';
+      d.textContent = rows.map(function (r) { return r[0] + ': ' + r[1]; }).join('\n');
+      d.style.whiteSpace = 'pre-wrap';
+      d.addEventListener('click', function () { d.remove(); });
+      document.body.appendChild(d);
+    };
+    if (document.readyState === 'loading') addEventListener('DOMContentLoaded', show);
+    else show();
+  } catch (e) {}
+})();
+
 window.hbMeta = function (name, params) {
   var id = 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
   try { if (window.fbq) window.fbq('track', name, params || {}, { eventID: id }); } catch (e) {}
