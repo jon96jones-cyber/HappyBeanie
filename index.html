@@ -1061,7 +1061,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .hb-faq__kicker { font-family: var(--hb-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--hb-yellow); margin-bottom: 18px; }
 .hb-faq__title { margin: 0 0 40px; font-weight: 700; letter-spacing: -0.045em; font-size: clamp(30px, 3.6vw, 52px); line-height: 0.98; max-width: 16em; color: var(--hb-cream-text); text-wrap: balance; }
 .hb-faq__title em { font-style: normal; color: var(--hb-yellow); }
-.hb-faq__rail { position: relative; }
+.hb-faq__rail { position: relative; touch-action: pan-y; }
 .hb-faq__fade { position: absolute; top: 0; bottom: 0; width: 140px; z-index: 2; pointer-events: none; }
 .hb-faq__fade--l { left: 0; background: linear-gradient(to right, var(--hb-ink) 25%, rgba(23,20,15,0)); }
 .hb-faq__fade--r { right: 0; background: linear-gradient(to left, var(--hb-ink) 25%, rgba(23,20,15,0)); }
@@ -9351,6 +9351,72 @@ window.hbFaqInit = function () {
     }
     prev.addEventListener('click', function () { pos--; layout(); });
     next.addEventListener('click', function () { pos++; layout(); });
+
+    // Swipe the rail (Jon, Sep 2026). On a phone only one card fits, so
+    // without this the only way through six questions is a 48px button at the
+    // edge of the screen — the gesture anyone would try first did nothing.
+    //
+    // Touch and pen only. A mouse keeps the arrows and plain clicking, because
+    // dragging with a mouse is not how a carousel is read on a desktop and
+    // arming it there only creates ways to mis-click.
+    //
+    // The cards are buttons that flip when tapped, so the gesture has to be
+    // told apart from the tap. Past the slop it is a swipe, and the click the
+    // browser synthesises on release is then swallowed in the capture phase
+    // before it reaches the card. Under the slop nothing here fires at all and
+    // the flip behaves exactly as it did.
+    var SWIPE_SLOP = 10, SWIPE_THROW = 45;
+    var swStartX = 0, swStartY = 0, swBase = 0, swDown = false, swMoved = false, swEatClick = false;
+
+    function trackX() {
+      return parseFloat(track.style.getPropertyValue('--x')) || 0;
+    }
+
+    rail.addEventListener('pointerdown', function (e) {
+      // Cleared here rather than on a timer: a pointerdown always precedes the
+      // next click, so a swipe that ended on nothing cannot leave this armed
+      // and swallow someone's next real tap.
+      swEatClick = false;
+      if (e.pointerType === 'mouse') return;
+      swDown = true; swMoved = false;
+      swStartX = e.clientX; swStartY = e.clientY; swBase = trackX();
+    });
+
+    rail.addEventListener('pointermove', function (e) {
+      if (!swDown) return;
+      var dx = e.clientX - swStartX, dy = e.clientY - swStartY;
+      // Claim the gesture only once it is clearly sideways, so a finger on its
+      // way down the page still scrolls it.
+      if (!swMoved && Math.abs(dx) > SWIPE_SLOP && Math.abs(dx) > Math.abs(dy)) swMoved = true;
+      if (!swMoved) return;
+      // Follow the finger. The rail's own easing would lag behind it, so it is
+      // off for the drag and restored on release.
+      track.style.transition = 'none';
+      track.style.setProperty('--x', Math.round(swBase + dx) + 'px');
+    });
+
+    function swipeEnd(e) {
+      if (!swDown) return;
+      swDown = false;
+      track.style.transition = '';
+      if (!swMoved) return;
+      swEatClick = true;
+      var dx = (e && e.clientX != null ? e.clientX : swStartX) - swStartX;
+      if (dx <= -SWIPE_THROW && !next.disabled) pos++;
+      else if (dx >= SWIPE_THROW && !prev.disabled) pos--;
+      // Either way: layout() puts --x back where it belongs, so a throw that
+      // was too short springs back rather than leaving the rail half paged.
+      layout();
+    }
+    rail.addEventListener('pointerup', swipeEnd);
+    rail.addEventListener('pointercancel', swipeEnd);
+
+    rail.addEventListener('click', function (e) {
+      if (!swEatClick) return;
+      swEatClick = false;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
     if (window.ResizeObserver) new ResizeObserver(layout).observe(rail); else window.addEventListener('resize', layout);
     layout();
 
