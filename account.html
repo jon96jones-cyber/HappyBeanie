@@ -1776,8 +1776,11 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   // Weight bands — same cut-offs and chew counts the eligibility screener
   // uses, so the account and the quiz never disagree about a dose.
   var PET_W = {
-    dog: [['u20', 'Under 20 lb', '½ chew daily'], ['20-100', '20 to 100 lb', '1 chew daily'],
-          ['o100', 'Over 100 lb', 'Up to 2 chews daily']],
+    // The last two values still read 100 because a pet already saved in this
+    // browser stores the key: renaming them would blank its weight. The
+    // labels are the bands as they stand — 1 chew to 75 lb, 1½ above it.
+    dog: [['u20', 'Under 20 lb', '½ chew daily'], ['20-100', '20 to 75 lb', '1 chew daily'],
+          ['o100', 'Over 75 lb', '1½ chews daily']],
     cat: [['u8', 'Under 8 lb', '1 chew daily'], ['8-12', '8 to 12 lb', '1 chew daily'],
           ['o12', 'Over 12 lb', '1 chew daily']]
   };
