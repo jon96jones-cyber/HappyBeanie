@@ -1411,6 +1411,9 @@ image-slot:not([data-filled]) { color: transparent !important; }
 @media (hover: hover) and (pointer: fine) { .pc-band:hover { border-color: rgba(23,20,15,0.45); } }
 .pc-band[aria-pressed="true"] { background: var(--yellow); border-color: var(--ink); }
 .pc-band:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* Each pill carries its label twice, full and short; one shows per width.
+   The unit in the header only appears with the short labels. */
+.pc-band__short, .pc-head__unit { display: none; }
 .pc-body { padding: 20px 24px 0; }
 .pc-dose { display: grid; grid-template-columns: 56px 1fr; gap: 16px; align-items: center; padding-bottom: 16px; border-bottom: 1px solid rgba(23,20,15,0.12); }
 .pc-chews { display: flex; align-items: flex-end; justify-content: center; gap: 3px; width: 56px; height: 50px; }
@@ -1474,11 +1477,12 @@ image-slot:not([data-filled]) { color: transparent !important; }
   .pc-head { padding: 15px 16px 12px; }
   .pc-head__row { margin-bottom: 10px; }
   .pc-head__k { padding-bottom: 5px; }
-  /* Four dog bands do not fit across a phone at a readable size, so they go
-     two by two; a lone last pill (the cat's third) takes the full row. */
-  .pc-bands { grid-template-columns: repeat(2, 1fr); gap: 9px; }
-  .pc-band { min-height: 48px; font-size: 15px; padding: 8px 10px; }
-  .pc-band:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  /* One row on a phone (Jon, Sep 2026): the pills drop their unit — it moves
+     up into the header — and tighten, so four fit across at 14px. */
+  .pc-bands { gap: 6px; }
+  .pc-band { min-height: 46px; font-size: 14px; letter-spacing: -0.03em; padding: 8px 4px; }
+  .pc-band__full { display: none; }
+  .pc-band__short, .pc-head__unit { display: inline; }
   .pc-body { padding: 13px 16px 0; }
   /* The bean and its line: a smaller chew still reads at a glance. */
   .pc-dose { grid-template-columns: 46px 1fr; gap: 12px; padding-bottom: 12px; }
@@ -9754,17 +9758,20 @@ window.hbPcInit = function (ctx) {
   // them. `rep` is the weight a band stands for wherever a number is needed
   // — the cart, checkout, the app's own state — a weight from its middle.
   // `of` is how the dose line names the animal.
+  // `short` is the phone label: four full labels do not fit one row at a
+  // readable size, so there the unit moves up into the header ("Dog weight
+  // · lb") and the pills carry the numbers alone.
   var BANDS = {
     dog: [
-      { key: 'u30', label: 'Up to 30 lb', max: 30, rep: 20, of: 'a dog up to 30 lb' },
-      { key: '30-75', label: '30–75 lb', max: 75, rep: 50, of: 'a 30–75 lb dog' },
-      { key: '75-120', label: '75–120 lb', max: 120, rep: 95, of: 'a 75–120 lb dog' },
-      { key: 'o120', label: 'Over 120 lb', max: Infinity, rep: 135, of: 'a dog over 120 lb' }
+      { key: 'u30', label: 'Up to 30 lb', short: 'Up to 30', max: 30, rep: 20, of: 'a dog up to 30 lb' },
+      { key: '30-75', label: '30–75 lb', short: '30–75', max: 75, rep: 50, of: 'a 30–75 lb dog' },
+      { key: '75-120', label: '75–120 lb', short: '75–120', max: 120, rep: 95, of: 'a 75–120 lb dog' },
+      { key: 'o120', label: 'Over 120 lb', short: 'Over 120', max: Infinity, rep: 135, of: 'a dog over 120 lb' }
     ],
     cat: [
-      { key: 'u8', label: 'Under 8 lb', max: 7, rep: 6, of: 'a cat under 8 lb' },
-      { key: '8-12', label: '8–12 lb', max: 12, rep: 10, of: 'an 8–12 lb cat' },
-      { key: 'o12', label: 'Over 12 lb', max: Infinity, rep: 15, of: 'a cat over 12 lb' }
+      { key: 'u8', label: 'Under 8 lb', short: 'Under 8', max: 7, rep: 6, of: 'a cat under 8 lb' },
+      { key: '8-12', label: '8–12 lb', short: '8–12', max: 12, rep: 10, of: 'an 8–12 lb cat' },
+      { key: 'o12', label: 'Over 12 lb', short: 'Over 12', max: Infinity, rep: 15, of: 'a cat over 12 lb' }
     ]
   };
   var bandOf = function (sp, lb) {
@@ -9879,10 +9886,13 @@ window.hbPcInit = function (ctx) {
       bandsEl.__sp = sp;
       bandsEl.style.setProperty('--n', String(BANDS[sp].length));
       bandsEl.setAttribute('aria-label', cat ? 'Your cat\'s weight' : 'Your dog\'s weight');
-      bandsEl.innerHTML = BANDS[sp].map(function (b) { return '<button class="pc-band" type="button" data-band="' + b.key + '">' + b.label + '</button>'; }).join('');
+      bandsEl.innerHTML = BANDS[sp].map(function (b) {
+        return '<button class="pc-band" type="button" data-band="' + b.key + '" aria-label="' + b.label + '">'
+          + '<span class="pc-band__full">' + b.label + '</span><span class="pc-band__short" aria-hidden="true">' + b.short + '</span></button>';
+      }).join('');
     }
     root.querySelectorAll('.pc-band').forEach(function (el) { el.setAttribute('aria-pressed', String(el.getAttribute('data-band') === band.key)); });
-    root.querySelector('[data-sp-label]').textContent = cat ? 'Cat weight' : 'Dog weight';
+    root.querySelector('[data-sp-label]').innerHTML = (cat ? 'Cat weight' : 'Dog weight') + '<span class="pc-head__unit"> · lb</span>';
     chews.innerHTML = d === 0.5 ? chew(25, 50, 50)
       : d === 1 ? chew(50, 50, 50)
       : d === 1.5 ? chew(40, 40, 40) + chew(13, 26, 26)
