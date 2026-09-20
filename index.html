@@ -1415,10 +1415,18 @@ image-slot:not([data-filled]) { color: transparent !important; }
    The unit in the header only appears with the short labels. */
 .pc-band__short, .pc-head__unit { display: none; }
 .pc-body { padding: 20px 24px 0; }
-.pc-dose { display: grid; grid-template-columns: 56px 1fr; gap: 16px; align-items: center; padding-bottom: 16px; border-bottom: 1px solid rgba(23,20,15,0.12); }
-.pc-chews { display: flex; align-items: flex-end; justify-content: center; gap: 3px; width: 56px; height: 50px; }
+/* The dose tile (Jon, Sep 2026): the chew in a ringed well, the dose as a
+   figure, the box-lasts stat behind a hairline. Built from the same parts
+   as the rest of the panel so it reads as an instrument, not a caption. */
+.pc-dose { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 14px 18px 14px 14px; background: #F5F0E6; border: 1.5px solid rgba(23,20,15,0.16); border-radius: 6px; }
+.pc-dose__well { width: 66px; height: 66px; border-radius: 50%; background: var(--cream); border: 1.5px solid var(--ink); display: flex; align-items: center; justify-content: center; }
+.pc-chews { display: flex; align-items: center; justify-content: center; gap: 2px; }
 .pc-chews span { display: block; overflow: hidden; flex: 0 0 auto; } .pc-chews img { display: block; object-fit: contain; }
-.pc-dose__t { font-weight: 700; letter-spacing: -0.04em; font-size: 20px; line-height: 1.05; }
+.pc-dose__t { font-weight: 700; letter-spacing: -0.045em; font-size: 24px; line-height: 1; }
+.pc-dose__t span { font-family: var(--mono); font-weight: 400; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-left: 6px; }
+.pc-dose__stat { text-align: right; padding-left: 18px; border-left: 1px solid rgba(23,20,15,0.14); }
+.pc-dose__k { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; }
+.pc-dose__v { display: block; font-family: var(--mono); font-weight: 500; font-size: 15px; margin-top: 4px; white-space: nowrap; }
 .pc-plans { display: grid; gap: 6px; padding: 16px 0 18px; }
 /* The single-box toggle (Jon, Sep 2026): one pill, two segments, the chosen
    one solid ink. When a multi-box row below is the selection, the pill keeps
@@ -1484,10 +1492,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
   .pc-band__full { display: none; }
   .pc-band__short, .pc-head__unit { display: inline; }
   .pc-body { padding: 13px 16px 0; }
-  /* The bean and its line: a smaller chew still reads at a glance. */
-  .pc-dose { grid-template-columns: 46px 1fr; gap: 12px; padding-bottom: 12px; }
-  .pc-chews { width: 46px; height: 42px; }
-  .pc-dose__t { font-size: 18px; }
+  /* The dose tile, a little tighter: a smaller well still reads at a glance. */
+  .pc-dose { gap: 12px; padding: 11px 14px 11px 11px; }
+  .pc-dose__well { width: 56px; height: 56px; }
+  .pc-dose__t { font-size: 21px; }
+  .pc-dose__stat { padding-left: 14px; }
   /* The 14px row gap stays — the "Best value" chip sits in it on touch. */
   .pc-plans { padding: 13px 0 14px; }
   .pc-row { padding: 11px 14px; }
@@ -9713,7 +9722,15 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<div class="pc-bands" role="group" aria-label="Your dog\'s weight" data-bands></div>'
   + '</div>'
   + '<div class="pc-body">'
-  + '<div class="pc-dose"><div class="pc-chews" data-chews></div><div class="pc-dose__t" data-dose></div></div>'
+  // The dose readout is a tile (Jon, Sep 2026): the chew in a ringed well,
+  // the dose as a figure, and how long a box lasts at that dose behind a
+  // hairline on the right. No subline — the pressed pill already says whose
+  // dose it is.
+  + '<div class="pc-dose">'
+  + '<div class="pc-dose__well"><div class="pc-chews" data-chews></div></div>'
+  + '<div class="pc-dose__t" data-dose></div>'
+  + '<div class="pc-dose__stat"><span class="pc-dose__k">A box lasts</span><span class="pc-dose__v" data-lasts></span></div>'
+  + '</div>'
   + '<div class="pc-plans">'
   // The single box is a two-way toggle, Subscribe or One-time (Jon, Sep
   // 2026), in place of the two rows it used to be, with a 1-box row under it
@@ -9757,21 +9774,20 @@ window.hbPcInit = function (ctx) {
   // cat's are the screener's three, and the dose is one chew across all of
   // them. `rep` is the weight a band stands for wherever a number is needed
   // — the cart, checkout, the app's own state — a weight from its middle.
-  // `of` is how the dose line names the animal.
   // `short` is the phone label: four full labels do not fit one row at a
   // readable size, so there the unit moves up into the header ("Dog weight
   // · lb") and the pills carry the numbers alone.
   var BANDS = {
     dog: [
-      { key: 'u30', label: 'Up to 30 lb', short: 'Up to 30', max: 30, rep: 20, of: 'a dog up to 30 lb' },
-      { key: '30-75', label: '30–75 lb', short: '30–75', max: 75, rep: 50, of: 'a 30–75 lb dog' },
-      { key: '75-120', label: '75–120 lb', short: '75–120', max: 120, rep: 95, of: 'a 75–120 lb dog' },
-      { key: 'o120', label: 'Over 120 lb', short: 'Over 120', max: Infinity, rep: 135, of: 'a dog over 120 lb' }
+      { key: 'u30', label: 'Up to 30 lb', short: 'Up to 30', max: 30, rep: 20 },
+      { key: '30-75', label: '30–75 lb', short: '30–75', max: 75, rep: 50 },
+      { key: '75-120', label: '75–120 lb', short: '75–120', max: 120, rep: 95 },
+      { key: 'o120', label: 'Over 120 lb', short: 'Over 120', max: Infinity, rep: 135 }
     ],
     cat: [
-      { key: 'u8', label: 'Under 8 lb', short: 'Under 8', max: 7, rep: 6, of: 'a cat under 8 lb' },
-      { key: '8-12', label: '8–12 lb', short: '8–12', max: 12, rep: 10, of: 'an 8–12 lb cat' },
-      { key: 'o12', label: 'Over 12 lb', short: 'Over 12', max: Infinity, rep: 15, of: 'a cat over 12 lb' }
+      { key: 'u8', label: 'Under 8 lb', short: 'Under 8', max: 7, rep: 6 },
+      { key: '8-12', label: '8–12 lb', short: '8–12', max: 12, rep: 10 },
+      { key: 'o12', label: 'Over 12 lb', short: 'Over 12', max: Infinity, rep: 15 }
     ]
   };
   var bandOf = function (sp, lb) {
@@ -9893,12 +9909,14 @@ window.hbPcInit = function (ctx) {
     }
     root.querySelectorAll('.pc-band').forEach(function (el) { el.setAttribute('aria-pressed', String(el.getAttribute('data-band') === band.key)); });
     root.querySelector('[data-sp-label]').innerHTML = (cat ? 'Cat weight' : 'Dog weight') + '<span class="pc-head__unit"> · lb</span>';
-    chews.innerHTML = d === 0.5 ? chew(25, 50, 50)
-      : d === 1 ? chew(50, 50, 50)
-      : d === 1.5 ? chew(40, 40, 40) + chew(13, 26, 26)
-      : chew(36, 36, 36) + chew(36, 36, 36);
-    doseEl.textContent = (d === 0.5 ? '½ chew a day' : d === 1 ? '1 chew a day' : d === 1.5 ? '1½ chews a day' : '2 chews a day')
-      + ' for ' + band.of;
+    // Sized for the 66px well: a half chew is the left half of one, one and a
+    // half is a chew and a half-chew, two is two smaller ones side by side.
+    chews.innerHTML = d === 0.5 ? chew(22, 44, 44)
+      : d === 1 ? chew(44, 44, 44)
+      : d === 1.5 ? chew(34, 34, 34) + chew(11, 22, 22)
+      : chew(27, 27, 27) + chew(27, 27, 27);
+    doseEl.innerHTML = '<b>' + (d === 0.5 ? '½ chew' : d === 1 ? '1 chew' : d === 1.5 ? '1½ chews' : '2 chews') + '</b> <span>a day</span>';
+    root.querySelector('[data-lasts]').textContent = lasts + ' days';
     var money = function (n) { return '$' + Number(n).toFixed(2).replace(/\.00$/, ''); };
     // Every plan prices per box, with the saving against the same number of
     // boxes bought one at a time underneath. Both come off the plan's own
