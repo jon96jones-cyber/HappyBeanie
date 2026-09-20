@@ -1431,12 +1431,16 @@ image-slot:not([data-filled]) { color: transparent !important; }
    one solid ink. When a multi-box row below is the selection, the pill keeps
    its position but steps back, so the one highlighted thing on the panel is
    always the plan that the CTA will charge for. */
-.pc-toggle { display: flex; padding: 4px; background: #EDE6D8; border: 1.5px solid var(--ink); border-radius: 999px; transition: opacity 0.2s ease; }
+.pc-toggle { display: flex; padding: 7px; background: #EDE6D8; border: 1.5px solid var(--ink); border-radius: 999px; transition: opacity 0.2s ease; }
 .pc-toggle:not([data-active]) { opacity: 0.55; }
-.pc-seg { touch-action: manipulation; flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 8px 14px; background: transparent; border: none; border-radius: 999px; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: var(--muted); transition: background 0.2s ease, color 0.2s ease; }
+.pc-seg { touch-action: manipulation; flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 8px 14px; background: transparent; border: none; border-radius: 999px; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 16px; letter-spacing: -0.02em; color: var(--muted); transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease; }
 .pc-seg[hidden] { display: none; }
-.pc-seg[aria-pressed="true"] { background: var(--ink); color: #F5F0E6; }
-.pc-seg:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* The chosen segment sits inside the pill with a clear cream margin and a
+   yellow ring in it. With a 4px margin and no ring, the ink segment and the
+   ink pill border were two concentric curves a hairline apart, and it read
+   as a rendering fault rather than a selection (Jon, Sep 2026). */
+.pc-seg[aria-pressed="true"] { background: var(--ink); color: #F5F0E6; box-shadow: 0 0 0 2px var(--yellow); }
+.pc-seg:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .pc-seg__save { font-family: var(--mono); font-weight: 500; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); }
 .pc-seg[aria-pressed="true"] .pc-seg__save { color: var(--yellow); }
 .pc-seg__save:empty { display: none; }
@@ -1489,7 +1493,8 @@ image-slot:not([data-filled]) { color: transparent !important; }
   /* The 14px row gap stays — the "Best value" chip sits in it on touch. */
   .pc-plans { padding: 13px 0 14px; }
   .pc-row { padding: 11px 14px; }
-  .pc-seg { min-height: 42px; padding: 6px 10px; gap: 7px; font-size: 14px; }
+  .pc-toggle { padding: 5px; }
+  .pc-seg { min-height: 44px; padding: 6px 10px; gap: 7px; font-size: 15px; }
   .pc-one { padding: 4px 14px 6px; }
   .pc-cta { padding: 17px; }
 }
