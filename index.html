@@ -9744,7 +9744,7 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   // Figures here are only the first paint; the render recomputes them from
   // each plan's price and box count.
   + '<div class="pc-toggle" role="group" aria-label="One box" data-toggle>'
-  + '<button class="pc-seg" type="button" data-plan="1" aria-pressed="true"><span class="pc-seg__n">Subscribe</span><span class="pc-seg__save" data-seg-save>Save 14%</span></button>'
+  + '<button class="pc-seg" type="button" data-plan="1" aria-pressed="true"><span class="pc-seg__n">Subscribe</span><span class="pc-seg__save" data-seg-save>Save 15%</span></button>'
   + '<button class="pc-seg" type="button" data-plan="0" aria-pressed="false"><span class="pc-seg__n">One-time</span></button>'
   + '</div>'
   // The 1-box row (Jon, Sep 2026): a plan row like the ones under it, whose
@@ -9949,9 +9949,12 @@ window.hbPcInit = function (ctx) {
       seg.hidden = k === '1' && !subOn;
       seg.setAttribute('aria-pressed', String(k === S.one));
     });
-    // The saving the subscription makes on a box, as a share of buying once.
+    // The subscription's saving is stated as 15% (Jon, Sep 2026). The exact
+    // figure is $16 off $115 = 13.9%, and the dollar line beside it stays
+    // computed; this percentage is the one thing on the panel not derived
+    // from the prices, so if they move, revisit it here.
     var segSave = root.querySelector('[data-seg-save]');
-    if (segSave) segSave.textContent = 'Save ' + Math.round((1 - PLANS[1].price / PLANS[0].price) * 100) + '%';
+    if (segSave) segSave.textContent = 'Save 15%';
     var single = S.sel === '0' || S.sel === '1';
     if (single) toggle.setAttribute('data-active', ''); else toggle.removeAttribute('data-active');
     // The 1-box row: it is the plan the toggle points at, priced as such,
