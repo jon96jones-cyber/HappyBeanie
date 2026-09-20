@@ -2225,17 +2225,21 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="flipwrap"]:focus-visible [data-m~="flipback"] { transform: translateY(0) !important; }
     [data-m~="fliparrow"] { display: none; }
     /* Product buy column, desktop order (Jon, Sep 2026): purchase panel
-       first, straight under the animal picker; the eligibility card under
-       its buy button; then the name, lede and rating; promises; specs. The
-       source order (phones) keeps the name and lede on top. */
+       first, straight under the animal picker; the promises under its buy
+       button, then the eligibility card; then the name, lede and rating;
+       specs. The source order (phones) keeps the name and lede on top. */
     [data-m~="pdpcol"] { display: flex; flex-direction: column; }
     [data-m~="pdpcol"] > [data-m~="pdpbatch"] { order: 0; }
     [data-m~="pdpcol"] > [data-m~="pdpbuy"] { order: 1; }
-    [data-m~="pdpcol"] > [data-m~="pdpqz"] { order: 2; }
+    /* The three promises come before the eligibility card (Jon, Sep 2026).
+       In a flex column margins do not collapse, so the 24px that used to
+       trail the promises moves to trail the card instead — !important, as
+       both carry their margins inline. */
+    [data-m~="pdpcol"] > [data-m~="pdpguar"] { order: 2; margin-bottom: 0 !important; }
     /* The header block folds into the panel's identity strip on desktop
        (Jon, Sep 2026); pcCtx() still reads its text from it. */
     [data-m~="pdpcol"] > [data-m~="pdphead"] { order: 3; }
-    [data-m~="pdpcol"] > [data-m~="pdpguar"] { order: 4; }
+    [data-m~="pdpcol"] > [data-m~="pdpqz"] { order: 4; margin-bottom: 24px !important; }
     [data-m~="pdpcol"] > [data-m~="pdpspecs"] { order: 5; }
     [data-m~="pdpcol"] > [data-m~="pdpqzm"], [data-m~="pdpcol"] > [data-m~="pdpqznote"] { order: 6; }
   }
