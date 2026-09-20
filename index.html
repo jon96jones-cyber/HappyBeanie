@@ -1398,29 +1398,19 @@ image-slot:not([data-filled]) { color: transparent !important; }
    colour as the paragraph around it, marked only by the underline. */
 .pc-id__more { color: inherit; text-decoration: underline; text-underline-offset: 2px; text-decoration-color: rgba(23,20,15,0.35); }
 .pc-id__more:hover { text-decoration-color: currentColor; }
-/* Head (slider redesign, Jon, Sep 2026): dotted yellow ground that darkens
-   toward its foot, big readout, thick two-tone track, ringed thumb, ticks. */
-.pc-head { position: relative; padding: 26px 24px 20px; background: radial-gradient(rgba(23,20,15,0.09) 1px, transparent 1.2px) 0 0 / 24px 24px, linear-gradient(to bottom, oklch(0.87 0.14 92) 0%, oklch(0.85 0.14 90) 70%, oklch(0.80 0.14 86) 100%); box-shadow: inset 0 -28px 36px -30px rgba(23,20,15,0.45); }
-.pc-head__row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 14px; }
-.pc-head__k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; padding-bottom: 7px; }
-.pc-lb { font-weight: 700; letter-spacing: -0.06em; font-size: 40px; line-height: 0.85; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.pc-lb span { font-family: var(--mono); font-weight: 400; font-size: 11px; letter-spacing: 0.18em; margin-left: 6px; }
-.pc-slider { --r: 13px; --pct: 25%; position: relative; padding-bottom: 14px; }
-.pc-slider input { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 26px; margin: 0; background: transparent; cursor: pointer; outline: none; }
-.pc-slider input::-webkit-slider-runnable-track { height: 7px; border-radius: 999px; background: linear-gradient(90deg, var(--ink) 0 var(--pct), rgba(23,20,15,0.18) var(--pct) 100%); }
-.pc-slider input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; margin-top: -9.5px; border-radius: 50%; background: var(--ink); border: 3px solid #FCFAF4; box-shadow: 0 6px 14px -5px rgba(23,20,15,0.6); }
-.pc-slider input::-moz-range-track { height: 7px; border-radius: 999px; background: rgba(23,20,15,0.18); }
-.pc-slider input::-moz-range-progress { height: 7px; border-radius: 999px; background: var(--ink); }
-.pc-slider input::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--ink); border: 3px solid #FCFAF4; box-shadow: 0 6px 14px -5px rgba(23,20,15,0.6); }
-.pc-slider input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(23,20,15,0.25), 0 6px 14px -5px rgba(23,20,15,0.6); }
-/* Ticks sit on the thumb's travel, which runs from one radius in to one
-   radius short of the far edge. */
-.pc-ticks { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; pointer-events: none; }
-.pc-ticks i { position: absolute; top: 0; left: calc(var(--r) + (100% - 2 * var(--r)) * var(--p) / 100%); width: 1px; height: 6px; margin-left: -0.5px; background: rgba(23,20,15,0.32); }
-.pc-ticks i.is-major { width: 2px; height: 8px; margin-left: -1px; background: var(--ink); }
-.pc-ends { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #4A4235; }
-/* Cats get the same slider, on their own 4–30 lb scale (Jon, Sep 2026).
-   The dose is flat across it, so those ticks carry no major marks. */
+/* Head (Jon, Sep 2026): the weight is chosen by band — one pill per row of
+   the label chart — on the panel's own cream, with the two mono labels above.
+   Replaced the yellow slider head. The pressed pill is yellow with an ink
+   edge; the rest are outlined. Column count is set per species by the
+   render (four for dogs, three for cats). */
+.pc-head { position: relative; padding: 22px 24px 20px; background: var(--cream); border-bottom: 1px solid rgba(23,20,15,0.12); }
+.pc-head__row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 14px; }
+.pc-head__k { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.pc-bands { display: grid; grid-template-columns: repeat(var(--n, 4), 1fr); gap: 12px; }
+.pc-band { touch-action: manipulation; min-height: 54px; padding: 10px 12px; background: transparent; border: 1.5px solid rgba(23,20,15,0.18); border-radius: 999px; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 16px; letter-spacing: -0.02em; color: var(--ink); white-space: nowrap; transition: background 0.2s ease, border-color 0.2s ease; }
+@media (hover: hover) and (pointer: fine) { .pc-band:hover { border-color: rgba(23,20,15,0.45); } }
+.pc-band[aria-pressed="true"] { background: var(--yellow); border-color: var(--ink); }
+.pc-band:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .pc-body { padding: 20px 24px 0; }
 .pc-dose { display: grid; grid-template-columns: 56px 1fr; gap: 16px; align-items: center; padding-bottom: 16px; border-bottom: 1px solid rgba(23,20,15,0.12); }
 .pc-chews { display: flex; align-items: flex-end; justify-content: center; gap: 3px; width: 56px; height: 50px; }
@@ -1484,8 +1474,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
   .pc-head { padding: 15px 16px 12px; }
   .pc-head__row { margin-bottom: 10px; }
   .pc-head__k { padding-bottom: 5px; }
-  .pc-lb { font-size: 32px; }
-  .pc-slider { padding-bottom: 11px; }
+  /* Four dog bands do not fit across a phone at a readable size, so they go
+     two by two; a lone last pill (the cat's third) takes the full row. */
+  .pc-bands { grid-template-columns: repeat(2, 1fr); gap: 9px; }
+  .pc-band { min-height: 48px; font-size: 15px; padding: 8px 10px; }
+  .pc-band:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .pc-body { padding: 13px 16px 0; }
   /* The bean and its line: a smaller chew still reads at a glance. */
   .pc-dose { grid-template-columns: 46px 1fr; gap: 12px; padding-bottom: 12px; }
@@ -9686,7 +9679,7 @@ window.hbDoseInit();
 </script>
 <script>
 // Purchase panel (designer handoff, Setup_39): the product page's buy box —
-// weight slider, dose readout, plan rows, CTA. Injected into
+// weight bands, dose readout, plan toggle and rows, CTA. Injected into
 // [data-hb-pc-host] and wired by node identity like the dosing calculator;
 // the app calls hbPcInit(ctx) from componentDidMount/Update with what it
 // knows (species, chosen plan, weight, wholesale terms), and the panel
@@ -9709,12 +9702,11 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   // thick two-tone track with a ringed thumb, and ticks under it — bold at
   // the three dose thresholds (30, 75 and 120 lb), light between.
   + '<div class="pc-head">'
-  + '<div class="pc-head__row"><div class="pc-head__k">How big is your bean?</div><div class="pc-lb" data-lbwrap><b data-lb>45</b><span>lb</span></div></div>'
-  + '<div class="pc-slider">'
-  + '<input type="range" min="10" max="150" step="1" value="45" aria-label="Your dog\'s weight in pounds" data-range>'
-  + '<div class="pc-ticks" aria-hidden="true" data-ticks></div>'
-  + '</div>'
-  + '<div class="pc-ends"><span data-end-min>10 lb</span><span data-end-max>150 lb</span></div>'
+  // Weight is picked by band (Jon, Sep 2026), one pill per row of the label
+  // chart, in place of the slider. The pills are written by the render, per
+  // species.
+  + '<div class="pc-head__row"><div class="pc-head__k">How big is your bean?</div><div class="pc-head__k" data-sp-label>Dog weight</div></div>'
+  + '<div class="pc-bands" role="group" aria-label="Your dog\'s weight" data-bands></div>'
   + '</div>'
   + '<div class="pc-body">'
   + '<div class="pc-dose"><div class="pc-chews" data-chews></div><div class="pc-dose__t" data-dose></div></div>'
@@ -9755,14 +9747,35 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
 var hbPcWired = new WeakSet(), hbPcDelegated = false;
 window.hbPcInit = function (ctx) {
   var PLANS = { 0: { key: 'once', price: 115, boxes: 1 }, 1: { key: 'monthly', price: 99, boxes: 1 }, 2: { key: 'four', price: 297, boxes: 4 }, 3: { key: 'big', price: 159, boxes: 2 } };
-  // Each formula has its own weight scale. Ticks are marked in pounds, and
-  // a major tick is a point where the dose changes — which is why the cat
-  // scale has none: one chew from 4 lb to 30.
-  var SCALE = {
-    dog: { min: 10, max: 150, def: 45, ticks: [{ lb: 30, major: true }, { lb: 50 }, { lb: 75, major: true }, { lb: 100 }, { lb: 120, major: true }, { lb: 140 }] },
-    cat: { min: 4, max: 30, def: 10, ticks: [{ lb: 10 }, { lb: 15 }, { lb: 20 }, { lb: 25 }] }
+  // Each formula has its own weight bands (Jon, Sep 2026: pills in place of
+  // the slider). A dog's are the rows of the label chart, so each band is a
+  // dose, and their upper bounds are the same inclusive ones hbDose uses. A
+  // cat's are the screener's three, and the dose is one chew across all of
+  // them. `rep` is the weight a band stands for wherever a number is needed
+  // — the cart, checkout, the app's own state — a weight from its middle.
+  // `of` is how the dose line names the animal.
+  var BANDS = {
+    dog: [
+      { key: 'u30', label: 'Up to 30 lb', max: 30, rep: 20, of: 'a dog up to 30 lb' },
+      { key: '30-75', label: '30–75 lb', max: 75, rep: 50, of: 'a 30–75 lb dog' },
+      { key: '75-120', label: '75–120 lb', max: 120, rep: 95, of: 'a 75–120 lb dog' },
+      { key: 'o120', label: 'Over 120 lb', max: Infinity, rep: 135, of: 'a dog over 120 lb' }
+    ],
+    cat: [
+      { key: 'u8', label: 'Under 8 lb', max: 7, rep: 6, of: 'a cat under 8 lb' },
+      { key: '8-12', label: '8–12 lb', max: 12, rep: 10, of: 'an 8–12 lb cat' },
+      { key: 'o12', label: 'Over 12 lb', max: Infinity, rep: 15, of: 'a cat over 12 lb' }
+    ]
   };
-  var clamp = function (sp, v) { var s = SCALE[sp]; return Math.max(s.min, Math.min(s.max, Number(v) || s.def)); };
+  var bandOf = function (sp, lb) {
+    var w = Number(lb) || 0, list = BANDS[sp];
+    for (var i = 0; i < list.length; i++) if (w <= list[i].max) return list[i];
+    return list[list.length - 1];
+  };
+  // A weight handed in by the app is still a number; keep it to the range the
+  // bands cover so it always lands in one.
+  var BOUNDS = { dog: { min: 10, max: 150, def: 45 }, cat: { min: 4, max: 30, def: 10 } };
+  var clamp = function (sp, v) { var s = BOUNDS[sp]; return Math.max(s.min, Math.min(s.max, Number(v) || s.def)); };
   function chew(w, h, img) { return '<span style="width:' + w + 'px;height:' + h + 'px"><img src="/assets/img/purchase/chew.png" alt="" style="width:' + img + 'px;height:' + img + 'px"></span>'; }
   document.querySelectorAll('[data-hb-pc-host]').forEach(function (host) {
     var root = host.firstElementChild;
@@ -9803,20 +9816,20 @@ window.hbPcInit = function (ctx) {
       return root && root.__pc ? root : null;
     };
     var emit = function (root, name, detail) { root.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); };
-    var setLb = function (S, v) { if (S.sp === 'cat') S.catLb = Number(v); else S.lb = Number(v); };
-    // Dragging re-renders the panel alone; the app hears the weight on release.
-    document.addEventListener('input', function (e) {
-      var root = stateOf(e.target); if (!root || !e.target.matches('[data-range]')) return;
-      setLb(root.__pc, e.target.value); render(root, root.__pc);
-    });
-    document.addEventListener('change', function (e) {
-      var root = stateOf(e.target); if (!root || !e.target.matches('[data-range]')) return;
-      var S = root.__pc; setLb(S, e.target.value); render(root, S);
-      emit(root, 'hb:pc', { sp: S.sp, lb: S.sp === 'cat' ? S.catLb : S.lb, plan: Number(S.sel) });
-    });
     document.addEventListener('click', function (e) {
       var root = stateOf(e.target); if (!root) return;
       var S = root.__pc;
+      // A weight band. The band's representative weight is what the panel
+      // and the app carry from here on.
+      var bandBtn = e.target.closest('.pc-band');
+      if (bandBtn && root.contains(bandBtn)) {
+        var sp = S.sp === 'cat' ? 'cat' : 'dog';
+        var b = BANDS[sp].filter(function (x) { return x.key === bandBtn.getAttribute('data-band'); })[0];
+        if (b) { if (sp === 'cat') S.catLb = b.rep; else S.lb = b.rep; }
+        render(root, S);
+        emit(root, 'hb:pc', { sp: S.sp, lb: sp === 'cat' ? S.catLb : S.lb, plan: Number(S.sel) });
+        return;
+      }
       // A toggle segment and a plan row both choose a plan. The segment also
       // sets which way the toggle sits, so it holds its position while a
       // multi-box row is the selection and comes straight back on a tap.
@@ -9836,9 +9849,9 @@ window.hbPcInit = function (ctx) {
   }
 
   function render(root, S) {
-    var range = root.querySelector('[data-range]'), lbWrap = root.querySelector('[data-lbwrap]'), chews = root.querySelector('[data-chews]'), doseEl = root.querySelector('[data-dose]'), cta = root.querySelector('[data-cta]');
-    var cat = S.sp === 'cat', sc = SCALE[cat ? 'cat' : 'dog'];
-    var lb = clamp(cat ? 'cat' : 'dog', cat ? S.catLb : S.lb);
+    var bandsEl = root.querySelector('[data-bands]'), chews = root.querySelector('[data-chews]'), doseEl = root.querySelector('[data-dose]'), cta = root.querySelector('[data-cta]');
+    var cat = S.sp === 'cat', sp = cat ? 'cat' : 'dog';
+    var lb = clamp(sp, cat ? S.catLb : S.lb);
     if (cat) S.catLb = lb; else S.lb = lb;
     var d = window.hbDose(S.sp, lb), lasts = Math.round(30 / d), big = !cat && d >= 1.5 && !S.subsOff && !S.wholesale;
     root.setAttribute('data-sp', cat ? 'cat' : 'dog');
@@ -9859,24 +9872,23 @@ window.hbPcInit = function (ctx) {
     if (S.sel === '0' || S.sel === '1') S.one = S.sel;
     if (S.one !== '0' && S.one !== '1') S.one = '1';
     if (S.subsOff || S.wholesale) S.one = '0';
-    var pct = function (v) { return ((v - sc.min) / (sc.max - sc.min)) * 100; };
-    range.min = String(sc.min); range.max = String(sc.max); range.value = String(lb);
-    // The track's filled portion is a CSS variable the thumb position sets.
-    var slider = range.parentNode; if (slider && slider.style) slider.style.setProperty('--pct', pct(lb).toFixed(2) + '%');
-    var ticks = root.querySelector('[data-ticks]'), tkey = cat ? 'cat' : 'dog';
-    if (ticks.__sp !== tkey) {
-      ticks.__sp = tkey;
-      ticks.innerHTML = sc.ticks.map(function (t) { return '<i' + (t.major ? ' class="is-major"' : '') + ' style="--p:' + pct(t.lb).toFixed(2) + '%"></i>'; }).join('');
+    // The weight pills: one per band of the species on show, rebuilt only
+    // when the species changes, and the band the weight falls in is pressed.
+    var band = bandOf(sp, lb);
+    if (bandsEl.__sp !== sp) {
+      bandsEl.__sp = sp;
+      bandsEl.style.setProperty('--n', String(BANDS[sp].length));
+      bandsEl.setAttribute('aria-label', cat ? 'Your cat\'s weight' : 'Your dog\'s weight');
+      bandsEl.innerHTML = BANDS[sp].map(function (b) { return '<button class="pc-band" type="button" data-band="' + b.key + '">' + b.label + '</button>'; }).join('');
     }
-    root.querySelector('[data-end-min]').textContent = sc.min + ' lb';
-    root.querySelector('[data-end-max]').textContent = sc.max + ' lb';
-    lbWrap.innerHTML = '<b data-lb>' + lb + '</b><span>lb</span>';
+    root.querySelectorAll('.pc-band').forEach(function (el) { el.setAttribute('aria-pressed', String(el.getAttribute('data-band') === band.key)); });
+    root.querySelector('[data-sp-label]').textContent = cat ? 'Cat weight' : 'Dog weight';
     chews.innerHTML = d === 0.5 ? chew(25, 50, 50)
       : d === 1 ? chew(50, 50, 50)
       : d === 1.5 ? chew(40, 40, 40) + chew(13, 26, 26)
       : chew(36, 36, 36) + chew(36, 36, 36);
     doseEl.textContent = (d === 0.5 ? '½ chew a day' : d === 1 ? '1 chew a day' : d === 1.5 ? '1½ chews a day' : '2 chews a day')
-      + ' for a ' + lb + ' lb ' + (cat ? 'cat' : 'dog');
+      + ' for ' + band.of;
     var money = function (n) { return '$' + Number(n).toFixed(2).replace(/\.00$/, ''); };
     // Every plan prices per box, with the saving against the same number of
     // boxes bought one at a time underneath. Both come off the plan's own
