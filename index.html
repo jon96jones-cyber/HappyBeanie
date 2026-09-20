@@ -1473,8 +1473,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .pc-save { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--green); margin-top: 2px; }
 .pc-save:empty { display: none; }
 .pc-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7; }
-.pc-cta { touch-action: manipulation; display: block; width: 100%; padding: 20px; background: var(--ink); color: #F5F0E6; border: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s ease; }
-@media (hover: hover) and (pointer: fine) { .pc-cta:hover { background: var(--green); } }
+.pc-cta { touch-action: manipulation; display: block; width: 100%; padding: 20px; background: var(--yellow); color: var(--ink); border: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s ease; }
+/* Yellow with ink text (Jon, Sep 2026), like the site's other yellow buttons;
+   hover deepens the yellow rather than swapping colour. */
+@media (hover: hover) and (pointer: fine) { .pc-cta:hover { background: oklch(0.80 0.14 88); } }
 /* The panel on a phone (Jon, Sep 2026): it stood 763px, 90% of an iPhone 14
    screen, so reading from the lede to the buy button was most of a scroll.
    Nothing here is removed — every plan, the slider, the dose line and the
@@ -1498,11 +1500,15 @@ image-slot:not([data-filled]) { color: transparent !important; }
   .pc-dose__well { width: 56px; height: 56px; }
   .pc-dose__t { font-size: 21px; }
   .pc-dose__stat { padding-left: 14px; }
-  /* The 14px row gap stays — the "Best value" chip sits in it on touch. */
-  .pc-plans { padding: 13px 0 14px; }
+  /* The 14px row gap stays — the "Best value" chip sits in it on touch.
+     More air above the plans than on desktop, so the dose tile and the
+     toggle read as two things (Jon, Sep 2026). */
+  .pc-plans { padding: 26px 0 14px; }
   .pc-row { padding: 11px 14px; }
-  .pc-toggle { padding: 5px; }
-  .pc-seg { min-height: 44px; padding: 6px 10px; gap: 7px; font-size: 15px; }
+  /* The toggle sits centred and narrower than the rows on a phone rather
+     than edge to edge (Jon, Sep 2026). */
+  .pc-toggle { padding: 5px; width: 88%; max-width: 300px; justify-self: center; }
+  .pc-seg { min-height: 44px; padding: 6px 8px; gap: 7px; font-size: 15px; }
   .pc-cta { padding: 17px; }
 }
 
