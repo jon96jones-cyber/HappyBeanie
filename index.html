@@ -1412,8 +1412,9 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .pc-band[aria-pressed="true"] { background: var(--yellow); border-color: var(--ink); }
 .pc-band:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 /* Each pill carries its label twice, full and short; one shows per width.
-   The unit in the header only appears with the short labels. */
-.pc-band__short, .pc-head__unit { display: none; }
+   The header's unit shows at every width — it is the label's wording. */
+.pc-band__short { display: none; }
+.pc-head__unit { display: inline; }
 .pc-body { padding: 20px 24px 0; }
 /* The dose tile (Jon, Sep 2026): the chew in a ringed well, the dose as a
    figure, the box-lasts stat behind a hairline. Built from the same parts
@@ -9718,7 +9719,9 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   // Weight is picked by band (Jon, Sep 2026), one pill per row of the label
   // chart, in place of the slider. The pills are written by the render, per
   // species.
-  + '<div class="pc-head__row"><div class="pc-head__k">How big is your bean?</div><div class="pc-head__k" data-sp-label>Dog weight</div></div>'
+  // One label over the pills (Jon, Sep 2026): "Dog weight · lb". The
+  // "How big is your bean?" line that sat opposite it is gone.
+  + '<div class="pc-head__row"><div class="pc-head__k" data-sp-label>Dog weight</div></div>'
   + '<div class="pc-bands" role="group" aria-label="Your dog\'s weight" data-bands></div>'
   + '</div>'
   + '<div class="pc-body">'
