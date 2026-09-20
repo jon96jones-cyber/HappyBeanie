@@ -1737,14 +1737,39 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     cat: ['Domestic Shorthair','Domestic Longhair','Maine Coon','Siamese','Ragdoll','British Shorthair','Bengal','Persian','Sphynx','Russian Blue','Abyssinian','Scottish Fold','Norwegian Forest','Mixed breed']
   };
 
+  // The dog weight bands were recut in Sep 2026 — the half-chew band ran to
+  // 20 lb and now runs to 30, and an "over 120 lb" band was added. A pet
+  // stores its band's key, so every profile saved before that is holding a
+  // key nothing answers to any more.
+  //
+  // Only one of the three converts honestly. "Under 20 lb" sits wholly
+  // inside "Up to 30 lb" and is a half chew in both, so it is carried over.
+  // The other two straddle a new boundary — a dog filed under "20 to 100 lb"
+  // could now be on a half chew, one chew or one and a half, and picking for
+  // them would be inventing a dose. Those are cleared, which shows the owner
+  // "Not sure yet" and asks them to pick again.
+  var PET_BAND_MOVED = { u20: 'u30' };
+  var PET_BAND_GONE = ['20-100', 'o100'];
+  function migrateBands(list) {
+    var changed = false;
+    list.forEach(function (p) {
+      if (!p || p.species !== 'dog' || !p.weight) return;
+      if (PET_BAND_MOVED[p.weight]) { p.weight = PET_BAND_MOVED[p.weight]; changed = true; }
+      else if (PET_BAND_GONE.indexOf(p.weight) !== -1) { p.weight = ''; changed = true; }
+    });
+    if (changed) writePets(list);
+    return list;
+  }
+
   function readPets() {
     var list = null;
     try { list = JSON.parse(localStorage.getItem(PET_KEY) || 'null'); } catch (e) {}
-    if (Array.isArray(list)) return list;
+    if (Array.isArray(list)) return migrateBands(list);
     var old = null;
     try { old = JSON.parse(localStorage.getItem(PET_KEY_LEGACY) || 'null'); } catch (e) {}
     if (old && old.name) {
       old.id = old.id || 'p1';
+      migrateBands([old]);
       writePets([old]);
       return [old];
     }
@@ -1756,6 +1781,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   function readOrderPets() {
     try { return JSON.parse(localStorage.getItem(ORDER_PET_KEY) || '{}') || {}; } catch (e) { return {}; }
   }
+  // Run the band migration now rather than waiting for the pets panel to be
+  // rendered: the storefront's dosing calculator reads this same key, and a
+  // visit that never signs in never opens that panel.
+  readPets();
   function writeOrderPets(map) {
     try { localStorage.setItem(ORDER_PET_KEY, JSON.stringify(map)); } catch (e) {}
   }
@@ -1776,11 +1805,8 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
   // Weight bands — same cut-offs and chew counts the eligibility screener
   // uses, so the account and the quiz never disagree about a dose.
   var PET_W = {
-    // The last two values still read 100 because a pet already saved in this
-    // browser stores the key: renaming them would blank its weight. The
-    // labels are the bands as they stand — 1 chew to 75 lb, 1½ above it.
-    dog: [['u20', 'Under 20 lb', '½ chew daily'], ['20-100', '20 to 75 lb', '1 chew daily'],
-          ['o100', 'Over 75 lb', '1½ chews daily']],
+    dog: [['u30', 'Up to 30 lb', '½ chew daily'], ['30-75', '30 to 75 lb', '1 chew daily'],
+          ['75-120', '75 to 120 lb', '1½ chews daily'], ['o120', 'Over 120 lb', '2 chews daily']],
     cat: [['u8', 'Under 8 lb', '1 chew daily'], ['8-12', '8 to 12 lb', '1 chew daily'],
           ['o12', 'Over 12 lb', '1 chew daily']]
   };
