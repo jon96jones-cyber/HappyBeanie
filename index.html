@@ -6,11 +6,11 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png?v=4">
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png?v=4">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=4">
-<title>Happy Beanie — Peptide Care for Pets</title>
-<meta name="description" content="Happy Beanie Peptide Care — peptide-infused daily care for dogs and cats. Formulated in Scottsdale, AZ, third-party tested, 30-day refund window.">
+<title>Happy Beanie — Anti-Aging Pet Supplement for Dogs &amp; Cats</title>
+<meta name="description" content="Peptide-infused daily chews for dogs and cats. Anti-aging pet supplement formulated in Scottsdale, AZ, third-party tested lot by lot, 30-day refund window.">
 <meta name="facebook-domain-verification" content="ld5xcnuq9ottt3hm2hsrppw3n81gx0">
-<meta property="og:title" content="The Next Chapter of Pet Longevity Starts Here - Free Shipping">
-<meta property="og:description" content="Peptide-infused daily care for dogs and cats. The next chapter of pet longevity starts here.">
+<meta property="og:title" content="Happy Beanie — Anti-Aging Pet Supplement for Dogs &amp; Cats">
+<meta property="og:description" content="Peptide-infused daily chews for dogs and cats. Anti-aging pet supplement formulated in Scottsdale, AZ, third-party tested lot by lot, 30-day refund window.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.happybeanie.com/">
 <meta property="og:image" content="https://www.happybeanie.com/assets/og-image-8.jpg">
@@ -26,9 +26,11 @@
      invisible to exactly the crawlers that need it. Googlebot renders and sees
      it either way.
 
-     One <head> serves every SPA route (see the rewrite in vercel.json), so each
-     Product carries its own `url` naming the product page rather than implying
-     the page it was found on is that product.
+     One file serves every SPA route (see the rewrite in vercel.json); the
+     title, description and canonical are swapped per route at the edge by
+     middleware.js, but this block is the same on every route, so each Product
+     carries its own `url` naming the product page rather than implying the
+     page it was found on is that product.
 
      Names, SKUs and price are kept in sync with /google-product-feed.tsv. -->
 <script type="application/ld+json">
@@ -323,6 +325,26 @@ window.HB_SHOPIFY = {
   // These need creating in Shopify before the heavy bands are advertised as
   // subscriptions. hbSellingPlanFor() and hbBigPlanFor() do the choosing.
   sellingPlans: { d60: '', d30: 'gid://shopify/SellingPlan/974946368', d20: '', d15: '', big40: '', big30: '' }
+};
+// The tab title per route. middleware.js serves the same titles in the HTML
+// itself (that is what search engines read); this keeps the tab in step when
+// the app navigates without a page load. The two lists must agree —
+// tools/check-claims.js fails when they drift.
+window.HB_ROUTE_META = {
+  home: 'Happy Beanie — Anti-Aging Pet Supplement for Dogs & Cats',
+  product: 'Anti-Aging Supplement for Dogs and Cats | Happy Beanie',
+  shop: 'Shop Happy Beanie — Dog and Cat Anti-Aging Chews',
+  quiz: 'Is Happy Beanie Right for Your Pet? Eligibility Screener',
+  dosing: 'Dosing Calculator — The Right Dose for Your Pet | Happy Beanie',
+  certs: 'Certificates of Analysis — Every Lot Tested | Happy Beanie',
+  about: 'About Happy Beanie — Peptide Care from Scottsdale, AZ',
+  contact: 'Contact Happy Beanie',
+  cart: 'Your cart | Happy Beanie',
+  checkout: 'Checkout | Happy Beanie'
+};
+window.hbRouteTitle = function (page) {
+  var t = window.HB_ROUTE_META[page || 'home'];
+  if (t) try { document.title = t; } catch (e) {}
 };
 // One dosing rule for the whole storefront (dosing page, purchase panel,
 // cart). Cats take 1 chew at any weight. Dogs follow the label chart:
@@ -1401,7 +1423,9 @@ image-slot:not([data-filled]) { color: transparent !important; }
 [data-pc-plain] .pc-id { display: none; }
 [data-m~="pdphead"] { display: none !important; }
 .pc-id__row { display: flex; justify-content: space-between; align-items: center; gap: 10px 18px; flex-wrap: wrap; }
-.pc-id__k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--green); }
+/* The product page's one heading. It is the eyebrow — same type, same
+   place — so nothing moves; the h1 is for the crawler, not the layout. */
+.pc-id__k { font-family: var(--mono); font-weight: 400; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--green); margin: 0; }
 .pc-id__rate { display: inline-flex; align-items: center; gap: 10px; }
 .pc-id__stars { font-size: 11px; line-height: 1; letter-spacing: 2.5px; color: oklch(0.72 0.14 78); }
 .pc-id__n { font-family: var(--mono); font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
@@ -5621,6 +5645,7 @@ class Component extends DCLogic {
     if (VALID_PAGES.includes(pathPage) && pathPage !== (this.state.page || 'home')) {
       this.setState({ page: pathPage });
     }
+    if (window.hbRouteTitle) window.hbRouteTitle(VALID_PAGES.includes(pathPage) ? pathPage : 'home');
     // Deep links can name a species (?sp=dog|cat) — the dosing calculator's
     // shop CTA uses this so /product opens on the right formula.
     try {
@@ -5629,7 +5654,7 @@ class Component extends DCLogic {
     } catch (e) {}
     this.onPopState = () => {
       const p = window.location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
-      if (VALID_PAGES.includes(p)) this.setState({ page: p, menuOpen: false });
+      if (VALID_PAGES.includes(p)) { this.setState({ page: p, menuOpen: false }); if (window.hbRouteTitle) window.hbRouteTitle(p); }
     };
     window.addEventListener('popstate', this.onPopState);
     // The label's fit depends on both columns' heights, which move with the
@@ -6029,6 +6054,7 @@ class Component extends DCLogic {
       if (typeof window !== 'undefined') {
         const path = page === 'home' ? '/' : '/' + page;
         if (window.location.pathname !== path) window.history.pushState({ page }, '', path);
+        if (window.hbRouteTitle) window.hbRouteTitle(page);
         window.scrollTo({ top: 0 });
       }
     };
@@ -6216,7 +6242,7 @@ class Component extends DCLogic {
       { key: 'cat', label: 'For cats', meta: 'Happy Beans for Cats™ · 4–22 lb', slot: 'hbv2-species-cat', ph: 'Cat portrait, natural light' }
     ];
     const copy = isDog ? {
-      eyebrow: 'Happy Beans™ · For Dogs',
+      eyebrow: 'Happy Beans™ · Anti-Aging Chew for Dogs',
       head: 'For Dogs',
       italic: '',
       body: 'Formulated with human-grade ingredients, real food nutrition, and clinically studied doses of key active ingredients—including UC-II® collagen peptide and Green Lipped Mussel to help fight inflammation, reduce stiffness, support mobility, and promote healthy heart & organ function.',
@@ -6233,7 +6259,7 @@ class Component extends DCLogic {
       ],
       other: 'Other ingredients: chickpea flour, cane molasses, glycerin, coconut oil, sea salt, natural chicken flavor, lecithin, sorbic acid.'
     } : {
-      eyebrow: 'Happy Beans™ · For Cats',
+      eyebrow: 'Happy Beans™ · Anti-Aging Chew for Cats',
       head: 'For Cats',
       italic: '',
       body: 'Formulated with human-grade ingredients, real food nutrition, and clinically studied doses of key active ingredients—including UC-II® collagen peptide and Green Lipped Mussel to help fight inflammation, reduce stiffness, support mobility, and promote healthy heart & organ function.',
@@ -9743,7 +9769,7 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   // into the top of the panel; the standalone header block is hidden
   // there. Text is read from that block so the two can never differ.
   + '<div class="pc-id">'
-  + '<div class="pc-id__row"><span class="pc-id__k" data-eyebrow></span>'
+  + '<div class="pc-id__row"><h1 class="pc-id__k" data-eyebrow></h1>'
   + '<span class="pc-id__rate"><span class="pc-id__stars" aria-hidden="true">★★★★★</span><span class="pc-id__n">1,204 verified owners</span></span></div>'
   // The last sentence is a link, so the copy is a text span plus an inline
   // anchor inside the one paragraph — the lede is written with textContent

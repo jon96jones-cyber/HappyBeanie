@@ -146,6 +146,29 @@ if (ld) {
   });
 }
 
+// middleware.js writes each route's <title> into the HTML at the edge, and
+// HB_ROUTE_META in index.html sets the tab title on in-app navigation. A
+// route whose crawled title differs from its tab title is a page describing
+// itself two ways.
+{
+  const mw = read('middleware.js');
+  const mwBlock = (mw.match(/const ROUTES = \{([\s\S]*?)\n\};/) || [])[1] || '';
+  const edge = Object.fromEntries([...mwBlock.matchAll(/(\w+): \{\s*title: '([^']*)'/g)].map((m) => [m[1], m[2]]));
+  const appBlock = (html.match(/window\.HB_ROUTE_META = \{([\s\S]*?)\};/) || [])[1] || '';
+  const app = Object.fromEntries([...appBlock.matchAll(/(\w+): '([^']*)'/g)].map((m) => [m[1], m[2]]));
+  if (!Object.keys(edge).length) fail('CONFLICT', 'middleware.js', 'no ROUTES titles found');
+  if (!Object.keys(app).length) fail('CONFLICT', 'index.html', 'no HB_ROUTE_META titles found');
+  const keys = new Set([...Object.keys(edge), ...Object.keys(app)]);
+  keys.forEach((k) => {
+    if (edge[k] !== app[k]) fail('CONFLICT', 'route ' + k, `edge title ${JSON.stringify(edge[k])} vs app title ${JSON.stringify(app[k])}`);
+  });
+  const matcher = (mw.match(/matcher: \[([^\]]*)\]/) || [])[1] || '';
+  Object.keys(edge).forEach((k) => {
+    const path = k === 'home' ? "'/'" : "'/" + k + "'";
+    if (matcher.indexOf(path) === -1) fail('CONFLICT', 'middleware.js', `route ${k} has a title but is not in the matcher`);
+  });
+}
+
 // The shipping policy and the storefront both state a dispatch time.
 const shipping = read('policies/shipping.html');
 if (/24\s*h(ours)?/i.test(prose) && !/next business (morning|day)|24\s*h/i.test(shipping)) {
@@ -159,7 +182,7 @@ if (/24\s*h(ours)?/i.test(prose) && !/next business (morning|day)|24\s*h/i.test(
 // the dog page.
 
 // The claim copy is defined per species in the same object as the list.
-const ledes = [...html.matchAll(/eyebrow: 'Happy Beans[^']*· For (Dogs|Cats)'[\s\S]{0,600}?body: '([^']+)'/g)]
+const ledes = [...html.matchAll(/eyebrow: 'Happy Beans[^']*\b[Ff]or (Dogs|Cats)'[\s\S]{0,600}?body: '([^']+)'/g)]
   .map((m) => ({ species: m[1].toLowerCase().slice(0, 3), body: m[2] }));
 
 if (!ledes.length) fail('UNSOURCED', 'index.html', 'could not find the per-species product ledes to check');
