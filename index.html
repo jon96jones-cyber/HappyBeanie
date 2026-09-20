@@ -1427,6 +1427,21 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .pc-chews span { display: block; overflow: hidden; flex: 0 0 auto; } .pc-chews img { display: block; object-fit: contain; }
 .pc-dose__t { font-weight: 700; letter-spacing: -0.04em; font-size: 20px; line-height: 1.05; }
 .pc-plans { display: grid; gap: 6px; padding: 16px 0 18px; }
+/* The single-box toggle (Jon, Sep 2026): one pill, two segments, the chosen
+   one solid ink. When a multi-box row below is the selection, the pill keeps
+   its position but steps back, so the one highlighted thing on the panel is
+   always the plan that the CTA will charge for. */
+.pc-toggle { display: flex; padding: 4px; background: #EDE6D8; border: 1.5px solid var(--ink); border-radius: 999px; transition: opacity 0.2s ease; }
+.pc-toggle:not([data-active]) { opacity: 0.55; }
+.pc-seg { touch-action: manipulation; flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 8px 14px; background: transparent; border: none; border-radius: 999px; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: var(--muted); transition: background 0.2s ease, color 0.2s ease; }
+.pc-seg[hidden] { display: none; }
+.pc-seg[aria-pressed="true"] { background: var(--ink); color: #F5F0E6; }
+.pc-seg:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.pc-seg__save { font-family: var(--mono); font-weight: 500; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); }
+.pc-seg[aria-pressed="true"] .pc-seg__save { color: var(--yellow); }
+.pc-seg__save:empty { display: none; }
+.pc-one { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; padding: 6px 16px 8px; }
+.pc-one .pc-fit { margin-top: 0; }
 .pc-row { touch-action: manipulation; position: relative; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; text-align: left; padding: 13px 16px; background: transparent; border: 1.5px solid rgba(23,20,15,0.16); border-radius: 4px; cursor: pointer; font-family: var(--sans); color: var(--ink); transition: background 0.2s ease, border-color 0.2s ease; }
 .pc-row[aria-pressed="true"] { background: oklch(0.86 0.14 92 / 0.28); border-color: var(--ink); }
 .pc-row[hidden] { display: none; }
@@ -1471,9 +1486,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
   .pc-dose { grid-template-columns: 46px 1fr; gap: 12px; padding-bottom: 12px; }
   .pc-chews { width: 46px; height: 42px; }
   .pc-dose__t { font-size: 18px; }
-  /* The 14px row gap stays — the "Most chosen" chip sits in it on touch. */
+  /* The 14px row gap stays — the "Best value" chip sits in it on touch. */
   .pc-plans { padding: 13px 0 14px; }
   .pc-row { padding: 11px 14px; }
+  .pc-seg { min-height: 42px; padding: 6px 10px; gap: 7px; font-size: 14px; }
+  .pc-one { padding: 4px 14px 6px; }
   .pc-cta { padding: 17px; }
 }
 
@@ -9697,22 +9714,22 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<div class="pc-body">'
   + '<div class="pc-dose"><div class="pc-chews" data-chews></div><div class="pc-dose__t" data-dose></div></div>'
   + '<div class="pc-plans">'
-  + '<button class="pc-row" type="button" data-plan="0">'
-  + '<span class="pc-tag" data-tag></span>'
-  + '<span><span class="pc-name">One-time</span><span class="pc-fit" data-fit></span></span>'
-  // Every row prices per box (Jon, Sep 2026), with the saving against the
-  // same boxes bought one at a time underneath — so the four plans compare
-  // on one number, and the bundle correctly reads as the best rate. The
-  // total is deliberately off the rows; the CTA names it the moment a plan
-  // is selected. Figures here are only the first paint; the render
-  // recomputes them from each plan's price and box count.
-  + '<span style="text-align:right"><span class="pc-price" data-price>$115<span class="pc-per">/box</span></span><span class="pc-save" data-save></span></span>'
-  + '</button>'
-  + '<button class="pc-row" type="button" data-plan="1">'
-  + '<span class="pc-tag">Most chosen</span>'
-  + '<span><span class="pc-name">Subscribe &amp; Save</span><span class="pc-fit" data-fit></span></span>'
+  // The single box is a two-way toggle, Subscribe or One-time (Jon, Sep
+  // 2026), in place of the two rows it used to be. The readout under it
+  // carries what those rows carried: the per-box price, the saving against
+  // buying once, and how long a box lasts at the dose on the slider. The
+  // multi-box plans stay as rows beneath. Whichever of the four is chosen,
+  // the total is off the panel and the CTA names it. Figures here are only
+  // the first paint; the render recomputes them from each plan's price and
+  // box count.
+  + '<div class="pc-toggle" role="group" aria-label="One box" data-toggle>'
+  + '<button class="pc-seg" type="button" data-plan="1" aria-pressed="true"><span class="pc-seg__n">Subscribe</span><span class="pc-seg__save" data-seg-save>Save 14%</span></button>'
+  + '<button class="pc-seg" type="button" data-plan="0" aria-pressed="false"><span class="pc-seg__n">One-time</span></button>'
+  + '</div>'
+  + '<div class="pc-one" data-one>'
+  + '<span class="pc-fit" data-fit>A box lasts 30 days</span>'
   + '<span style="text-align:right"><span class="pc-price" data-price>$99<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $16</span></span>'
-  + '</button>'
+  + '</div>'
   + '<button class="pc-row pc-row--big" hidden type="button" data-plan="3">'
   + '<span class="pc-tag">For big beans</span>'
   + '<span><span class="pc-name">2 boxes, one order</span><span class="pc-fit" data-fit></span></span>'
@@ -9747,7 +9764,7 @@ window.hbPcInit = function (ctx) {
       // First sight of this node (or a hydration clone that kept the markup
       // and lost the listeners): wire it and give it its own state.
       hbPcWired.add(root);
-      S = root.__pc = { sp: 'dog', lb: 45, catLb: 10, sel: '1', added: false, wholesale: false, subsOff: false, tradePrice: null, tradeMin: 5 };
+      S = root.__pc = { sp: 'dog', lb: 45, catLb: 10, sel: '1', one: '1', added: false, wholesale: false, subsOff: false, tradePrice: null, tradeMin: 5 };
       wire();
     }
     if (ctx) {
@@ -9791,9 +9808,13 @@ window.hbPcInit = function (ctx) {
     document.addEventListener('click', function (e) {
       var root = stateOf(e.target); if (!root) return;
       var S = root.__pc;
-      var row = e.target.closest('.pc-row');
-      if (row && root.contains(row)) {
-        S.sel = row.getAttribute('data-plan'); S.added = false;
+      // A toggle segment and a plan row both choose a plan. The segment also
+      // sets which way the toggle sits, so it holds its position while a
+      // multi-box row is the selection and comes straight back on a tap.
+      var pick = e.target.closest('.pc-row, .pc-seg');
+      if (pick && root.contains(pick)) {
+        S.sel = pick.getAttribute('data-plan'); S.added = false;
+        if (pick.classList.contains('pc-seg')) S.one = S.sel;
         render(root, S); emit(root, 'hb:pc', { plan: Number(S.sel) });
         return;
       }
@@ -9823,6 +9844,12 @@ window.hbPcInit = function (ctx) {
     if (S.sel === '3' && !big) S.sel = '1';
     if ((S.sel === '1' || S.sel === '3') && (S.subsOff || S.wholesale)) S.sel = '0';
     if (S.sel === '2' && S.wholesale) S.sel = '0';
+    // Which way the single-box toggle sits. It follows the selection when
+    // that is a single box (a plan handed in by the app included), and it
+    // can only sit on Subscribe while subscriptions are on offer.
+    if (S.sel === '0' || S.sel === '1') S.one = S.sel;
+    if (S.one !== '0' && S.one !== '1') S.one = '1';
+    if (S.subsOff || S.wholesale) S.one = '0';
     var pct = function (v) { return ((v - sc.min) / (sc.max - sc.min)) * 100; };
     range.min = String(sc.min); range.max = String(sc.max); range.value = String(lb);
     // The track's filled portion is a CSS variable the thumb position sets.
@@ -9842,32 +9869,52 @@ window.hbPcInit = function (ctx) {
     doseEl.textContent = (d === 0.5 ? '½ chew a day' : d === 1 ? '1 chew a day' : d === 1.5 ? '1½ chews a day' : '2 chews a day')
       + ' for a ' + lb + ' lb ' + (cat ? 'cat' : 'dog');
     var money = function (n) { return '$' + Number(n).toFixed(2).replace(/\.00$/, ''); };
-    root.querySelectorAll('.pc-row').forEach(function (r) {
-      var k = r.getAttribute('data-plan'), p = PLANS[k], fit = r.querySelector('[data-fit]');
-      r.setAttribute('aria-pressed', String(k === S.sel));
-      // Every row prices per box, with the saving against the same number of
-      // boxes bought one at a time underneath. Both come off the plan's own
-      // price and box count — the two numbers checkout bills on — so the
-      // panel cannot quote a rate the cart disagrees with. A one-time box
-      // saves nothing against itself, so its save line stays empty.
+    // Every plan prices per box, with the saving against the same number of
+    // boxes bought one at a time underneath. Both come off the plan's own
+    // price and box count — the two numbers checkout bills on — so the
+    // panel cannot quote a rate the cart disagrees with. A one-time box
+    // saves nothing against itself, so its save line stays empty.
+    var priceInto = function (el, k) {
+      var p = PLANS[k];
+      // Wholesale accounts see their trade unit price on the one box they
+      // can order, as the old picker did.
       var trade = k === '0' && S.wholesale && S.tradePrice;
       var unit = trade ? S.tradePrice : p.price / p.boxes;
       var saved = trade ? 0 : PLANS[0].price * p.boxes - p.price;
-      r.querySelector('[data-price]').innerHTML = money(unit) + '<span class="pc-per">/box</span>';
-      // Wholesale accounts see their trade unit price on the one box they
-      // can order, as the old picker did.
-      r.querySelector('[data-save]').textContent = trade ? 'Trade price · ' + S.tradeMin + '+ boxes' : (saved > 0 ? 'save ' + money(saved) : '');
-      if (k === '0') r.querySelector('[data-tag]').textContent = S.wholesale ? 'Trade account' : '';
+      el.querySelector('[data-price]').innerHTML = money(unit) + '<span class="pc-per">/box</span>';
+      el.querySelector('[data-save]').textContent = trade ? 'Trade price · ' + S.tradeMin + '+ boxes' : (saved > 0 ? 'save ' + money(saved) : '');
+    };
+    var boxFit = function (k) {
+      return k === '1'
+        ? (lasts >= 30 ? 'A box lasts ' + lasts + ' days' : 'A box lasts ' + lasts + ' days · we ship every ' + lasts)
+        : (PLANS[k].boxes * lasts) + ' days of chews';
+    };
+    // The single-box toggle and its readout.
+    var toggle = root.querySelector('[data-toggle]'), one = root.querySelector('[data-one]');
+    var subOn = !S.subsOff && !S.wholesale;
+    root.querySelectorAll('.pc-seg').forEach(function (seg) {
+      var k = seg.getAttribute('data-plan');
+      seg.hidden = k === '1' && !subOn;
+      seg.setAttribute('aria-pressed', String(k === S.one));
+    });
+    // The saving the subscription makes on a box, as a share of buying once.
+    var segSave = root.querySelector('[data-seg-save]');
+    if (segSave) segSave.textContent = 'Save ' + Math.round((1 - PLANS[1].price / PLANS[0].price) * 100) + '%';
+    if (S.sel === '0' || S.sel === '1') toggle.setAttribute('data-active', ''); else toggle.removeAttribute('data-active');
+    one.querySelector('[data-fit]').textContent = boxFit(S.one);
+    priceInto(one, S.one);
+    // The multi-box rows.
+    root.querySelectorAll('.pc-row').forEach(function (r) {
+      var k = r.getAttribute('data-plan'), fit = r.querySelector('[data-fit]');
+      r.setAttribute('aria-pressed', String(k === S.sel));
+      priceInto(r, k);
       if (k === '3') {
         r.hidden = !big;
         fit.textContent = (2 * lasts) + ' days at ' + (d === 2 ? '2' : '1½') + ' a day · a full month covered';
         return;
       }
-      if (k === '1') r.hidden = S.subsOff || S.wholesale;
       if (k === '2') r.hidden = S.wholesale;
-      fit.textContent = p.key === 'monthly'
-        ? (lasts >= 30 ? 'A box lasts ' + lasts + ' days' : 'A box lasts ' + lasts + ' days · we ship every ' + lasts)
-        : (p.boxes * lasts) + ' days of chews';
+      fit.textContent = boxFit(k);
     });
     var c = PLANS[S.sel] || PLANS[1], price = S.sel === '0' && S.wholesale && S.tradePrice ? S.tradePrice : c.price;
     cta.textContent = S.added ? 'Added — checkout →' : 'Start the ' + (c.boxes * lasts) + ' days · $' + String(price).replace(/\.00$/, '') + ' →';
