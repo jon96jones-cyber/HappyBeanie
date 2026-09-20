@@ -1473,10 +1473,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .pc-save { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--green); margin-top: 2px; }
 .pc-save:empty { display: none; }
 .pc-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7; }
-.pc-cta { touch-action: manipulation; display: block; width: 100%; padding: 20px; background: var(--yellow); color: var(--ink); border: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s ease; }
-/* Yellow with ink text (Jon, Sep 2026), like the site's other yellow buttons;
-   hover deepens the yellow rather than swapping colour. */
-@media (hover: hover) and (pointer: fine) { .pc-cta:hover { background: oklch(0.80 0.14 88); } }
+.pc-cta { touch-action: manipulation; display: block; width: calc(100% - 48px); margin: 0 24px 22px; padding: 18px 20px; border-radius: 999px; box-shadow: 0 0 0 2px var(--yellow); background: var(--ink); color: #F5F0E6; border: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s ease; }
+/* The same object as the chosen Subscribe segment (Jon, Sep 2026): an ink
+   pill with cream text and a yellow ring, sitting inside the panel's padding
+   so the ring is not clipped by its edge. Hover thickens the ring. */
+@media (hover: hover) and (pointer: fine) { .pc-cta:hover { box-shadow: 0 0 0 3px var(--yellow); } }
 /* The panel on a phone (Jon, Sep 2026): it stood 763px, 90% of an iPhone 14
    screen, so reading from the lede to the buy button was most of a scroll.
    Nothing here is removed — every plan, the slider, the dose line and the
@@ -1508,7 +1509,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
   /* A shorter pill on a phone (Jon, Sep 2026): 48px tall against 56. */
   .pc-toggle { padding: 4px; }
   .pc-seg { min-height: 38px; padding: 4px 10px; gap: 7px; font-size: 15px; }
-  .pc-cta { padding: 17px; }
+  .pc-cta { width: calc(100% - 32px); margin: 0 16px 16px; padding: 16px 18px; }
 }
 
 /* Spin-to-win popup (designer handoff, Jon, Sep 2026). Replaces the research
