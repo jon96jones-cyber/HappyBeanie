@@ -1444,8 +1444,9 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .pc-seg__save { font-family: var(--mono); font-weight: 500; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); }
 .pc-seg[aria-pressed="true"] .pc-seg__save { color: var(--yellow); }
 .pc-seg__save:empty { display: none; }
-.pc-one { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; padding: 6px 16px 8px; }
-.pc-one .pc-fit { margin-top: 0; }
+/* The 1-box row sits directly under the pill; a little extra air keeps the
+   pill's ring clear of the row's border. */
+.pc-row[data-one] { margin-top: 4px; }
 .pc-row { touch-action: manipulation; position: relative; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; text-align: left; padding: 13px 16px; background: transparent; border: 1.5px solid rgba(23,20,15,0.16); border-radius: 4px; cursor: pointer; font-family: var(--sans); color: var(--ink); transition: background 0.2s ease, border-color 0.2s ease; }
 .pc-row[aria-pressed="true"] { background: oklch(0.86 0.14 92 / 0.28); border-color: var(--ink); }
 .pc-row[hidden] { display: none; }
@@ -1495,7 +1496,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
   .pc-row { padding: 11px 14px; }
   .pc-toggle { padding: 5px; }
   .pc-seg { min-height: 44px; padding: 6px 10px; gap: 7px; font-size: 15px; }
-  .pc-one { padding: 4px 14px 6px; }
   .pc-cta { padding: 17px; }
 }
 
@@ -9720,21 +9720,25 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<div class="pc-dose"><div class="pc-chews" data-chews></div><div class="pc-dose__t" data-dose></div></div>'
   + '<div class="pc-plans">'
   // The single box is a two-way toggle, Subscribe or One-time (Jon, Sep
-  // 2026), in place of the two rows it used to be. The readout under it
-  // carries what those rows carried: the per-box price, the saving against
-  // buying once, and how long a box lasts at the dose on the slider. The
-  // multi-box plans stay as rows beneath. Whichever of the four is chosen,
-  // the total is off the panel and the CTA names it. Figures here are only
-  // the first paint; the render recomputes them from each plan's price and
-  // box count.
+  // 2026), in place of the two rows it used to be, with a 1-box row under it
+  // that is priced for whichever side the toggle sits on: the per-box price,
+  // the saving against buying once, and how long a box lasts at the dose on
+  // the slider. The multi-box plans are the rows beneath that. Whichever of
+  // the four is chosen, the total is off the panel and the CTA names it.
+  // Figures here are only the first paint; the render recomputes them from
+  // each plan's price and box count.
   + '<div class="pc-toggle" role="group" aria-label="One box" data-toggle>'
   + '<button class="pc-seg" type="button" data-plan="1" aria-pressed="true"><span class="pc-seg__n">Subscribe</span><span class="pc-seg__save" data-seg-save>Save 14%</span></button>'
   + '<button class="pc-seg" type="button" data-plan="0" aria-pressed="false"><span class="pc-seg__n">One-time</span></button>'
   + '</div>'
-  + '<div class="pc-one" data-one>'
-  + '<span class="pc-fit" data-fit>A box lasts 30 days</span>'
+  // The 1-box row (Jon, Sep 2026): a plan row like the ones under it, whose
+  // price per box follows the toggle. Its data-plan is set in the render to
+  // whichever side the toggle sits on, so tapping it selects that plan.
+  + '<button class="pc-row" type="button" data-plan="1" data-one>'
+  + '<span class="pc-tag" data-one-tag>Most chosen</span>'
+  + '<span><span class="pc-name">1 box</span><span class="pc-fit" data-fit>A box lasts 30 days</span></span>'
   + '<span style="text-align:right"><span class="pc-price" data-price>$99<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $16</span></span>'
-  + '</div>'
+  + '</button>'
   + '<button class="pc-row pc-row--big" hidden type="button" data-plan="3">'
   + '<span class="pc-tag">For big beans</span>'
   + '<span><span class="pc-name">2 boxes, one order</span><span class="pc-fit" data-fit></span></span>'
@@ -9905,11 +9909,17 @@ window.hbPcInit = function (ctx) {
     // The saving the subscription makes on a box, as a share of buying once.
     var segSave = root.querySelector('[data-seg-save]');
     if (segSave) segSave.textContent = 'Save ' + Math.round((1 - PLANS[1].price / PLANS[0].price) * 100) + '%';
-    if (S.sel === '0' || S.sel === '1') toggle.setAttribute('data-active', ''); else toggle.removeAttribute('data-active');
+    var single = S.sel === '0' || S.sel === '1';
+    if (single) toggle.setAttribute('data-active', ''); else toggle.removeAttribute('data-active');
+    // The 1-box row: it is the plan the toggle points at, priced as such,
+    // and it is the selection whenever a single box is.
+    one.setAttribute('data-plan', S.one);
+    one.setAttribute('aria-pressed', String(single));
     one.querySelector('[data-fit]').textContent = boxFit(S.one);
+    one.querySelector('[data-one-tag]').textContent = S.one === '1' ? 'Most chosen' : '';
     priceInto(one, S.one);
     // The multi-box rows.
-    root.querySelectorAll('.pc-row').forEach(function (r) {
+    root.querySelectorAll('.pc-row:not([data-one])').forEach(function (r) {
       var k = r.getAttribute('data-plan'), fit = r.querySelector('[data-fit]');
       r.setAttribute('aria-pressed', String(k === S.sel));
       priceInto(r, k);
