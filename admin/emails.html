@@ -61,6 +61,12 @@ iframe { border:0; background:#fff; width:640px; max-width:100%; height:1200px; 
 .frameWrap.phone iframe { width:641px; max-width:none; height:1390px; transform:scale(0.6708); transform-origin:top left; margin:0; box-shadow:none; }
 pre.textalt { display:none; padding:20px 22px; white-space:pre-wrap; font-family:'DM Mono',ui-monospace,monospace; font-size:12.5px; line-height:1.7; color:#DED5C4; background:#100E0A; }
 .hint { color:#8A7F6E; font-size:13px; margin-top:14px; }
+.proof { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:12px 18px; border-bottom:1px solid rgba(245,240,230,0.12); }
+.proof input { flex:1 1 220px; min-width:0; padding:9px 12px; border-radius:3px; border:1px solid rgba(245,240,230,0.24); background:transparent; color:#F5F0E6; font-family:'DM Sans',system-ui,sans-serif; font-size:14px; }
+.proof input:focus { outline:none; border-color:#F0C64B; }
+.proofMsg { font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:#8A7F6E; flex-basis:100%; }
+.proofMsg.ok { color:#F0C64B; }
+.proofMsg.bad { color:#E5765A; }
 @media (max-width: 860px) { .wrap { grid-template-columns:1fr; } .list { position:static; max-height:none; display:grid; grid-template-columns:1fr 1fr; gap:0 10px; } .grp { grid-column:1/-1; } }
 </style>
 </head><body>
@@ -94,6 +100,12 @@ pre.textalt { display:none; padding:20px 22px; white-space:pre-wrap; font-family
           <div class="mono" style="font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; color:#8A7F6E;" id="meta"></div>
         </div>
         <div class="note" id="note" hidden></div>
+        <div class="proof" id="proof">
+          <input id="proofTo" type="email" placeholder="Send a proof to… (your address)" autocomplete="email">
+          <button id="proofOne">Send this one</button>
+          <button id="proofAll" hidden>Send the whole series</button>
+          <span class="mono proofMsg" id="proofMsg"></span>
+        </div>
         <div class="frameWrap" id="frameWrap"><div class="device"><div class="screen"><iframe id="frame" title="Email preview"></iframe></div></div></div>
         <pre class="textalt" id="textalt"></pre>
       </div>
@@ -161,8 +173,42 @@ pre.textalt { display:none; padding:20px 22px; white-space:pre-wrap; font-family
       $('frame').srcdoc = b.html;
       $('textalt').textContent = b.text || 'No separate text version for this design.';
       if (mode === 'text' && !b.text) setMode('desk');
+      var siblings = designs.filter(function (d) { return d.group === b.group; }).length;
+      $('proofAll').hidden = siblings < 2;
+      $('proofAll').textContent = 'Send the whole ' + (siblings === 3 && b.group === 'Welcome series' ? 'series' : 'group') + ' (' + siblings + ')';
+      $('proofMsg').textContent = ''; $('proofMsg').className = 'mono proofMsg';
     });
   }
+
+  // A proof to your own inbox — one design, or the whole group in order.
+  function proof(whole) {
+    var to = $('proofTo').value.trim();
+    var msg = $('proofMsg');
+    if (!to || to.indexOf('@') === -1) { msg.textContent = 'Enter the address to send to.'; msg.className = 'mono proofMsg bad'; return; }
+    if (!current) return;
+    var d = designs.filter(function (x) { return x.id === current; })[0];
+    if (!d) return;
+    try { localStorage.setItem('hb_proof_to', to); } catch (e) {}
+    $('proofOne').disabled = true; $('proofAll').disabled = true;
+    msg.textContent = 'Sending…'; msg.className = 'mono proofMsg';
+    var body = whole ? { group: d.group, to: to } : { id: d.id, to: to };
+    fetch('/api/admin/email-gallery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-analytics-key': key },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); }).then(function (b) {
+      if (b.ok) { msg.textContent = 'Sent ' + b.sent + ' to ' + b.to + ' · subjects carry a [Test] tag'; msg.className = 'mono proofMsg ok'; }
+      else {
+        var bad = (b.results || []).filter(function (x) { return !x.ok; }).map(function (x) { return x.id + ' (' + x.error + ')'; });
+        msg.textContent = 'Could not send: ' + (bad.length ? bad.join(', ') : (b.error || 'unknown'));
+        msg.className = 'mono proofMsg bad';
+      }
+    }).catch(function () { msg.textContent = 'The send could not be reached.'; msg.className = 'mono proofMsg bad'; })
+      .then(function () { $('proofOne').disabled = false; $('proofAll').disabled = false; });
+  }
+  $('proofOne').addEventListener('click', function () { proof(false); });
+  $('proofAll').addEventListener('click', function () { proof(true); });
+  try { $('proofTo').value = localStorage.getItem('hb_proof_to') || ''; } catch (e) {}
 
   function boot() {
     api('').then(function (b) {
