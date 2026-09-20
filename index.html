@@ -432,6 +432,10 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
       line = v.big ? { merchandiseId: v.big, quantity: r.qty } : { merchandiseId: v.onetime, quantity: r.qty * 2 };
       var bigPlan = window.hbBigPlanFor(r.lb);
       if (bigPlan) line.sellingPlanId = bigPlan;
+    } else if (r.plan === 4) {
+      // 2 boxes, bought once (dogs over 75 lb, Jon, Sep 2026): two one-time
+      // boxes and no selling plan. Nothing new in Shopify.
+      line = { merchandiseId: v.onetime, quantity: r.qty * 2 };
     } else {
       line = { merchandiseId: v.onetime, quantity: r.qty };
       if (r.plan === 1) line.sellingPlanId = window.hbSellingPlanFor(r.key, r.lb);
@@ -5212,7 +5216,7 @@ class Component extends DCLogic {
   }
 
   cartMath() {
-    const price = [115, 99, 297, 159];
+    const price = [115, 99, 297, 159, 198];
     // Plan 3 is the 2-box order for dogs over 75 lb (Setup_39). Terms name
     // how long a box actually lasts at the dose the shopper set — which is
     // why the 2-box term is computed rather than written out: 60 chews is
@@ -5221,13 +5225,13 @@ class Component extends DCLogic {
     const chewsDog = window.hbDose('dog', lbDog);
     const term = (key, plan) => {
       const l = key === 'dog' ? window.hbBoxDays('dog', lbDog) : 30;
-      return ['One-time · ' + l + '-day supply', 'Subscribe & save · ' + l + '-day supply', 'Buy 3 get 1 free · ' + (l === 30 ? '4 months' : (4 * l) + ' days'), '2 boxes, one order · ' + (2 * l) + '-day supply'][plan];
+      return ['One-time · ' + l + '-day supply', 'Subscribe & save · ' + l + '-day supply', 'Buy 3 get 1 free · ' + (l === 30 ? '4 months' : (4 * l) + ' days'), '2 boxes, one order · ' + (2 * l) + '-day supply', '2 boxes, one-time · ' + (2 * l) + '-day supply'][plan];
     };
     const rows = [];
     if (this.state.cartDog > 0) rows.push({ key: 'dog', badge: 'For dogs', name: 'Happy Beans for Dogs', slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans box', qty: this.state.cartDog, plan: this.state.cartPlanDog, lb: lbDog, dose: (chewsDog === 0.5 ? '½ chew' : chewsDog === 1 ? '1 chew' : chewsDog === 1.5 ? '1½ chews' : '2 chews') + ' a day' });
     // Cats are dosed flat, so their weight changes nothing about the plan —
     // it rides along so the order says which cat the box is for.
-    if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box', qty: this.state.cartCat, plan: this.state.cartPlanCat === 3 ? 1 : this.state.cartPlanCat, lb: this.state.cartLbCat || 10, dose: '1 chew a day' });
+    if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box', qty: this.state.cartCat, plan: this.state.cartPlanCat === 3 ? 1 : this.state.cartPlanCat === 4 ? 0 : this.state.cartPlanCat, lb: this.state.cartLbCat || 10, dose: '1 chew a day' });
     // Wholesale accounts are never offered subscriptions or bundles — any
     // plan that slipped into the cart (the picker's subscription default, a
     // cart saved before sign-in) is coerced to one-time here, so pricing
@@ -6166,8 +6170,9 @@ class Component extends DCLogic {
       { idx: 0, title: 'One-time', sub: pcLasts + '-day supply, shipped once', price: 115, save: '', badge: '', boxes: 1 },
       { idx: 1, title: 'Subscribe & save', sub: pcLasts + '-day supply · cancel anytime', price: 99, save: 'Save $16/mo', badge: 'Most chosen', boxes: 1 },
       { idx: 3, title: '2 boxes, one order', sub: (2 * pcLasts) + '-day supply · cancel anytime', price: 159, save: 'Save $71', badge: 'For big beans', boxes: 2 },
+      { idx: 4, title: '2 boxes', sub: (2 * pcLasts) + '-day supply, shipped once', price: 198, save: 'Save $32', badge: 'For big beans', boxes: 2 },
       { idx: 2, title: 'Buy 3, get 1 free', sub: (pcLasts * 4) + ' days · best value', price: 297, save: 'Save $163', badge: 'Best value', boxes: 4 }
-    ].filter(p => p.idx !== 3 || bigOk);
+    ].filter(p => (p.idx !== 3 && p.idx !== 4) || bigOk);
     // idx is the canonical plan number checkout maps on (1 = selling plan,
     // 2 = bundle variant, 3 = 2-box order) — it must survive any filtering
     // of this list.
@@ -6715,6 +6720,7 @@ class Component extends DCLogic {
           // 60 chews is 40 days at 1½ a day and 30 at 2, so the 2-box
           // cadence is computed, not written out. Plan 3 is dog-only.
           : i.plan === 3 ? 'Subscription · 2 boxes, auto-renews every ' + (2 * window.hbBoxDays('dog', i.lb)) + ' days'
+          : i.plan === 4 ? '2 boxes · one-time'
           : (i.plan === 2 ? 'Buy 3, get 1 free · one-time' : 'One-time purchase'),
         planColor: (i.plan === 1 || i.plan === 3) ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
         inc: () => this.setState(st => i.key === 'cat' ? { cartCat: st.cartCat + 1, ordered: false } : { cartDog: st.cartDog + 1, ordered: false }),
@@ -9779,6 +9785,14 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<span><span class="pc-name">2 boxes, one order</span><span class="pc-fit" data-fit></span></span>'
   + '<span style="text-align:right"><span class="pc-price" data-price>$79.50<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $71</span></span>'
   + '</button>'
+  // 2 boxes bought once (Jon, Sep 2026): the One-time side's middle rung for
+  // heavy dogs, so each side climbs 1 → 2 (→ 4) boxes with the per-box
+  // price falling at every step. Two of the one-time variant, no plan.
+  + '<button class="pc-row pc-row--big" hidden type="button" data-plan="4">'
+  + '<span class="pc-tag">For big beans</span>'
+  + '<span><span class="pc-name">2 boxes</span><span class="pc-fit" data-fit></span></span>'
+  + '<span style="text-align:right"><span class="pc-price" data-price>$99<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $32</span></span>'
+  + '</button>'
   + '<div class="pc-or" aria-hidden="true" data-or><span>Or buy in bulk · one-time</span></div>'
   + '<button class="pc-row" type="button" data-plan="2">'
   + '<span class="pc-tag">Best value</span>'
@@ -9790,7 +9804,7 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '</div>';
 var hbPcWired = new WeakSet(), hbPcDelegated = false;
 window.hbPcInit = function (ctx) {
-  var PLANS = { 0: { key: 'once', price: 115, boxes: 1 }, 1: { key: 'monthly', price: 99, boxes: 1 }, 2: { key: 'four', price: 297, boxes: 4 }, 3: { key: 'big', price: 159, boxes: 2 } };
+  var PLANS = { 0: { key: 'once', price: 115, boxes: 1 }, 1: { key: 'monthly', price: 99, boxes: 1 }, 2: { key: 'four', price: 297, boxes: 4 }, 3: { key: 'big', price: 159, boxes: 2 }, 4: { key: 'twice', price: 198, boxes: 2 } };
   // Each formula has its own weight bands (Jon, Sep 2026: pills in place of
   // the slider). A dog's are the rows of the label chart, so each band is a
   // dose, and their upper bounds are the same inclusive ones hbDose uses. A
@@ -9909,7 +9923,10 @@ window.hbPcInit = function (ctx) {
     if (ledeP) { if (S.lede) ledeP.removeAttribute('data-blank'); else ledeP.setAttribute('data-blank', ''); }
     // Selections that are no longer on offer settle where the app's picker
     // does: the subscription, then one-time.
+    // The one-time 2-box needs a heavy dog too, but not subscriptions on offer.
+    var big4 = !cat && d >= 1.5 && !S.wholesale;
     if (S.sel === '3' && !big) S.sel = '1';
+    if (S.sel === '4' && !big4) S.sel = '0';
     if ((S.sel === '1' || S.sel === '3') && (S.subsOff || S.wholesale)) S.sel = '0';
     if (S.sel === '2' && S.wholesale) S.sel = '0';
     // Which way the toggle sits: it shows the nature of the selected plan
@@ -9998,6 +10015,12 @@ window.hbPcInit = function (ctx) {
         // on Subscribe. Flip to One-time and it goes with the other renewals.
         r.hidden = !big || S.one !== '1';
         fit.textContent = (2 * lasts) + ' days at ' + (d === 2 ? '2' : '1½') + ' a day · a full month covered';
+        return;
+      }
+      if (k === '4') {
+        // Bought once: on offer to heavy dogs while the pill sits on One-time.
+        r.hidden = !big4 || S.one !== '0';
+        fit.textContent = (2 * lasts) + ' days of chews';
         return;
       }
       // The bundle is always listed, on either side of the pill, under its own
