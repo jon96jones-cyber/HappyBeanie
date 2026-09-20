@@ -5216,7 +5216,7 @@ class Component extends DCLogic {
   }
 
   cartMath() {
-    const price = [115, 99, 297, 159, 198];
+    const price = [115, 99, 297, 159, 230];
     // Plan 3 is the 2-box order for dogs over 75 lb (Setup_39). Terms name
     // how long a box actually lasts at the dose the shopper set — which is
     // why the 2-box term is computed rather than written out: 60 chews is
@@ -6170,7 +6170,7 @@ class Component extends DCLogic {
       { idx: 0, title: 'One-time', sub: pcLasts + '-day supply, shipped once', price: 115, save: '', badge: '', boxes: 1 },
       { idx: 1, title: 'Subscribe & save', sub: pcLasts + '-day supply · cancel anytime', price: 99, save: 'Save $16/mo', badge: 'Most chosen', boxes: 1 },
       { idx: 3, title: '2 boxes, one order', sub: (2 * pcLasts) + '-day supply · cancel anytime', price: 159, save: 'Save $71', badge: 'For big beans', boxes: 2 },
-      { idx: 4, title: '2 boxes', sub: (2 * pcLasts) + '-day supply, shipped once', price: 198, save: 'Save $32', badge: 'For big beans', boxes: 2 },
+      { idx: 4, title: '2 boxes', sub: (2 * pcLasts) + '-day supply, shipped once', price: 230, save: '', badge: 'For big beans', boxes: 2 },
       { idx: 2, title: 'Buy 3, get 1 free', sub: (pcLasts * 4) + ' days · best value', price: 297, save: 'Save $163', badge: 'Best value', boxes: 4 }
     ].filter(p => (p.idx !== 3 && p.idx !== 4) || bigOk);
     // idx is the canonical plan number checkout maps on (1 = selling plan,
@@ -9786,12 +9786,12 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<span style="text-align:right"><span class="pc-price" data-price>$79.50<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $71</span></span>'
   + '</button>'
   // 2 boxes bought once (Jon, Sep 2026): the One-time side's middle rung for
-  // heavy dogs, so each side climbs 1 → 2 (→ 4) boxes with the per-box
-  // price falling at every step. Two of the one-time variant, no plan.
+  // heavy dogs, at the one-time box price — two boxes, no discount and no
+  // plan. Two of the one-time variant.
   + '<button class="pc-row pc-row--big" hidden type="button" data-plan="4">'
   + '<span class="pc-tag">For big beans</span>'
   + '<span><span class="pc-name">2 boxes</span><span class="pc-fit" data-fit></span></span>'
-  + '<span style="text-align:right"><span class="pc-price" data-price>$99<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $32</span></span>'
+  + '<span style="text-align:right"><span class="pc-price" data-price>$115<span class="pc-per">/box</span></span><span class="pc-save" data-save></span></span>'
   + '</button>'
   + '<div class="pc-or" aria-hidden="true" data-or><span>Or buy in bulk · one-time</span></div>'
   + '<button class="pc-row" type="button" data-plan="2">'
@@ -9804,7 +9804,7 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '</div>';
 var hbPcWired = new WeakSet(), hbPcDelegated = false;
 window.hbPcInit = function (ctx) {
-  var PLANS = { 0: { key: 'once', price: 115, boxes: 1 }, 1: { key: 'monthly', price: 99, boxes: 1 }, 2: { key: 'four', price: 297, boxes: 4 }, 3: { key: 'big', price: 159, boxes: 2 }, 4: { key: 'twice', price: 198, boxes: 2 } };
+  var PLANS = { 0: { key: 'once', price: 115, boxes: 1 }, 1: { key: 'monthly', price: 99, boxes: 1 }, 2: { key: 'four', price: 297, boxes: 4 }, 3: { key: 'big', price: 159, boxes: 2 }, 4: { key: 'twice', price: 230, boxes: 2 } };
   // Each formula has its own weight bands (Jon, Sep 2026: pills in place of
   // the slider). A dog's are the rows of the label chart, so each band is a
   // dose, and their upper bounds are the same inclusive ones hbDose uses. A
