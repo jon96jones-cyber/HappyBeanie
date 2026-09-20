@@ -1348,16 +1348,27 @@ image-slot:not([data-filled]) { color: transparent !important; }
   .hb-wall { padding: 64px 20px; }
   /* The headline stays on one line on a phone: sized to the viewport, no wrap. */
   .hb-wall h2 { font-size: clamp(17px, 5.1vw, 30px) !important; white-space: nowrap !important; letter-spacing: -0.04em !important; }
-  .hb-wall [data-m~="bwinst"] { grid-template-columns: 1fr !important; }
-  /* Phones: the score panel folds into one compact row — the number on the
-     left, stars and the review line stacked beside it — instead of a tall
-     centred block (Jon, Sep 2026). */
-  .hb-wall [data-m~="bwscore"] { display: grid !important; grid-template-columns: auto auto !important; justify-content: center !important; align-items: center !important; column-gap: 16px !important; row-gap: 3px !important; border-right: none !important; border-bottom: 1.5px solid #17140F !important; padding: 12px 16px !important; }
-  .hb-wall [data-m~="bwscore"] > span:first-child { grid-row: 1 / span 2 !important; font-size: 44px !important; line-height: 0.9 !important; }
-  .hb-wall [data-m~="bwscore"] > span:nth-child(2) { justify-self: start !important; }
-  .hb-wall [data-m~="bwscore"] > span:last-child { text-align: left !important; line-height: 1.45 !important; }
-  .hb-wall [data-m~="bwinst"] > div:last-child { padding: 10px 14px !important; gap: 0 !important; }
-  .hb-wall [data-row] { min-height: 26px !important; padding: 3px 6px !important; gap: 10px !important; grid-template-columns: 28px 1fr 44px 12px !important; }
+  /* Phones (Jon, Sep 2026): the rating instrument was a score band with the
+     five distribution rows stacked under it, ~220px tall. The rows now sit
+     beside the score in a second column, so the whole instrument is about
+     the height of the rows alone. */
+  .hb-wall [data-m~="bwinst"] { grid-template-columns: 108px minmax(0, 1fr) !important; }
+  .hb-wall [data-m~="bwscore"] { display: flex !important; flex-direction: column !important; justify-content: center !important; align-items: center !important; gap: 5px !important; padding: 10px 6px !important; border-right: 1.5px solid #17140F !important; border-bottom: none !important; }
+  .hb-wall [data-m~="bwscore"] > span:first-child { font-size: 38px !important; line-height: 0.9 !important; }
+  .hb-wall [data-m~="bwscore"] > span:nth-child(2) { gap: 2px !important; }
+  .hb-wall [data-m~="bwscore"] > span:nth-child(2) > span { font-size: 11px !important; }
+  .hb-wall [data-m~="bwscore"] > span:last-child { font-size: 8px !important; letter-spacing: 0.12em !important; line-height: 1.4 !important; text-align: center !important; }
+  .hb-wall [data-m~="bwinst"] > div:last-child { padding: 6px 10px !important; gap: 0 !important; }
+  .hb-wall [data-row] { min-height: 21px !important; padding: 1px 4px !important; gap: 8px !important; grid-template-columns: 24px 1fr 34px 10px !important; }
+  .hb-wall [data-row] > span:nth-child(2) { height: 5px !important; }
+  /* The narrowest phones (320px): a slimmer score column and tighter row
+     columns, so the bars keep a readable length. */
+  @media (max-width: 340px) {
+    .hb-wall [data-m~="bwinst"] { grid-template-columns: 90px minmax(0, 1fr) !important; }
+    .hb-wall [data-m~="bwscore"] > span:first-child { font-size: 32px !important; }
+    .hb-wall [data-m~="bwinst"] > div:last-child { padding: 6px 8px !important; }
+    .hb-wall [data-row] { gap: 6px !important; grid-template-columns: 20px 1fr 28px 8px !important; }
+  }
   .hb-wall [data-m~="bwcards"] { grid-template-columns: 1fr !important; gap: 8px !important; }
   .hb-wall [data-m~="bwcards"] > div { min-height: 0 !important; padding: 14px 16px !important; }
   .hb-wall [data-m~="bwcards"] > div > div:first-child { margin-bottom: 8px !important; }
