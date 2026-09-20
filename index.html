@@ -1446,7 +1446,8 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .pc-name { display: block; font-weight: 700; font-size: 15px; letter-spacing: -0.03em; }
 .pc-fit { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
 .pc-fit:empty { display: none; }
-.pc-price { display: block; font-family: var(--mono); font-weight: 500; font-size: 15px; }
+.pc-price { display: block; font-family: var(--mono); font-weight: 500; font-size: 15px; white-space: nowrap; }
+.pc-per { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-left: 3px; }
 .pc-save { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--green); margin-top: 2px; }
 .pc-save:empty { display: none; }
 .pc-note { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #A2977F; line-height: 1.7; }
@@ -9709,7 +9710,12 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<button class="pc-row pc-row--big" hidden type="button" data-plan="3">'
   + '<span class="pc-tag">For big beans</span>'
   + '<span><span class="pc-name">2 boxes, one order</span><span class="pc-fit" data-fit></span></span>'
-  + '<span style="text-align:right"><span class="pc-price">$159</span><span class="pc-save">–$71 vs two one-time</span></span>'
+  // This row leads with the per-box price rather than the total (Jon, Sep
+  // 2026): $159 reads as the most expensive line on the panel when it is
+  // the cheapest a box gets outside the bundle. The total sits under it —
+  // it is what gets charged, so it never comes off the row. Both are
+  // recomputed in the render, this is only the first paint.
+  + '<span style="text-align:right"><span class="pc-price" data-price>$79.50<span class="pc-per">/box</span></span><span class="pc-save" data-save>$159 total · save $71</span></span>'
   + '</button>'
   + '<button class="pc-row" type="button" data-plan="2">'
   + '<span class="pc-tag">Best value</span>'
@@ -9837,7 +9843,18 @@ window.hbPcInit = function (ctx) {
     root.querySelectorAll('.pc-row').forEach(function (r) {
       var k = r.getAttribute('data-plan'), p = PLANS[k], fit = r.querySelector('[data-fit]');
       r.setAttribute('aria-pressed', String(k === S.sel));
-      if (k === '3') { r.hidden = !big; fit.textContent = (2 * lasts) + ' days at ' + (d === 2 ? '2' : '1½') + ' a day · a full month covered'; return; }
+      if (k === '3') {
+        r.hidden = !big;
+        fit.textContent = (2 * lasts) + ' days at ' + (d === 2 ? '2' : '1½') + ' a day · a full month covered';
+        // Per box up front, total underneath. Both come off the same two
+        // numbers as the checkout line, so a price change cannot leave the
+        // panel quoting a rate the cart disagrees with.
+        var per = (p.price / p.boxes).toFixed(2).replace(/\.00$/, '');
+        var saved = PLANS[0].price * p.boxes - p.price;
+        r.querySelector('[data-price]').innerHTML = '$' + per + '<span class="pc-per">/box</span>';
+        r.querySelector('[data-save]').textContent = '$' + p.price + ' total · save $' + saved;
+        return;
+      }
       if (k === '1') r.hidden = S.subsOff || S.wholesale;
       if (k === '2') r.hidden = S.wholesale;
       if (k === '0') {
