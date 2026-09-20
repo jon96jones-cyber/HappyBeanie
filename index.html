@@ -5644,7 +5644,13 @@ class Component extends DCLogic {
       const doc = document.documentElement;
       const foot = document.querySelector('footer');
       const footIn = foot ? foot.getBoundingClientRect().top < window.innerHeight - 40 : false;
-      const show = window.scrollY > 640 && !footIn;
+      // On a phone, the product page's bar waits for the What-is-inside
+      // section (Jon, Sep 2026): it rises once that section's top has come
+      // into view, not at a fixed depth. Desktop, and pages without that
+      // section, keep the depth rule.
+      const inside = this._mqFacts && this._mqFacts.matches ? document.getElementById('inside') : null;
+      const reached = inside ? inside.getBoundingClientRect().top < window.innerHeight - 40 : window.scrollY > 640;
+      const show = reached && !footIn;
       const pct = Math.min(100, Math.round((window.scrollY / Math.max(1, doc.scrollHeight - window.innerHeight)) * 100));
       // Drive the progress bar imperatively. Routing setState through every
       // scroll pixel re-rendered the whole app continuously; a tap that landed
