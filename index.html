@@ -9700,29 +9700,28 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<button class="pc-row" type="button" data-plan="0">'
   + '<span class="pc-tag" data-tag></span>'
   + '<span><span class="pc-name">One-time</span><span class="pc-fit" data-fit></span></span>'
-  + '<span style="text-align:right"><span class="pc-price" data-price>$115</span><span class="pc-save" data-save></span></span>'
+  // Every row prices per box (Jon, Sep 2026), with the saving against the
+  // same boxes bought one at a time underneath — so the four plans compare
+  // on one number, and the bundle correctly reads as the best rate. The
+  // total is deliberately off the rows; the CTA names it the moment a plan
+  // is selected. Figures here are only the first paint; the render
+  // recomputes them from each plan's price and box count.
+  + '<span style="text-align:right"><span class="pc-price" data-price>$115<span class="pc-per">/box</span></span><span class="pc-save" data-save></span></span>'
   + '</button>'
   + '<button class="pc-row" type="button" data-plan="1">'
   + '<span class="pc-tag">Most chosen</span>'
   + '<span><span class="pc-name">Subscribe &amp; Save</span><span class="pc-fit" data-fit></span></span>'
-  + '<span style="text-align:right"><span class="pc-price">$99</span><span class="pc-save">–$16 a box</span></span>'
+  + '<span style="text-align:right"><span class="pc-price" data-price>$99<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $16</span></span>'
   + '</button>'
   + '<button class="pc-row pc-row--big" hidden type="button" data-plan="3">'
   + '<span class="pc-tag">For big beans</span>'
   + '<span><span class="pc-name">2 boxes, one order</span><span class="pc-fit" data-fit></span></span>'
-  // This row leads with the per-box price rather than the total (Jon, Sep
-  // 2026): $159 reads as the most expensive line on the panel when it is
-  // the cheapest a box gets outside the bundle. The total is off the row at
-  // Jon's request — the CTA under the panel still names it in full the
-  // moment this plan is selected ("Start the 30 days · $159"), so nobody
-  // reaches checkout without having seen it. Both figures are recomputed in
-  // the render; this is only the first paint.
   + '<span style="text-align:right"><span class="pc-price" data-price>$79.50<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $71</span></span>'
   + '</button>'
   + '<button class="pc-row" type="button" data-plan="2">'
   + '<span class="pc-tag">Best value</span>'
   + '<span><span class="pc-name">Buy 3, get 1 free</span><span class="pc-fit" data-fit></span></span>'
-  + '<span style="text-align:right"><span class="pc-price">$297</span><span class="pc-save">–$163</span></span>'
+  + '<span style="text-align:right"><span class="pc-price" data-price>$74.25<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $163</span></span>'
   + '</button>'
   + '</div></div>'
   + '<button class="pc-cta" type="button" data-cta>Start the 30 days · $99 →</button>'
@@ -9842,31 +9841,30 @@ window.hbPcInit = function (ctx) {
       : chew(36, 36, 36) + chew(36, 36, 36);
     doseEl.textContent = (d === 0.5 ? '½ chew a day' : d === 1 ? '1 chew a day' : d === 1.5 ? '1½ chews a day' : '2 chews a day')
       + ' for a ' + lb + ' lb ' + (cat ? 'cat' : 'dog');
+    var money = function (n) { return '$' + Number(n).toFixed(2).replace(/\.00$/, ''); };
     root.querySelectorAll('.pc-row').forEach(function (r) {
       var k = r.getAttribute('data-plan'), p = PLANS[k], fit = r.querySelector('[data-fit]');
       r.setAttribute('aria-pressed', String(k === S.sel));
+      // Every row prices per box, with the saving against the same number of
+      // boxes bought one at a time underneath. Both come off the plan's own
+      // price and box count — the two numbers checkout bills on — so the
+      // panel cannot quote a rate the cart disagrees with. A one-time box
+      // saves nothing against itself, so its save line stays empty.
+      var trade = k === '0' && S.wholesale && S.tradePrice;
+      var unit = trade ? S.tradePrice : p.price / p.boxes;
+      var saved = trade ? 0 : PLANS[0].price * p.boxes - p.price;
+      r.querySelector('[data-price]').innerHTML = money(unit) + '<span class="pc-per">/box</span>';
+      // Wholesale accounts see their trade unit price on the one box they
+      // can order, as the old picker did.
+      r.querySelector('[data-save]').textContent = trade ? 'Trade price · ' + S.tradeMin + '+ boxes' : (saved > 0 ? 'save ' + money(saved) : '');
+      if (k === '0') r.querySelector('[data-tag]').textContent = S.wholesale ? 'Trade account' : '';
       if (k === '3') {
         r.hidden = !big;
         fit.textContent = (2 * lasts) + ' days at ' + (d === 2 ? '2' : '1½') + ' a day · a full month covered';
-        // Per box, and what that saves against buying the same boxes one at
-        // a time. Both come off the plan's own price and box count, the same
-        // two numbers checkout bills on, so the panel cannot quote a rate the
-        // cart disagrees with.
-        var per = (p.price / p.boxes).toFixed(2).replace(/\.00$/, '');
-        var saved = PLANS[0].price * p.boxes - p.price;
-        r.querySelector('[data-price]').innerHTML = '$' + per + '<span class="pc-per">/box</span>';
-        r.querySelector('[data-save]').textContent = 'save $' + saved;
         return;
       }
       if (k === '1') r.hidden = S.subsOff || S.wholesale;
       if (k === '2') r.hidden = S.wholesale;
-      if (k === '0') {
-        // Wholesale accounts see their trade unit price on the one box they
-        // can order, as the old picker did.
-        r.querySelector('[data-price]').textContent = '$' + (S.wholesale && S.tradePrice ? String(S.tradePrice).replace(/\.00$/, '') : '115');
-        r.querySelector('[data-save]').textContent = S.wholesale && S.tradePrice ? 'Trade price · ' + S.tradeMin + '+ boxes' : '';
-        r.querySelector('[data-tag]').textContent = S.wholesale ? 'Trade account' : '';
-      }
       fit.textContent = p.key === 'monthly'
         ? (lasts >= 30 ? 'A box lasts ' + lasts + ' days' : 'A box lasts ' + lasts + ' days · we ship every ' + lasts)
         : (p.boxes * lasts) + ' days of chews';
