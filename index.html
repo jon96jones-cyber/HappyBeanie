@@ -6449,7 +6449,10 @@ class Component extends DCLogic {
       // reads as a sequence rather than a flash.
       notInside: [
         'Artificial preservatives', 'Artificial flavors', 'Artificial colors & dyes',
-        'Corn', 'Wheat', 'Soy', 'Added sugar', 'Glycerin fillers', 'Carrageenan'
+        // "Fillers", not "Glycerin fillers" (Jon, Sep 2026): glycerin is on
+        // both formulas' other-ingredients lines, so naming it here as
+        // something the chew is free of contradicted the label.
+        'Corn', 'Wheat', 'Soy', 'Added sugar', 'Fillers', 'Carrageenan'
       ].map((label, i) => ({
         label,
         chipStyle: { animationDelay: (i * 0.06).toFixed(2) + 's' },
