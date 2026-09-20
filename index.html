@@ -1430,11 +1430,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .pc-dose__v { display: block; font-family: var(--mono); font-weight: 500; font-size: 15px; margin-top: 4px; white-space: nowrap; }
 .pc-plans { display: grid; gap: 6px; padding: 16px 0 18px; }
 /* The single-box toggle (Jon, Sep 2026): one pill, two segments, the chosen
-   one solid ink. When a multi-box row below is the selection, the pill keeps
-   its position but steps back, so the one highlighted thing on the panel is
-   always the plan that the CTA will charge for. */
+   one solid ink. It always sits on the side of the plan that is selected —
+   renewals on Subscribe, one-off charges on One-time — so it is never out
+   of play. */
 .pc-toggle { display: flex; padding: 7px; background: #EDE6D8; border: 1.5px solid var(--ink); border-radius: 999px; transition: opacity 0.2s ease; }
-.pc-toggle:not([data-active]) { opacity: 0.55; }
 .pc-seg { touch-action: manipulation; flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 8px 14px; background: transparent; border: none; border-radius: 999px; cursor: pointer; font-family: var(--sans); font-weight: 700; font-size: 16px; letter-spacing: -0.02em; color: var(--muted); transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease; }
 .pc-seg[hidden] { display: none; }
 /* The chosen segment sits inside the pill with a clear cream margin and a
@@ -1449,6 +1448,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
 /* The 1-box row sits directly under the pill; a little extra air keeps the
    pill's ring clear of the row's border. */
 .pc-row[data-one] { margin-top: 4px; }
+/* The rule the bundle sits under: it is listed on both sides of the pill,
+   and this says why — it is bought once, not renewed. */
+.pc-or { display: flex; align-items: center; gap: 10px; margin: 8px 0 2px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap; }
+.pc-or::before, .pc-or::after { content: ''; flex: 1; height: 1px; background: rgba(23,20,15,0.14); }
+.pc-or[hidden] { display: none; }
 .pc-row { touch-action: manipulation; position: relative; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; text-align: left; padding: 13px 16px; background: transparent; border: 1.5px solid rgba(23,20,15,0.16); border-radius: 4px; cursor: pointer; font-family: var(--sans); color: var(--ink); transition: background 0.2s ease, border-color 0.2s ease; }
 .pc-row[aria-pressed="true"] { background: oklch(0.86 0.14 92 / 0.28); border-color: var(--ink); }
 .pc-row[hidden] { display: none; }
@@ -9775,6 +9779,7 @@ var HB_PC_HTML = '<div class="pc" data-pc data-sp="dog">'
   + '<span><span class="pc-name">2 boxes, one order</span><span class="pc-fit" data-fit></span></span>'
   + '<span style="text-align:right"><span class="pc-price" data-price>$79.50<span class="pc-per">/box</span></span><span class="pc-save" data-save>save $71</span></span>'
   + '</button>'
+  + '<div class="pc-or" aria-hidden="true" data-or><span>Or buy in bulk · one-time</span></div>'
   + '<button class="pc-row" type="button" data-plan="2">'
   + '<span class="pc-tag">Best value</span>'
   + '<span><span class="pc-name">Buy 3, get 1 free</span><span class="pc-fit" data-fit></span></span>'
@@ -9907,11 +9912,12 @@ window.hbPcInit = function (ctx) {
     if (S.sel === '3' && !big) S.sel = '1';
     if ((S.sel === '1' || S.sel === '3') && (S.subsOff || S.wholesale)) S.sel = '0';
     if (S.sel === '2' && S.wholesale) S.sel = '0';
-    // Which way the single-box toggle sits. It follows the selection when
-    // that is a single box (a plan handed in by the app included), and it
-    // can only sit on Subscribe while subscriptions are on offer.
-    if (S.sel === '0' || S.sel === '1') S.one = S.sel;
-    if (S.one !== '0' && S.one !== '1') S.one = '1';
+    // Which way the toggle sits: it shows the nature of the selected plan
+    // (Jon, Sep 2026). The 1-box subscription and the 2-box order renew, so
+    // they sit it on Subscribe; a one-time box and the bundle are charged
+    // once, so they sit it on One-time. A plan handed in by the app counts.
+    // It can only sit on Subscribe while subscriptions are on offer.
+    S.one = (S.sel === '1' || S.sel === '3') ? '1' : '0';
     if (S.subsOff || S.wholesale) S.one = '0';
     // The weight pills: one per band of the species on show, rebuilt only
     // when the species changes, and the band the weight falls in is pressed.
@@ -9971,7 +9977,9 @@ window.hbPcInit = function (ctx) {
     var segSave = root.querySelector('[data-seg-save]');
     if (segSave) segSave.textContent = 'Save 15%';
     var single = S.sel === '0' || S.sel === '1';
-    if (single) toggle.setAttribute('data-active', ''); else toggle.removeAttribute('data-active');
+    // The pill is always live: whichever plan is chosen, it sits on that
+    // plan's side, so there is never a state it does not apply to.
+    toggle.setAttribute('data-active', '');
     // The 1-box row: it is the plan the toggle points at, priced as such,
     // and it is the selection whenever a single box is.
     one.setAttribute('data-plan', S.one);
@@ -9979,16 +9987,21 @@ window.hbPcInit = function (ctx) {
     one.querySelector('[data-fit]').textContent = boxFit(S.one);
     one.querySelector('[data-one-tag]').textContent = S.one === '1' ? 'Most chosen' : '';
     priceInto(one, S.one);
+    var orEl = root.querySelector('[data-or]'); if (orEl) orEl.hidden = !!S.wholesale;
     // The multi-box rows.
     root.querySelectorAll('.pc-row:not([data-one])').forEach(function (r) {
       var k = r.getAttribute('data-plan'), fit = r.querySelector('[data-fit]');
       r.setAttribute('aria-pressed', String(k === S.sel));
       priceInto(r, k);
       if (k === '3') {
-        r.hidden = !big;
+        // A subscription: on offer to heavy dogs, and only while the pill sits
+        // on Subscribe. Flip to One-time and it goes with the other renewals.
+        r.hidden = !big || S.one !== '1';
         fit.textContent = (2 * lasts) + ' days at ' + (d === 2 ? '2' : '1½') + ' a day · a full month covered';
         return;
       }
+      // The bundle is always listed, on either side of the pill, under its own
+      // rule — a one-off charge, so choosing it sits the pill on One-time.
       if (k === '2') r.hidden = S.wholesale;
       fit.textContent = boxFit(k);
     });
