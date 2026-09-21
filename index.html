@@ -7122,8 +7122,10 @@ const QZ_QUESTIONS = [
   { id: 'species', kind: 'single', eyebrow: 'Question 01 · Formula', title: 'Which animal are we screening?', help: '', options: [
     { v: 'dog', label: 'Dog', meta: '' },
     { v: 'cat', label: 'Cat', meta: '' } ] },
-  { id: 'age', kind: 'single', eyebrow: 'Question 02 · Life stage', title: 'How old is your pet?', help: 'Neither formula has been dosed for growing animals. Elk velvet antler and the B-complex load are built for a finished skeleton.', options: [
-    { v: 'under1', label: 'Under 12 months', meta: 'Still growing', tag: 'Not eligible', flags: [{ ...QZ_F('block', 'Elk velvet antler · full formula', 'Pri. 04', 'The formula is dosed for adult maintenance and has not been evaluated in growing animals. Come back at twelve months.'), defer: 'age' }] },
+  { id: 'age', kind: 'single', eyebrow: 'Question 02 · Life stage', title: 'How old is your pet?', help: 'Neither formula has been dosed for growing animals. The dog formula\u2019s elk velvet antler and both formulas\u2019 B-complex load are built for a finished skeleton.', options: [
+    { v: 'under1', label: 'Under 12 months', meta: 'Still growing', tag: 'Not eligible', flags: [
+      { speciesOnly: 'dog', ...QZ_F('block', 'Elk velvet antler · full formula', 'Pri. 04', 'The formula is dosed for adult maintenance and has not been evaluated in growing animals. Come back at twelve months.'), defer: 'age' },
+      { speciesOnly: 'cat', ...QZ_F('block', 'Full formula', '\u2014', 'The formula is dosed for adult maintenance and has not been evaluated in growing animals. Come back at twelve months.'), defer: 'age' } ] },
     { v: '1-6', label: '1 to 6 years', meta: 'Adult maintenance' },
     { v: '7-10', label: '7 to 10 years', meta: 'Early senior — the core use case' },
     { v: '11plus', label: '11 years or older', meta: 'Senior', flags: [QZ_F('caution', 'CoQ10 · L-Carnitine', 'Pri. 09 · 10', 'Senior animals are more likely to be on cardiac or thyroid medication. If yours is, weigh that against these two inputs before starting.')] } ] },
@@ -7143,14 +7145,15 @@ const QZ_QUESTIONS = [
   { id: 'repro', kind: 'single', eyebrow: 'Question 04 · Status', title: 'Is your pet pregnant or nursing?', help: 'Several of the concentrated inputs in these formulas cross into a developing or nursing animal. None of it has been studied there.', options: [
     { v: 'no', label: 'No', meta: 'Not pregnant, not nursing' },
     { v: 'yes', label: 'Yes, or possibly', meta: 'Pregnant, in season, or feeding a litter', tag: 'Not eligible', flags: [
-      { speciesOnly: 'dog', ...QZ_F('block', 'Elk Liver · Turmeric / Curcumin', 'Pri. 05 · 02', 'Preformed vitamin A is teratogenic at concentration and curcumin is uterine-active. We do not sell to pregnant or nursing animals — wait until the litter is weaned.'), defer: 'repro' },
+      { speciesOnly: 'dog', ...QZ_F('block', 'Elk Liver · Curcumin', 'Pri. 04 · 02', 'Preformed vitamin A is teratogenic at concentration and curcumin is uterine-active. We do not sell to pregnant or nursing animals — wait until the litter is weaned.'), defer: 'repro' },
       { speciesOnly: 'cat', ...QZ_F('block', 'Full formula', '—', 'The formula has not been evaluated in pregnant or nursing cats. We do not sell into that window — wait until the litter is weaned.'), defer: 'repro' } ] },
     { v: 'unsure', label: 'Not sure', meta: 'Intact female, unknown status', tag: 'Not eligible', flags: [QZ_F('block', 'Full formula', '—', 'Confirm whether she is pregnant before starting. Until you know, we treat unknown as pregnant.')] } ] },
   { id: 'allergies', kind: 'multi', eyebrow: 'Question 05 · Allergies', title: 'Any known food or environmental allergies?', help: 'Select everything that applies. Omega-3 leads both formulas, so a fish allergy is the one hard stop we cannot formulate around.', options: [
     { v: 'none', label: 'None that we know of', meta: 'No diagnosed or suspected allergies', exclusive: true },
     { v: 'fish', label: 'Fish or salmon', meta: 'Salmon oil is priority 01 in both formulas', tag: 'Not eligible', flags: [QZ_F('block', 'Omega-3 EPA/DHA (Salmon Oil)', 'Pri. 01', 'Salmon oil is the backbone of both formulas and cannot be removed. There is no fish-free version of Happy Beanie today.')] },
-    { v: 'shellfish', label: 'Shellfish', meta: 'Relevant to the cat formula', flags: [
-      { speciesOnly: 'cat', ...QZ_F('block', 'Green-Lipped Mussel', 'Pri. 04', 'The feline joint input is a mollusc powder. Shellfish-allergic cats are not eligible for the cat chew.') } ] },
+    { v: 'shellfish', label: 'Shellfish', meta: 'Both formulas carry green-lipped mussel', tag: 'Not eligible', flags: [
+      { speciesOnly: 'dog', ...QZ_F('block', 'Green-Lipped Mussel', 'Pri. 05', 'The dog formula\u2019s joint input is a mollusc powder. Shellfish-allergic dogs are not eligible for the dog chew.') },
+      { speciesOnly: 'cat', ...QZ_F('block', 'Green-Lipped Mussel', 'Pri. 03', 'The feline joint input is a mollusc powder. Shellfish-allergic cats are not eligible for the cat chew.') } ] },
     { v: 'mushroom', label: 'Mushrooms or fungal extracts', meta: 'Relevant to the dog formula', flags: [
       { speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail', 'Pri. 03', 'The dog formula\u2019s immune layer is a mushroom extract at a functional dose. The cat formula is mushroom-free.') } ] },
     { v: 'beef', label: 'Beef', meta: '' },
@@ -7158,24 +7161,30 @@ const QZ_QUESTIONS = [
  ] },
   { id: 'meds', kind: 'multi', eyebrow: 'Question 06 · Medication', title: 'Is your pet on any of these medications?', help: 'This is the most important question on the screener. Select everything currently prescribed, including anything given seasonally.', options: [
     { v: 'none', label: 'No medication at all', meta: 'Nothing prescription, nothing daily', exclusive: true },
-    { v: 'anticoag', label: 'Blood thinner or anticoagulant', meta: 'Clopidogrel, warfarin, aspirin therapy', flags: [QZ_F('caution', 'Omega-3 · Curcumin · CoQ10', 'Pri. 01 · 02 · 09', 'Three inputs independently affect platelet function and clotting time. Read this one carefully and decide deliberately before the first chew — this is not a start-and-see-how-it-goes situation.')] },
+    { v: 'anticoag', label: 'Blood thinner or anticoagulant', meta: 'Clopidogrel, warfarin, aspirin therapy', flags: [
+      { speciesOnly: 'dog', ...QZ_F('caution', 'Omega-3 · Curcumin · CoQ10', 'Pri. 01 · 02 · 08', 'Three inputs independently affect platelet function and clotting time. Read this one carefully and decide deliberately before the first chew — this is not a start-and-see-how-it-goes situation.') },
+      { speciesOnly: 'cat', ...QZ_F('caution', 'Omega-3 · CoQ10', 'Pri. 01 · 08', 'Two inputs independently affect platelet function and clotting time. Read this one carefully and decide deliberately before the first chew — this is not a start-and-see-how-it-goes situation.') } ] },
     { v: 'immuno', label: 'Immunosuppressant or long-term steroid', meta: 'Cyclosporine, prednisone, Atopica', flags: [{ speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail', 'Pri. 03', 'The dog formula\u2019s mushroom layer is an immune modulator and works directly against a drug prescribed to suppress immunity. These two pull in opposite directions — weigh that carefully before stacking them.') }] },
     { v: 'sedative', label: 'Sedative, anti-anxiety or anticonvulsant', meta: 'Trazodone, gabapentin, phenobarbital, fluoxetine', flags: [QZ_F('caution', 'L-Carnitine', 'Pri. 10', 'Carnitine can shift seizure-medication levels. Weigh it against your pet’s current medication before adding.')] },
     { v: 'thyroid', label: 'Thyroid or cardiac medication', meta: 'Levothyroxine, pimobendan, methimazole', flags: [QZ_F('caution', 'CoQ10 · L-Carnitine', 'Pri. 09 · 10', 'Both inputs act on cardiac energy metabolism. Beneficial in many cases — just account for them before any dose adjustments.')] },
     { v: 'daily', label: 'Any other daily oral medication', meta: 'Given by mouth on a schedule' } ] },
   { id: 'conditions', kind: 'multi', eyebrow: 'Question 07 · History', title: 'Has your pet been diagnosed with any of these?', help: 'Select everything on record, past or present. A resolved episode still matters — pancreatitis and obstruction both recur.', options: [
     { v: 'none', label: 'None of these', meta: 'No relevant diagnosis on record', exclusive: true },
-    { v: 'pancreatitis', label: 'Pancreatitis or fat intolerance', meta: 'Including a single past episode', flags: [QZ_F('block', 'Salmon Oil + MCT Oil', 'Pri. 01', 'The chew carries a meaningful fat load by design. In a pancreatitis-prone animal that is a real risk of relapse, not a theoretical one.')] },
-    { v: 'liver', label: 'Liver disease or elevated liver values', meta: 'Diagnosed or flagged on bloodwork', flags: [{ speciesOnly: 'dog', ...QZ_F('block', 'Elk Liver · Turmeric', 'Pri. 05 · 02', 'Freeze-dried liver is a concentrated preformed vitamin A source and curcumin is hepatically cleared. Both need a compromised liver ruled out first.') }] },
+    { v: 'pancreatitis', label: 'Pancreatitis or fat intolerance', meta: 'Including a single past episode', flags: [
+      { speciesOnly: 'dog', ...QZ_F('block', 'Salmon Oil + MCT Oil', 'Pri. 01', 'The chew carries a meaningful fat load by design. In a pancreatitis-prone animal that is a real risk of relapse, not a theoretical one.') },
+      { speciesOnly: 'cat', ...QZ_F('block', 'Salmon Oil', 'Pri. 01', 'The chew carries a meaningful fat load by design. In a pancreatitis-prone animal that is a real risk of relapse, not a theoretical one.') } ] },
+    { v: 'liver', label: 'Liver disease or elevated liver values', meta: 'Diagnosed or flagged on bloodwork', flags: [{ speciesOnly: 'dog', ...QZ_F('block', 'Elk Liver · Curcumin', 'Pri. 04 · 02', 'Freeze-dried liver is a concentrated preformed vitamin A source and curcumin is hepatically cleared. Both need a compromised liver ruled out first.') }] },
     { v: 'gi', label: 'GI obstruction, megacolon or chronic constipation', meta: 'Any history of blockage or motility disease' },
     { v: 'urinary', label: 'Calcium oxalate stones or urinary crystals', meta: 'Relevant to the cat formula', flags: [
       { speciesOnly: 'cat', ...QZ_F('block', 'Organic Cranberry Extract', 'Pri. 07', 'Cranberry is oxalate-rich and acidifies urine — the wrong direction entirely for an oxalate former.') } ] },
     { v: 'kidney', label: 'Kidney disease', meta: 'Any stage of CKD', flags: [QZ_F('caution', 'UC-II® Collagen Peptide', 'Pri. 11', 'Collagen is a protein load and should be counted against a renal diet. A reduced dose may make more sense here than skipping it entirely.')] },
     { v: 'autoimmune', label: 'Autoimmune disease', meta: 'IMHA, IBD, lupus, allergic skin disease', flags: [{ speciesOnly: 'dog', ...QZ_F('caution', 'Turkey Tail', 'Pri. 03', 'Immune modulation in an already dysregulated immune system can cut either way — something to weigh carefully and watch closely if you start. Applies to the dog formula\u2019s mushroom layer.') }] },
     { v: 'diabetes', label: 'Diabetes', meta: 'Insulin-managed or diet-managed' } ] },
-  { id: 'surgery', kind: 'single', eyebrow: 'Question 08 · Next 14 days', title: 'Is any surgery or dental procedure scheduled?', help: 'Three inputs affect bleeding time, so they are best stopped a week or two ahead of anaesthesia.', options: [
+  { id: 'surgery', kind: 'single', eyebrow: 'Question 08 · Next 14 days', title: 'Is any surgery or dental procedure scheduled?', help: 'Omega-3 and CoQ10, plus curcumin in the dog formula, affect bleeding time, so they are best stopped a week or two ahead of anaesthesia.', options: [
     { v: 'no', label: 'Nothing scheduled', meta: 'No procedure planned' },
-    { v: 'yes', label: 'Yes, within two weeks', meta: 'Surgery, dental, or biopsy booked', flags: [QZ_F('caution', 'Omega-3 · Curcumin · CoQ10', 'Pri. 01 · 02 · 09', 'Start after the procedure, or stop 10 to 14 days before it — either way it changes how clotting reads during anaesthesia, so factor that into your timing.')] } ] }
+    { v: 'yes', label: 'Yes, within two weeks', meta: 'Surgery, dental, or biopsy booked', flags: [
+      { speciesOnly: 'dog', ...QZ_F('caution', 'Omega-3 · Curcumin · CoQ10', 'Pri. 01 · 02 · 08', 'Start after the procedure, or stop 10 to 14 days before it — either way it changes how clotting reads during anaesthesia, so factor that into your timing.') },
+      { speciesOnly: 'cat', ...QZ_F('caution', 'Omega-3 · CoQ10', 'Pri. 01 · 08', 'Start after the procedure, or stop 10 to 14 days before it — either way it changes how clotting reads during anaesthesia, so factor that into your timing.') } ] } ] }
 ];
 
 Object.assign(Component.prototype, {
