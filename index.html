@@ -2749,10 +2749,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
     </div>
     <nav data-m="hide" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px clamp(12px, 1.8vw, 26px); font-size: 14px; letter-spacing: 0.01em; flex: 1 1 auto; min-width: 0; justify-content: flex-end;">
       <sc-for list="{{ navLinks }}" as="nl" hint-placeholder-count="4">
-        <a sc-camel-on-click="{{ nl.go }}" style="color: {{ nl.color }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ nl.rule }};" style-hover="color: oklch(0.5 0.07 152);">{{ nl.label }}</a>
+        <a href="{{ nl.href }}" sc-camel-on-click="{{ nl.go }}" style="color: {{ nl.color }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ nl.rule }};" style-hover="color: oklch(0.5 0.07 152);">{{ nl.label }}</a>
       </sc-for>
       <a href="account.html" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">{{ acctLabel }}</a>
-      <a sc-camel-on-click="{{ goQuiz }}" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">Eligibility</a>
+      <a href="/quiz" sc-camel-on-click="{{ goQuiz }}" style="color: {{ qzNavColor }}; cursor: pointer; padding-bottom: 3px; border-bottom: 1px solid {{ qzNavRule }};" style-hover="color: oklch(0.5 0.07 152);">Eligibility</a>
       <sc-if value="{{ cartAdded }}" hint-placeholder-val="{{ false }}">
         <div sc-camel-on-click="{{ goCart }}" title="In your cart" style="position: relative; display: flex; align-items: center; gap: 7px; padding: 8px 12px 8px 10px; border: 1px solid #17140F; border-radius: 2px; background: #FCFAF4; cursor: pointer; flex: 0 0 auto; transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F0EAD9; transform: translateY(-1px);">
           <svg width="36" height="27" sc-camel-view-box="0 0 36 27" fill="none" style="display: block; overflow: visible;">
@@ -2816,7 +2816,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
           <span aria-hidden="true" style="position: absolute; top: -5px; right: -5px; width: 9px; height: 9px; border-radius: 50%; background: oklch(0.88 0.15 96); border: 1px solid #17140F;"></span>
         </div>
       </sc-if>
-      <a sc-camel-on-click="{{ goProduct }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; padding: 12px clamp(12px, 1.6vw, 20px); border-radius: 2px; background: #17140F; color: #F5F0E6; cursor: pointer;" style-hover="background: oklch(0.5 0.07 152); color: #F5F0E6;">Try Happy Beanie</a>
+      <a href="/product" sc-camel-on-click="{{ goProduct }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; padding: 12px clamp(12px, 1.6vw, 20px); border-radius: 2px; background: #17140F; color: #F5F0E6; cursor: pointer;" style-hover="background: oklch(0.5 0.07 152); color: #F5F0E6;">Try Happy Beanie</a>
     </nav>
     <button sc-camel-on-click="{{ toggleMenu }}" data-m="showf hdrbtn" aria-label="Menu" style="position: relative; display: none; flex-direction: column; gap: 5px; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid #17140F; border-radius: 2px; background: transparent; cursor: pointer;">
       <span style="display: block; width: 20px; height: 1.5px; background: #17140F; transition: transform 0.28s cubic-bezier(0.2,0.7,0.2,1); transform: {{ navBar1 }};"></span>
@@ -2853,12 +2853,12 @@ image-slot:not([data-filled]) { color: transparent !important; }
 
     <div class="hbm-scroll">
       <div class="hbm-tiles">
-        <a sc-camel-on-click="{{ goDog }}" class="hbm-tile hbm-tile--dog">
+        <a href="/product?sp=dog" sc-camel-on-click="{{ goDog }}" class="hbm-tile hbm-tile--dog">
           <img src="assets/img/cart/dog-box.webp" alt="" loading="lazy" decoding="async">
           <span class="hbm-tile__scrim"></span>
           <span class="hbm-tile__label"><span>Shop</span><span>For dogs</span></span>
         </a>
-        <a sc-camel-on-click="{{ goCat }}" class="hbm-tile hbm-tile--cat">
+        <a href="/product?sp=cat" sc-camel-on-click="{{ goCat }}" class="hbm-tile hbm-tile--cat">
           <img src="assets/img/cart/cat-box.webp" alt="" loading="lazy" decoding="async">
           <span class="hbm-tile__scrim"></span>
           <span class="hbm-tile__label"><span>Shop</span><span>For cats</span></span>
@@ -2866,15 +2866,15 @@ image-slot:not([data-filled]) { color: transparent !important; }
       </div>
 
       <div class="hbm-rows">
-        <a sc-camel-on-click="{{ goDosing }}" class="hbm-row"><span>Dosing guide</span><span>&rarr;</span></a>
-        <a sc-camel-on-click="{{ goQuiz }}" class="hbm-row"><span>Is it right for my pet?</span><span>&rarr;</span></a>
-        <a sc-camel-on-click="{{ goAbout }}" class="hbm-row"><span>About our lab</span><span>&rarr;</span></a>
-        <a sc-camel-on-click="{{ goContact }}" class="hbm-row"><span>Contact us</span><span>&rarr;</span></a>
+        <a href="/dosing" sc-camel-on-click="{{ goDosing }}" class="hbm-row"><span>Dosing guide</span><span>&rarr;</span></a>
+        <a href="/quiz" sc-camel-on-click="{{ goQuiz }}" class="hbm-row"><span>Is it right for my pet?</span><span>&rarr;</span></a>
+        <a href="/about" sc-camel-on-click="{{ goAbout }}" class="hbm-row"><span>About our lab</span><span>&rarr;</span></a>
+        <a href="/contact" sc-camel-on-click="{{ goContact }}" class="hbm-row"><span>Contact us</span><span>&rarr;</span></a>
         <a href="track.html" class="hbm-row"><span>Track my order</span><span>&rarr;</span></a>
       </div>
 
       <div class="hbm-sub">
-        <a sc-camel-on-click="{{ goCerts }}">Lab certificates</a>
+        <a href="/certs" sc-camel-on-click="{{ goCerts }}">Lab certificates</a>
         <a href="account.html">{{ acctLabel }}</a>
         <a sc-camel-on-click="{{ goFaq }}">FAQ</a>
       </div>
@@ -3085,7 +3085,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
             </div>
           </sc-for>
         </div>
-        <a sc-camel-on-click="{{ goQuiz }}" data-m="hmquiz" style="cursor: pointer; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px 20px; padding: 22px 24px; border: 1px solid #E0D6C2; border-radius: 3px; background: #F5F0E6; margin-bottom: 30px; color: #17140F;" style-hover="border-color: #17140F;">
+        <a href="/quiz" sc-camel-on-click="{{ goQuiz }}" data-m="hmquiz" style="cursor: pointer; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px 20px; padding: 22px 24px; border: 1px solid #E0D6C2; border-radius: 3px; background: #F5F0E6; margin-bottom: 30px; color: #17140F;" style-hover="border-color: #17140F;">
           <span style="flex: 1 1 260px; min-width: 0;">
             <span data-m="hmqh" style="display: block; font-weight: 700; font-size: 15px; margin-bottom: 4px;">Not sure Happy Beanie is right for your pet?</span>
             <span data-m="hmqs" style="display: block; font-size: 13px; line-height: 1.5; color: #6A6055;">One minute, eight questions, screened against every ingredient on the formulation sheet.</span>
@@ -3106,7 +3106,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
              from. data-pc-plain drops its identity strip: the name, lede
              and rating are already above it here. -->
         <div data-hb-pc-host data-pc-plain style="margin-bottom: 4px;"></div>
-        <a sc-camel-on-click="{{ goQuiz }}" data-m="hmquizm" style="display: none; cursor: pointer; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 15px; border: 1px solid #E0D6C2; border-radius: 3px; background: #F5F0E6; margin: 14px 0 0; color: #17140F;">
+        <a href="/quiz" sc-camel-on-click="{{ goQuiz }}" data-m="hmquizm" style="display: none; cursor: pointer; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 15px; border: 1px solid #E0D6C2; border-radius: 3px; background: #F5F0E6; margin: 14px 0 0; color: #17140F;">
           <span style="flex: 1 1 260px; min-width: 0;">
             <span data-m="hmqh" style="display: block; text-align: center; font-weight: 700; font-size: 15px; margin-bottom: 4px;">Not sure Happy Beanie is right for your pet?</span>
             <span data-m="hmqs" style="display: block; font-size: 13px; line-height: 1.5; color: #6A6055;">One minute, eight questions, screened against every ingredient on the formulation sheet.</span>
@@ -3480,14 +3480,14 @@ image-slot:not([data-filled]) { color: transparent !important; }
           <div data-m="pdpqznote" style="display: none; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: #8A7F6E; margin: 14px 0 0; text-align: center;">Free shipping over $60 · Cancel anytime · 30-day refund</div>
           <!-- Desktop eligibility card: a full-width row under the buy button.
                Hidden on phones, where pdpqzm below takes over. -->
-          <a sc-camel-on-click="{{ goQuiz }}" data-m="qzcard pdpqz" style="cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 10px 24px; align-items: center; padding: 18px 22px; margin: 14px 0 0; border: 1px solid rgba(23,20,15,0.1); border-radius: 20px; background: #FCFAF4; color: #17140F; box-shadow: 0 22px 40px -26px rgba(23,20,15,0.3), 0 1px 0 rgba(255,255,255,0.9) inset; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease;" style-hover="transform: translateY(-4px); box-shadow: 0 30px 52px -26px rgba(23,20,15,0.36);">
+          <a href="/quiz" sc-camel-on-click="{{ goQuiz }}" data-m="qzcard pdpqz" style="cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 10px 24px; align-items: center; padding: 18px 22px; margin: 14px 0 0; border: 1px solid rgba(23,20,15,0.1); border-radius: 20px; background: #FCFAF4; color: #17140F; box-shadow: 0 22px 40px -26px rgba(23,20,15,0.3), 0 1px 0 rgba(255,255,255,0.9) inset; transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease;" style-hover="transform: translateY(-4px); box-shadow: 0 30px 52px -26px rgba(23,20,15,0.36);">
             <span style="display: block; min-width: 0;">
               <span style="display: block; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 8px;">Before you buy</span>
               <span style="display: block; font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35;">Is Happy Beanie right for your pet?</span>
             </span>
             <span data-m="qzcta" style="display: block; text-align: center; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #FCFAF4; background: oklch(0.36 0.055 152); padding: 12px 22px; border-radius: 999px; white-space: nowrap;">Check eligibility →</span>
           </a>
-          <a sc-camel-on-click="{{ goQuiz }}" data-m="pdpqzm" style="display: none; cursor: pointer; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 15px; border: 1px solid #E0D6C2; border-radius: 3px; background: #F5F0E6; margin: 30px 0 0; color: #17140F;">
+          <a href="/quiz" sc-camel-on-click="{{ goQuiz }}" data-m="pdpqzm" style="display: none; cursor: pointer; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 15px; border: 1px solid #E0D6C2; border-radius: 3px; background: #F5F0E6; margin: 30px 0 0; color: #17140F;">
             <span style="flex: 1 1 260px; min-width: 0;">
               <span data-m="hmqh" style="display: block; text-align: center; font-weight: 700; font-size: 15px; margin-bottom: 4px;">Not sure Happy Beanie is right for your pet?</span>
               <span data-m="hmqs" style="display: block; font-size: 13px; line-height: 1.5; color: #6A6055;">One minute, eight questions, screened against every ingredient on the formulation sheet.</span>
@@ -6045,7 +6045,10 @@ class Component extends DCLogic {
   }
 
   nav(page) {
-    return () => {
+    return (e) => {
+      // The header and menu anchors carry real hrefs so crawlers can follow
+      // them; a click still navigates in-app, so the default is stopped.
+      if (e && typeof e.preventDefault === 'function') e.preventDefault();
       // Leaving the product page drops the chew stage's DOM node with the rest
       // of the markup, so the cached handle would be stale on return. Reset to
       // the photo view and let the next opt-in rebuild the stage.
@@ -6407,6 +6410,7 @@ class Component extends DCLogic {
       goContact: this.nav('contact'),
       navLinks: pages.map(p => ({
         label: p.label,
+        href: '/' + p.key,
         go: this.nav(p.key),
         color: page === p.key ? 'oklch(0.44 0.07 152)' : '#17140F',
         rule: page === p.key ? 'oklch(0.44 0.07 152)' : 'transparent'
@@ -6415,8 +6419,8 @@ class Component extends DCLogic {
       goQuiz: this.nav('quiz'),
       // The mobile menu's tiles pick the species on the way to the product
       // page, the way the shop cards do, so the panel opens on the right one.
-      goDog: () => { this.setState({ sp: 'dog' }); this.nav('product')(); },
-      goCat: () => { this.setState({ sp: 'cat' }); this.nav('product')(); },
+      goDog: (e) => { this.setState({ sp: 'dog' }); this.nav('product')(e); },
+      goCat: (e) => { this.setState({ sp: 'cat' }); this.nav('product')(e); },
       // There is no FAQ page — the band is injected into four of them. The
       // dosing page is the one it belongs beside, so the link lands there and
       // scrolls down to it once the page has rendered.
