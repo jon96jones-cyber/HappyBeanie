@@ -2744,7 +2744,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
   <header data-m="pad hdr {{ qzHdr }} {{ spHdr }}" style="position: sticky; top: 0; z-index: 60; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 20px 44px; background: rgba(245,240,230,0.93); backdrop-filter: blur(10px); border-bottom: 1px solid #DDD3C0;">
     <div sc-camel-on-click="{{ goHome }}" data-m="hdrmark" style="display: flex; align-items: baseline; gap: 9px; cursor: pointer;">
       <span style="font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 23px; letter-spacing: -0.045em; white-space: nowrap;">happy bean<span style="position: relative;"><span style="position: absolute; left: 50%; top: 0.26em; width: 0.19em; height: 0.135em; margin-left: -0.095em; border-radius: 46% 54% 50% 50% / 58% 42% 58% 42%; background: oklch(0.8 0.13 92); transform: rotate(-18deg);"></span><span style="position: relative; z-index: 1;">ı</span></span>e</span>
-      <span style="display: inline-flex; gap: 0.5em; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-weight: 400; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap;"><span>hormone</span><span>care</span></span>
+      <span style="display: inline-flex; gap: 0.5em; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-weight: 400; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E; white-space: nowrap;"><span>peptide</span><span>care</span></span>
     </div>
     <nav data-m="hide" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px clamp(12px, 1.8vw, 26px); font-size: 14px; letter-spacing: 0.01em; flex: 1 1 auto; min-width: 0; justify-content: flex-end;">
       <sc-for list="{{ navLinks }}" as="nl" hint-placeholder-count="4">
@@ -2846,7 +2846,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
            people tab through, so the one control up here that is not the close
            button should be reachable and announced like one. nav() already
            closes the menu, so this needs no second handler. -->
-      <button type="button" class="hbm-head__mark" sc-camel-on-click="{{ goHome }}" aria-label="Happy Beanie — go to the home page"><b>happy beanie</b><span>Hormone care</span></button>
+      <button type="button" class="hbm-head__mark" sc-camel-on-click="{{ goHome }}" aria-label="Happy Beanie — go to the home page"><b>happy beanie</b><span>Peptide care</span></button>
       <button sc-camel-on-click="{{ closeMenu }}" class="hbm-close" type="button" aria-label="Close menu" data-hbm-close>&times;</button>
     </div>
 
@@ -6097,7 +6097,7 @@ class Component extends DCLogic {
         points: [
           { k: 'A1 Peptides', v: 'Proprietary peptide blend' },
           { k: 'A2 Whole-food', v: 'Elk blend' },
-          { k: 'A3 Mushroom', v: 'Lion\u2019s mane, reishi, turkey tail' },
+          { k: 'A3 Mushroom', v: 'Turkey tail extract' },
           { k: 'Weight range', v: '10\u2013150 lb' },
           { k: 'Ritual', v: 'One chew each morning' }
         ] },
@@ -7152,14 +7152,14 @@ const QZ_QUESTIONS = [
     { v: 'shellfish', label: 'Shellfish', meta: 'Relevant to the cat formula', flags: [
       { speciesOnly: 'cat', ...QZ_F('block', 'Green-Lipped Mussel', 'Pri. 04', 'The feline joint input is a mollusc powder. Shellfish-allergic cats are not eligible for the cat chew.') } ] },
     { v: 'mushroom', label: 'Mushrooms or fungal extracts', meta: 'Relevant to the dog formula', flags: [
-      { speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'The dog formula\u2019s immune layer is a mushroom extract at a functional dose. The cat formula is mushroom-free.') } ] },
+      { speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail', 'Pri. 03', 'The dog formula\u2019s immune layer is a mushroom extract at a functional dose. The cat formula is mushroom-free.') } ] },
     { v: 'beef', label: 'Beef', meta: '' },
     { v: 'organ', label: 'Organ meat or game', meta: '', flags: [{ speciesOnly: 'dog', ...QZ_F('caution', 'Elk Liver (freeze-dried)', 'Pri. 05', 'The dog formula carries freeze-dried elk liver. Game and organ meat sit close enough to it to matter — introduce at half dose for a week and watch for itching or loose stool.') }] },
  ] },
   { id: 'meds', kind: 'multi', eyebrow: 'Question 06 · Medication', title: 'Is your pet on any of these medications?', help: 'This is the most important question on the screener. Select everything currently prescribed, including anything given seasonally.', options: [
     { v: 'none', label: 'No medication at all', meta: 'Nothing prescription, nothing daily', exclusive: true },
     { v: 'anticoag', label: 'Blood thinner or anticoagulant', meta: 'Clopidogrel, warfarin, aspirin therapy', flags: [QZ_F('caution', 'Omega-3 · Curcumin · CoQ10', 'Pri. 01 · 02 · 09', 'Three inputs independently affect platelet function and clotting time. Read this one carefully and decide deliberately before the first chew — this is not a start-and-see-how-it-goes situation.')] },
-    { v: 'immuno', label: 'Immunosuppressant or long-term steroid', meta: 'Cyclosporine, prednisone, Atopica', flags: [{ speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'The dog formula\u2019s mushroom layer is an immune modulator and works directly against a drug prescribed to suppress immunity. These two pull in opposite directions — weigh that carefully before stacking them.') }] },
+    { v: 'immuno', label: 'Immunosuppressant or long-term steroid', meta: 'Cyclosporine, prednisone, Atopica', flags: [{ speciesOnly: 'dog', ...QZ_F('block', 'Turkey Tail', 'Pri. 03', 'The dog formula\u2019s mushroom layer is an immune modulator and works directly against a drug prescribed to suppress immunity. These two pull in opposite directions — weigh that carefully before stacking them.') }] },
     { v: 'sedative', label: 'Sedative, anti-anxiety or anticonvulsant', meta: 'Trazodone, gabapentin, phenobarbital, fluoxetine', flags: [QZ_F('caution', 'L-Carnitine', 'Pri. 10', 'Carnitine can shift seizure-medication levels. Weigh it against your pet’s current medication before adding.')] },
     { v: 'thyroid', label: 'Thyroid or cardiac medication', meta: 'Levothyroxine, pimobendan, methimazole', flags: [QZ_F('caution', 'CoQ10 · L-Carnitine', 'Pri. 09 · 10', 'Both inputs act on cardiac energy metabolism. Beneficial in many cases — just account for them before any dose adjustments.')] },
     { v: 'daily', label: 'Any other daily oral medication', meta: 'Given by mouth on a schedule' } ] },
@@ -7171,7 +7171,7 @@ const QZ_QUESTIONS = [
     { v: 'urinary', label: 'Calcium oxalate stones or urinary crystals', meta: 'Relevant to the cat formula', flags: [
       { speciesOnly: 'cat', ...QZ_F('block', 'Organic Cranberry Extract', 'Pri. 07', 'Cranberry is oxalate-rich and acidifies urine — the wrong direction entirely for an oxalate former.') } ] },
     { v: 'kidney', label: 'Kidney disease', meta: 'Any stage of CKD', flags: [QZ_F('caution', 'UC-II® Collagen Peptide', 'Pri. 11', 'Collagen is a protein load and should be counted against a renal diet. A reduced dose may make more sense here than skipping it entirely.')] },
-    { v: 'autoimmune', label: 'Autoimmune disease', meta: 'IMHA, IBD, lupus, allergic skin disease', flags: [{ speciesOnly: 'dog', ...QZ_F('caution', 'Turkey Tail / Lion\u2019s Mane', 'Pri. 03', 'Immune modulation in an already dysregulated immune system can cut either way — something to weigh carefully and watch closely if you start. Applies to the dog formula\u2019s mushroom layer.') }] },
+    { v: 'autoimmune', label: 'Autoimmune disease', meta: 'IMHA, IBD, lupus, allergic skin disease', flags: [{ speciesOnly: 'dog', ...QZ_F('caution', 'Turkey Tail', 'Pri. 03', 'Immune modulation in an already dysregulated immune system can cut either way — something to weigh carefully and watch closely if you start. Applies to the dog formula\u2019s mushroom layer.') }] },
     { v: 'diabetes', label: 'Diabetes', meta: 'Insulin-managed or diet-managed' } ] },
   { id: 'surgery', kind: 'single', eyebrow: 'Question 08 · Next 14 days', title: 'Is any surgery or dental procedure scheduled?', help: 'Three inputs affect bleeding time, so they are best stopped a week or two ahead of anaesthesia.', options: [
     { v: 'no', label: 'Nothing scheduled', meta: 'No procedure planned' },
@@ -7427,7 +7427,7 @@ Object.assign(Component.prototype, {
       ] : [
         { code: 'A1', name: 'Proprietary peptide blend', dose: 'Signalling active', role: 'The signalling layer \u2014 instructs repair in joint, skin and connective tissue.' },
         { code: 'A2', name: 'Elk blend', dose: 'Whole-food base', role: 'Whole-food velvet antler and organ nutrition: the cofactors repair actually spends.' },
-        { code: 'A3', name: 'Mushroom extract blend', dose: 'Botanical blend', role: 'Lion\u2019s mane, reishi and turkey tail for immune, gut and nerve support.' }
+        { code: 'A3', name: 'Turkey tail extract', dose: 'Botanical', role: 'Turkey tail mushroom extract for immune regulation.' }
       ],
       qzBuyName: a.species === 'cat' ? 'Happy Beans for Cats™' : 'Happy Beans™ for Dogs',
       qzBuyAddLabel: this.state.qzAdded ? 'Added — view cart →' : 'Add to cart',
