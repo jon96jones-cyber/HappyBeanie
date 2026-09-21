@@ -16,8 +16,15 @@
 // customer, but not by enough to risk the outage.
 
 export const config = {
-  matcher: ['/', '/product', '/shop', '/quiz', '/dosing', '/certs', '/about', '/contact', '/cart', '/checkout']
+  matcher: ['/', '/product', '/shop', '/quiz', '/dosing', '/certs', '/about', '/contact', '/cart', '/checkout', '/google497e0b14e9539348.html']
 };
+
+// Google Search Console's ownership file. It must answer at exactly this
+// address with a 200, and cleanUrls would otherwise 308 it to the
+// extensionless path, which the verifier treats as a miss. Answered here,
+// ahead of routing, so the redirect never happens. The same file is also
+// committed at the repo root.
+const GOOGLE_VERIFY = { path: '/google497e0b14e9539348.html', body: 'google-site-verification: google497e0b14e9539348.html' };
 
 const SITE = 'https://www.happybeanie.com';
 
@@ -88,6 +95,9 @@ export function swapHead(html, key) {
 export default async function middleware(req) {
   try {
     const url = new URL(req.url);
+    if (url.pathname === GOOGLE_VERIFY.path) {
+      return new Response(GOOGLE_VERIFY.body, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'x-hb-verify': 'google' } });
+    }
     // The page fetch below carries this flag so the middleware lets it pass
     // through to the static file instead of running again on its own fetch.
     if (url.searchParams.has('hb_raw')) return;
