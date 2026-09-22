@@ -343,6 +343,26 @@ window.HB_ROUTE_META = {
   cart: 'Your cart | Happy Beanie',
   checkout: 'Checkout | Happy Beanie'
 };
+// Which page this document was served with. The edge sends each route with
+// only its own page's markup (middleware.js), so a move to another page is a
+// real navigation. Absent the meta — the raw file, a local harness — every
+// page is present and the app switches in place as before.
+window.hbServedPage = function () {
+  var m = document.querySelector('meta[name="hb-page"]');
+  return m ? m.getAttribute('content') : null;
+};
+// The next page starts downloading while the cursor rests on its link.
+document.addEventListener('mouseover', function (e) {
+  var a = e.target && e.target.closest ? e.target.closest('a[href^="/"]') : null;
+  if (!a || !window.hbServedPage()) return;
+  var h = a.getAttribute('href');
+  if (!/^\/(product|shop|quiz|dosing|certs|about|contact)(\?|$)/.test(h)) return;
+  window.__hbPrefetched = window.__hbPrefetched || {};
+  if (window.__hbPrefetched[h]) return;
+  window.__hbPrefetched[h] = 1;
+  var l = document.createElement('link'); l.rel = 'prefetch'; l.href = h; l.as = 'document';
+  document.head.appendChild(l);
+}, { passive: true });
 window.hbRouteTitle = function (page) {
   var t = window.HB_ROUTE_META[page || 'home'];
   if (t) try { document.title = t; } catch (e) {}
@@ -5604,7 +5624,12 @@ class Component extends DCLogic {
     } catch (e) {}
     this.onPopState = () => {
       const p = window.location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
-      if (VALID_PAGES.includes(p)) { this.setState({ page: p, menuOpen: false }); if (window.hbRouteTitle) window.hbRouteTitle(p); }
+      if (!VALID_PAGES.includes(p)) return;
+      // Back or forward to a page this document was not served with: reload
+      // so the edge sends that page.
+      const served = window.hbServedPage ? window.hbServedPage() : null;
+      if (served && served !== p) { window.location.reload(); return; }
+      this.setState({ page: p, menuOpen: false }); if (window.hbRouteTitle) window.hbRouteTitle(p);
     };
     window.addEventListener('popstate', this.onPopState);
     // The label's fit depends on both columns' heights, which move with the
@@ -5993,11 +6018,21 @@ class Component extends DCLogic {
     requestAnimationFrame(aim);
   }
 
-  nav(page) {
+  nav(page, query) {
     return (e) => {
       // The header and menu anchors carry real hrefs so crawlers can follow
       // them; a click still navigates in-app, so the default is stopped.
       if (e && typeof e.preventDefault === 'function') e.preventDefault();
+      // Served with one page only: another page is a real navigation. The
+      // state update flushes first, so the cart written in componentDidUpdate
+      // is on disk before the document goes.
+      const served = window.hbServedPage ? window.hbServedPage() : null;
+      if (served && served !== page) {
+        const q = query && query.sp ? '?sp=' + query.sp : '';
+        const dest = (page === 'home' ? '/' : '/' + page) + q;
+        this.setState({ menuOpen: false }, () => { window.location.href = dest; });
+        return;
+      }
       // Leaving the product page drops the chew stage's DOM node with the rest
       // of the markup, so the cached handle would be stale on return. Reset to
       // the photo view and let the next opt-in rebuild the stage.
@@ -6350,8 +6385,8 @@ class Component extends DCLogic {
       goQuiz: this.nav('quiz'),
       // The mobile menu's tiles pick the species on the way to the product
       // page, the way the shop cards do, so the panel opens on the right one.
-      goDog: (e) => { this.setState({ sp: 'dog' }); this.nav('product')(e); },
-      goCat: (e) => { this.setState({ sp: 'cat' }); this.nav('product')(e); },
+      goDog: (e) => { this.setState({ sp: 'dog' }); this.nav('product', { sp: 'dog' })(e); },
+      goCat: (e) => { this.setState({ sp: 'cat' }); this.nav('product', { sp: 'cat' })(e); },
       // There is no FAQ page — the band is injected into four of them. The
       // dosing page is the one it belongs beside, so the link lands there and
       // scrolls down to it once the page has rendered.
@@ -6374,7 +6409,7 @@ class Component extends DCLogic {
         const on = this.state.sp === s.key;
         return { ...s,
           pick: () => this.setState({ sp: s.key }),
-          choose: () => { this.setState({ sp: s.key, plan: this.state.wholesale ? 0 : 1, added: false }); this.nav('product')(); },
+          choose: () => { this.setState({ sp: s.key, plan: this.state.wholesale ? 0 : 1, added: false }); this.nav('product', { sp: s.key })(); },
           cta: s.key === 'dog' ? 'Choose Happy Beans for Dogs' : 'Choose ' + s.name,
           bg: on ? '#F5F0E6' : '#FCFAF4',
           border: on ? '#17140F' : '#E0D6C2',

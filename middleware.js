@@ -74,6 +74,28 @@ const ROUTES = {
   checkout: { title: 'Checkout | Happy Beanie', description: '', noindex: true }
 };
 
+// Each storefront page lives in its own top-level <sc-if> wrapper in the
+// file. A route serves only its own wrapper: a tool fetching /product then
+// reads the product page and nothing else, which is also what a visitor
+// sees. The app, told which page it was served (the hb-page meta), makes a
+// full navigation to any other page instead of switching in place.
+const PAGE_WRAPPERS = {
+  home: 'isHome', shop: 'isShop', product: 'isProduct', about: 'isAbout', contact: 'isContact',
+  dosing: 'isDosing', certs: 'isCerts', quiz: 'onQuizPage', cart: 'isCart', checkout: 'isCheckout'
+};
+
+function keepOnlyPage(html, key) {
+  const mine = PAGE_WRAPPERS[key];
+  if (!mine || html.indexOf('<sc-if value="{{ ' + mine + ' }}"') === -1) return html;
+  let out = html;
+  for (const k of Object.keys(PAGE_WRAPPERS)) {
+    if (k === key) continue;
+    const re = new RegExp('\\n  <sc-if value="\\{\\{ ' + PAGE_WRAPPERS[k] + ' \\}\\}"[^>]*>[\\s\\S]*?\\n  </sc-if>\\n');
+    out = out.replace(re, '\n');
+  }
+  return out;
+}
+
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
@@ -91,6 +113,7 @@ export function swapHead(html, key) {
   let out = html;
   out = out.replace(/<title>[^<]*<\/title>/, '<title>' + title + '</title>' +
     '\n<link rel="canonical" href="' + url + '">' +
+    '\n<meta name="hb-page" content="' + key + '">' +
     (meta.noindex ? '\n<meta name="robots" content="noindex, follow">' : ''));
   if (meta.description) {
     out = out.replace(/<meta name="description" content="[^"]*">/, '<meta name="description" content="' + desc + '">');
@@ -99,6 +122,7 @@ export function swapHead(html, key) {
   out = out.replace(/<meta property="og:description" content="[^"]*">/, '<meta property="og:description" content="' + esc(SHARE.description) + '">');
   out = out.replace(/<meta property="og:url" content="[^"]*">/, '<meta property="og:url" content="' + url + '">');
   if (key !== 'product') out = dropProductNodes(out);
+  out = keepOnlyPage(out, key);
   return out;
 }
 
@@ -137,14 +161,19 @@ export default async function middleware(req) {
     const html = await res.text();
     if (html.indexOf('<title>') === -1) return;
 
-    return new Response(swapHead(html, key), {
-      status: 200,
-      headers: {
-        'content-type': 'text/html; charset=utf-8',
-        'cache-control': 'public, max-age=0, must-revalidate',
-        'x-hb-route': key
-      }
-    });
+    // A validator per route and file version, so a page a visitor already
+    // has is answered with 304 rather than sent again.
+    const tag = 'W/"' + key + '-' + String(res.headers.get('etag') || '').replace(/[^A-Za-z0-9]/g, '') + '"';
+    const headers = {
+      'content-type': 'text/html; charset=utf-8',
+      'cache-control': 'public, max-age=0, must-revalidate',
+      'etag': tag,
+      'vary': 'Accept-Encoding',
+      'x-hb-route': key
+    };
+    if (req.headers.get('if-none-match') === tag) return new Response(null, { status: 304, headers: headers });
+
+    return new Response(swapHead(html, key), { status: 200, headers: headers });
   } catch (e) {
     return;
   }
