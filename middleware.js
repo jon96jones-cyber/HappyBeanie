@@ -89,7 +89,24 @@ export function swapHead(html, key) {
   }
   out = out.replace(/<meta property="og:title" content="[^"]*">/, '<meta property="og:title" content="' + title + '">');
   out = out.replace(/<meta property="og:url" content="[^"]*">/, '<meta property="og:url" content="' + url + '">');
+  if (key !== 'product') out = dropProductNodes(out);
   return out;
+}
+
+// The static JSON-LD carries both Product entries so that anything reading
+// the raw file sees the formulas. Google, though, expects product markup
+// only on the page about that product, and reports it on every other route
+// as a product with missing fields. Off the product page the graph keeps
+// the Organization and WebSite nodes and drops the Products. Anything odd
+// in the block — no block, unparseable — leaves the page untouched.
+function dropProductNodes(html) {
+  const m = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+  if (!m) return html;
+  let graph;
+  try { graph = JSON.parse(m[1]); } catch (e) { return html; }
+  if (!graph || !Array.isArray(graph['@graph'])) return html;
+  graph['@graph'] = graph['@graph'].filter(function (n) { return n['@type'] !== 'Product'; });
+  return html.replace(m[0], '<script type="application/ld+json">' + JSON.stringify(graph, null, 2) + '</script>');
 }
 
 export default async function middleware(req) {
