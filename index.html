@@ -3092,16 +3092,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
           </span>
           <span data-m="qzcta" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.44 0.07 152); white-space: nowrap;">Check eligibility →</span>
         </a>
-        <div data-m="hmbatch" style="display: {{ batchShow }}; border: 1px solid #E0D6C2; border-radius: 3px; background: #FCFAF4; padding: 18px 22px 20px; margin-bottom: 30px;">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px 18px; flex-wrap: wrap; margin-bottom: 12px;">
-            <span style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #8A7F6E;"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ batchPulse }}; animation: qzBlip 1.6s ease-in-out infinite;"></span>Small batch · current run</span>
-            <span style="font-family: 'DM Sans', sans-serif; font-size: 13.5px; letter-spacing: -0.01em; color: {{ batchNumColor }};"><b style="font-weight: 700; font-size: 15px; letter-spacing: -0.02em;">{{ batchLeft }}</b> of {{ batchTotal }} boxes left</span>
-          </div>
-          <div style="height: 6px; border-radius: 999px; background: #EDE6D8; overflow: hidden;">
-            <div style="height: 100%; width: {{ batchPct }}%; min-width: 4px; background: {{ batchBarColor }}; border-radius: 999px; transition: width 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);"></div>
-          </div>
-          <div style="margin-top: 11px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #A2977F; line-height: 1.7;">{{ batchNote }}</div>
-        </div>
         <!-- Purchase panel (Setup_39), the same one the product page buys
              from. data-pc-plain drops its identity strip: the name, lede
              and rating are already above it here. -->
@@ -3638,16 +3628,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
               <span>Made to order</span>
               <span>Small batch</span>
             </div>
-            <div style="display: {{ batchShow }};">
-              <div data-m="catchtagrow" style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px 18px; flex-wrap: wrap; margin-bottom: 9px;">
-                <span style="display: flex; align-items: center; gap: 8px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B9AF9C;"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ batchPulse }}; animation: qzBlip 1.6s ease-in-out infinite;"></span>Small batch · current run</span>
-                <span style="font-family: 'DM Sans', sans-serif; font-size: 13px; letter-spacing: -0.01em; color: {{ batchNumColorDark }};"><b style="font-weight: 700; font-size: 15px; letter-spacing: -0.02em;">{{ batchLeft }}</b> of {{ batchTotal }} boxes left</span>
-              </div>
-              <div style="height: 6px; border-radius: 999px; background: rgba(245,240,230,0.16); overflow: hidden;">
-                <div style="height: 100%; width: {{ batchPct }}%; min-width: 4px; background: {{ batchBarColor }}; border-radius: 999px; transition: width 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);"></div>
-              </div>
-              <div data-m="catchtagnote" style="margin-top: 10px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A7F6E; line-height: 1.7;">{{ batchNote }}</div>
-            </div>
             <!-- CTA (Jon, Sep 2026): the same add-to-cart as the sticky bar, so
                  it carries the plan and cycle the purchase panel is set to. -->
             <button sc-camel-on-click="{{ barCtaGo }}" data-m="catchcta" style="display: block; width: 100%; margin-top: 2px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; padding: 16px 20px; border: none; border-radius: 3px; background: oklch(0.86 0.14 92); color: #17140F; font-weight: 500; cursor: pointer; box-shadow: 0 16px 30px -18px oklch(0.86 0.14 92 / 0.7); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">{{ barCta }}</button>
@@ -3740,16 +3720,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
         </div>
       </div>
 
-      <div data-m="stack gap" style="display: none; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; max-width: 1180px; margin: 88px auto 0;">
-        <div data-m="auto" style="height: 520px; border-radius: 5px; overflow: hidden; box-shadow: 0 34px 60px -38px rgba(23,20,15,0.5);"><image-slot id="hbv2-pdp-story" placeholder="Beanie, the dog this began with" style="width: 100%; height: 100%;"></image-slot></div>
-        <div>
-          <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.44 0.07 152); margin-bottom: 20px;">Why this exists</div>
-          <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.04; margin: 0 0 22px; max-width: 20em; text-wrap: balance;">He stopped meeting me at the door.</h2>
-          <p style="font-size: 16.5px; line-height: 1.72; color: #554C40; margin: 0 0 18px; max-width: 34em; text-wrap: pretty;">Beanie was fourteen. Nothing was wrong on paper — bloodwork fine, no diagnosis, nothing to treat. He had just quietly stopped doing the things that made him him. The stairs became a decision. The greeting at the door became a look up from the rug.</p>
-          <p style="font-size: 16.5px; line-height: 1.72; color: #554C40; margin: 0 0 26px; max-width: 34em; text-wrap: pretty;">His owner came from fifteen years of sterile human formulation. He spent a year reading canine trials instead of marketing copy, then blended the first batch on a borrowed bench for one dog. Eleven weeks later Beanie beat him to the door. Every batch since is that formula, published lot by lot.</p>
-          <div style="display: flex; align-items: center; gap: 14px; padding-top: 22px; border-top: 1px solid #E0D6C2; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #8A7F6E;"><span style="width: 26px; height: 1px; background: oklch(0.44 0.07 152);"></span>Scottsdale, Arizona · since 2022</div>
-        </div>
-      </div>
 
       <!-- The FAQ band runs flush: no cream above (wrapper margin) or below
            (the section's old 104px bottom padding) — the dark band meets the
@@ -3759,27 +3729,6 @@ image-slot:not([data-filled]) { color: transparent !important; }
         <div data-hb-faq-host></div>
       </div>
 
-      <!-- "Nothing to lose" guarantee band — hidden for now at Jon's request
-           (Sep 2026). Remove the display:none below to bring it back. -->
-      <div data-m="inset" data-rv="1" style="display: none; position: relative; max-width: 1180px; margin: 88px auto 0; background: #17140F; border-radius: 5px; padding: 72px 56px; overflow: hidden; opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.2,0.7,0.2,1);">
-        <div aria-hidden="true" style="position: absolute; left: -140px; bottom: -180px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, oklch(0.72 0.08 152 / 0.16), transparent 70%); pointer-events: none;"></div>
-        <div data-m="stack gap" style="position: relative; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; align-items: center;">
-          <div>
-            <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: oklch(0.72 0.08 152); margin-bottom: 22px;">Nothing to lose</div>
-            <h2 style="font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: -0.042em; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.03; color: #F5F0E6; margin: 0 0 20px; max-width: 20em;">Try it for thirty days. <span style="color: oklch(0.86 0.14 92);">Keep the box either way.</span></h2>
-            <p style="font-size: 16px; line-height: 1.7; color: #B9AF9C; margin: 0 0 32px; max-width: 32em;">If you do not see the change you were hoping for, tell us and we refund the order in full — opened, half-empty, no return shipment.</p>
-            <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
-              <button sc-camel-on-click="{{ cartCta }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 20px 36px; border: none; border-radius: 2px; background: oklch(0.86 0.14 92); color: #17140F; cursor: pointer; box-shadow: 0 20px 38px -22px oklch(0.86 0.14 92 / 0.6); transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2,0.7,0.2,1);" style-hover="background: #F5F0E6; transform: translateY(-2px);">{{ cartLabel }}</button>
-              <span style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A7F6E;">{{ planRecap }}</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px; font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.72 0.08 152);"><span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.72 0.08 152);"></span><span>Order today, ships within 24 hours from Scottsdale</span></div>
-            <p style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; line-height: 1.6; color: #8A7F6E; margin: 14px 0 0;">Terms and conditions apply. <a href="policies/refunds.html#guarantee" target="_blank" rel="noopener" style="color: oklch(0.72 0.08 152); text-decoration: none; border-bottom: 1px solid oklch(0.72 0.08 152 / 0.45);">Read the guarantee terms</a></p>
-          </div>
-          <div data-m="auto" style="height: 320px; border-radius: 4px; overflow: hidden; box-shadow: 0 26px 60px rgba(0,0,0,0.5);">
-            <image-slot id="hbv2-close" placeholder="Pet mid-play, joyful, warm light" style="width: 100%; height: 100%;"></image-slot>
-          </div>
-        </div>
-      </div>
     </section>
 
     <div class="hb-buybar" data-m="pad" style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; transform: translateY(110%); opacity: 0; transition: transform 0.35s cubic-bezier(0.2,0.7,0.2,1), opacity 0.3s ease; background: rgba(23,20,15,0.96); backdrop-filter: blur(10px); border-top: 1px solid rgba(245,240,230,0.16); padding: 14px 44px;">
@@ -6098,22 +6047,10 @@ class Component extends DCLogic {
     const shopDefs = [
       { key: 'dog', badge: 'For dogs', format: 'Happy Beans™ · daily soft chew', name: 'Happy Beans for Dogs', price: 'As low as $74', term: 'Per month · buy 3 get 1 free', slot: 'hbv2-shop-dog', ph: 'Happy Beans box with dog, editorial',
         body: 'The world\u2019s most powerful anti aging pet supplement. Made fresh daily at our in-house lab in Scottsdale, Arizona. Tested on humans, trusted by pet owners.',
-        points: [
-          { k: 'A1 Peptides', v: 'Proprietary peptide blend' },
-          { k: 'A2 Whole-food', v: 'Elk blend' },
-          { k: 'A3 Mushroom', v: 'Turkey tail extract' },
-          { k: 'Weight range', v: '10\u2013150 lb' },
-          { k: 'Ritual', v: 'One chew each morning' }
-        ] },
+        },
       { key: 'cat', badge: 'For cats', format: 'Happy Beans for Cats™ · daily supplement chew', name: 'Happy Beans for Cats', price: 'As low as $74', term: 'Per month · buy 3 get 1 free', slot: 'hbv2-shop-cat', ph: 'Happy Beans for Cats box with cat, editorial',
         body: 'The world\u2019s most powerful anti aging pet supplement. Made fresh daily at our in-house lab in Scottsdale, Arizona. Tested on humans, trusted by pet owners.',
-        points: [
-          { k: 'A1 Peptides', v: 'Proprietary peptide blend' },
-          { k: 'A2 Whole-food', v: 'Taurine & salmon blend' },
-          { k: 'A3 Mussel', v: 'Green-lipped mussel, whole powder' },
-          { k: 'Weight range', v: '4\u201322 lb' },
-          { k: 'Ritual', v: 'One chew each morning' }
-        ] }
+        }
     ];
     const compareRows = [
       { k: 'Format', dog: 'Soft chew, scored', cat: 'Soft chew, scored' },
@@ -6247,8 +6184,6 @@ class Component extends DCLogic {
     ];
     const copy = isDog ? {
       eyebrow: 'Happy Beans™ · Anti-Aging Chew for Dogs',
-      head: 'For Dogs',
-      italic: '',
       body: 'Formulated with human-grade ingredients, real food nutrition, and clinically studied doses of key active ingredients—including UC-II® collagen peptide and Green Lipped Mussel to help fight inflammation, reduce stiffness, support mobility, and promote healthy heart & organ function.',
       main: { slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans box, hero angle' },
       thumbs: [
@@ -6264,8 +6199,6 @@ class Component extends DCLogic {
       other: 'Other ingredients: chickpea flour, cane molasses, glycerin, coconut oil, sea salt, natural chicken flavor, lecithin, sorbic acid.'
     } : {
       eyebrow: 'Happy Beans™ · Anti-Aging Chew for Cats',
-      head: 'For Cats',
-      italic: '',
       body: 'Formulated with human-grade ingredients, real food nutrition, and clinically studied doses of key active ingredients—including UC-II® collagen peptide and Green Lipped Mussel to help fight inflammation, reduce stiffness, support mobility, and promote healthy heart & organ function.',
       main: { slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box, hero angle' },
       thumbs: [
@@ -6305,8 +6238,6 @@ class Component extends DCLogic {
         cueColor: this.state.sp === s.key ? 'oklch(0.44 0.07 152)' : '#8A7F6E'
       })),
       pdpEyebrow: copy.eyebrow,
-      pdpHead: copy.head,
-      pdpHeadItalic: copy.italic,
       pdpBody: copy.body,
 
       // Comparison chart. Straight from the renderVals() the design shipped
@@ -7040,12 +6971,6 @@ class Component extends DCLogic {
         }, 900);
       },
       resetForm: () => this.setState({ sent: false, form: { name: '', email: '', animal: '', message: '', clinic: '', license: '' }, ticket: '' }),
-      reviews: [
-        { quote: '\u201CTwo weeks in and he was waiting at the door again.\u201D', who: 'Brenda S. · Jim, 3 yrs', slot: 'hbv2-rev1' },
-        { quote: '\u201CThe balm closed a hot spot we\u2019d fought for a year.\u201D', who: 'Makenzie B. · Finley, 6 yrs', slot: 'hbv2-rev2' },
-        { quote: '\u201CPeace of mind. I\u2019m supporting her body, not just watching her age.\u201D', who: 'Giulianna T. · Milo, 5 yrs', slot: 'hbv2-rev3' },
-        { quote: '\u201CI lost my soul dog too soon. This time I\u2019m doing everything I can.\u201D', who: 'Carly M. · Ghost, 8 yrs', slot: 'hbv2-rev4' }
-      ].map((r, i) => ({ ...r, delay: i * 90 })),
       steps: [
         { n: '01 Morning', title: 'One chew, once a day', body: 'Have your pet take their Happy Bean after food, before the walk.', slot: 'hbv2-step1', ph: 'Chews on kitchen counter, morning light' },
         { n: '02 Direct', title: 'Hand it over', body: 'No mixing, no measuring, no pill pocket. Most beans take it as a treat on the first try.', slot: 'hbv2-step2', ph: 'Hand offering chew to dog' },
@@ -7434,15 +7359,6 @@ Object.assign(Component.prototype, {
       qzBuyLabel: 'Get ' + (a.species === 'cat' ? 'Happy Beans for Cats' : 'Happy Beans for Dogs') + ' →',
       qzBuyNote: verdict === 'ok' ? 'One chew daily · 30-day box' : 'Start at ½ dose for week one',
       qzBuySlot: a.species === 'cat' ? 'hbv2-pdp-cat-main' : 'hbv2-pdp-dog-main',
-      qzActives: a.species === 'cat' ? [
-        { code: 'A1', name: 'Proprietary peptide blend', dose: 'Signalling active', role: 'Copper-free signalling, dosed to a cat\u2019s faster clearance rate.' },
-        { code: 'A2', name: 'Taurine & salmon blend', dose: 'Amino-acid base', role: 'The amino acid cats cannot make enough of, with salmon oil for absorption.' },
-        { code: 'A3', name: 'Green-lipped mussel', dose: 'Joint support', role: 'Whole New Zealand green-lipped mussel \u2014 natural glucosamine, chondroitin and rare omega-3s for joints.' }
-      ] : [
-        { code: 'A1', name: 'Proprietary peptide blend', dose: 'Signalling active', role: 'The signalling layer \u2014 instructs repair in joint, skin and connective tissue.' },
-        { code: 'A2', name: 'Elk blend', dose: 'Whole-food base', role: 'Whole-food velvet antler and organ nutrition: the cofactors repair actually spends.' },
-        { code: 'A3', name: 'Turkey tail extract', dose: 'Botanical', role: 'Turkey tail mushroom extract for immune regulation.' }
-      ],
       qzBuyName: a.species === 'cat' ? 'Happy Beans for Cats™' : 'Happy Beans™ for Dogs',
       qzBuyAddLabel: this.state.qzAdded ? 'Added — view cart →' : 'Add to cart',
       qzBuyAdd: () => {
