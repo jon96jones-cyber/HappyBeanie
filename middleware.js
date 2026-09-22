@@ -28,6 +28,15 @@ const GOOGLE_VERIFY = { path: '/google497e0b14e9539348.html', body: 'google-site
 
 const SITE = 'https://www.happybeanie.com';
 
+// What a shared link shows in Messages, iMessage and social apps. This is
+// the og:title / og:description pair, kept apart from the search title so
+// the two can each say what suits their reader: Google gets the query, a
+// friend gets the line Jon wrote. Every route shares this one preview.
+const SHARE = {
+  title: 'The Next Chapter of Pet Longevity Starts Here - Free Shipping',
+  description: 'Peptide-infused daily care for dogs and cats. The next chapter of pet longevity starts here.'
+};
+
 const ROUTES = {
   home: {
     title: 'Happy Beanie — Anti-Aging Pet Supplement for Dogs & Cats',
@@ -85,9 +94,9 @@ export function swapHead(html, key) {
     (meta.noindex ? '\n<meta name="robots" content="noindex, follow">' : ''));
   if (meta.description) {
     out = out.replace(/<meta name="description" content="[^"]*">/, '<meta name="description" content="' + desc + '">');
-    out = out.replace(/<meta property="og:description" content="[^"]*">/, '<meta property="og:description" content="' + desc + '">');
   }
-  out = out.replace(/<meta property="og:title" content="[^"]*">/, '<meta property="og:title" content="' + title + '">');
+  out = out.replace(/<meta property="og:title" content="[^"]*">/, '<meta property="og:title" content="' + esc(SHARE.title) + '">');
+  out = out.replace(/<meta property="og:description" content="[^"]*">/, '<meta property="og:description" content="' + esc(SHARE.description) + '">');
   out = out.replace(/<meta property="og:url" content="[^"]*">/, '<meta property="og:url" content="' + url + '">');
   if (key !== 'product') out = dropProductNodes(out);
   return out;
