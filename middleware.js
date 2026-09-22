@@ -33,7 +33,7 @@ const SITE = 'https://www.happybeanie.com';
 // the two can each say what suits their reader: Google gets the query, a
 // friend gets the line Jon wrote. Every route shares this one preview.
 const SHARE = {
-  title: 'The Next Chapter of Pet Longevity Starts Here - Free Shipping',
+  title: 'The Next Chapter of Anti-Aging Pet Supplements Starts Here - Free Shipping',
   description: 'Peptide-infused daily care for dogs and cats. The next chapter of pet longevity starts here.'
 };
 
