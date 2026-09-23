@@ -56,7 +56,7 @@ tr:last-child td { border-bottom:none; }
 
 <div id="gate">
   <h1>Subscriptions</h1>
-  <p>Every Subscribe &amp; Save contract, with the last payment result and why a renewal failed. Same key as the Live desk.</p>
+  <p>Every Subscribe &amp; Save contract Shopify Flow has told us about, with the last payment result and why a renewal failed. Same key as the Live desk.</p>
   <input id="key" type="password" placeholder="Desk key" autocomplete="off">
   <button class="primary" id="unlock" style="width:100%; padding:13px;">Unlock</button>
   <div id="gateErr"></div>
@@ -81,8 +81,8 @@ tr:last-child td { border-bottom:none; }
       </table>
     </div>
     <p class="note">
-      READ-ONLY · CHANGES TO A CONTRACT ARE MADE IN SHOPIFY OR BY THE CUSTOMER IN THEIR ACCOUNT<br>
-      FAILED-PAYMENT RETRIES AND WHAT HAPPENS AFTER THEM ARE SET IN THE SUBSCRIPTIONS APP · KEEP THIS PAGE PRIVATE
+      READ-ONLY · FED BY SHOPIFY FLOW (CREATED · PAYMENT FAILED · CANCELLED · PAUSED / RESUMED) · A CONTRACT'S STATE IS ITS NEWEST EVENT<br>
+      CHANGES TO A CONTRACT ARE MADE IN SHOPIFY OR BY THE CUSTOMER IN THEIR ACCOUNT · RETRIES ARE SET IN THE SUBSCRIPTIONS APP · KEEP THIS PAGE PRIVATE
     </p>
   </div>
 </div>
@@ -110,7 +110,8 @@ tr:last-child td { border-bottom:none; }
   }
   function gateMessage(b) {
     if (b.error === 'unauthorized') return 'That key was not accepted.';
-    if (b.error === 'not_configured') return 'SHOPIFY_ADMIN_TOKEN is not set on this deployment.';
+    if (b.error === 'no_database') return 'No database connected.';
+    if (b.error === 'query_failed') return 'The log could not be read: ' + esc(b.message || '');
     if (b.error === 'unreachable') return 'Could not reach the desk.';
     return esc(b.message || b.error || 'Something went wrong.');
   }
@@ -169,14 +170,14 @@ tr:last-child td { border-bottom:none; }
       ? b.contracts.map(function (c) {
           var a = c.attempts[0];
           var attempt = !a ? '<span class="muted">none</span>'
-            : a.errorCode
-              ? '<span class="fail">' + esc(a.errorCode.replace(/_/g, ' ').toLowerCase()) + '</span>' + (a.errorMessage ? '<div class="small muted">' + esc(a.errorMessage) + '</div>' : '') + '<div class="small muted">' + esc(whenAt(a.at)) + '</div>'
-              : '<span class="okp">succeeded</span>' + (a.order ? ' <span class="muted small">' + esc(a.order) + '</span>' : '') + '<div class="small muted">' + esc(whenAt(a.at)) + '</div>';
+            : !a.ok
+              ? '<span class="fail">' + esc((a.errorCode || 'failed').replace(/_/g, ' ').toLowerCase()) + '</span>' + (a.errorMessage ? '<div class="small muted">' + esc(a.errorMessage) + '</div>' : '') + '<div class="small muted">' + esc(whenAt(a.at)) + '</div>'
+              : '<span class="okp">succeeded</span><div class="small muted">' + esc(whenAt(a.at)) + '</div>';
           var pay = c.lastPaymentStatus === 'FAILED' ? '<span class="fail">Failed</span>'
             : c.lastPaymentStatus === 'SUCCEEDED' ? '<span class="okp">Succeeded</span>' : '<span class="muted">—</span>';
           return '<tr>' +
             '<td><b>' + esc(c.customer.name || '—') + '</b><div class="small muted">' + esc(c.customer.email) + '</div></td>' +
-            '<td>' + esc(c.product || '—') + '<div class="small muted">' + (c.price != null ? '$' + c.price.toFixed(2) + ' · ' : '') + 'every ' + esc(c.every || '?') + (c.originOrder ? ' · from ' + esc(c.originOrder) : '') + '</div></td>' +
+            '<td>' + esc(c.product || '—') + '<div class="small muted">' + (c.originOrder ? 'from ' + esc(c.originOrder) + ' · ' : '') + 'last event: ' + esc((c.lastEvent || '').replace(/_/g, ' ')) + '</div></td>' +
             '<td><span class="pill ' + esc(c.status) + '">' + esc(LABEL[c.status] || c.status) + '</span></td>' +
             '<td class="hide-m">' + esc(when(c.nextBillingDate)) + '</td>' +
             '<td>' + pay + '</td>' +
@@ -184,7 +185,7 @@ tr:last-child td { border-bottom:none; }
             '<td class="hide-m small muted">' + esc(when(c.updatedAt)) + '</td>' +
             '</tr>';
         }).join('')
-      : '<tr><td colspan="7" class="empty">No contracts match.</td></tr>';
+      : '<tr><td colspan="7" class="empty">' + (b.filter.status || b.filter.q ? 'No contracts match.' : 'Nothing logged yet. This desk fills as Shopify Flow posts contract events — see docs/shopify-flow-subscriptions.md.') + '</td></tr>';
   }
 
   if (key()) { $('key').value = key(); $('unlock').click(); }

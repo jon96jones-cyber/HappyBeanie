@@ -140,6 +140,30 @@ async function ensureSchema() {
   await q`create index if not exists quiz_reminders_due_idx
           on quiz_reminders (remind_on) where sent_at is null and cancelled_at is null`;
 
+  // Subscription contract events, posted by Shopify Flow (api/hooks/
+  // subscription.js). This is the only record of contracts we can hold:
+  // the Admin API refuses subscription contracts to a custom app, so the
+  // desk and the rescue cron read this log instead. One row per event; a
+  // contract's current state is its newest row.
+  await q`create table if not exists subscription_events (
+     id                bigserial primary key,
+     received_at       timestamptz not null default now(),
+     event             text not null,
+     contract_id       text not null,
+     status            text,
+     customer_email    text,
+     customer_name     text,
+     product           text,
+     next_billing_date timestamptz,
+     origin_order      text,
+     error_code        text,
+     error_message     text,
+     raw               jsonb
+   )`;
+  await q`create index if not exists subscription_events_contract_idx on subscription_events (contract_id, received_at desc)`;
+  await q`create index if not exists subscription_events_received_idx on subscription_events (received_at desc)`;
+  await q`create index if not exists subscription_events_event_idx on subscription_events (event, received_at desc)`;
+
   // What has already gone out, so a sequence can be re-run without emailing
   // anyone twice. The recovery cron gets away with no state by only ever
   // looking at a one-hour window; a multi-step flow cannot, because step 2 has
