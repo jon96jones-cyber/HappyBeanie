@@ -2681,7 +2681,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
        homepage's copy of the same panel, runs at about half the buy button's
        width and well under its height, centred, so it never reads as a
        second CTA (Jon, Sep 2026). */
-    [data-m~="pdpqzm"] [data-m~="qzcta"], [data-m~="hmquizm"] [data-m~="qzcta"] { width: 52% !important; margin: 2px auto 0 !important; min-height: 40px !important; padding: 12px 14px !important; font-size: 9.5px !important; letter-spacing: 0.12em !important; box-shadow: none !important; }
+    [data-m~="pdpqzm"] [data-m~="qzcta"], [data-m~="hmquizm"] [data-m~="qzcta"] { width: max-content !important; max-width: 100% !important; margin: 2px auto 0 !important; min-height: 38px !important; padding: 11px 22px !important; font-size: 9.5px !important; letter-spacing: 0.12em !important; box-shadow: none !important; }
+    /* And the card itself steps in from the buy panel's edges, so the whole
+       block reads smaller than the panel above it, not level with it. */
+    [data-m~="pdpqzm"], [data-m~="hmquizm"] { width: 84% !important; margin-left: auto !important; margin-right: auto !important; padding: 12px 12px 14px !important; border-radius: 12px !important; gap: 8px !important; }
+    [data-m~="pdpqzm"] [data-m~="hmqh"], [data-m~="hmquizm"] [data-m~="hmqh"] { font-size: 12px !important; letter-spacing: -0.01em !important; margin-bottom: 2px !important; text-wrap: balance; }
     /* Sits under the buy button now, so the gap below it is the eligibility
        card's own top margin — no bottom margin of its own to stack with. */
     [data-m~="pdpqznote"] { font-size: 8.5px !important; margin: 12px 0 0 !important; }
