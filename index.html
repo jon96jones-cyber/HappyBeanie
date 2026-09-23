@@ -2057,6 +2057,9 @@ image-slot:not([data-filled]) { color: transparent !important; }
   // page is drawn and the minimum has elapsed since the click.
   var stamp = 0;
   try { stamp = Number(sessionStorage.getItem('hbNav')) || 0; sessionStorage.removeItem('hbNav'); } catch (e) {}
+  // No stamp but the previous page was ours (the journal, a policy page, a
+  // tab loaded before this shipped): still an internal move, still the ring.
+  if (!stamp) { try { if (document.referrer && new URL(document.referrer).origin === location.origin) stamp = Date.now(); } catch (e) {} }
   if (stamp && Date.now() - stamp < 15000) {
     show();
     var settle = function () { setTimeout(hide, Math.max(0, MIN - (Date.now() - stamp))); };
