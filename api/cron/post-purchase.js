@@ -64,8 +64,8 @@ const ORDERS_Q = `query PostPurchase($q: String!, $after: String) {
       customer {
         email tags numberOfOrders
         emailMarketingConsent { marketingState }
-        subscriptionContracts(first: 3) { nodes { status nextBillingDate } }
       }
+      lineItems(first: 10) { nodes { sellingPlan { name } } }
     }
   }
 }`;
@@ -107,6 +107,24 @@ module.exports = async function handler(req, res) {
       after = o.pageInfo.endCursor;
     }
 
+    // A subscriber's next renewal date, for the halfway-sub email. Shopify
+    // will not show a custom app its contracts, so this comes from the
+    // events Shopify Flow posts to our log (api/hooks/subscription.js);
+    // absent there, the email says "on schedule".
+    const renewsBy = {};
+    try {
+      const rows = await db.withSchema(() => sql`
+        select distinct on (lower(customer_email)) lower(customer_email) as email, next_billing_date
+          from subscription_events
+         where customer_email is not null and next_billing_date > now()
+         order by lower(customer_email), received_at desc`);
+      rows.forEach(function (r) {
+        renewsBy[r.email] = new Date(r.next_billing_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/Phoenix' });
+      });
+    } catch (e) {
+      console.error('[post-purchase] renewal dates unavailable:', e && e.message);
+    }
+
     // Classify: which step, if any, does each order put its buyer in line for.
     // Priority: milestone (they reordered) > checkin > the halfway pair.
     const RANK = { milestone: 1, checkin: 2, halfway: 3, 'halfway-sub': 3 };
@@ -127,17 +145,15 @@ module.exports = async function handler(req, res) {
       else if (age >= 7 && age <= 10 && nOrders <= 1) step = 'checkin';
       else if (age >= 21 && age <= 24) {
         const subtotal = parseFloat((((o.currentSubtotalPriceSet || {}).shopMoney || {}).amount) || '0');
-        const active = ((c.subscriptionContracts || {}).nodes || []).filter(function (s) { return s.status === 'ACTIVE'; });
+        // A subscriber is someone whose box came with a selling plan: the
+        // order itself says so, no contract lookup needed.
+        const subscribed = ((o.lineItems || {}).nodes || []).some(function (li) { return !!(li && li.sellingPlan); });
         if (subtotal < BUNDLE_FLOOR) {
-          step = active.length ? 'halfway-sub' : 'halfway';
+          step = subscribed ? 'halfway-sub' : 'halfway';
           // The design's jar counter: 30 chews minus the days since the box
           // arrived (~5 transit days after the order), never below 1.
           chews = Math.max(1, Math.min(30, 30 - (age - 5)));
-          const next = active.map(function (s) { return s.nextBillingDate; })
-            .filter(Boolean).sort()[0];
-          if (next) {
-            renews = new Date(next).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/Phoenix' });
-          }
+          if (subscribed && renewsBy[email]) renews = renewsBy[email];
         }
       }
       if (!step) return;
