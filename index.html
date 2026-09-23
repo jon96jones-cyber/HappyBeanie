@@ -5625,6 +5625,9 @@ class Component extends DCLogic {
         // one-time (their plan picker offers nothing else).
         ...(j.wholesale ? { plan: 0 } : {})
       });
+      // A screening parked in this browser before they had an account (or
+      // before they signed in) is attached now, on any storefront page.
+      if (j && j.in) this.qzFlushParked();
       // The popup's gate waits on this — see maybePop().
       this._authKnown = true;
     }).catch(() => { this._authKnown = true; });
@@ -7231,6 +7234,47 @@ const QZ_QUESTIONS = [
 ];
 
 Object.assign(Component.prototype, {
+  // Every completed screening is kept without a button press (Jon, Sep 2026).
+  // Signed in, it goes straight to the account. Signed out, it is parked in
+  // this browser for 30 days, and the next sign-in or account visit attaches
+  // it (the account page and the signed-in probe below both flush the park).
+  // Keyed on the answers, so re-renders of the result never resend a run.
+  qzPark(payload) {
+    const sig = JSON.stringify(payload.answers || {}) + '|' + payload.verdict;
+    if (this._qzParked === sig) return;
+    this._qzParked = sig;
+    const park = () => { try { localStorage.setItem('hb-quiz-pending', JSON.stringify({ at: Date.now(), screening: payload })); } catch (e) {} };
+    if (!this.state.signedIn) { park(); return; }
+    fetch('/api/account/quiz', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ screening: payload })
+    }).then(r => r.json().catch(() => ({}))).then(b => {
+      if (b && b.ok) { this.setState({ qzSaveDone: true }); return; }
+      park();
+    }).catch(park);
+  },
+  // A parked screening from an earlier visit, once this browser is known to
+  // be signed in: hand it to the account and clear it. Same shape and same
+  // 30-day window as the account page's own pickup.
+  qzFlushParked() {
+    let raw = null;
+    try { raw = localStorage.getItem('hb-quiz-pending'); } catch (e) {}
+    if (!raw) return;
+    let p = null;
+    try { p = JSON.parse(raw); } catch (e) {}
+    if (!p || !p.screening || !p.screening.species || !p.screening.verdict || !p.at || Date.now() - p.at > 30 * 24 * 60 * 60 * 1000) {
+      try { localStorage.removeItem('hb-quiz-pending'); } catch (e) {}
+      return;
+    }
+    fetch('/api/account/quiz', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ screening: p.screening })
+    }).then(r => r.json().catch(() => ({}))).then(b => {
+      if (b && b.ok) { try { localStorage.removeItem('hb-quiz-pending'); } catch (e) {} }
+    }).catch(() => {});
+  },
   qzList() {
     const sp = (this.state.qzAnswers || {}).species;
     const order = ['species', 'age', 'weightDog', 'weightCat', 'repro', 'allergies', 'conditions', 'meds', 'surgery'];
@@ -7328,6 +7372,13 @@ Object.assign(Component.prototype, {
       caution: { eyebrow: 'Result', head: 'Your pet is eligible.', italic: '', copy: 'Nothing you told us rules Happy Beanie out, but some of your answers touch inputs that interact with medication, diet or a diagnosis. Start at half dose for the first week.', bg: '#17140F', fg: '#F5F0E6', body: '#B9AF9C', accent: cCaution, eye: cCaution },
       block: { eyebrow: 'Result', head: 'Sorry, your pet isn\u2019t eligible at this time.', italic: '', copy: '', bg: '#17140F', fg: '#F5F0E6', body: '#B9AF9C', accent: cBlock, eye: cBlock }
     }[verdict];
+    if (stage === 'result') {
+      this.qzPark({
+        species: a.species, age: a.age, verdict: verdict, dose: doseLine,
+        flags: flags.map(f => ({ level: f.level, ing: f.ing, note: f.note, srcs: f.srcs })),
+        answers: a
+      });
+    }
     return {
       qzIntro: stage === 'intro',
       qzAsking: stage === 'quiz',
@@ -7429,7 +7480,7 @@ Object.assign(Component.prototype, {
       qzSaveHead: st.signedIn ? 'Keep this on your account.' : 'Keep this result.',
       qzSaveNote: st.signedIn
         ? 'Saves the formula, the dose and every ingredient we flagged to your account — there when you reorder, and on your phone.'
-        : 'This page is the only copy. Close the tab and it is gone. An account keeps the formula, the dose and every ingredient we flagged, on any device, ready the next time you order.',
+        : 'This browser keeps the result for 30 days. An account keeps the formula, the dose and every ingredient we flagged on any device, ready the next time you order.',
       qzSaveLabel: st.qzSaveBusy ? 'Saving…' : (st.signedIn ? 'Save to my account' : 'Save it to an account →'),
       qzSaveBusy: !!st.qzSaveBusy,
       qzSaveErr: st.qzSaveErr || '',

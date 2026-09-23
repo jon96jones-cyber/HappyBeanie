@@ -2006,10 +2006,11 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     block: 'oklch(0.78 0.12 38)'
   };
 
-  // Abandoning sign-in leaves the parked result behind. A week is long enough
-  // to cover a distracted afternoon and short enough that a forgotten one never
-  // turns up months later looking like a fresh screening.
-  var QZ_PENDING_TTL = 7 * 24 * 60 * 60 * 1000;
+  // Every completed screening is parked in the browser now, not only the ones
+  // someone chose to save, so the window is a month: long enough for the
+  // person who screens, thinks about it, and buys weeks later, and short
+  // enough that a forgotten one never turns up looking like a fresh screening.
+  var QZ_PENDING_TTL = 30 * 24 * 60 * 60 * 1000;
 
   // The newest saved screening for one animal, or null. Screenings are stored
   // newest first and only one per species survives a retake, so the first match
