@@ -2677,10 +2677,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
     [data-m~="upcell"] { grid-row: auto / span 2 !important; padding: 16px 16px 18px !important; gap: 8px !important; }
     [data-m~="upcell"] > :nth-child(3) span:nth-child(2) { font-size: 19px !important; }
     [data-m~="qzcta"] { display: block !important; width: 100% !important; min-height: 52px !important; text-align: center !important; padding: 17px 18px !important; border-radius: 999px !important; font-size: 11px !important; color: #FCFAF4 !important; background: oklch(0.36 0.055 152) !important; box-shadow: 0 16px 30px -18px oklch(0.36 0.055 152 / 0.85) !important; }
-    /* Product page only: the eligibility pill under the buy button runs at
-       about half the buy button's width, centred, with the note under it
-       set smaller (Jon, Sep 2026). The homepage card keeps the full pill. */
-    [data-m~="pdpqzm"] [data-m~="qzcta"] { width: 52% !important; margin: 2px auto 0 !important; min-height: 40px !important; padding: 12px 14px !important; font-size: 9.5px !important; letter-spacing: 0.12em !important; }
+    /* The eligibility pill under the buy button, on the product page and the
+       homepage's copy of the same panel, runs at about half the buy button's
+       width and well under its height, centred, so it never reads as a
+       second CTA (Jon, Sep 2026). */
+    [data-m~="pdpqzm"] [data-m~="qzcta"], [data-m~="hmquizm"] [data-m~="qzcta"] { width: 52% !important; margin: 2px auto 0 !important; min-height: 40px !important; padding: 12px 14px !important; font-size: 9.5px !important; letter-spacing: 0.12em !important; box-shadow: none !important; }
     /* Sits under the buy button now, so the gap below it is the eligibility
        card's own top margin — no bottom margin of its own to stack with. */
     [data-m~="pdpqznote"] { font-size: 8.5px !important; margin: 12px 0 0 !important; }
