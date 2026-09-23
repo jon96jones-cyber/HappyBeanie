@@ -156,8 +156,19 @@ input:focus { outline:none; border-color:#F0C64B; }
   // A desk is "ready" only if its key actually works, so the pills mean
   // something — a saved-but-rejected key is exactly what you want to catch
   // here rather than after clicking through.
+  // Desks that share a header share a key: the one saved for the Live desk
+  // opens Campaigns and Subscriptions too, without saving it three times.
+  function keyFor(d) {
+    var v = vault();
+    if (v[d.id]) return v[d.id];
+    for (var i = 0; i < DESKS.length; i++) {
+      var o = DESKS[i];
+      if (o.id !== d.id && o.header === d.header && v[o.id]) return v[o.id];
+    }
+    return '';
+  }
   function check(d) {
-    var key = vault()[d.id] || '';
+    var key = keyFor(d);
     if (!key) { setPill(d, 'needs', 'Key needed'); setMsg(d, '', ''); return Promise.resolve(); }
     setPill(d, 'wait', 'Checking');
     return fetch(d.api, { headers: makeHeaders(d, key) })
@@ -177,8 +188,8 @@ input:focus { outline:none; border-color:#F0C64B; }
   }
 
   DESKS.forEach(function (d) {
-    var v = vault();
-    if (v[d.id]) $('key-' + d.id).value = v[d.id];
+    var k0 = keyFor(d);
+    if (k0) $('key-' + d.id).value = k0;
 
     $('save-' + d.id).onclick = function () {
       var k = $('key-' + d.id).value.trim();
@@ -192,7 +203,7 @@ input:focus { outline:none; border-color:#F0C64B; }
     });
 
     $('open-' + d.id).onclick = function () {
-      var k = ($('key-' + d.id).value || '').trim();
+      var k = ($('key-' + d.id).value || '').trim() || keyFor(d);
       if (k) {
         var vv = vault(); vv[d.id] = k; saveVault(vv);
         d.hand(k);            // drop the key where that desk looks for it
@@ -208,7 +219,7 @@ input:focus { outline:none; border-color:#F0C64B; }
     if (!window.confirm('Remove every saved desk key from this browser?')) return;
     try {
       localStorage.removeItem(VAULT);
-      ['hb_stats_prefs', 'hb_amb_prefs', 'hb_ws_prefs'].forEach(function (s) {
+      ['hb_stats_prefs', 'hb_amb_prefs', 'hb_ws_prefs', 'hb_subs_prefs'].forEach(function (s) {
         var cur = {};
         try { cur = JSON.parse(localStorage.getItem(s) || '{}'); } catch (e) {}
         delete cur.key;
