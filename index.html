@@ -2019,10 +2019,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
 <body>
 <!-- Between pages: three chews turn clockwise over the page, no veil
      (Jon, Sep 2026). A same-site link shows the ring on the page being
-     left, holds there for 0.9s, then fades as the browser leaves for the
-     next address. Nothing carries into the next document: it starts
-     clean. A move the router keeps in-app cancels the hold; back/forward
-     hides it; a timer clears it if a navigation never completes. -->
+     left, holds there for 0.6s, then fades before the browser leaves for
+     the next address. Nothing carries into the next document: it starts
+     clean. Moves into the cart or checkout go at once with no ring. A move
+     the router keeps in-app cancels the hold; back/forward hides it; a
+     timer clears it if a navigation never completes. -->
 <style>
   #hbLoad { position: fixed; inset: 0; z-index: 2147483000; display: none; align-items: center; justify-content: center; pointer-events: none; opacity: 1; transition: opacity 0.25s ease; }
   #hbLoad[data-on] { display: flex; }
@@ -2039,7 +2040,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
 <div id="hbLoad" aria-hidden="true"><div class="hbLoad__ring"><img src="/assets/img/purchase/chew.png" alt="" decoding="async"><img src="/assets/img/purchase/chew.png" alt="" decoding="async"><img src="/assets/img/purchase/chew.png" alt="" decoding="async"></div></div>
 <script>
 (function () {
-  var el = document.getElementById('hbLoad'), HOLD = 900, timer = null, safety = null, fade = null, dest = null;
+  var el = document.getElementById('hbLoad'), HOLD = 600, timer = null, safety = null, fade = null, dest = null;
+  // No ring on the way to money: a pause before the cart or checkout
+  // invites second thoughts (Jon, Sep 2026).
+  function skip(to) { var path = String(to).split(/[?#]/)[0].replace(/\/+$/, ''); return path === '/cart' || path === '/checkout'; }
   function show() { clearTimeout(fade); el.removeAttribute('data-out'); el.setAttribute('data-on', ''); }
   function hide() { el.setAttribute('data-out', ''); clearTimeout(fade); fade = setTimeout(function () { el.removeAttribute('data-on'); el.removeAttribute('data-out'); }, 260); }
   function cancel() { clearTimeout(timer); clearTimeout(safety); timer = null; dest = null; }
@@ -2047,7 +2051,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
   // and the router both call this for the same address; the second call
   // keeps the first timer so the hold is measured from the click.
   window.hbGo = function (to) {
-    if (!el) { window.location.href = to; return; }
+    if (!el || skip(to)) { cancel(); window.location.href = to; return; }
     if (timer && dest === to) return;
     cancel();
     dest = to;
