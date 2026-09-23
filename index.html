@@ -3989,14 +3989,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
                     <button sc-camel-on-click="{{ tp.pick }}" style="font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; padding: 11px 17px; border-radius: 0; cursor: pointer; border: 1px solid {{ tp.border }}; background: {{ tp.bg }}; color: {{ tp.fg }}; transform: {{ tp.lift }}; box-shadow: {{ tp.shadow }}; transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease;" style-hover="border-color: #17140F;">{{ tp.label }}</button>
                   </sc-for>
                 </div>
-                <div style="display: flex; gap: 10px; align-items: baseline; margin-top: 14px; padding: 14px 16px; background: #F5F0E6; border-left: 2px solid oklch(0.44 0.07 152); border-radius: 0;">
-                  <span style="font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; color: oklch(0.44 0.07 152);">Tip</span>
-                  <span style="font-size: 14px; line-height: 1.6; color: #554C40;">{{ topicHint }}</span>
-                </div>
               </div>
-              <label style="display: grid; gap: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0; text-transform: none; color: #6A6055;">Your animal
-                <input value="{{ fAnimal }}" sc-camel-on-change="{{ setAnimal }}" placeholder="Species, age, weight — e.g. cat, 9 yrs, 11 lb" style="border: 1px solid #E0D6C2; background: #F5F0E6; border-radius: 0; padding: 15px 16px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: #17140F; transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.25s ease;" style-focus="outline: none; border-color: #17140F; box-shadow: 0 10px 24px rgba(23,20,15,0.09); transform: translateY(-1px);">
-              </label>
               <sc-if value="{{ vetMode }}" hint-placeholder-val="{{ false }}">
                 <div style="display: grid; gap: 14px; padding: 18px 20px 20px; background: #F5F0E6; border-left: 2px solid oklch(0.44 0.07 152);">
                   <div style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.44 0.07 152);">Veterinary packet request</div>
@@ -4739,7 +4732,7 @@ const POP_MODE = {
 
 class Component extends DCLogic {
   state = { igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', topic: 0, sent: false, pct: 0,
-    form: { name: '', email: '', animal: '', message: '' }, sending: false, copied: '', ticket: '',
+    form: { name: '', email: '', message: '' }, sending: false, copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null, signedIn: false, wholesale: false, trade: null,
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
     pdpView: 'photo', pdpSel: 0, pdpCut: false, pdpReady: false, factsScale: 1, factsWrapH: 'auto', factsTileH: 'auto',
@@ -6185,19 +6178,19 @@ class Component extends DCLogic {
       fg: r.head ? '#17140F' : '#554C40'
     }));
     const form = this.state.form;
-    const filled = ['name', 'email', 'animal', 'message'].filter(k => form[k].trim().length > 1).length;
-    const pct = Math.round((filled / 4) * 100);
+    const filled = ['name', 'email', 'message'].filter(k => form[k].trim().length > 1).length;
+    const pct = Math.round((filled / 3) * 100);
     const canSend = form.name.trim().length > 1 && form.email.indexOf('@') > 0 && form.message.trim().length > 4;
     // Desk hours are Arizona's, Monday to Friday 8am–5pm. The label promises
     // MST, so the check runs on America/Phoenix time, not the visitor's clock.
     const desk = this.deskState();
     const deskOpen = desk.open;
     const topicDefs = [
-      { label: 'Dosing help', hint: 'Include species, age and weight — it is the first thing we will ask for.' },
-      { label: 'Look up a lot', hint: 'The lot number is printed on the box, next to the best-by date.' },
-      { label: 'Order issue', hint: 'Paste your order number and we will fix it before we explain it.' },
-      { label: 'Vet or clinic', hint: 'Tell us your practice name and we will send the full formulation packet.' },
-      { label: 'Wholesale', hint: 'Shop name, city and rough monthly volume gets you a straight answer fastest.' }
+      { label: 'Dosing help' },
+      { label: 'Look up a lot' },
+      { label: 'Order issue' },
+      { label: 'Vet or clinic' },
+      { label: 'Wholesale' }
     ];
     const certDefs = [
       { key: 'dog', product: 'Happy Beans', lot: 'HB-2607-A', made: '02 Jul 2026', tested: '09 Jul 2026', lab: 'Sonoran Analytical, Tempe AZ', status: 'Released', size: '4,120 boxes',
@@ -7032,7 +7025,6 @@ class Component extends DCLogic {
         lift: this.state.topic === i ? 'translateY(-2px)' : 'translateY(0)',
         shadow: this.state.topic === i ? '0 10px 22px rgba(23,20,15,0.16)' : 'none'
       })),
-      topicHint: topicDefs[this.state.topic].hint,
       vetMode: this.state.topic === 3,
       fClinic: form.clinic || '',
       fLicense: form.license || '',
@@ -7040,14 +7032,12 @@ class Component extends DCLogic {
       setLicense: (e) => this.setState(s => ({ form: { ...s.form, license: e.target.value } })),
       fName: form.name,
       fEmail: form.email,
-      fAnimal: form.animal,
       fMessage: form.message,
       setName: this.setField('name'),
       setEmail: this.setField('email'),
-      setAnimal: this.setField('animal'),
       setMessage: this.setField('message'),
       progressPct: pct + '%',
-      progressLabel: filled + ' of 4 answered' + (canSend ? ' · ready to send' : ''),
+      progressLabel: filled + ' of 3 answered' + (canSend ? ' · ready to send' : ''),
       charCount: form.message.length ? form.message.length + ' characters' : 'the more detail the better',
       countColor: form.message.length > 20 ? 'oklch(0.44 0.07 152)' : '#8A7F6E',
       sendLabel: this.state.sending ? 'Sending…' : 'Send message',
@@ -7074,7 +7064,7 @@ class Component extends DCLogic {
           if (typeof window !== 'undefined') window.scrollTo({ top: 0 });
         }, 900);
       },
-      resetForm: () => this.setState({ sent: false, form: { name: '', email: '', animal: '', message: '', clinic: '', license: '' }, ticket: '' }),
+      resetForm: () => this.setState({ sent: false, form: { name: '', email: '', message: '', clinic: '', license: '' }, ticket: '' }),
       steps: [
         { n: '01 Morning', title: 'One chew, once a day', body: 'Have your pet take their Happy Bean after food, before the walk.', slot: 'hbv2-step1', ph: 'Chews on kitchen counter, morning light' },
         { n: '02 Direct', title: 'Hand it over', body: 'No mixing, no measuring, no pill pocket. Most beans take it as a treat on the first try.', slot: 'hbv2-step2', ph: 'Hand offering chew to dog' },
