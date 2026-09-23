@@ -2028,8 +2028,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
   #hbLoad { position: fixed; inset: 0; z-index: 2147483000; display: none; align-items: center; justify-content: center; pointer-events: none; opacity: 1; transition: opacity 0.25s ease; }
   #hbLoad[data-on] { display: flex; }
   #hbLoad[data-out] { opacity: 0; }
-  #hbLoad .hbLoad__ring { position: relative; width: 150px; height: 150px; animation: hbLoadSpin 2.4s linear infinite; }
-  #hbLoad img { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(23,20,15,0.3)); }
+  #hbLoad .hbLoad__ring { position: relative; width: 150px; height: 150px; animation: hbLoadSpin 2.4s linear infinite; will-change: transform; }
+  /* No filter on the chews: Safari paints a filtered image's rectangular
+     bounds as a faint box while the ring fades, which read as a background
+     behind each chew. The PNG itself is fully transparent. */
+  #hbLoad img { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; object-fit: contain; background: transparent; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
   #hbLoad img:nth-child(1) { transform: rotate(0deg) translateY(-46px) rotate(180deg); }
   #hbLoad img:nth-child(2) { transform: rotate(120deg) translateY(-46px) rotate(180deg); }
   #hbLoad img:nth-child(3) { transform: rotate(240deg) translateY(-46px) rotate(180deg); }
