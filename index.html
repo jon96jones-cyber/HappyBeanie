@@ -4010,7 +4010,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
               </label>
               <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap;">
                 <button sc-camel-on-click="{{ submitForm }}" style="font-family: 'HB Mono Figures', 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; padding: 18px 34px; border: none; border-radius: 0; background: {{ sendBg }}; color: {{ sendFg }}; cursor: {{ sendCursor }}; opacity: {{ sendOpacity }}; transition: background 0.25s ease, opacity 0.25s ease, transform 0.3s cubic-bezier(0.2,0.7,0.2,1);" style-hover="transform: translateY(-2px);">{{ sendLabel }}</button>
-                <span style="font-family: 'DM Sans', sans-serif; font-size: 13px; color: #6A6055;">{{ sendNote }}</span>
+                <span style="font-family: 'DM Sans', sans-serif; font-size: 13px; color: {{ sendNoteColor }};">{{ sendNote }}</span>
               </div>
             </div>
           </sc-if>
@@ -4732,7 +4732,7 @@ const POP_MODE = {
 
 class Component extends DCLogic {
   state = { igOpen: null, igDrag: null, igPct: null, igW: 0, menuOpen: false, plan: 1, factsOpen: true, added: false, cartDog: 0, cartCat: 0, sp: 'dog', layer: 0, page: 'home', filter: 'all', topic: 0, sent: false, pct: 0,
-    form: { name: '', email: '', message: '' }, sending: false, copied: '', ticket: '',
+    form: { name: '', email: '', message: '' }, sending: false, sendErr: '', copied: '', ticket: '',
     coa: null, certFilter: 'all', batch: null, signedIn: false, wholesale: false, trade: null,
     roomSel: 0, roomHov: null, roomYaw: 45, roomTilt: 56, roomZoom: false, roomGrab: false, roomW: 0, roomReady: false,
     pdpView: 'photo', pdpSel: 0, pdpCut: false, pdpReady: false, factsScale: 1, factsWrapH: 'auto', factsTileH: 'auto',
@@ -7045,7 +7045,8 @@ class Component extends DCLogic {
       sendFg: canSend ? '#F5F0E6' : '#8A7F6E',
       sendCursor: canSend ? 'pointer' : 'not-allowed',
       sendOpacity: canSend ? 1 : 0.85,
-      sendNote: canSend ? 'A real person reads this, not a bot.' : '',
+      sendNote: this.state.sendErr || (canSend ? 'A real person reads this, not a bot.' : ''),
+      sendNoteColor: this.state.sendErr ? 'oklch(0.55 0.19 25)' : '#6A6055',
       sentName: form.name ? form.name.split(' ')[0] : 'friend',
       ticketId: this.state.ticket,
       deskShort: deskOpen ? 'Open now' : 'Closed',
@@ -7055,16 +7056,27 @@ class Component extends DCLogic {
       deskStatus: deskOpen ? 'Desk open · support team on shift' : 'Desk closed · replies resume ' + desk.resume,
       sent: this.state.sent,
       notSent: !this.state.sent,
+      // The message goes to /api/contact, which emails it to hello@. The
+      // "sent" card only shows once the server says it landed, with the
+      // ticket number the server minted; before this it showed a made-up
+      // number and sent nothing.
       submitForm: () => {
         if (!canSend || this.state.sending) return;
-        this.setState({ sending: true });
-        setTimeout(() => {
-          const pre = this.state.topic === 3 ? 'VET-' : 'HB-';
-          this.setState({ sending: false, sent: true, ticket: pre + Math.floor(2000 + Math.random() * 7999) });
-          if (typeof window !== 'undefined') window.scrollTo({ top: 0 });
-        }, 900);
+        this.setState({ sending: true, sendErr: '' });
+        const f = this.state.form;
+        const fail = () => this.setState({ sending: false, sendErr: 'That didn’t go through. Try again in a moment, or email hello@happybeanie.com.' });
+        fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: f.name, email: f.email, message: f.message, topic: topicDefs[this.state.topic].label, clinic: f.clinic || '', license: f.license || '', page: window.location.pathname })
+        }).then(r => r.json().catch(() => ({}))).then(b => {
+          if (!b || !b.ok) return fail();
+          this.setState({ sending: false, sent: true, ticket: b.ticket || '' });
+          try { if (window.hbTrack) window.hbTrack('contact_send'); } catch (e) {}
+          window.scrollTo({ top: 0 });
+        }).catch(fail);
       },
-      resetForm: () => this.setState({ sent: false, form: { name: '', email: '', message: '', clinic: '', license: '' }, ticket: '' }),
+      resetForm: () => this.setState({ sent: false, sendErr: '', form: { name: '', email: '', message: '', clinic: '', license: '' }, ticket: '' }),
       steps: [
         { n: '01 Morning', title: 'One chew, once a day', body: 'Have your pet take their Happy Bean after food, before the walk.', slot: 'hbv2-step1', ph: 'Chews on kitchen counter, morning light' },
         { n: '02 Direct', title: 'Hand it over', body: 'No mixing, no measuring, no pill pocket. Most beans take it as a treat on the first try.', slot: 'hbv2-step2', ph: 'Hand offering chew to dog' },
