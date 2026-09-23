@@ -83,6 +83,12 @@ input:focus { outline:none; border-color:#F0C64B; }
       what:'Every email sent, grouped by campaign, and who received it.',
       hand:function (k) { setItem('hb_ckey', k); } },
 
+    // Also on the Live desk's key, for the same reason as Campaigns.
+    { id:'subscriptions', name:'Subscriptions', page:'/admin/subscriptions',
+      api:'/api/admin/subscriptions', header:'x-analytics-key',
+      what:'Every Subscribe & Save contract, the last payment result, and why a renewal failed.',
+      hand:function (k) { mergePrefs('hb_subs_prefs', k); } },
+
     { id:'fulfillment', name:'Fulfillment',  page:'/admin/fulfillment',
       api:'/api/admin/fulfillment', header:'x-fulfillment-key',
       what:'Orders to pack, labels and shipment status.',
