@@ -1,6 +1,6 @@
 // /api/admin/analytics — the numbers behind the analytics desk.
 //
-// GET  → { ok, live, today, series, topPages, topSources, funnel, geo, recent }
+// GET  → { ok, live, today, series, topPages, topSources, funnel, geo, recent, quiz }
 //        live:   visitors in the last 5 minutes, and what they are doing
 //        today:  sessions / pageviews / product views / carts / checkouts
 //        series: daily rollup for the requested window (?days=7|30|90)
@@ -8,6 +8,8 @@
 //        geo:    sessions by US state (plus other countries) for the window,
 //                and who is on the site right now by city — all from Vercel's
 //                IP-derived edge headers; the IP itself is never stored
+//        quiz:   the screener — starts, finished runs, results by verdict
+//                and species, results by day, and every flagged ingredient
 //
 // POST { action: 'init' } → creates the tables. Safe to run repeatedly.
 //
@@ -77,7 +79,7 @@ module.exports = async function handler(req, res) {
     // ?internal=1 puts it back, so a test can still be seen to have landed.
     const inc = q.internal === '1';
 
-    const [live, today, series, topPages, topSources, funnel, recent, popup, geo, geoLive] = await db.withSchema(() => Promise.all([
+    const [live, today, series, topPages, topSources, funnel, recent, popup, geo, geoLive, quiz, quizDays, quizFlags] = await db.withSchema(() => Promise.all([
       sql`select
             count(*) filter (where last_seen > now() - interval '5 minutes')                      as visitors_now,
             count(*) filter (where last_seen > now() - interval '5 minutes' and added_to_cart)    as active_carts,
@@ -181,7 +183,47 @@ module.exports = async function handler(req, res) {
           from sessions
           where last_seen > now() - interval '5 minutes'
             and (${inc} or not internal)
-          group by 1, 2, 3 order by visitors desc limit 20`
+          group by 1, 2, 3 order by visitors desc limit 20`,
+
+      // The screener. One quiz_verdict per completed run, carrying the
+      // verdict in meta and the species in its own column; starts are
+      // counted per session so a retake within a visit is one start.
+      sql`select
+            count(distinct session_id) filter (where name = 'quiz_start')   as started,
+            count(*) filter (where name = 'quiz_verdict')                    as finished,
+            count(*) filter (where name = 'quiz_verdict' and meta->>'verdict' = 'ok'      and species = 'dog') as ok_dog,
+            count(*) filter (where name = 'quiz_verdict' and meta->>'verdict' = 'ok'      and species = 'cat') as ok_cat,
+            count(*) filter (where name = 'quiz_verdict' and meta->>'verdict' = 'caution' and species = 'dog') as caution_dog,
+            count(*) filter (where name = 'quiz_verdict' and meta->>'verdict' = 'caution' and species = 'cat') as caution_cat,
+            count(*) filter (where name = 'quiz_verdict' and meta->>'verdict' = 'block'   and species = 'dog') as block_dog,
+            count(*) filter (where name = 'quiz_verdict' and meta->>'verdict' = 'block'   and species = 'cat') as block_cat
+          from events
+          where name in ('quiz_start', 'quiz_verdict') and ts >= ${since}::timestamptz
+            and (${until}::timestamptz is null or ts < ${until}::timestamptz)
+            and (${inc} or not internal)`,
+
+      sql`select to_char(date_trunc('day', ts), 'YYYY-MM-DD') as day,
+                 count(*) filter (where meta->>'verdict' = 'ok')      as ok,
+                 count(*) filter (where meta->>'verdict' = 'caution') as caution,
+                 count(*) filter (where meta->>'verdict' = 'block')   as block
+          from events
+          where name = 'quiz_verdict' and ts >= ${since}::timestamptz
+            and (${until}::timestamptz is null or ts < ${until}::timestamptz)
+            and (${inc} or not internal)
+          group by 1 order by 1`,
+
+      // Every flagged ingredient across the window's runs, blocking and
+      // review counted apart, split by species.
+      sql`select f->>'ing' as ing, f->>'level' as level,
+                 count(*) filter (where e.species = 'dog') as dog,
+                 count(*) filter (where e.species = 'cat') as cat,
+                 count(*) as runs
+          from events e,
+               jsonb_array_elements(case when jsonb_typeof(e.meta->'flags') = 'array' then e.meta->'flags' else '[]'::jsonb end) f
+          where e.name = 'quiz_verdict' and e.ts >= ${since}::timestamptz
+            and (${until}::timestamptz is null or e.ts < ${until}::timestamptz)
+            and (${inc} or not e.internal)
+          group by 1, 2 order by runs desc limit 30`
     ]));
 
     const l = live[0] || {}, t = today[0] || {}, f = funnel[0] || {};
@@ -243,7 +285,19 @@ module.exports = async function handler(req, res) {
       })(),
       recent: recent.map(function (r) {
         return { at: r.at, name: r.name, path: r.path, species: r.species, value: r.value };
-      })
+      }),
+      quiz: (function (z) {
+        return {
+          started: n(z.started), finished: n(z.finished),
+          results: {
+            ok:      { dog: n(z.ok_dog),      cat: n(z.ok_cat) },
+            caution: { dog: n(z.caution_dog), cat: n(z.caution_cat) },
+            block:   { dog: n(z.block_dog),   cat: n(z.block_cat) }
+          },
+          days: quizDays.map(function (r) { return { day: r.day, ok: n(r.ok), caution: n(r.caution), block: n(r.block) }; }),
+          flags: quizFlags.map(function (r) { return { ing: r.ing, level: r.level, dog: n(r.dog), cat: n(r.cat), runs: n(r.runs) }; })
+        };
+      })(quiz[0] || {})
     });
   } catch (err) {
     const msg = (err && err.message) || 'unknown';

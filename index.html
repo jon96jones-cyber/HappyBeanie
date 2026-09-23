@@ -7243,6 +7243,15 @@ Object.assign(Component.prototype, {
     const sig = JSON.stringify(payload.answers || {}) + '|' + payload.verdict;
     if (this._qzParked === sig) return;
     this._qzParked = sig;
+    // The run itself, for the desk's screener chart: species, verdict, age
+    // band and the flagged ingredients. Never the answers and never an
+    // address — the desk counts outcomes, it does not keep people.
+    try {
+      if (window.hbTrack) window.hbTrack('quiz_verdict', {
+        species: payload.species, value: (payload.flags || []).length,
+        meta: { verdict: payload.verdict, age: payload.age, flags: (payload.flags || []).map(f => ({ ing: f.ing, level: f.level })) }
+      });
+    } catch (e) {}
     const park = () => { try { localStorage.setItem('hb-quiz-pending', JSON.stringify({ at: Date.now(), screening: payload })); } catch (e) {} };
     if (!this.state.signedIn) { park(); return; }
     fetch('/api/account/quiz', {
