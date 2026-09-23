@@ -309,9 +309,12 @@ html:not(.js) .rise { opacity:1; transform:none; }
   .hub-hero .kicker { margin-top:22px; }
   .hub-hero h1 { font-size:30px; margin-bottom:10px; }
   .hub-lede { font-size:15px; line-height:1.55; }
-  .hub-hero .hero-art { max-width:none; }
+  /* Flush with the text column (no glow inset), a shorter band, and the
+     crop taken off the bottom only: the dog's ears sit at the top edge of
+     the photo, so any top crop clips them. */
+  .hub-hero .hero-art { max-width:none; padding:0; background:none; }
   .hub-hero .hero-art figure { border-radius:6px; }
-  .hub-hero .hero-art img { aspect-ratio:2/1; }
+  .hub-hero .hero-art img { aspect-ratio:16/11; object-position:50% 0; }
   .group { margin-top:24px; }
   .group-h { margin-bottom:16px; }
   .cards { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
