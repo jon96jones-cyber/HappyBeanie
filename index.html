@@ -2018,13 +2018,11 @@ image-slot:not([data-filled]) { color: transparent !important; }
 </head>
 <body>
 <!-- Between pages: three chews turn clockwise over the page, no veil
-     (Jon, Sep 2026). Shown the instant a same-site link is clicked, then
-     carried into the next document by a sessionStorage stamp so it plays
-     from the moment the new page starts drawing until at least 600ms
-     after the click. A visitor arriving from outside never sees it; a move
-     the router keeps in-app hides it; back/forward hides it; a timer
-     clears it if a navigation never completes. Sits at the top of the
-     body so it exists before the page's own markup on the new document. -->
+     (Jon, Sep 2026). A same-site link shows the ring on the page being
+     left, holds there for 0.9s, then fades as the browser leaves for the
+     next address. Nothing carries into the next document: it starts
+     clean. A move the router keeps in-app cancels the hold; back/forward
+     hides it; a timer clears it if a navigation never completes. -->
 <style>
   #hbLoad { position: fixed; inset: 0; z-index: 2147483000; display: none; align-items: center; justify-content: center; pointer-events: none; opacity: 1; transition: opacity 0.25s ease; }
   #hbLoad[data-on] { display: flex; }
@@ -2041,33 +2039,25 @@ image-slot:not([data-filled]) { color: transparent !important; }
 <div id="hbLoad" aria-hidden="true"><div class="hbLoad__ring"><img src="/assets/img/purchase/chew.png" alt="" decoding="async"><img src="/assets/img/purchase/chew.png" alt="" decoding="async"><img src="/assets/img/purchase/chew.png" alt="" decoding="async"></div></div>
 <script>
 (function () {
-  var el = document.getElementById('hbLoad'), safety = null, fade = null;
-  var MIN = 600;
+  var el = document.getElementById('hbLoad'), HOLD = 900, timer = null, safety = null, fade = null, dest = null;
   function show() { clearTimeout(fade); el.removeAttribute('data-out'); el.setAttribute('data-on', ''); }
   function hide() { el.setAttribute('data-out', ''); clearTimeout(fade); fade = setTimeout(function () { el.removeAttribute('data-on'); el.removeAttribute('data-out'); }, 260); }
-  window.hbLoading = function (on) {
-    clearTimeout(safety);
-    if (!el) return;
-    if (!on) { hide(); return; }
+  function cancel() { clearTimeout(timer); clearTimeout(safety); timer = null; dest = null; }
+  // Show the ring here for HOLD, then leave for `to`. The link's own click
+  // and the router both call this for the same address; the second call
+  // keeps the first timer so the hold is measured from the click.
+  window.hbGo = function (to) {
+    if (!el) { window.location.href = to; return; }
+    if (timer && dest === to) return;
+    cancel();
+    dest = to;
     show();
-    try { sessionStorage.setItem('hbNav', String(Date.now())); } catch (e) {}
-    safety = setTimeout(hide, 12000);
+    timer = setTimeout(function () { hide(); window.location.href = to; }, HOLD);
+    safety = setTimeout(function () { cancel(); hide(); }, 12000);
   };
-  // Carried over from the page that was just left: keep turning until the
-  // page is drawn and the minimum has elapsed since the click.
-  var stamp = 0;
-  try { stamp = Number(sessionStorage.getItem('hbNav')) || 0; sessionStorage.removeItem('hbNav'); } catch (e) {}
-  // No stamp but the previous page was ours (the journal, a policy page, a
-  // tab loaded before this shipped): still an internal move, still the ring.
-  if (!stamp) { try { if (document.referrer && new URL(document.referrer).origin === location.origin) stamp = Date.now(); } catch (e) {} }
-  if (stamp && Date.now() - stamp < 15000) {
-    show();
-    var settle = function () { setTimeout(hide, Math.max(0, MIN - (Date.now() - stamp))); };
-    if (document.readyState !== 'loading') settle(); else document.addEventListener('DOMContentLoaded', settle);
-    safety = setTimeout(hide, 12000);
-  }
-  // Any same-site link that will load another page. The router hides the
-  // ring again when it keeps the move in-app.
+  // hbLoading(false) is the router's cancel for a move it keeps in-app.
+  window.hbLoading = function (on) { if (!el) return; if (on) show(); else { cancel(); hide(); } };
+  // Any same-site link that will load another page.
   document.addEventListener('click', function (e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (!window.hbServedPage || !window.hbServedPage()) return;
@@ -2076,9 +2066,10 @@ image-slot:not([data-filled]) { color: transparent !important; }
     var h = a.getAttribute('href');
     if (!h || h.charAt(0) !== '/' || h.charAt(1) === '/' || h.indexOf('#') === 0) return;
     if (h.split(/[?#]/)[0] === location.pathname && h.indexOf('?') === -1) return;
-    window.hbLoading(true);
+    e.preventDefault();
+    window.hbGo(h);
   }, true);
-  window.addEventListener('pageshow', function (ev) { if (ev.persisted) hide(); });
+  window.addEventListener('pageshow', function (ev) { if (ev.persisted) { cancel(); hide(); } });
 })();
 </script>
 <x-dc>
@@ -6094,8 +6085,7 @@ class Component extends DCLogic {
       if (served && served !== page) {
         const q = query && query.sp ? '?sp=' + query.sp : '';
         const dest = (page === 'home' ? '/' : '/' + page) + q;
-        if (window.hbLoading) window.hbLoading(true);
-        this.setState({ menuOpen: false }, () => { window.location.href = dest; });
+        this.setState({ menuOpen: false }, () => { if (window.hbGo) window.hbGo(dest); else window.location.href = dest; });
         return;
       }
       if (window.hbLoading) window.hbLoading(false);
