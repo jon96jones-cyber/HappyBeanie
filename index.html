@@ -366,7 +366,8 @@ window.hbRouteTitle = function (page) {
   if (t) try { document.title = t; } catch (e) {}
 };
 // One dosing rule for the whole storefront (dosing page, purchase panel,
-// cart). Cats take 1 chew at any weight. Dogs follow the label chart:
+// cart). Cats under 8 lb take ½ chew, 8 lb and over 1 chew (Jon, Sep 2026).
+// Dogs follow the label chart:
 //
 //   up to 30 lb    ½ chew      30 lb dogs included
 //   30 – 75 lb     1 chew
@@ -377,8 +378,9 @@ window.hbRouteTitle = function (page) {
 // ("Up to 30 lb") and the only way the four rows do not overlap at 30, 75
 // and 120. A box is 30 chews, so hbBoxDays is how long one lasts.
 window.hbDose = function (species, lb) {
-  if (species === 'cat') return 1;
   var w = Number(lb) || 0;
+  // A cat with no weight given is the standard dose, not the small one.
+  if (species === 'cat') return (w > 0 && w < 8) ? 0.5 : 1;
   return w <= 30 ? 0.5 : w <= 75 ? 1 : w <= 120 ? 1.5 : 2;
 };
 window.hbBoxDays = function (species, lb) { return Math.round(30 / window.hbDose(species, lb)); };
@@ -1847,8 +1849,14 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .ds-readout__n { font-weight: 700; letter-spacing: -0.06em; font-size: clamp(64px, 6vw, 96px); line-height: 0.85; font-variant-numeric: tabular-nums; }
 .ds-readout__u { font-size: 12px; letter-spacing: 0.18em; color: var(--hb-muted); }
 .ds-any { display: none; min-width: 0; font-weight: 700; letter-spacing: -0.05em; font-size: clamp(28px, 3.6vw, 52px); line-height: 0.9; text-wrap: balance; }
-.ds-calc[data-species="cat"] .ds-readout, .ds-calc[data-species="cat"] .ds-slider { display: none; }
-.ds-calc[data-species="cat"] .ds-any, .ds-calc[data-species="cat"] .ds-catnote { display: block; }
+/* Cats have a slider of their own now (½ chew under 8 lb): the readout and
+   slider stay, the tick marks and end labels swap to the cat scale. */
+.ds-ticks { display: contents; }
+.ds-ticks--cat, .ds-ends--cat { display: none; }
+.ds-calc[data-species="cat"] .ds-ticks--dog, .ds-calc[data-species="cat"] .ds-ends--dog { display: none; }
+.ds-calc[data-species="cat"] .ds-ticks--cat { display: contents; }
+.ds-calc[data-species="cat"] .ds-ends--cat { display: flex; }
+.ds-calc[data-species="cat"] .ds-catnote { display: block; }
 .ds-toggle { flex: 0 0 auto; display: inline-flex; padding: 4px; gap: 4px; background: rgba(245,240,230,0.08); border: 1px solid rgba(245,240,230,0.14); border-radius: 999px; }
 .ds-toggle button { padding: 10px 22px; font-family: var(--hb-mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--hb-muted-2); background: transparent; border: none; border-radius: 999px; cursor: pointer; transition: background 0.25s ease, color 0.25s ease; }
 .ds-toggle button[aria-pressed="true"] { background: var(--hb-yellow); color: var(--hb-ink); }
@@ -5326,15 +5334,17 @@ class Component extends DCLogic {
     // 40 days at 1½ a day and 30 days at 2.
     const lbDog = this.state.cartLbDog || 45;
     const chewsDog = window.hbDose('dog', lbDog);
+    const lbCat = this.state.cartLbCat || 10;
+    const chewsCat = window.hbDose('cat', lbCat);
     const term = (key, plan) => {
-      const l = key === 'dog' ? window.hbBoxDays('dog', lbDog) : 30;
+      const l = key === 'dog' ? window.hbBoxDays('dog', lbDog) : window.hbBoxDays('cat', lbCat);
       return ['One-time · ' + l + '-day supply', 'Subscribe & save · ' + l + '-day supply', 'Buy 3 get 1 free · ' + (l === 30 ? '4 months' : (4 * l) + ' days'), '2 boxes, one order · ' + (2 * l) + '-day supply', '2 boxes, one-time · ' + (2 * l) + '-day supply'][plan];
     };
     const rows = [];
     if (this.state.cartDog > 0) rows.push({ key: 'dog', badge: 'For dogs', name: 'Happy Beans for Dogs', slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans box', qty: this.state.cartDog, plan: this.state.cartPlanDog, lb: lbDog, dose: (chewsDog === 0.5 ? '½ chew' : chewsDog === 1 ? '1 chew' : chewsDog === 1.5 ? '1½ chews' : '2 chews') + ' a day' });
-    // Cats are dosed flat, so their weight changes nothing about the plan —
-    // it rides along so the order says which cat the box is for.
-    if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box', qty: this.state.cartCat, plan: this.state.cartPlanCat === 3 ? 1 : this.state.cartPlanCat === 4 ? 0 : this.state.cartPlanCat, lb: this.state.cartLbCat || 10, dose: '1 chew a day' });
+    // A cat's weight sets its dose too now (½ chew under 8 lb), so it rides
+    // along for the dose line and so the order says which cat the box is for.
+    if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box', qty: this.state.cartCat, plan: this.state.cartPlanCat === 3 ? 1 : this.state.cartPlanCat === 4 ? 0 : this.state.cartPlanCat, lb: lbCat, dose: (chewsCat === 0.5 ? '½ chew' : '1 chew') + ' a day' });
     // Wholesale accounts are never offered subscriptions or bundles — any
     // plan that slipped into the cart (the picker's subscription default, a
     // cart saved before sign-in) is coerced to one-time here, so pricing
@@ -6185,34 +6195,10 @@ class Component extends DCLogic {
         body: 'The world\u2019s most powerful anti aging pet supplement. Made fresh daily at our in-house lab in Scottsdale, Arizona. Tested on humans, trusted by pet owners.',
         }
     ];
-    const compareRows = [
-      { k: 'Format', dog: 'Soft chew, scored', cat: 'Soft chew, scored' },
-      { k: 'A1 Peptide blend', dog: 'Canine complex', cat: 'Feline complex' },
-      { k: 'A2 Whole-food base', dog: 'Elk blend', cat: 'Taurine & salmon' },
-      { k: 'A3 Third active', dog: 'Mushroom blend', cat: 'Green-lipped mussel' },
-      { k: 'Copper', dog: 'Included as cofactor', cat: 'None — removed entirely' },
-      { k: 'Dosing', dog: 'One chew daily', cat: 'One chew daily' },
-      { k: 'Weight range', dog: '10–150 lb', cat: '4–22 lb' },
-      { k: 'Supply', dog: '30-day box', cat: '30-day box' },
-      { k: 'Flavour base', dog: 'Natural chicken', cat: 'Natural tuna, salmon oil' }
-    ];
-    const dogDosing = [
-      { weight: 'Stage', amount: 'Daily amount', note: 'Notes', head: true },
-      { weight: 'Every size', amount: 'One chew', note: 'The same daily dose from 6 lb to 120 lb, with a meal' },
-      { weight: 'First week', amount: 'Half a chew', note: 'Optional easing-in period — break along the score line' },
-      { weight: 'Under 12 months', amount: 'Not recommended', note: 'Dosed for adult maintenance, ask us first' }
-    ];
-    const catDosing = [
-      { weight: 'Stage', amount: 'Daily amount', note: 'Notes', head: true },
-      { weight: 'Every size', amount: 'One chew', note: 'The same daily dose at every weight, with a meal' },
-      { weight: 'First week', amount: 'Half a chew', note: 'Optional easing-in period — the chew is scored' },
-      { weight: 'Under 12 months', amount: 'Not recommended', note: 'Dosed for adult maintenance, ask us first' }
-    ];
-    const dosingRows = (this.state.sp === 'dog' ? dogDosing : catDosing).map(r => ({
-      weight: r.weight, amount: r.amount, note: r.note,
-      bg: r.head ? '#EDE6D8' : '#F5F0E6',
-      fg: r.head ? '#17140F' : '#554C40'
-    }));
+    // The comparison chart and the dosing tables that used to live here were
+    // read by no template (dead since the product page recut); their copy
+    // contradicted the live dosing rule and is gone. Dosing lives in
+    // window.hbDose, the dosing page and the purchase panel.
     const form = this.state.form;
     const filled = ['name', 'email', 'message'].filter(k => form[k].trim().length > 1).length;
     const pct = Math.round((filled / 3) * 100);
@@ -6279,7 +6265,7 @@ class Component extends DCLogic {
     // 120. Cats are always 30. Plan 3 — 2 boxes, one order — is offered to
     // the two heavy bands, and covers 40 days at 1½ a day or 30 at 2.
     const pcLb = this.state.dogLb || 45;
-    const pcLasts = isDog ? window.hbBoxDays('dog', pcLb) : 30;
+    const pcLasts = isDog ? window.hbBoxDays('dog', pcLb) : window.hbBoxDays('cat', this.state.catLb || 10);
     const bigOk = isDog && window.hbDose('dog', pcLb) >= 1.5;
     const planDefsAll = [
       { idx: 0, title: 'One-time', sub: pcLasts + '-day supply, shipped once', price: 115, save: '', badge: '', boxes: 1 },
@@ -6517,8 +6503,6 @@ class Component extends DCLogic {
           ctaFg: on ? '#F5F0E6' : '#17140F'
         };
       }),
-      compare: compareRows,
-      dosing: dosingRows,
       // Hero ticker — facts a buyer can act on, not status filler. The two run
       // counts come from /api/batch and only appear once it has loaded.
       tickerItems: (() => {
@@ -7211,7 +7195,7 @@ const QZ_QUESTIONS = [
     { v: '75-120', label: '75 to 120 lb', meta: '1½ chews daily' },
     { v: 'o120', label: 'Over 120 lb', meta: '2 chews daily' } ] },
   { id: 'weightCat', kind: 'single', species: 'cat', eyebrow: 'Question 03 · Dose', title: 'Roughly what does your cat weigh?', help: 'Cats clear these inputs faster and tolerate a much narrower dose band, so we keep the daily count low and flat.', options: [
-    { v: 'u8', label: 'Under 8 lb', meta: '1 chew daily' },
+    { v: 'u8', label: 'Under 8 lb', meta: '½ chew daily' },
     { v: '8-12', label: '8 to 12 lb', meta: '1 chew daily' },
     { v: 'o12', label: 'Over 12 lb', meta: '1 chew daily' } ] },
   { id: 'repro', kind: 'single', eyebrow: 'Question 04 · Status', title: 'Is your pet pregnant or nursing?', help: 'Several of the concentrated inputs in these formulas cross into a developing or nursing animal. None of it has been studied there.', options: [
@@ -7342,8 +7326,14 @@ Object.assign(Component.prototype, {
     return q.options.some(o => picked.includes(o.v) && (o.flags || []).some(f =>
       f.level === 'block' && (!f.speciesOnly || f.speciesOnly === species)));
   },
+  // The screener's dose, from the weight band answered: ½ chew for dogs to
+  // 30 lb and cats under 8 lb, then the label chart (Jon, Sep 2026).
   qzDose() {
-    return '1 chew daily';
+    const a = this.state.qzAnswers || {};
+    const n = a.species === 'cat'
+      ? (a.weightCat === 'u8' ? 0.5 : 1)
+      : (({ u30: 0.5, '30-75': 1, '75-120': 1.5, o120: 2 })[a.weightDog] || 1);
+    return (n === 0.5 ? '½ chew' : n === 1 ? '1 chew' : n === 1.5 ? '1½ chews' : n + ' chews') + ' daily';
   },
   qzAnswer(q, v) {
     const answers = { ...(this.state.qzAnswers || {}) };
@@ -7396,8 +7386,16 @@ Object.assign(Component.prototype, {
     const species = a.species === 'cat' ? 'Cat Formula' : 'Dog Formula';
     // One dose line, read by the profile grid and by whatever gets saved to
     // the account, so the two can never disagree about what we advised.
+    // The dose is the weight band's, the same one its option showed: ½ chew
+    // for dogs to 30 lb and cats under 8 lb, then the label chart. A caution
+    // starts at half of that for the first week.
+    const baseDose = a.species === 'cat'
+      ? (a.weightCat === 'u8' ? 0.5 : 1)
+      : (({ u30: 0.5, '30-75': 1, '75-120': 1.5, o120: 2 })[a.weightDog] || 1);
+    const fmtDose = (n) => n === 0.25 ? '¼ chew' : n === 0.5 ? '½ chew' : n === 0.75 ? '¾ chew' : n === 1 ? '1 chew' : n === 1.5 ? '1½ chews' : n + ' chews';
     const doseLine = verdict === 'block' ? 'Held'
-      : verdict === 'caution' ? '1 chew daily, ½ for week one' : '1 chew daily';
+      : verdict === 'caution' ? fmtDose(baseDose) + ' daily, ' + fmtDose(baseDose / 2) + ' for week one'
+      : fmtDose(baseDose) + ' daily';
     // The weight band answered here seeds the purchase panel's slider (a
     // representative weight per band) so the dose carries through to the buy.
     // A representative weight from the middle of each band (the keys are the
@@ -9775,7 +9773,6 @@ var HB_DOSE_TOP = '<div class="hb-dose">'
   + '<div class="ds-ctl">'
   + '<div class="ds-head">'
   + '<div class="ds-readout"><span class="ds-readout__n" data-lb>45</span><span class="mono ds-readout__u">lb</span></div>'
-  + '<div class="ds-any">Any weight.</div>'
   + '<div class="ds-toggle" role="group" aria-label="Species">'
   + '<button type="button" data-species-btn="dog" aria-pressed="true">Dog</button>'
   + '<button type="button" data-species-btn="cat" aria-pressed="false">Cat</button>'
@@ -9784,17 +9781,25 @@ var HB_DOSE_TOP = '<div class="hb-dose">'
   + '<div class="ds-slider__track">'
   // Marked at the three points where the dose changes, as a fraction of the
   // 10–150 lb scale: (30-10)/140, (75-10)/140, (120-10)/140.
+  + '<span class="ds-ticks ds-ticks--dog">'
   + '<span class="mono ds-tick-l" style="left: 14.29%" aria-hidden="true">30 lb</span>'
   + '<span class="mono ds-tick-l" style="left: 46.43%" aria-hidden="true">75 lb</span>'
   + '<span class="mono ds-tick-l" style="left: 78.57%" aria-hidden="true">120 lb</span>'
   + '<span class="ds-tick" style="left: 14.29%" aria-hidden="true"></span>'
   + '<span class="ds-tick" style="left: 46.43%" aria-hidden="true"></span>'
   + '<span class="ds-tick" style="left: 78.57%" aria-hidden="true"></span>'
+  + '</span>'
+  // The cat scale is 4–22 lb and the dose changes once, at 8 lb: (8-4)/18.
+  + '<span class="ds-ticks ds-ticks--cat">'
+  + '<span class="mono ds-tick-l" style="left: 22.22%" aria-hidden="true">8 lb</span>'
+  + '<span class="ds-tick" style="left: 22.22%" aria-hidden="true"></span>'
+  + '</span>'
   + '<input type="range" min="10" max="150" step="1" value="45" aria-label="Weight in pounds" data-range>'
   + '</div>'
-  + '<div class="mono ds-slider__ends"><span>10 lb</span><span>150 lb</span></div>'
+  + '<div class="mono ds-slider__ends ds-ends--dog"><span>10 lb</span><span>150 lb</span></div>'
+  + '<div class="mono ds-slider__ends ds-ends--cat"><span>4 lb</span><span>22 lb</span></div>'
   + '</div>'
-  + '<p class="ds-catnote">The cat formula is dosed flat. From a 5 lb to 20 lb, one chew a day.</p>'
+  + '<p class="ds-catnote">Cats under 8 lb take half a chew a day, broken along the score line. From 8 lb up, one chew.</p>'
   + '<div class="ds-result">'
   + '<div class="ds-chews" data-chews aria-hidden="true"></div>'
   + '<div>'
@@ -9826,12 +9831,13 @@ window.hbDoseInit = function () {
     var calc = root.querySelector('[data-ds-calc]');
     if (!calc) return; // the CTA band has nothing to wire
 
-    // Single source of truth for dosing (README, Setup_32):
-    // cat any weight 1 · dog to 30 lb ½ · 30–75 lb 1 · 75–120 lb 1½ · over
-    // 120 lb 2. Upper bounds inclusive, as in window.hbDose.
+    // Single source of truth for dosing (README, Setup_32; cats recut Jon,
+    // Sep 2026): cat under 8 lb ½, 8 lb and over 1 · dog to 30 lb ½ · 30–75
+    // lb 1 · 75–120 lb 1½ · over 120 lb 2. Upper bounds inclusive, as in
+    // window.hbDose.
     function HB_DOSE(species, lb) {
-      if (species === 'cat') return { chews: 1, label: '1 chew' };
       var w = Number(lb) || 0;
+      if (species === 'cat') return (w > 0 && w < 8) ? { chews: 0.5, label: '½ chew' } : { chews: 1, label: '1 chew' };
       if (w <= 30) return { chews: 0.5, label: '½ chew' };
       if (w <= 75) return { chews: 1, label: '1 chew' };
       if (w <= 120) return { chews: 1.5, label: '1½ chews' };
@@ -9839,6 +9845,10 @@ window.hbDoseInit = function () {
     }
     var range = calc.querySelector('[data-range]'), lbEl = calc.querySelector('[data-lb]'), chews = calc.querySelector('[data-chews]');
     var meta = calc.querySelector('[data-meta]'), big = calc.querySelector('[data-big]'), sub = calc.querySelector('[data-sub]'), shop = calc.querySelector('[data-shop]');
+    // Each species keeps its own weight on its own scale, so flipping the
+    // toggle and back does not lose the number someone set.
+    var LIM = { dog: { min: 10, max: 150 }, cat: { min: 4, max: 22 } };
+    var lbBy = { dog: 45, cat: 10 };
     var species = 'dog', lb = 45;
 
     // Prefill from a saved pet when one exists (same key the account page
@@ -9852,35 +9862,37 @@ window.hbDoseInit = function () {
     // The other two old bands straddle a new boundary and are deliberately
     // absent: those fall through to the default rather than start someone
     // at a dose nobody chose.
-    var BAND_LB = { u30: 20, '30-75': 50, '75-120': 95, o120: 135, u20: 15 };
+    var BAND_LB = { u30: 20, '30-75': 50, '75-120': 95, o120: 135, u20: 15, u8: 6, '8-12': 10, o12: 15 };
     try {
       var pets = JSON.parse(localStorage.getItem('hb-pets') || '[]');
       var p = pets.find && pets.find(function (x) { return x && x.species; });
-      if (p) {
+      if (p && LIM[p.species]) {
         species = p.species;
         var pw = BAND_LB[p.weight] != null ? BAND_LB[p.weight] : Number(p.weight);
-        if (pw) lb = Math.max(10, Math.min(150, pw));
+        if (pw) lbBy[species] = Math.max(LIM[species].min, Math.min(LIM[species].max, pw));
       }
     } catch (e) {}
 
     function chewHtml(w, h, img) { return '<span style="width:' + w + 'px;height:' + h + 'px"><img src="/assets/img/dosing/chew.webp" alt="" style="width:' + img + 'px;height:' + img + 'px"></span>'; }
     function render() {
+      var L = LIM[species]; lb = lbBy[species];
       var d = HB_DOSE(species, lb), cat = species === 'cat';
       calc.setAttribute('data-species', species);
       calc.querySelectorAll('[data-species-btn]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-species-btn') === species)); });
+      range.min = String(L.min); range.max = String(L.max);
       lbEl.textContent = String(lb); range.value = String(lb);
       chews.innerHTML = d.chews === 0.5 ? chewHtml(42, 84, 84)
         : d.chews === 1 ? chewHtml(84, 84, 84)
         : d.chews === 1.5 ? chewHtml(66, 66, 66) + chewHtml(22, 44, 44)
         : chewHtml(60, 60, 60) + chewHtml(60, 60, 60);
-      meta.textContent = cat ? 'Cat · Happy Beans for Cats' : 'Dog · ' + lb + ' lb · Happy Beans for Dogs';
+      meta.textContent = cat ? 'Cat · ' + lb + ' lb · Happy Beans for Cats' : 'Dog · ' + lb + ' lb · Happy Beans for Dogs';
       big.textContent = d.label;
-      sub.textContent = cat ? 'every day, any weight' : 'every day, with a meal';
+      sub.textContent = 'every day, with a meal';
       shop.textContent = cat ? 'Get Happy Beans for Cats →' : 'Get Happy Beans for Dogs →';
       shop.setAttribute('href', cat ? '/product?sp=cat' : '/product?sp=dog');
-      calc.dispatchEvent(new CustomEvent('hb:dose', { bubbles: true, detail: { species: species, lb: cat ? null : lb, chews: d.chews } }));
+      calc.dispatchEvent(new CustomEvent('hb:dose', { bubbles: true, detail: { species: species, lb: lb, chews: d.chews } }));
     }
-    range.addEventListener('input', function () { lb = Number(range.value); render(); });
+    range.addEventListener('input', function () { lbBy[species] = Number(range.value); render(); });
     calc.querySelectorAll('[data-species-btn]').forEach(function (b) { b.addEventListener('click', function () { species = b.getAttribute('data-species-btn'); render(); }); });
     render();
   });
@@ -9979,8 +9991,8 @@ window.hbPcInit = function (ctx) {
   // Each formula has its own weight bands (Jon, Sep 2026: pills in place of
   // the slider). A dog's are the rows of the label chart, so each band is a
   // dose, and their upper bounds are the same inclusive ones hbDose uses. A
-  // cat's are the screener's three, and the dose is one chew across all of
-  // them. `rep` is the weight a band stands for wherever a number is needed
+  // cat's are the screener's three; under 8 lb is ½ chew, the other two one
+  // chew. `rep` is the weight a band stands for wherever a number is needed
   // — the cart, checkout, the app's own state — a weight from its middle.
   // `short` is the phone label: four full labels do not fit one row at a
   // readable size, so there the unit moves up into the header ("Dog weight
