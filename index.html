@@ -312,18 +312,26 @@ window.HB_SHOPIFY = {
   },
   sellingPlan: 'gid://shopify/SellingPlan/974946368',
   // Dose-aware subscriptions (Setup_39): each weight band renews on its own
-  // cadence. A box is 30 chews, so it lasts 60 days to 30 lb (½ a day), 30
-  // days at 30–75 (1), 20 days at 75–120 (1½) and 15 days over 120 (2). The
-  // two heaviest bands can also take 2 boxes in one order, which covers 40
-  // days at 1½ a day and 30 days at 2 — hence two "big" plans, not one.
-  // Cats are always the 30-day plan.
+  // cadence. A box is 30 chews, so it lasts 60 days at ½ a day (dogs to
+  // 30 lb, cats under 5 lb), 30 days at 1, 20 days at 1½ (dogs 75–120) and
+  // 15 days at 2 (over 120). The two heaviest bands can also take 2 boxes in
+  // one order, which covers 40 days at 1½ a day and 30 days at 2.
   //
-  // Only d30 exists in Shopify today. Every empty slot falls back to it so
-  // checkout never breaks, but a heavy dog on the monthly plan runs out
-  // before the next box: d20 is a month short over a year, d15 twice that.
-  // These need creating in Shopify before the heavy bands are advertised as
-  // subscriptions. hbSellingPlanFor() and hbBigPlanFor() do the choosing.
-  sellingPlans: { d60: '', d30: 'gid://shopify/SellingPlan/974946368', d20: '', d15: '', big40: '', big30: '' }
+  // Shopify's Subscriptions app bills in weeks and months only, so each
+  // cadence is the nearest one it offers: 2 months, 1 month, 3 weeks,
+  // 2 weeks, and 6 weeks for the 40-day two-box order. All five live in the
+  // one "Subscribe and save" group (Jon, Sep 2026), $16 off a box, attached
+  // to both products. hbSellingPlanFor() and hbBigPlanFor() do the choosing
+  // and hbCadence() words it; every slot falls back to monthly so a line
+  // on a subscription plan is never sent to checkout as a one-time buy.
+  sellingPlans: {
+    d60: 'gid://shopify/SellingPlan/1008009280',    // every 2 months
+    d30: 'gid://shopify/SellingPlan/974946368',     // every month
+    d20: 'gid://shopify/SellingPlan/1007943744',    // every 3 weeks
+    d15: 'gid://shopify/SellingPlan/1007976512',    // every 2 weeks
+    big40: 'gid://shopify/SellingPlan/1007910976',  // every 6 weeks, 2 boxes
+    big30: 'gid://shopify/SellingPlan/974946368'    // every month, 2 boxes
+  }
 };
 // The tab title per route. middleware.js serves the same titles in the HTML
 // itself (that is what search engines read); this keeps the tab in step when
@@ -384,11 +392,13 @@ window.hbDose = function (species, lb) {
   return w <= 30 ? 0.5 : w <= 75 ? 1 : w <= 120 ? 1.5 : 2;
 };
 window.hbBoxDays = function (species, lb) { return Math.round(30 / window.hbDose(species, lb)); };
+// The plan for one box a cycle, chosen by how long a box lasts at the dose.
+// Cats under 5 lb are on the half chew too, so the choice follows the dose
+// and not the species.
 window.hbSellingPlanFor = function (species, lb) {
   var sp = (window.HB_SHOPIFY && window.HB_SHOPIFY.sellingPlans) || {};
   var d30 = sp.d30 || window.HB_SHOPIFY.sellingPlan;
-  if (species !== 'dog') return d30;
-  var chews = window.hbDose('dog', lb);
+  var chews = window.hbDose(species, lb);
   return chews === 0.5 ? (sp.d60 || d30)
     : chews === 1.5 ? (sp.d20 || d30)
     : chews === 2 ? (sp.d15 || d30)
@@ -396,9 +406,30 @@ window.hbSellingPlanFor = function (species, lb) {
 };
 // The 2-box order renews on the dose as well: 60 chews is 40 days at 1½ a
 // day and 30 days at 2, so the two heavy bands need different cadences.
+// Always returns a plan: a 2-box subscription must never check out as a
+// one-time buy because a slot was left empty.
 window.hbBigPlanFor = function (lb) {
   var sp = (window.HB_SHOPIFY && window.HB_SHOPIFY.sellingPlans) || {};
-  return window.hbDose('dog', lb) === 2 ? sp.big30 : sp.big40;
+  var d30 = sp.d30 || window.HB_SHOPIFY.sellingPlan;
+  return (window.hbDose('dog', lb) === 2 ? sp.big30 : sp.big40) || d30;
+};
+// How the cadence is worded and dated, in the terms Shopify actually bills
+// on (weeks and months, never a day count): the label goes on the cart line,
+// and next() is the date the next box is charged, counted from today.
+window.hbCadence = function (species, lb, boxes) {
+  var chews = window.hbDose(species, lb);
+  var days = Math.round((30 * (boxes || 1)) / chews);
+  var c = days >= 60 ? { label: 'every 2 months', months: 2 }
+    : days >= 40 ? { label: 'every 6 weeks', days: 42 }
+    : days >= 30 ? { label: 'every month', months: 1 }
+    : days >= 20 ? { label: 'every 3 weeks', days: 21 }
+    : { label: 'every 2 weeks', days: 14 };
+  c.next = function () {
+    var d = new Date();
+    if (c.months) d.setMonth(d.getMonth() + c.months); else d.setDate(d.getDate() + c.days);
+    return d;
+  };
+  return c;
 };
 // Subscribe & save was paused once, during the prelaunch window, because a
 // contract opened then would bill its second month as the first box arrived.
@@ -6810,10 +6841,12 @@ class Component extends DCLogic {
         unit: this.money(i.unitPrice) + ' each',
         lineTotal: this.money(i.line),
         summaryLine: i.name + ' × ' + i.qty,
-        planShort: i.plan === 1 ? 'Subscription · auto-renews every ' + (i.key === 'dog' ? window.hbBoxDays('dog', i.lb) : 30) + ' days'
+        // Worded the way Shopify bills it (every 3 weeks, not every 20
+        // days), so the cart never promises a date the renewal can't hit.
+        planShort: i.plan === 1 ? 'Subscription · auto-renews ' + window.hbCadence(i.key, i.lb, 1).label
           // 60 chews is 40 days at 1½ a day and 30 at 2, so the 2-box
           // cadence is computed, not written out. Plan 3 is dog-only.
-          : i.plan === 3 ? 'Subscription · 2 boxes, auto-renews every ' + (2 * window.hbBoxDays('dog', i.lb)) + ' days'
+          : i.plan === 3 ? 'Subscription · 2 boxes, auto-renews ' + window.hbCadence('dog', i.lb, 2).label
           : i.plan === 4 ? '2 boxes · one-time'
           : (i.plan === 2 ? 'Buy 3, get 1 free · one-time' : 'One-time purchase'),
         planColor: (i.plan === 1 || i.plan === 3) ? 'oklch(0.86 0.14 92)' : '#8A7F6E',
@@ -6829,8 +6862,7 @@ class Component extends DCLogic {
       ...(() => {
         const sub = M.items.find(i => i.plan === 1 || i.plan === 3);
         if (!sub) return { nextBoxShow: 'none', nextBoxDate: '' };
-        const days = sub.plan === 3 ? 40 : (sub.key === 'dog' ? window.hbBoxDays('dog', sub.lb) : 30);
-        const d = new Date(); d.setDate(d.getDate() + days);
+        const d = window.hbCadence(sub.key, sub.lb, sub.plan === 3 ? 2 : 1).next();
         return { nextBoxShow: 'flex', nextBoxDate: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) };
       })(),
       checkoutCtaOff: tradeBlocked ? 'is-off' : '',
