@@ -1,9 +1,13 @@
 <!--
   Happy Beanie · ORDER CONFIRMATION
   Paste into: Settings → Notifications → Order confirmation → Edit code.
-  Uses standard Shopify order Liquid — near drop-in. It shows the subscription
-  plan per line and a "renews" note automatically when the order is a subscription.
-  If your Liquid preview flags a variable, check the README notes.
+
+  Same family as the lifecycle and post-purchase emails (600px, dark header,
+  gold rule, DM Sans / DM Mono, bordered tables, one gold pill CTA, cream
+  footer). Standard Shopify order Liquid throughout: the line loop, the plan
+  name per line, the renewal note when any line carries a plan, and the
+  discount / tax rows only when they are non-zero. Image URLs are absolute.
+  Transactional: no unsubscribe link, by design.
 -->
 <!doctype html>
 <html lang="en">
@@ -11,91 +15,175 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>Your Happy Beanie order</title>
+<meta name="supported-color-schemes" content="light">
+<title>Order {{ order_name }} is confirmed</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--[if mso]>
+<style>body, table, td, a, p, span, h1, strong, div { font-family: Arial, Helvetica, sans-serif !important; }</style>
+<![endif]-->
+<style>
+  /* Only what cannot be inlined. Clients that drop this must still read correctly. */
+  @media only screen and (max-width: 620px) {
+    .sm-pad { padding-left: 24px !important; padding-right: 24px !important; }
+    .sm-h1 { font-size: 31px !important; line-height: 34px !important; }
+    .sm-stack { display: block !important; width: 100% !important; box-sizing: border-box !important; border-right: 0 !important; }
+    .sm-full { width: 100% !important; height: auto !important; }
+  }
+  a { color: #43684E; }
+</style>
 </head>
-<body style="margin:0; padding:0; background:#e7decb;">
-  <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#e7decb; font-size:1px; line-height:1px;">
-    Order {{ order_name }} confirmed — formulated fresh in Scottsdale.
-  </div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#e7decb;">
-    <tr><td align="center" style="padding:28px 12px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background:#fcfaf4; border:1px solid #e0d6c2; border-radius:10px; overflow:hidden;">
+<body style="margin:0; padding:0; width:100%; background-color:#DED5C4;">
+<div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all; color:#DED5C4;">Order {{ order_name }} is in. Your box is being packed in Scottsdale and tracking follows the moment it ships.</div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#DED5C4;">
+<tr><td align="center" style="padding:28px 12px 46px 12px;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px; max-width:600px; background-color:#FAF8F1;">
 
-        <!-- header -->
-        <tr><td style="background:#17140f; padding:22px 30px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-            <td align="left" style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:20px; font-weight:700; letter-spacing:-0.5px; color:#f5f0e6;">happy&nbsp;beanie</td>
-            <td align="right" style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Hormone&nbsp;care</td>
-          </tr></table>
-        </td></tr>
-        <tr><td style="height:3px; background:#f2ce59; font-size:0; line-height:0;">&nbsp;</td></tr>
+  <!-- header -->
+  <tr><td style="background-color:#17140F; padding:20px 40px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+      <tr>
+        <td valign="middle" align="left">
+          <img src="https://www.happybeanie.com/assets/email/lifecycle/hb-wordmark.png" width="159" height="26" alt="happy beanie" style="display:block; width:159px; height:26px; border:0; outline:none; text-decoration:none;">
+        </td>
+        <td valign="middle" align="right" style="font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:9px; line-height:14px; letter-spacing:1.5px; text-transform:uppercase; color:#8A7F6E; white-space:nowrap;">Order {{ order_name }}</td>
+      </tr>
+    </table>
+  </td></tr>
+  <tr><td style="background-color:#F0C64B; font-size:0; line-height:0; height:3px;">&nbsp;</td></tr>
 
-        <!-- body -->
-        <tr><td style="padding:38px 34px 6px;">
-          <p style="margin:0 0 14px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#325e3f;">● &nbsp;Order · confirmed &nbsp;·&nbsp; {{ order_name }}</p>
-          <h1 style="margin:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:27px; line-height:1.1; letter-spacing:-1px; font-weight:700; color:#17140f;">Thank you, {{ customer.first_name | default: "friend" }}.</h1>
-          <p style="margin:0 0 26px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15.5px; line-height:1.62; color:#554c40;">We’re formulating your order fresh in Scottsdale. You’ll get a note the moment it ships.</p>
+  <!-- hero -->
+  <tr><td style="font-size:0; line-height:0; background-color:#FAF8F1;">
+    <img src="https://www.happybeanie.com/assets/email/pp/hero-boxes.png" class="sm-full" width="600" height="254" alt="A goldendoodle sitting between two happy beanie boxes" style="display:block; width:600px; height:254px; border:0; outline:none; text-decoration:none;">
+  </td></tr>
 
-          <!-- order card -->
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#17140f; border-radius:10px;">
-            <tr><td style="padding:24px 24px 22px;">
-              <p style="margin:0 0 16px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:#7eb38c;">Order summary</p>
+  <!-- headline -->
+  <tr><td class="sm-pad" style="padding:34px 40px 0 40px;">
+    <p style="margin:0 0 16px 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:10px; line-height:14px; letter-spacing:2.2px; text-transform:uppercase; color:#43684E; mso-line-height-rule:exactly;">&#9679;&nbsp; Order confirmed{% if order.created_at %} &middot; {{ order.created_at | date: "%b %-d, %Y" }}{% endif %}</p>
+    <h1 class="sm-h1" style="margin:0 0 16px 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-weight:bold; font-size:38px; line-height:40px; letter-spacing:-1.6px; color:#17140F; mso-line-height-rule:exactly;">Thank you, {{ customer.first_name | default: "friend" }}.</h1>
+    <p style="margin:0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:16px; line-height:26px; color:#4A4237; mso-line-height-rule:exactly;">Your box is being packed in Scottsdale. You&rsquo;ll get a note with tracking the moment it ships.</p>
+  </td></tr>
 
-              {% for line in subtotal_line_items %}
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid rgba(245,240,230,0.12);"><tr>
-                {% if line.image %}
-                <td valign="top" width="60" style="padding:0 14px 14px 0;">
-                  <img src="{{ line.image | img_url: 'compact' }}" alt="{{ line.title | escape }}" width="52" height="52" style="display:block; width:52px; height:52px; border:0; border-radius:7px; background:#8a5a26;">
-                </td>
-                {% endif %}
-                <td valign="top" style="padding:0 0 14px;">
-                  <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15px; font-weight:600; color:#f5f0e6;">{{ line.title }} <span style="color:#8a7f6e; font-weight:400;">× {{ line.quantity }}</span></div>
-                  {% if line.variant.title and line.variant.title != "Default Title" %}<div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:12.5px; color:#b9af9c; padding-top:3px;">{{ line.variant.title }}</div>{% endif %}
-                  {% if line.selling_plan_allocation %}<div style="font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:#f2ce59; padding-top:5px;">{{ line.selling_plan_allocation.selling_plan.name }}</div>{% endif %}
-                </td>
-                <td valign="top" align="right" style="padding:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15px; font-weight:600; color:#f5f0e6; white-space:nowrap;">{{ line.final_line_price | money }}</td>
-              </tr></table>
-              {% endfor %}
-
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px; font-family:'DM Sans',Helvetica,Arial,sans-serif;">
-                <tr><td style="padding:5px 0; font-size:13px; color:#b9af9c;">Subtotal</td><td align="right" style="padding:5px 0; font-size:13px; color:#ded5c4;">{{ subtotal_price | money }}</td></tr>
-                <tr><td style="padding:5px 0; font-size:13px; color:#b9af9c;">Shipping</td><td align="right" style="padding:5px 0; font-size:13px; color:#ded5c4;">{% if shipping_price == 0 %}Free{% else %}{{ shipping_price | money }}{% endif %}</td></tr>
-                <tr><td style="padding:12px 0 0; border-top:1px solid rgba(245,240,230,0.12); font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Total</td><td align="right" style="padding:12px 0 0; border-top:1px solid rgba(245,240,230,0.12); font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:20px; font-weight:600; color:#f5f0e6;">{{ total_price | money }}</td></tr>
-              </table>
-
-              {% assign is_sub = false %}{% for line in line_items %}{% if line.selling_plan_allocation %}{% assign is_sub = true %}{% endif %}{% endfor %}
-              {% if is_sub %}
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;"><tr><td style="padding:12px 14px; background:rgba(242,206,89,0.06); border:1px solid rgba(242,206,89,0.28); border-radius:6px;">
-                <div style="font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:12.5px; line-height:1.55; color:#ded5c4;">↻ &nbsp;This order includes a subscription. It renews automatically until you skip, pause, or cancel — anytime from your account, no fees.</div>
-              </td></tr></table>
-              {% endif %}
-            </td></tr>
+  <!-- order summary -->
+  <tr><td class="sm-pad" style="padding:30px 40px 0 40px;">
+    <p style="margin:0 0 10px 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:9.5px; line-height:13px; letter-spacing:1.7px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">Order summary</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border:1px solid #E0D6C3;">
+      {% for line in subtotal_line_items %}
+      <tr>
+        {% if line.image %}
+        <td valign="top" width="72" style="width:72px; padding:16px 0 16px 20px;">
+          <img src="{{ line.image | img_url: 'compact' }}" alt="" width="52" height="52" style="display:block; width:52px; height:52px; border:0; outline:none; text-decoration:none; background-color:#17140F;">
+        </td>
+        {% endif %}
+        <td valign="top" style="padding:16px 20px;{% if forloop.index > 1 %} border-top:1px solid #E0D6C3;{% endif %}">
+          <p style="margin:0 0 4px 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-weight:bold; font-size:15.5px; line-height:21px; letter-spacing:-0.3px; color:#17140F; mso-line-height-rule:exactly;">{{ line.title }}</p>
+          <p style="margin:0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:11.5px; line-height:16px; letter-spacing:1.1px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">{% if line.variant.title and line.variant.title != "Default Title" %}{{ line.variant.title }} &middot; {% endif %}qty {{ line.quantity }}</p>
+          {% if line.selling_plan_allocation %}
+          <p style="margin:6px 0 0 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-weight:500; font-size:11px; line-height:16px; letter-spacing:1.1px; text-transform:uppercase; color:#43684E; mso-line-height-rule:exactly;">&#8635;&nbsp; {{ line.selling_plan_allocation.selling_plan.name }}</p>
+          {% endif %}
+        </td>
+        <td valign="top" align="right" style="padding:16px 20px 16px 0;{% if forloop.index > 1 %} border-top:1px solid #E0D6C3;{% endif %} font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:15px; line-height:21px; color:#4A4237; white-space:nowrap; mso-line-height-rule:exactly;">{{ line.final_line_price | money }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="3" bgcolor="#F4EFE2" style="padding:14px 20px; border-top:1px solid #E0D6C3; background-color:#F4EFE2;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr>
+              <td style="padding:3px 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:10.5px; line-height:16px; letter-spacing:1.8px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">Subtotal</td>
+              <td align="right" style="padding:3px 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:14px; line-height:20px; color:#4A4237; white-space:nowrap; mso-line-height-rule:exactly;">{{ subtotal_price | money }}</td>
+            </tr>
+            {% if discounts_amount > 0 %}
+            <tr>
+              <td style="padding:3px 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:10.5px; line-height:16px; letter-spacing:1.8px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">Discount</td>
+              <td align="right" style="padding:3px 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:14px; line-height:20px; color:#43684E; white-space:nowrap; mso-line-height-rule:exactly;">&minus;{{ discounts_amount | money }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <td style="padding:3px 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:10.5px; line-height:16px; letter-spacing:1.8px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">Shipping{% if shipping_method %} &middot; {{ shipping_method.title }}{% endif %}</td>
+              <td align="right" style="padding:3px 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:14px; line-height:20px; color:#4A4237; white-space:nowrap; mso-line-height-rule:exactly;">{% if shipping_price == 0 %}Free{% else %}{{ shipping_price | money }}{% endif %}</td>
+            </tr>
+            {% if tax_price > 0 %}
+            <tr>
+              <td style="padding:3px 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:10.5px; line-height:16px; letter-spacing:1.8px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">Tax</td>
+              <td align="right" style="padding:3px 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:14px; line-height:20px; color:#4A4237; white-space:nowrap; mso-line-height-rule:exactly;">{{ tax_price | money }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <td style="padding:10px 0 0 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-weight:500; font-size:10.5px; line-height:16px; letter-spacing:1.8px; text-transform:uppercase; color:#17140F; mso-line-height-rule:exactly;">Total</td>
+              <td align="right" style="padding:10px 0 0 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-weight:500; font-size:19px; line-height:24px; color:#17140F; white-space:nowrap; mso-line-height-rule:exactly;">{{ total_price | money }}</td>
+            </tr>
           </table>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
 
-          <!-- CTA -->
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 8px;"><tr>
-            <td align="center" bgcolor="#f2ce59" style="border-radius:999px;">
-              <a href="https://www.happybeanie.com/account" style="display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#17140f; text-decoration:none;">View your order →</a>
-            </td>
-          </tr></table>
-          <p style="margin:0 0 30px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#8a7f6e; text-align:center;">
-            Shipping to {{ shipping_address.name }} · {{ shipping_address.city }}, {{ shipping_address.province_code }}
-          </p>
-        </td></tr>
+  {% assign is_sub = false %}{% for line in line_items %}{% if line.selling_plan_allocation %}{% assign is_sub = true %}{% endif %}{% endfor %}
+  {% if is_sub %}
+  <!-- renewal note: only when a line carries a plan -->
+  <tr><td class="sm-pad" style="padding:14px 40px 0 40px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border:1px solid #E0D6C3;">
+      <tr>
+        <td class="sm-stack sm-pad" valign="top" width="110" style="width:110px; padding:16px 14px 0 20px; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:9.5px; line-height:15px; letter-spacing:1.5px; text-transform:uppercase; color:#43684E; mso-line-height-rule:exactly;">Subscribe &amp; save</td>
+        <td class="sm-stack sm-pad" valign="top" style="padding:16px 20px 16px 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:14px; line-height:21px; color:#4A4237; mso-line-height-rule:exactly;">This order renews on the schedule shown above, at the same price. Skip, pause or cancel any time from <a href="https://www.happybeanie.com/account" style="color:#43684E; text-decoration:underline;">your account</a>. No fees.</td>
+      </tr>
+    </table>
+  </td></tr>
+  {% endif %}
 
-        <!-- footer -->
-        <tr><td style="background:#f5f0e6; border-top:1px solid #e0d6c2; padding:26px 34px 30px;" align="center">
-          <p style="margin:0 0 12px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:#8a7f6e;">Formulated fresh · Scottsdale, AZ</p>
-          <p style="margin:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:12.5px; color:#554c40;">
-            <a href="https://www.happybeanie.com/account" style="color:#325e3f; text-decoration:none;">Your account</a> &nbsp;·&nbsp;
-            <a href="https://www.happybeanie.com/policies/shipping.html" style="color:#325e3f; text-decoration:none;">Shipping</a> &nbsp;·&nbsp;
-            <a href="https://www.happybeanie.com/policies/refunds.html" style="color:#325e3f; text-decoration:none;">Refunds</a>
-          </p>
-          <p style="margin:0; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:11px; line-height:1.6; color:#8a7f6e;">Questions? A human reads every note — <a href="mailto:hello@happybeanie.com" style="color:#325e3f; text-decoration:none;">hello@happybeanie.com</a><br>© 2026 Happy Beanie</p>
-        </td></tr>
+  <!-- CTA -->
+  <tr><td class="sm-pad" style="padding:26px 40px 0 40px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+      <tr><td align="center" bgcolor="#F0C64B" style="background-color:#F0C64B; border-radius:999px; mso-padding-alt:19px 24px;">
+        <a href="https://www.happybeanie.com/track?order={{ order_number }}&amp;email={{ customer.email | url_encode }}" style="display:block; padding:19px 24px; font-family:'DM Mono', 'Courier New', Courier, monospace; font-weight:500; font-size:12.5px; letter-spacing:2.5px; text-transform:uppercase; color:#17140F; text-decoration:none;">Track your order &rarr;</a>
+      </td></tr>
+    </table>
+  </td></tr>
 
-      </table>
-    </td></tr>
-  </table>
+  <!-- shipping + payment -->
+  <tr><td class="sm-pad" style="padding:32px 40px 0 40px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top:1px solid #E0D6C3;">
+      <tr>
+        <td class="sm-stack" valign="top" width="50%" style="width:50%; padding:20px 16px 0 0;">
+          <p style="margin:0 0 8px 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:9.5px; line-height:13px; letter-spacing:1.7px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">Shipping to</p>
+          <p style="margin:0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:14px; line-height:21px; color:#4A4237; mso-line-height-rule:exactly;">{{ shipping_address.name }}<br>{{ shipping_address.address1 }}{% if shipping_address.address2 != blank %}, {{ shipping_address.address2 }}{% endif %}<br>{{ shipping_address.city }}, {{ shipping_address.province_code }} {{ shipping_address.zip }}</p>
+        </td>
+        <td class="sm-stack" valign="top" width="50%" style="width:50%; padding:20px 0 0 0;">
+          <p style="margin:0 0 8px 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:9.5px; line-height:13px; letter-spacing:1.7px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">Payment</p>
+          <p style="margin:0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:14px; line-height:21px; color:#4A4237; mso-line-height-rule:exactly;">{% for transaction in transactions %}{% if transaction.status == "success" and transaction.kind == "authorization" or transaction.kind == "sale" %}{% if transaction.payment_details.credit_card_company %}{{ transaction.payment_details.credit_card_company }} ending {{ transaction.payment_details.credit_card_last_four_digits }}{% else %}{{ transaction.gateway_display_name }}{% endif %}<br>{% endif %}{% endfor %}{{ total_price | money }} charged today</p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <!-- what happens next -->
+  <tr><td class="sm-pad" style="padding:28px 40px 0 40px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top:1px solid #E0D6C3;">
+      <tr>
+        <td class="sm-stack" valign="top" width="110" style="width:110px; padding:20px 14px 0 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:9.5px; line-height:15px; letter-spacing:1.5px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">What&rsquo;s next</td>
+        <td class="sm-stack" valign="top" style="padding:20px 0 0 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:14px; line-height:21px; color:#4A4237; mso-line-height-rule:exactly;">Orders in before noon MST leave the next business morning. Tracking lands in your inbox the moment it leaves, and the dosing guide is at <a href="https://www.happybeanie.com/dosing" style="color:#43684E; text-decoration:underline;">happybeanie.com/dosing</a> whenever you need it.</td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <!-- footer -->
+  <tr><td style="padding:34px 0 0 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#F2EEE3; border-top:1px solid #E0D6C3;">
+      <tr><td class="sm-pad" align="center" style="padding:24px 40px 28px 40px;">
+        <p style="margin:0 0 10px 0; font-family:'DM Mono', 'Courier New', Courier, monospace; font-size:9.5px; line-height:14px; letter-spacing:1.9px; text-transform:uppercase; color:#8A7F6E; mso-line-height-rule:exactly;">Formulated fresh &middot; Scottsdale, AZ</p>
+        <p style="margin:0 0 5px 0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:12.5px; line-height:19px; color:#8A7F6E; mso-line-height-rule:exactly;">You&rsquo;re getting this because you placed order {{ order_name }} at happybeanie.com.</p>
+        <p style="margin:0; font-family:'DM Sans', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size:12.5px; line-height:19px; color:#8A7F6E; mso-line-height-rule:exactly;">
+          <a href="https://www.happybeanie.com/account" style="color:#43684E; text-decoration:none;">Your account</a>
+          &nbsp;&middot;&nbsp;<a href="https://www.happybeanie.com/policies/shipping.html" style="color:#43684E; text-decoration:none;">Shipping</a>
+          &nbsp;&middot;&nbsp;<a href="https://www.happybeanie.com/policies/refunds.html" style="color:#43684E; text-decoration:none;">Refunds</a>
+          &nbsp;&middot;&nbsp;<a href="mailto:hello@happybeanie.com" style="color:#43684E; text-decoration:none;">hello@happybeanie.com</a>
+          &nbsp;&middot;&nbsp;&copy; 2026 Happy Beanie
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
 </body>
 </html>

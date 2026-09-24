@@ -8,7 +8,7 @@ files** — they aren't served by the site; you paste each into the Shopify admi
 
 | File | Shopify notification | Accent | Liquid |
 |------|----------------------|--------|--------|
-| `order-confirmation.html` | **Order confirmation** (every order incl. 1st subscription order) | green | real, near drop-in |
+| `order-confirmation.html` | **Order confirmation** (every order incl. 1st subscription order) | green | **wired** — real Liquid, paste as-is (campaign-desk design, Sep 2026) |
 | `new-subscription.html` | New subscription (contract created) | green | **wired** — real Liquid, paste as-is |
 | `upcoming-billing.html` | Upcoming order / payment reminder | gold | **wired** — real Liquid, paste as-is |
 | `payment-failed.html` | Subscription payment failure (after dunning; branches on `status_after_dunning`) | clay | **wired** — real Liquid, paste as-is |
@@ -36,12 +36,16 @@ files** — they aren't served by the site; you paste each into the Shopify admi
 
 ## Order confirmation — no tokens
 
-`order-confirmation.html` uses **standard Shopify order Liquid** (`customer.first_name`,
-a `subtotal_line_items` loop, `subtotal_price` / `shipping_price` / `total_price`,
-`shipping_address`, and `line.selling_plan_allocation.selling_plan.name` for the plan).
-It should render as-is. The only thing to verify on **Send test**: that the selling-plan
-line shows for subscription items — if your Shopify version exposes that under a different
-field, tell me the name and I'll adjust.
+`order-confirmation.html` is the campaign-desk design (600px, dark header, box hero,
+bordered summary, one gold CTA) on **standard Shopify order Liquid**: `customer.first_name`,
+a `subtotal_line_items` loop with `line.image`, `line.variant.title` and
+`line.selling_plan_allocation.selling_plan.name`, `subtotal_price` / `discounts_amount` /
+`shipping_price` / `shipping_method.title` / `tax_price` / `total_price`,
+`shipping_address`, the `transactions` loop for the card, and `order_number` +
+`customer.email` for the /track deep link. Discount and tax rows only print when non-zero;
+the Subscribe & save note only when a line carries a plan. Images are absolute URLs under
+`assets/email/`, so nothing to upload. Verified through a Liquid renderer for a one-time
+and a subscription order at 600px and phone width; still **Send test** after pasting.
 
 ## Wired subscription templates
 
