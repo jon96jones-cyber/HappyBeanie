@@ -303,11 +303,11 @@ window.HB_SHOPIFY = {
   token: '8d2ebcaeb6c98f834078f575873a77ac',
   apiVersion: '2025-07',
   variants: {
-    // big: the 2-box variant for dogs over 75 lb ($159, Setup_39). Empty
-    // until it exists in Shopify — checkout then sends two one-time boxes on
-    // the matching 2-box plan below instead (same price once that plan
-    // carries the per-box reduction).
-    dog: { onetime: 'gid://shopify/ProductVariant/41325473005632', bundle: 'gid://shopify/ProductVariant/41325473071168', big: '' },
+    // big: the 2-box variant for dogs over 75 lb (HB-DOG-2PK, Setup_39). It
+    // is listed at $175 so the plan's $16 off lands the subscription on the
+    // $159 the site advertises (Jon, Sep 2026). Only ever sent with a plan:
+    // the one-time 2-box order is two one-time boxes at $230.
+    dog: { onetime: 'gid://shopify/ProductVariant/41325473005632', bundle: 'gid://shopify/ProductVariant/41325473071168', big: 'gid://shopify/ProductVariant/41382667518016' },
     cat: { onetime: 'gid://shopify/ProductVariant/41325473103936', bundle: 'gid://shopify/ProductVariant/41325473169472' }
   },
   sellingPlan: 'gid://shopify/SellingPlan/974946368',
@@ -500,9 +500,10 @@ window.hbShopifyCheckout = async function (rows, buyer, opts) {
     var line;
     if (r.plan === 2) line = { merchandiseId: v.bundle, quantity: r.qty };
     else if (r.plan === 3) {
-      // 2 boxes, one order (dogs over 75 lb): the dedicated variant when it
-      // exists, otherwise two one-time boxes on the 2-box plan that matches
-      // the dose — 40 days at 1½ chews a day, 30 at 2.
+      // 2 boxes, one order (dogs over 75 lb): the $175 two-box variant on
+      // the plan that matches the dose (6 weeks at 1½ chews a day, monthly
+      // at 2), which the $16 off brings to the $159 shown. The fallback to
+      // two one-time boxes is only for a config with no big variant.
       line = v.big ? { merchandiseId: v.big, quantity: r.qty } : { merchandiseId: v.onetime, quantity: r.qty * 2 };
       var bigPlan = window.hbBigPlanFor(r.lb);
       if (bigPlan) line.sellingPlanId = bigPlan;
