@@ -366,7 +366,7 @@ window.hbRouteTitle = function (page) {
   if (t) try { document.title = t; } catch (e) {}
 };
 // One dosing rule for the whole storefront (dosing page, purchase panel,
-// cart). Cats under 8 lb take ½ chew, 8 lb and over 1 chew (Jon, Sep 2026).
+// cart). Cats under 5 lb take ½ chew, 5 lb and over 1 chew (Jon, Sep 2026).
 // Dogs follow the label chart:
 //
 //   up to 30 lb    ½ chew      30 lb dogs included
@@ -380,7 +380,7 @@ window.hbRouteTitle = function (page) {
 window.hbDose = function (species, lb) {
   var w = Number(lb) || 0;
   // A cat with no weight given is the standard dose, not the small one.
-  if (species === 'cat') return (w > 0 && w < 8) ? 0.5 : 1;
+  if (species === 'cat') return (w > 0 && w < 5) ? 0.5 : 1;
   return w <= 30 ? 0.5 : w <= 75 ? 1 : w <= 120 ? 1.5 : 2;
 };
 window.hbBoxDays = function (species, lb) { return Math.round(30 / window.hbDose(species, lb)); };
@@ -1849,7 +1849,7 @@ image-slot:not([data-filled]) { color: transparent !important; }
 .ds-readout__n { font-weight: 700; letter-spacing: -0.06em; font-size: clamp(64px, 6vw, 96px); line-height: 0.85; font-variant-numeric: tabular-nums; }
 .ds-readout__u { font-size: 12px; letter-spacing: 0.18em; color: var(--hb-muted); }
 .ds-any { display: none; min-width: 0; font-weight: 700; letter-spacing: -0.05em; font-size: clamp(28px, 3.6vw, 52px); line-height: 0.9; text-wrap: balance; }
-/* Cats have a slider of their own now (½ chew under 8 lb): the readout and
+/* Cats have a slider of their own now (½ chew under 5 lb): the readout and
    slider stay, the tick marks and end labels swap to the cat scale. */
 .ds-ticks { display: contents; }
 .ds-ticks--cat, .ds-ends--cat { display: none; }
@@ -5342,7 +5342,7 @@ class Component extends DCLogic {
     };
     const rows = [];
     if (this.state.cartDog > 0) rows.push({ key: 'dog', badge: 'For dogs', name: 'Happy Beans for Dogs', slot: 'hbv2-pdp-dog-main', ph: 'Happy Beans box', qty: this.state.cartDog, plan: this.state.cartPlanDog, lb: lbDog, dose: (chewsDog === 0.5 ? '½ chew' : chewsDog === 1 ? '1 chew' : chewsDog === 1.5 ? '1½ chews' : '2 chews') + ' a day' });
-    // A cat's weight sets its dose too now (½ chew under 8 lb), so it rides
+    // A cat's weight sets its dose too now (½ chew under 5 lb), so it rides
     // along for the dose line and so the order says which cat the box is for.
     if (this.state.cartCat > 0) rows.push({ key: 'cat', badge: 'For cats', name: 'Happy Beans for Cats', slot: 'hbv2-pdp-cat-main', ph: 'Happy Beans for Cats box', qty: this.state.cartCat, plan: this.state.cartPlanCat === 3 ? 1 : this.state.cartPlanCat === 4 ? 0 : this.state.cartPlanCat, lb: lbCat, dose: (chewsCat === 0.5 ? '½ chew' : '1 chew') + ' a day' });
     // Wholesale accounts are never offered subscriptions or bundles — any
@@ -7195,8 +7195,8 @@ const QZ_QUESTIONS = [
     { v: '75-120', label: '75 to 120 lb', meta: '1½ chews daily' },
     { v: 'o120', label: 'Over 120 lb', meta: '2 chews daily' } ] },
   { id: 'weightCat', kind: 'single', species: 'cat', eyebrow: 'Question 03 · Dose', title: 'Roughly what does your cat weigh?', help: 'Cats clear these inputs faster and tolerate a much narrower dose band, so we keep the daily count low and flat.', options: [
-    { v: 'u8', label: 'Under 8 lb', meta: '½ chew daily' },
-    { v: '8-12', label: '8 to 12 lb', meta: '1 chew daily' },
+    { v: 'u5', label: 'Under 5 lb', meta: '½ chew daily' },
+    { v: '5-12', label: '5 to 12 lb', meta: '1 chew daily' },
     { v: 'o12', label: 'Over 12 lb', meta: '1 chew daily' } ] },
   { id: 'repro', kind: 'single', eyebrow: 'Question 04 · Status', title: 'Is your pet pregnant or nursing?', help: 'Several of the concentrated inputs in these formulas cross into a developing or nursing animal. None of it has been studied there.', options: [
     { v: 'no', label: 'No', meta: 'Not pregnant, not nursing' },
@@ -7327,11 +7327,11 @@ Object.assign(Component.prototype, {
       f.level === 'block' && (!f.speciesOnly || f.speciesOnly === species)));
   },
   // The screener's dose, from the weight band answered: ½ chew for dogs to
-  // 30 lb and cats under 8 lb, then the label chart (Jon, Sep 2026).
+  // 30 lb and cats under 5 lb, then the label chart (Jon, Sep 2026).
   qzDose() {
     const a = this.state.qzAnswers || {};
     const n = a.species === 'cat'
-      ? (a.weightCat === 'u8' ? 0.5 : 1)
+      ? (a.weightCat === 'u5' ? 0.5 : 1)
       : (({ u30: 0.5, '30-75': 1, '75-120': 1.5, o120: 2 })[a.weightDog] || 1);
     return (n === 0.5 ? '½ chew' : n === 1 ? '1 chew' : n === 1.5 ? '1½ chews' : n + ' chews') + ' daily';
   },
@@ -7387,10 +7387,10 @@ Object.assign(Component.prototype, {
     // One dose line, read by the profile grid and by whatever gets saved to
     // the account, so the two can never disagree about what we advised.
     // The dose is the weight band's, the same one its option showed: ½ chew
-    // for dogs to 30 lb and cats under 8 lb, then the label chart. A caution
+    // for dogs to 30 lb and cats under 5 lb, then the label chart. A caution
     // starts at half of that for the first week.
     const baseDose = a.species === 'cat'
-      ? (a.weightCat === 'u8' ? 0.5 : 1)
+      ? (a.weightCat === 'u5' ? 0.5 : 1)
       : (({ u30: 0.5, '30-75': 1, '75-120': 1.5, o120: 2 })[a.weightDog] || 1);
     const fmtDose = (n) => n === 0.25 ? '¼ chew' : n === 0.5 ? '½ chew' : n === 0.75 ? '¾ chew' : n === 1 ? '1 chew' : n === 1.5 ? '1½ chews' : n + ' chews';
     const doseLine = verdict === 'block' ? 'Held'
@@ -9789,17 +9789,19 @@ var HB_DOSE_TOP = '<div class="hb-dose">'
   + '<span class="ds-tick" style="left: 46.43%" aria-hidden="true"></span>'
   + '<span class="ds-tick" style="left: 78.57%" aria-hidden="true"></span>'
   + '</span>'
-  // The cat scale is 4–22 lb and the dose changes once, at 8 lb: (8-4)/18.
+  // The cat scale is 4–22 lb and the dose changes once, at 5 lb: (5-4)/18.
+  // The label hangs to the right of its tick so it does not run off the
+  // left edge of the track.
   + '<span class="ds-ticks ds-ticks--cat">'
-  + '<span class="mono ds-tick-l" style="left: 22.22%" aria-hidden="true">8 lb</span>'
-  + '<span class="ds-tick" style="left: 22.22%" aria-hidden="true"></span>'
+  + '<span class="mono ds-tick-l" style="left: 5.56%; transform: none" aria-hidden="true">5 lb</span>'
+  + '<span class="ds-tick" style="left: 5.56%" aria-hidden="true"></span>'
   + '</span>'
   + '<input type="range" min="10" max="150" step="1" value="45" aria-label="Weight in pounds" data-range>'
   + '</div>'
   + '<div class="mono ds-slider__ends ds-ends--dog"><span>10 lb</span><span>150 lb</span></div>'
   + '<div class="mono ds-slider__ends ds-ends--cat"><span>4 lb</span><span>22 lb</span></div>'
   + '</div>'
-  + '<p class="ds-catnote">Cats under 8 lb take half a chew a day, broken along the score line. From 8 lb up, one chew.</p>'
+  + '<p class="ds-catnote">Cats under 5 lb take half a chew a day, broken along the score line. From 5 lb up, one chew.</p>'
   + '<div class="ds-result">'
   + '<div class="ds-chews" data-chews aria-hidden="true"></div>'
   + '<div>'
@@ -9832,12 +9834,12 @@ window.hbDoseInit = function () {
     if (!calc) return; // the CTA band has nothing to wire
 
     // Single source of truth for dosing (README, Setup_32; cats recut Jon,
-    // Sep 2026): cat under 8 lb ½, 8 lb and over 1 · dog to 30 lb ½ · 30–75
+    // Sep 2026): cat under 5 lb ½, 5 lb and over 1 · dog to 30 lb ½ · 30–75
     // lb 1 · 75–120 lb 1½ · over 120 lb 2. Upper bounds inclusive, as in
     // window.hbDose.
     function HB_DOSE(species, lb) {
       var w = Number(lb) || 0;
-      if (species === 'cat') return (w > 0 && w < 8) ? { chews: 0.5, label: '½ chew' } : { chews: 1, label: '1 chew' };
+      if (species === 'cat') return (w > 0 && w < 5) ? { chews: 0.5, label: '½ chew' } : { chews: 1, label: '1 chew' };
       if (w <= 30) return { chews: 0.5, label: '½ chew' };
       if (w <= 75) return { chews: 1, label: '1 chew' };
       if (w <= 120) return { chews: 1.5, label: '1½ chews' };
@@ -9862,7 +9864,9 @@ window.hbDoseInit = function () {
     // The other two old bands straddle a new boundary and are deliberately
     // absent: those fall through to the default rather than start someone
     // at a dose nobody chose.
-    var BAND_LB = { u30: 20, '30-75': 50, '75-120': 95, o120: 135, u20: 15, u8: 6, '8-12': 10, o12: 15 };
+    // u8 and 8-12 are the cat bands from before the 5 lb recut; a pet saved
+    // on them still gets a weight from the middle of what it answered.
+    var BAND_LB = { u30: 20, '30-75': 50, '75-120': 95, o120: 135, u20: 15, u5: 4, '5-12': 9, o12: 15, u8: 6, '8-12': 10 };
     try {
       var pets = JSON.parse(localStorage.getItem('hb-pets') || '[]');
       var p = pets.find && pets.find(function (x) { return x && x.species; });
@@ -9991,7 +9995,7 @@ window.hbPcInit = function (ctx) {
   // Each formula has its own weight bands (Jon, Sep 2026: pills in place of
   // the slider). A dog's are the rows of the label chart, so each band is a
   // dose, and their upper bounds are the same inclusive ones hbDose uses. A
-  // cat's are the screener's three; under 8 lb is ½ chew, the other two one
+  // cat's are the screener's three; under 5 lb is ½ chew, the other two one
   // chew. `rep` is the weight a band stands for wherever a number is needed
   // — the cart, checkout, the app's own state — a weight from its middle.
   // `short` is the phone label: four full labels do not fit one row at a
@@ -10005,8 +10009,8 @@ window.hbPcInit = function (ctx) {
       { key: 'o120', label: 'Over 120 lb', short: 'Over 120', max: Infinity, rep: 135 }
     ],
     cat: [
-      { key: 'u8', label: 'Under 8 lb', short: 'Under 8', max: 7, rep: 6 },
-      { key: '8-12', label: '8–12 lb', short: '8–12', max: 12, rep: 10 },
+      { key: 'u5', label: 'Under 5 lb', short: 'Under 5', max: 4, rep: 4 },
+      { key: '5-12', label: '5–12 lb', short: '5–12', max: 12, rep: 9 },
       { key: 'o12', label: 'Over 12 lb', short: 'Over 12', max: Infinity, rep: 15 }
     ]
   };
