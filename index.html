@@ -10196,7 +10196,9 @@ window.hbPcInit = function (ctx) {
     };
     var boxFit = function (k) {
       return k === '1'
-        ? (lasts >= 30 ? 'A box lasts ' + lasts + ' days' : 'A box lasts ' + lasts + ' days · we ship every ' + lasts)
+        // The shipping cadence is worded as Shopify bills it (every 3 weeks
+        // for a 20-day box), never as the day count.
+        ? (lasts >= 30 ? 'A box lasts ' + lasts + ' days' : 'A box lasts ' + lasts + ' days · we ship ' + window.hbCadence(S.sp, lb, 1).label)
         : (PLANS[k].boxes * lasts) + ' days of chews';
     };
     // The single-box toggle and its readout.
