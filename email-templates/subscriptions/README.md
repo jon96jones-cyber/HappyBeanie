@@ -27,6 +27,24 @@ files** — they aren't served by the site; you paste each into the Shopify admi
 > Not every store has every subscription notification. If a template has no matching
 > notification in your admin, just skip that file.
 
+## Order numbers: always the HB number
+
+Customers never see Shopify's own order number (Jon, Sep 2026). Shopify's
+counter cannot be moved, so every customer-facing order number is Shopify's
+plus a fixed offset of **384438** — #1006 is HB-385444. The same offset lives
+in `api/_lib/order-number.js` and the account page, so all of them agree.
+
+In every notification template, body **and subject line**:
+
+| Where | Use | Never |
+|------|-----|-------|
+| Order and shipping notifications | `HB-{{ order_number \| plus: 384438 }}` | `{{ order_name }}`, `{{ name }}` |
+| Packing slip | `HB-{{ order.order_number \| plus: 384438 }}` | `{{ order.name }}` |
+| Tracking links | `https://www.happybeanie.com/track?o={{ order_number \| plus: 384438 }}&e=...` | `{{ order_status_url }}` (Shopify's page shows the raw number) |
+
+Do not put 384438 in Settings → General → Order ID; that field only adds text
+in front of Shopify's number.
+
 ## How to install one
 
 1. Shopify admin → **Settings → Notifications**.
