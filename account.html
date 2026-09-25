@@ -1609,7 +1609,10 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     renderBandana(orders);
     stampSync();
     wirePlanActions();
-    renderPets();
+    // The pets come from the account once per visit; the minute-by-minute
+    // resync just re-renders what is held, and never over a half-typed form.
+    if (!petLoaded) loadPets();
+    else if (!petFormFor) renderPets();
     loadQuiz();
     show('dash');
   }
@@ -1763,11 +1766,20 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       if (moved[p.weight]) { p.weight = moved[p.weight]; changed = true; }
       else if (gone.indexOf(p.weight) !== -1) { p.weight = ''; changed = true; }
     });
-    if (changed) writePets(list);
+    if (changed) writeLocalPets(list);
     return list;
   }
 
-  function readPets() {
+  // Pets live on the account now — /api/account/pets, the site's Postgres,
+  // keyed to the customer (Jon, Sep 2026) — so they follow the person to any
+  // device and the desk can count them. This browser keeps a mirror under the
+  // same key the storefront's purchase panel and dosing calculator read, so
+  // those keep working unchanged, and anything saved here before the move is
+  // lifted to the account on the first signed-in load rather than lost.
+  var petList = [];
+  var petState = 'local';   // 'local' until the account answers, then 'ready' or 'error'
+  var petLoaded = false;
+  function readLocalPets() {
     var list = null;
     try { list = JSON.parse(localStorage.getItem(PET_KEY) || 'null'); } catch (e) {}
     if (Array.isArray(list)) return migrateBands(list);
@@ -1776,21 +1788,63 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
     if (old && old.name) {
       old.id = old.id || 'p1';
       migrateBands([old]);
-      writePets([old]);
+      writeLocalPets([old]);
       return [old];
     }
     return [];
   }
-  function writePets(list) {
+  function writeLocalPets(list) {
     try { localStorage.setItem(PET_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  function readPets() { return petList; }
+  // Every save goes three places at once: the list the panel renders, the
+  // browser mirror, and the account. A failed push keeps the first two and
+  // says so on the panel; the next save tries the account again.
+  function writePets(list) {
+    petList = list;
+    writeLocalPets(list);
+    pushPets(list);
+  }
+  function pushPets(list) {
+    if (DEMO) { petState = 'ready'; return; }
+    fetch('/api/account/pets', {
+      method: 'PUT', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pets: list })
+    }).then(function (r) { return r.json().catch(function () { return null; }); })
+      .then(function (b) {
+        if (b && b.ok && Array.isArray(b.pets)) { petList = b.pets; writeLocalPets(petList); petState = 'ready'; }
+        else petState = 'error';
+        if (!petFormFor) renderPets();
+      })
+      .catch(function () { petState = 'error'; if (!petFormFor) renderPets(); });
+  }
+  // First signed-in load: what the account holds wins. An account with no
+  // pets yet takes whatever this browser saved before the move (the one-time
+  // lift), and from then on the browser only mirrors.
+  function loadPets() {
+    petLoaded = true;
+    petList = readLocalPets();
+    if (DEMO) { petState = 'ready'; renderPets(); return; }
+    fetch('/api/account/pets', { credentials: 'same-origin' })
+      .then(function (r) { return r.json().catch(function () { return null; }); })
+      .then(function (b) {
+        if (!b || !b.ok || !Array.isArray(b.pets)) { petState = 'error'; renderPets(); return; }
+        if (!b.pets.length && petList.length) { pushPets(petList); renderPets(); return; }
+        petList = b.pets;
+        writeLocalPets(petList);
+        petState = 'ready';
+        renderPets();
+      })
+      .catch(function () { petState = 'error'; renderPets(); });
   }
   function readOrderPets() {
     try { return JSON.parse(localStorage.getItem(ORDER_PET_KEY) || '{}') || {}; } catch (e) { return {}; }
   }
-  // Run the band migration now rather than waiting for the pets panel to be
-  // rendered: the storefront's dosing calculator reads this same key, and a
+  // Run the band migration on the mirror now rather than waiting for the pets
+  // panel: the storefront's dosing calculator reads this same key, and a
   // visit that never signs in never opens that panel.
-  readPets();
+  petList = readLocalPets();
   function writeOrderPets(map) {
     try { localStorage.setItem(ORDER_PET_KEY, JSON.stringify(map)); } catch (e) {}
   }
@@ -1799,7 +1853,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
 
   // Remove deleted on the first tap. On a mouse that was merely brisk; with a
   // 44px target sitting beside Edit it is a misfire waiting to happen, and a
-  // registered pet lives only in this browser — there is nothing to restore it
+  // removed pet is gone from the account too — there is nothing to restore it
   // from. So the first tap arms, the second removes, and it disarms itself.
   var petArmed = null, petArmTimer = null;
   function armPet(id) {
@@ -1873,6 +1927,12 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
         ? '<button type="button" class="pet-add" id="petAdd">+ Add another pet</button>'
         : '<p class="muted" style="margin-bottom:16px;">Tell us who the beans are for and we\'ll label your deliveries.</p>' +
           '<button type="button" class="pet-save" id="petAdd">Add a pet</button>';
+    }
+
+    // The account could not be reached: the pets shown are this browser's
+    // copy, and the next save tries the account again.
+    if (petState === 'error') {
+      html += '<p class="muted" style="margin:12px 0 0; font-size:12px;">Saved on this device for now — we couldn’t reach your account. It will sync on your next change.</p>';
     }
 
     box.innerHTML = html;

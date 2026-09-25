@@ -5697,6 +5697,14 @@ class Component extends DCLogic {
       // A screening parked in this browser before they had an account (or
       // before they signed in) is attached now, on any storefront page.
       if (j && j.in) this.qzFlushParked();
+      // The registered pets live on the account (api/account/pets); this
+      // browser keeps a mirror so the purchase panel and dosing calculator
+      // can start from a saved weight. Refreshed only when the account holds
+      // pets, so a list saved here before the move is not wiped before the
+      // account page lifts it.
+      if (j && j.in) fetch('/api/account/pets', { credentials: 'same-origin' }).then(r => r.json()).then(b => {
+        if (b && b.ok && Array.isArray(b.pets) && b.pets.length) { try { localStorage.setItem('hb-pets', JSON.stringify(b.pets)); } catch (e) {} }
+      }).catch(() => {});
       // The popup's gate waits on this — see maybePop().
       this._authKnown = true;
     }).catch(() => { this._authKnown = true; });

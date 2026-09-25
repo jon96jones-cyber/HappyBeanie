@@ -140,6 +140,27 @@ async function ensureSchema() {
   await q`create index if not exists quiz_reminders_due_idx
           on quiz_reminders (remind_on) where sent_at is null and cancelled_at is null`;
 
+  // Registered pets, one row per animal per customer (api/account/pets.js).
+  // The living record: name, species, breed and weight band as they are now,
+  // as opposed to a screening, which is a snapshot on a date. Keyed to the
+  // Shopify customer id so it follows the person across devices; the email
+  // is kept beside it so orders can be joined without another lookup.
+  // Breed and band are stored as keys from fixed lists, never free text.
+  await q`create table if not exists pets (
+     customer_id text not null,
+     pet_id      text not null,
+     email       text,
+     name        text not null,
+     species     text not null,
+     breed       text,
+     weight_band text,
+     created_at  timestamptz not null default now(),
+     updated_at  timestamptz not null default now(),
+     primary key (customer_id, pet_id)
+   )`;
+  await q`create index if not exists pets_email_idx on pets (lower(email))`;
+  await q`create index if not exists pets_species_idx on pets (species, weight_band)`;
+
   // Subscription contract events, posted by Shopify Flow (api/hooks/
   // subscription.js). This is the only record of contracts we can hold:
   // the Admin API refuses subscription contracts to a custom app, so the
