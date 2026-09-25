@@ -17,7 +17,7 @@
       <tr><td style="height:3px; background:#f2ce59; font-size:0; line-height:0;">&nbsp;</td></tr>
 
       <tr><td style="padding:38px 34px 6px;">
-        <p style="margin:0 0 14px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#325e3f;">● &nbsp;Out for delivery &nbsp;·&nbsp; {{ order_name }}</p>
+        <p style="margin:0 0 14px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#325e3f;">● &nbsp;Out for delivery &nbsp;·&nbsp; HB-{{ order_number | plus: 384438 }}</p>
         <h1 style="margin:0 0 14px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:27px; line-height:1.1; letter-spacing:-1px; font-weight:700; color:#17140f;">Almost there — it’s out for delivery.</h1>
         <p style="margin:0 0 26px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:15.5px; line-height:1.62; color:#554c40;">Your box is on the truck and headed your way today, {{ customer.first_name | default: "friend" }}. Keep an eye out.</p>
 
@@ -31,7 +31,7 @@
         {% endif %}
 
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 8px;"><tr><td align="center" bgcolor="#f2ce59" style="border-radius:999px;">
-          <a href="{% if fulfillment.tracking_url %}{{ fulfillment.tracking_url }}{% else %}{{ order_status_url }}{% endif %}" style="display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#17140f; text-decoration:none;">Follow it in →</a>
+          <a href="{% if fulfillment.tracking_url %}{{ fulfillment.tracking_url }}{% else %}https://www.happybeanie.com/track?o={{ order_number | plus: 384438 }}&amp;e={{ email | default: customer.email | url_encode }}{% endif %}" style="display:block; padding:17px 24px; font-family:'DM Mono',Menlo,Consolas,monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; color:#17140f; text-decoration:none;">Follow it in →</a>
         </td></tr></table>
         <p style="margin:0 0 30px; font-family:'DM Sans',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.6; color:#8a7f6e; text-align:center;">Won’t be home? Your carrier’s tracking page has delivery options.</p>
       </td></tr>

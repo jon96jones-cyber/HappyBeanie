@@ -846,6 +846,17 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+  // Customers only ever see the HB series (Jon, Sep 2026). Shopify's counter
+  // cannot be moved, so the HB number is Shopify's plus a fixed offset — the
+  // same one api/_lib/order-number.js and the notification emails use.
+  // "#1006" → "HB-385444". Anything already in HB form passes through.
+  var HB_ORDER_OFFSET = 384438;
+  function hbOrder(name) {
+    var s = String(name == null ? '' : name);
+    if (/^HB-/i.test(s)) return s;
+    var n = parseInt(s.replace(/[^0-9]/g, ''), 10);
+    return isFinite(n) && n > 0 ? 'HB-' + (n + HB_ORDER_OFFSET) : s;
+  }
 
   function money(m) {
     if (!m) return '';
@@ -1133,7 +1144,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
             var dt = '';
             try { dt = new Date(o.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }); } catch (e) {}
             return '<div style="' + cols + ' padding:8px 12px; border-top:1px solid rgba(245,240,230,0.1); font-size:12.5px;">' +
-              '<span style="' + mono + ' font-size:11.5px; color:#B9AF9C;">' + o.name + '</span>' +
+              '<span style="' + mono + ' font-size:11.5px; color:#B9AF9C;">' + esc(hbOrder(o.name)) + '</span>' +
               '<span style="color:#B9AF9C;">' + dt + '</span>' +
               '<span style="text-align:right; color:#DED5C4;">' + ambUsd(o.subtotal) + '</span>' +
               '<span style="text-align:right; color:oklch(0.9 0.1 92);">' + (o.commission != null ? ambUsd(o.commission) : '—') + '</span>' +
@@ -1304,7 +1315,7 @@ footer.site { background:transparent; border-top:1px solid rgba(233,226,212,0.1)
         });
       });
       return '<div class="order">' +
-        '<div class="o-head"><span class="o-id">' + esc(o.name) + '</span>' +
+        '<div class="o-head"><span class="o-id">' + esc(hbOrder(o.name)) + '</span>' +
           '<span class="o-date">' + fmtShort(o.processedAt) + '</span>' +
           '<span class="o-total">' + money(o.totalPrice) + '</span></div>' +
         (items ? '<div class="o-items">' + items + '</div>' : '') +
