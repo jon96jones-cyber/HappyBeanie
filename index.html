@@ -7215,6 +7215,10 @@ class Component extends DCLogic {
 
 
 const QZ_F = (level, ing, pri, note) => ({ level, ing, pri, note });
+// The rule set's date. Bump it whenever a question, an option or a flag
+// changes: every saved run carries the version that judged it, so a rule
+// change never makes an old verdict look like today's.
+const QZ_VERSION = '2026-09-24';
 const QZ_QUESTIONS = [
   { id: 'species', kind: 'single', eyebrow: 'Question 01 · Formula', title: 'Which animal are we screening?', help: '', options: [
     { v: 'dog', label: 'Dog', meta: '' },
@@ -7295,13 +7299,23 @@ Object.assign(Component.prototype, {
     const sig = JSON.stringify(payload.answers || {}) + '|' + payload.verdict;
     if (this._qzParked === sig) return;
     this._qzParked = sig;
-    // The run itself, for the desk's screener chart: species, verdict, age
-    // band and the flagged ingredients. Never the answers and never an
-    // address — the desk counts outcomes, it does not keep people.
+    // One id per run. It goes with the beacon and with the account copy, so
+    // the screenings table and a customer's saved screening can be matched
+    // later without either holding the other's data.
+    payload.runId = 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    // Every completed run is kept (Jon, Sep 2026): the desk's count in meta,
+    // and the whole run — answers as option keys, verdict, flags, dose — in
+    // the screenings table. Never a name and never an address; identity is
+    // only ever attached later, from the account, by run id.
     try {
       if (window.hbTrack) window.hbTrack('quiz_verdict', {
         species: payload.species, value: (payload.flags || []).length,
-        meta: { verdict: payload.verdict, age: payload.age, flags: (payload.flags || []).map(f => ({ ing: f.ing, level: f.level })) }
+        meta: { verdict: payload.verdict, age: payload.age, flags: (payload.flags || []).map(f => ({ ing: f.ing, level: f.level })) },
+        run: {
+          runId: payload.runId, species: payload.species, verdict: payload.verdict, dose: payload.dose,
+          answers: payload.answers, flags: (payload.flags || []).map(f => ({ ing: f.ing, level: f.level })),
+          version: QZ_VERSION
+        }
       });
     } catch (e) {}
     const park = () => { try { localStorage.setItem('hb-quiz-pending', JSON.stringify({ at: Date.now(), screening: payload })); } catch (e) {} };

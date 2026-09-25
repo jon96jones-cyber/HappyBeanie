@@ -45,6 +45,55 @@ function num(v) {
   return Number.isFinite(n) ? n : null;
 }
 
+// The screener's own option keys, one list per question. A run that names a
+// key outside these is a hand-made body and is dropped, so the counted
+// columns only ever hold values the desk knows how to read.
+const QZ = {
+  species: ['dog', 'cat'],
+  age: ['under1', '1-6', '7-10', '11plus'],
+  weight: { dog: ['u30', '30-75', '75-120', 'o120'], cat: ['u5', '5-12', 'o12'] },
+  repro: ['no', 'yes', 'unsure'],
+  allergies: ['none', 'fish', 'shellfish', 'mushroom', 'beef', 'chicken', 'organ'],
+  meds: ['none', 'anticoag', 'immuno', 'sedative', 'thyroid', 'daily'],
+  conditions: ['none', 'pancreatitis', 'liver', 'gi', 'urinary', 'kidney', 'autoimmune', 'diabetes'],
+  surgery: ['no', 'yes'],
+  verdict: ['ok', 'caution', 'block']
+};
+// Chews a day per weight band; a box is 30 chews. Same table as the site's
+// hbDose, kept here so box_days is computed once, server side.
+const DOSE = { u30: 0.5, '30-75': 1, '75-120': 1.5, o120: 2, u5: 0.5, '5-12': 1, o12: 1 };
+function pick(list, v) { const s = String(v == null ? '' : v); return list.indexOf(s) !== -1 ? s : null; }
+function pickMany(list, v) {
+  const arr = Array.isArray(v) ? v : (v == null ? [] : [v]);
+  const out = [];
+  arr.slice(0, 12).forEach(function (x) { const s = pick(list, x); if (s && out.indexOf(s) === -1) out.push(s); });
+  return out;
+}
+function screeningRow(r) {
+  const runId = str(r.runId, 40);
+  const species = pick(QZ.species, r.species);
+  const verdict = pick(QZ.verdict, r.verdict);
+  if (!runId || !/^[A-Za-z0-9_-]+$/.test(runId) || !species || !verdict) return null;
+  const a = (r.answers && typeof r.answers === 'object') ? r.answers : {};
+  const weight = pick(QZ.weight[species], species === 'dog' ? a.weightDog : a.weightCat);
+  const answers = {
+    species: species, age: pick(QZ.age, a.age), repro: pick(QZ.repro, a.repro), surgery: pick(QZ.surgery, a.surgery),
+    allergies: pickMany(QZ.allergies, a.allergies), meds: pickMany(QZ.meds, a.meds), conditions: pickMany(QZ.conditions, a.conditions)
+  };
+  if (species === 'dog') answers.weightDog = weight; else answers.weightCat = weight;
+  const flags = (Array.isArray(r.flags) ? r.flags : []).slice(0, 20).map(function (f) {
+    const o = (f && typeof f === 'object') ? f : {};
+    return { ing: str(o.ing, 80), level: String(o.level) === 'block' ? 'block' : 'caution' };
+  }).filter(function (f) { return f.ing; });
+  return {
+    runId: runId, species: species, age: answers.age, weight: weight, repro: answers.repro,
+    allergies: answers.allergies, meds: answers.meds, conditions: answers.conditions, surgery: answers.surgery,
+    answers: answers, verdict: verdict, flags: flags, dose: str(r.dose, 60),
+    boxDays: weight && DOSE[weight] ? Math.round(30 / DOSE[weight]) : null,
+    version: str(r.version, 24)
+  };
+}
+
 module.exports = async function handler(req, res) {
   // Beacons are fire-and-forget; the browser ignores this, but be explicit.
   res.setHeader('Cache-Control', 'no-store');
@@ -116,6 +165,24 @@ module.exports = async function handler(req, res) {
       insert into events (session_id, visitor_id, name, path, species, value, meta, internal)
       values (${sid}, ${vid}, ${name}, ${path}, ${str(b.species, 16)}, ${num(b.value)},
               ${b.meta ? JSON.stringify(b.meta).slice(0, 2000) : null}, ${internal})`);
+
+    // A completed screening also lands in full in the screenings table (the
+    // events row above is the desk's count; this is the record). Whitelisted
+    // field by field: the body is shaped by our own page, but the collector
+    // is reachable by hand.
+    if (name === 'quiz_verdict' && b.run && typeof b.run === 'object') {
+      const run = screeningRow(b.run);
+      if (run) {
+        await db.withSchema(() => sql`
+          insert into screenings (run_id, session_id, visitor_id, species, age_band, weight_band, repro,
+                                  allergies, meds, conditions, surgery, answers, verdict, flags, dose,
+                                  box_days, quiz_version, internal)
+          values (${run.runId}, ${sid}, ${vid}, ${run.species}, ${run.age}, ${run.weight}, ${run.repro},
+                  ${run.allergies}, ${run.meds}, ${run.conditions}, ${run.surgery}, ${JSON.stringify(run.answers)},
+                  ${run.verdict}, ${JSON.stringify(run.flags)}, ${run.dose}, ${run.boxDays}, ${run.version}, ${internal})
+          on conflict (run_id) do nothing`);
+      }
+    }
 
     return res.status(204).end();
   } catch (err) {

@@ -102,6 +102,10 @@ function clean(raw) {
 
   return {
     id: 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    // The run id the screener gave this completion, the same one the
+    // screenings table holds — the join between the account copy and the
+    // anonymous record, so the record can be claimed by customer later.
+    runId: text(s.runId, 40).replace(/[^A-Za-z0-9_-]/g, ''),
     name: text(s.name, 40),
     species: species,
     age: AGES.indexOf(String(s.age)) !== -1 ? String(s.age) : '',

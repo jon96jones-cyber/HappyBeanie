@@ -140,6 +140,46 @@ async function ensureSchema() {
   await q`create index if not exists quiz_reminders_due_idx
           on quiz_reminders (remind_on) where sent_at is null and cancelled_at is null`;
 
+  // Every completed screening, signed in or not (Jon, Sep 2026: keep every
+  // run). One row per completion, written by the collector from the
+  // quiz_verdict beacon. The answers are the option keys the screener
+  // stores, never the wording, so copy changes leave history readable; the
+  // multi-answers get typed columns for counting and the whole answer set
+  // rides along as JSON. quiz_version names the rule set that produced the
+  // verdict, so a later rule change never rewrites what someone was told.
+  // No name and no address: identity arrives later, if at all, through
+  // customer_id / email (the "claim", step 2), matched on run_id — the same
+  // id the account copy of the screening carries.
+  await q`create table if not exists screenings (
+     id           bigserial primary key,
+     ts           timestamptz not null default now(),
+     run_id       text not null,
+     session_id   text,
+     visitor_id   text,
+     species      text not null,
+     age_band     text,
+     weight_band  text,
+     repro        text,
+     allergies    text[],
+     meds         text[],
+     conditions   text[],
+     surgery      text,
+     answers      jsonb,
+     verdict      text not null,
+     flags        jsonb,
+     dose         text,
+     box_days     integer,
+     quiz_version text,
+     internal     boolean not null default false,
+     customer_id  text,
+     email        text
+   )`;
+  await q`create unique index if not exists screenings_run_idx on screenings (run_id)`;
+  await q`create index if not exists screenings_ts_idx on screenings (ts desc)`;
+  await q`create index if not exists screenings_session_idx on screenings (session_id)`;
+  await q`create index if not exists screenings_species_verdict_idx on screenings (species, verdict, ts desc)`;
+  await q`create index if not exists screenings_email_idx on screenings (lower(email)) where email is not null`;
+
   // Registered pets, one row per animal per customer (api/account/pets.js).
   // The living record: name, species, breed and weight band as they are now,
   // as opposed to a screening, which is a snapshot on a date. Keyed to the
